@@ -791,7 +791,7 @@ export default function PlanNavigator({
       <Icon name="sheets" size={18} />
       <strong style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)" }}>{title}</strong>
       {onBrowseProjects && (
-        <button onClick={onBrowseProjects} title="Back to your team's projects"
+        <button onClick={onBrowseProjects} title="Volver a los proyectos de su equipo"
           style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontFamily: "var(--f-mono)", fontSize: 12, padding: "2px 4px" }}>
           Projects
         </button>
@@ -815,28 +815,28 @@ export default function PlanNavigator({
       <div style={{ flex: 1 }} />
 
       {/* RIGHT: source toggle · browse filters · add plans · account */}
-      {onPremium && <button type="button" data-premium-trigger onClick={onPremium} style={{...ctrlBtn, color:"var(--cobalt)", borderColor:"var(--cobalt)"}}>Request Premium</button>}
+      {onPremium && <button type="button" data-premium-trigger onClick={onPremium} style={{...ctrlBtn, color:"var(--cobalt)", borderColor:"var(--cobalt)"}}>Solicitar Premium</button>}
       {browseEnabled && (
         <div style={{ display: "inline-flex", border: "1px solid var(--ink-faint)", borderRadius: 2, overflow: "hidden" }}>
-          <button onClick={() => setMode("plan")} style={{ ...ctrlBtn, border: "none", background: mode === "plan" ? "var(--ink)" : "transparent", color: mode === "plan" ? "var(--paper-bright)" : "var(--ink-muted)" }}>Plan set</button>
-          <button onClick={() => setMode("browse")} style={{ ...ctrlBtn, border: "none", background: mode === "browse" ? "var(--ink)" : "transparent", color: mode === "browse" ? "var(--paper-bright)" : "var(--ink-muted)" }}>Browse Drive</button>
+          <button onClick={() => setMode("plan")} style={{ ...ctrlBtn, border: "none", background: mode === "plan" ? "var(--ink)" : "transparent", color: mode === "plan" ? "var(--paper-bright)" : "var(--ink-muted)" }}>Juego de planos</button>
+          <button onClick={() => setMode("browse")} style={{ ...ctrlBtn, border: "none", background: mode === "browse" ? "var(--ink)" : "transparent", color: mode === "browse" ? "var(--paper-bright)" : "var(--ink-muted)" }}>Explorar Drive</button>
         </div>
       )}
       {mode === "browse" && (
         <>
-          <input name="drive-filter" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter by name…"
+          <input name="drive-filter" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filtrar por nombre…"
             style={{ padding: "6px 10px", border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", fontSize: 12.5, minWidth: 140 }} />
-          <select name="drive-sort" value={sort} onChange={(e) => setSort(e.target.value)} title="Sort files"
+          <select name="drive-sort" value={sort} onChange={(e) => setSort(e.target.value)} title="Ordenar archivos"
             style={{ padding: "6px 8px", border: "1px solid var(--ink-faint)", background: "transparent", fontSize: 12 }}>
-            <option value="name">Name</option>
-            <option value="size">Size</option>
-            <option value="date">Modified</option>
+            <option value="name">Nombre</option>
+            <option value="size">Tamaño</option>
+            <option value="date">Modificado</option>
           </select>
         </>
       )}
       {mode === "plan" && sheets.length > 0 && (onCloseMany || onClearWorkspace) && (
         <button onClick={() => { setMSel([]); setMode("manage"); }}
-          title="Manage the plan set — remove several PDFs at once, or clear the whole workspace"
+          title="Administrar el juego de planos: quitar varios PDF a la vez o limpiar todo el espacio"
           style={ctrlBtn}>
           <Icon name="sheets" size={13} />Manage
         </button>
@@ -844,7 +844,7 @@ export default function PlanNavigator({
       {mode === "plan" && onAddFiles && (
         <div style={{ position: "relative" }}>
           <button onClick={() => (browseEnabled ? setAddMenu((v) => !v) : fileRef.current?.click())}
-            title="Add plans — from your computer or Google Drive"
+            title="Agregar planos: desde su equipo o Google Drive"
             style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", border: "1px solid var(--ink)", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 600, fontSize: 12.5 }}>
             <Icon name="plus" size={13} />Add plans{browseEnabled && <Icon name="chevronDown" size={12} />}
           </button>
@@ -869,10 +869,10 @@ export default function PlanNavigator({
       )}
       <AuthChip />
       {onCloseProject && (
-        <button onClick={onCloseProject} title="Close this project and return to the local canvas" style={{ ...ctrlBtn, color: "var(--ink-muted)" }}>Close project</button>
+        <button onClick={onCloseProject} title="Cerrar este proyecto y volver al lienzo local" style={{ ...ctrlBtn, color: "var(--ink-muted)" }}>Cerrar proyecto</button>
       )}
       {canClose && (
-        <button onClick={onExit} title="Back to the canvas (Esc)" style={ctrlBtn}>
+        <button onClick={onExit} title="Volver al lienzo (Esc)" style={ctrlBtn}>
           <Icon name="close" size={12} />Close
         </button>
       )}
@@ -894,9 +894,9 @@ export default function PlanNavigator({
     <>
       <div style={{ flex: 1, overflow: "auto" }}>
         {bLoading ? (
-          <div style={{ padding: 40, textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>Reading folder…</div>
+          <div style={{ padding: 40, textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>Leyendo la carpeta…</div>
         ) : bErr ? (
-          <div style={{ padding: 40, textAlign: "center", color: "var(--c-danger)", fontSize: 13 }}>Couldn't read the folder: {bErr}</div>
+          <div style={{ padding: 40, textAlign: "center", color: "var(--c-danger)", fontSize: 13 }}>No se pudo leer la carpeta: {bErr}</div>
         ) : (folders.length === 0 && pdfs.length === 0) ? (
           <div style={{ padding: 40, textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>
             {needle ? "Nothing matches that filter." : "This folder has no PDFs or subfolders."}
@@ -939,7 +939,7 @@ export default function PlanNavigator({
         </span>
         <div style={{ flex: 1 }} />
         {picked.length > 0 && (
-          <button onClick={() => setPicked([])} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>Clear</button>
+          <button onClick={() => setPicked([])} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>Limpiar</button>
         )}
         <button onClick={addPicked} disabled={!picked.length || adding}
           style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 16px", border: "1px solid var(--ink)", background: picked.length ? "var(--cobalt)" : "var(--text-faint)", color: "var(--paper-bright)", cursor: picked.length && !adding ? "pointer" : "default", fontWeight: 700, fontSize: 13 }}>
@@ -979,16 +979,16 @@ export default function PlanNavigator({
   // ── PLAN body + footer ──────────────────────────────────────────────────
   const planBody = (
     <>
-      <div className="sheet-preview-controls"><label>Page previews</label>{["medium", "large"].map(size => <button type="button" key={size} aria-pressed={previewSize === size} onClick={() => setPreviewSize(size)}>{size === "large" ? "Large" : "Medium"}</button>)}<span style={{ color: "var(--ink-muted)", fontSize: "var(--fs-s)" }}>Preview to inspect · View to open · Select cards for tabs or stitching</span>
+      <div className="sheet-preview-controls"><label>Vistas previas</label>{["medium", "large"].map(size => <button type="button" key={size} aria-pressed={previewSize === size} onClick={() => setPreviewSize(size)}>{size === "large" ? "Grande" : "Mediana"}</button>)}<span style={{ color: "var(--ink-muted)", fontSize: "var(--fs-s)" }}>Vista previa para inspeccionar · Ver para abrir · Seleccione tarjetas para pestañas o empalmes</span>
         {/* plan-set search (#471), right-aligned in this row: the browse filter's field styling */}
         {sheets.length > 0 && planIndexRef && (<>
           <span style={{ flex: 1 }} />
           {countLine && <span aria-live="polite" style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)" }}>{countLine}</span>}
           {search && indexProg && <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)" }}>· Indexing {indexProg.done} / {indexProg.total}</span>}
-          {failLine && <span data-search-failed="" style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--c-danger)" }}>· {failLine} <button type="button" onClick={() => setWalkTick((t) => t + 1)} style={{ ...ctrlBtn, padding: "1px 6px", fontSize: 11 }}>Retry</button></span>}
+          {failLine && <span data-search-failed="" style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--c-danger)" }}>· {failLine} <button type="button" onClick={() => setWalkTick((t) => t + 1)} style={{ ...ctrlBtn, padding: "1px 6px", fontSize: 11 }}>Reintentar</button></span>}
           <input name="plan-search" type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search sheet text…" aria-label="Search the text on every sheet"
-            title="Find sheets by the text on them — a finish tag, room number, sheet number or word (Esc clears)"
+            placeholder="Buscar texto en las hojas…" aria-label="Buscar el texto de todas las hojas"
+            title="Encuentre hojas por su texto: una etiqueta de acabado, número de recinto, número de hoja o palabra (Esc limpia)"
             autoComplete="off" spellCheck={false}
             style={{ padding: "6px 10px", border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", fontSize: 12.5, minWidth: 180 }} />
         </>)}
@@ -1017,13 +1017,13 @@ export default function PlanNavigator({
                 style={{ border: isSel ? "1.5px solid var(--cobalt)" : "1px solid var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", position: "relative", boxShadow: isSel ? "var(--shadow-2)" : "var(--shadow-1)" }}>
                 <button type="button" aria-label={`Select ${labelOf(key)}`} aria-pressed={isSel} onClick={(e) => { e.stopPropagation(); toggleSel(key); }} style={{ position: "absolute", top: 8, left: 8, zIndex: 2, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", border: isSel ? "none" : "1.5px solid var(--ink-faint)", background: isSel ? "var(--cobalt)" : "var(--paper-bright)", color: "var(--paper-bright)", fontFamily: "var(--f-mono)", fontSize: 12, fontWeight: 700 }}>{isSel ? idx + 1 : ""}</button>
                 <div style={{ position: "absolute", top: 8, right: 8, zIndex: 2, display: "flex", gap: 6 }}>
-                  <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewSheet(key); }} style={ctrlBtn}>Preview</button>
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewSheet(key); }} style={ctrlBtn}>Previa</button>
                   {isFirstPageOfPdf && onClosePdf && (
                     <button onClick={(e) => { e.stopPropagation(); requestClose(parsed.file); }} title={cloudMode ? "Close this PDF — unload it from the plan set (it stays in Drive)" : "Close this PDF — remove it from the plan set (local plans aren't stored elsewhere)"}
                       style={{ padding: "5px 8px", border: "none", background: "var(--paper-bright)", color: "var(--ink-muted)", cursor: "pointer", fontFamily: "var(--f-mono)", fontSize: 11, boxShadow: "var(--shadow-1)" }}>✕</button>
                   )}
-                  <button onClick={(e) => { e.stopPropagation(); onOpen([key], false); }} title="Open just this sheet"
-                    style={{ padding: "5px 12px", border: "none", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer", fontFamily: "var(--f-mono)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>View</button>
+                  <button onClick={(e) => { e.stopPropagation(); onOpen([key], false); }} title="Abrir solo esta hoja"
+                    style={{ padding: "5px 12px", border: "none", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer", fontFamily: "var(--f-mono)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>Ver</button>
                 </div>
                 <div data-preview-well style={{ height: 185, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--well)", borderBottom: "1px solid var(--ink-faint)", overflow: "hidden" }}>
                   {thumb
@@ -1032,12 +1032,12 @@ export default function PlanNavigator({
                 </div>
                 <div data-preview-caption style={{ padding: "8px 10px", display: "flex", alignItems: "baseline", gap: 8 }}>
                   <strong style={{ fontFamily: "var(--f-mono)", fontSize: 12.5, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1 }} title={key}>{labelOf(key)}</strong>
-                  {levels[key] && <span title="Level" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--ink-muted)", border: "1px solid var(--ink-faint)", padding: "1px 5px" }}>{levels[key]}</span>}
+                  {levels[key] && <span title="Nivel" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--ink-muted)", border: "1px solid var(--ink-faint)", padding: "1px 5px" }}>{levels[key]}</span>}
                   {search?.chipsByKey[key]?.map((t) => (
-                    <span key={`m:${t}`} title="Matched text on this sheet" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--cobalt)", border: "1px solid var(--cobalt)", padding: "1px 5px", whiteSpace: "nowrap" }}>{t}</span>
+                    <span key={`m:${t}`} title="Texto coincidente en esta hoja" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--cobalt)", border: "1px solid var(--cobalt)", padding: "1px 5px", whiteSpace: "nowrap" }}>{t}</span>
                   ))}
-                  {search?.ocrKeys.has(key) && <span title="Matched in text the on-device text reader (OCR) read from the page image, not the PDF's own text — check the sheet" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--c-warning)", textTransform: "uppercase", letterSpacing: "0.08em" }}>OCR</span>}
-                  {isOpenTab && <span title="Already open as a tab" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--cobalt)", textTransform: "uppercase", letterSpacing: "0.08em" }}>open</span>}
+                  {search?.ocrKeys.has(key) && <span title="Coincidencia en texto que el lector local (OCR) sacó de la imagen de la página, no del texto propio del PDF — revise la hoja" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--c-warning)", textTransform: "uppercase", letterSpacing: "0.08em" }}>OCR</span>}
+                  {isOpenTab && <span title="Ya está abierta como pestaña" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--cobalt)", textTransform: "uppercase", letterSpacing: "0.08em" }}>open</span>}
                   {cnt > 0 && <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, color: "var(--ink-muted)" }}>{cnt}▦</span>}
                   <span style={{ fontSize: 10, fontWeight: 600, whiteSpace: "nowrap", color: scales[key] ? (scaleUnconfirmed[key] === false ? "var(--c-warning)" : "var(--c-positive)") : detectedScales[key] ? "var(--c-warning)" : "var(--c-danger)" }}
                     title={scales[key] && scaleUnconfirmed[key] === false ? "Scale set by an agent — no person has confirmed it. Open the sheet and confirm from the scale menu." : undefined}>
@@ -1053,7 +1053,7 @@ export default function PlanNavigator({
         ))}
         {search && !search.hits.length && allKeys.length > 0 && (
           <div style={{ padding: 48, textAlign: "center", color: "var(--ink-muted)", fontSize: 13.5, lineHeight: 1.7 }}>
-            <div style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)", marginBottom: 6 }}>No sheet matches “{query.trim()}”</div>
+            <div style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)", marginBottom: 6 }}>Ninguna hoja coincide con «{query.trim()}»</div>
             {indexProg
               ? `Still reading sheet text — ${indexProg.done} of ${indexProg.total} checked.`
               : "Search reads each sheet's own text: finish tags, room and sheet numbers, and words of three letters or more."}
@@ -1062,19 +1062,19 @@ export default function PlanNavigator({
         {unread && (
           <div data-unread-line style={{ padding: "14px 2px 0", fontFamily: "var(--f-mono)", fontSize: 11.5, color: "var(--ink-muted)", textAlign: search.hits.length ? "left" : "center" }}>
             {unread}
-            {ocrAvail === "error" && <> <button type="button" onClick={retryProbe} style={{ ...ctrlBtn, padding: "1px 6px", fontSize: 11 }}>Retry</button></>}
+            {ocrAvail === "error" && <> <button type="button" onClick={retryProbe} style={{ ...ctrlBtn, padding: "1px 6px", fontSize: 11 }}>Reintentar</button></>}
           </div>
         )}
         {!allKeys.length && (
           <div style={{ padding: 48, textAlign: "center", color: "var(--ink-muted)", fontSize: 13.5, lineHeight: 1.7 }}>
             {!sheets.length ? (
               <div style={{ maxWidth: 560, margin: "0 auto" }}>
-                <div style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--cobalt)", marginBottom: 6 }}>People &amp; agents · one engine</div>
-                <div style={{ fontFamily: "var(--f-display)", fontSize: 18, color: "var(--ink)", lineHeight: 1.32, marginBottom: 5 }}>Measure a plan by hand — or point an AI&nbsp;agent at the same engine.</div>
-                <div style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.55, marginBottom: 20 }}>Every measurement keeps its scale and how it was made — a person, one click, or an agent.</div>
+                <div style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--cobalt)", marginBottom: 6 }}>Personas y agentes · un solo motor</div>
+                <div style={{ fontFamily: "var(--f-display)", fontSize: 18, color: "var(--ink)", lineHeight: 1.32, marginBottom: 5 }}>Mida un plano a mano — o apunte un agente de IA al mismo motor.</div>
+                <div style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.55, marginBottom: 20 }}>Cada medición guarda su escala y cómo se hizo: una persona, un clic o un agente.</div>
                 <button onClick={() => fileRef.current?.click()}
                   style={{ display: "block", width: "100%", margin: "24px auto 0", padding: "44px 24px", border: "2px dashed var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", color: "var(--ink-muted)", fontFamily: "var(--f-body)", fontSize: 13.5, lineHeight: 1.7 }}>
-                  <div style={{ fontFamily: "var(--f-display)", fontSize: 20, color: "var(--ink)", marginBottom: 8 }}>Open your plans</div>
+                  <div style={{ fontFamily: "var(--f-display)", fontSize: 20, color: "var(--ink)", marginBottom: 8 }}>Abra sus planos</div>
                   Drag a PDF, an image, or a whole .zip plan set here — or click to choose. Nothing leaves your browser.
                 </button>
                 {isGoogleConfigured() && (!user || projectHomeFolderId()) && (
@@ -1082,11 +1082,11 @@ export default function PlanNavigator({
                     {!user ? (
                       <>
                         <button type="button" onClick={handleDriveSignIn} disabled={driveBusy}
-                          title="Sign in with your team Google account to open projects stored in Drive"
+                          title="Inicie sesión con la cuenta de Google de su equipo para abrir proyectos guardados en Drive"
                           style={{ border: "none", background: "transparent", padding: 0, color: "var(--cobalt)", cursor: driveBusy ? "default" : "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
                           {driveBusy ? "Signing in…" : "or sign in with Google Drive"}
                         </button>
-                        {driveErr ? <div style={{ color: "var(--c-danger)", fontSize: 11.5, marginTop: 5 }}>Sign-in failed: {driveErr}</div> : null}
+                        {driveErr ? <div style={{ color: "var(--c-danger)", fontSize: 11.5, marginTop: 5 }}>Falló el inicio de sesión: {driveErr}</div> : null}
                       </>
                     ) : (
                       <Link to="/projects" style={{ color: "var(--cobalt)", fontSize: 12, textDecoration: "underline" }}>
@@ -1122,7 +1122,7 @@ export default function PlanNavigator({
                   <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.6 }}>
                     {!folderLink ? (
                       <button type="button" onClick={doLinkFolder}
-                        title="Pick a folder your team already syncs (a network share, a synced document library) — the takeoff syncs through it as one JSON file. No account, no credentials; the folder's own sync client does the transport."
+                        title="Elija una carpeta que su equipo ya sincronice (un recurso de red, una librería de documentos sincronizada): el takeoff se sincroniza por ahí como un archivo JSON. Sin cuenta ni credenciales; el cliente de sincronización de la carpeta hace el transporte."
                         style={{ border: "none", background: "transparent", padding: 0, color: "var(--cobalt)", cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
                         or sync this workspace through a shared folder
                       </button>
@@ -1151,7 +1151,7 @@ export default function PlanNavigator({
                       onClick={reducedMotion ? undefined : onStartTour}
                       style={{ width: 220, aspectRatio: "960 / 618", border: "1px solid var(--ink-faint)", background: "var(--paper-shadow)", cursor: reducedMotion ? "default" : "pointer", display: "block" }} />
                     <div style={{ maxWidth: 250 }}>
-                      <button onClick={onStartTour} title="Open the sample plan and do one real takeoff, step by step — about two minutes"
+                      <button onClick={onStartTour} title="Abrir el plano de ejemplo y hacer un takeoff real, paso a paso — unos dos minutos"
                         style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "13px 22px", border: "1px solid var(--ink)", background: "var(--cobalt)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 700, fontSize: 14, fontFamily: "var(--f-body)" }}>
                         <Icon name="takeoff" size={16} />Guided first takeoff
                       </button>
@@ -1161,7 +1161,7 @@ export default function PlanNavigator({
                     </div>
                   </div>
                 )}
-                <button onClick={loadSample} disabled={sampleBusy} title="Open a real floor finish plan and try a takeoff"
+                <button onClick={loadSample} disabled={sampleBusy} title="Abrir un plano real de acabados de piso y probar un takeoff"
                   style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: onStartTour ? "9px 16px" : "13px 22px", border: "1px solid var(--ink)", background: onStartTour ? "transparent" : "var(--cobalt)", color: onStartTour ? "var(--ink)" : "var(--paper-bright)", cursor: sampleBusy ? "default" : "pointer", opacity: sampleBusy ? 0.65 : 1, fontWeight: 700, fontSize: onStartTour ? 13 : 14, fontFamily: "var(--f-body)" }}>
                   <Icon name="takeoff" size={16} />{sampleBusy ? "Loading sample…" : onStartTour ? "Just open the sample plan" : "Load sample plan"}
                 </button>
@@ -1185,7 +1185,7 @@ export default function PlanNavigator({
               </div>
             ) : enumerated ? (
               <>
-                <div style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)", marginBottom: 6 }}>Couldn't read those PDFs</div>
+                <div style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)", marginBottom: 6 }}>No se pudieron leer esos PDF</div>
                 None of the opened files would render — try opening them again.
               </>
             ) : "Reading the plan set…"}
@@ -1194,12 +1194,12 @@ export default function PlanNavigator({
       </div>
       {stitches.length > 0 && (
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", padding: "9px 18px", borderTop: "1px solid var(--ink-faint)", background: "var(--paper-bright)" }}>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Stitched surfaces</span>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Superficies empalmadas</span>
           {stitches.map((st) => (
             <span key={st.id} style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "1px solid var(--ink-faint)", padding: "4px 8px", fontSize: 12 }}>
               <button onClick={() => onOpenStitch && onOpenStitch(st.id)} title={`Open ${st.name} — ${st.members.length} sheets as one working surface`}
                 style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontWeight: 600, fontSize: 12, padding: 0 }}>{st.name}</button>
-              <button onClick={() => onDeleteStitch && onDeleteStitch(st.id)} title="Delete this stitch (refused while takeoffs live on it)"
+              <button onClick={() => onDeleteStitch && onDeleteStitch(st.id)} title="Eliminar este empalme (se niega mientras tenga mediciones encima)"
                 style={{ border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12, padding: 0 }}>×</button>
             </span>
           ))}
@@ -1211,9 +1211,9 @@ export default function PlanNavigator({
           <div style={{ flex: 1 }} />
           {sel.length > 0 && (
             <>
-              <button onClick={assignLevel} title="Group the selected sheets under a floor/level — the gallery sorts by it and tabs carry the label"
-                style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12 }}>Assign level…</button>
-              <button onClick={() => setSel([])} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>Clear</button>
+              <button onClick={assignLevel} title="Agrupar las hojas seleccionadas bajo un piso/nivel: la galería ordena por él y las pestañas llevan la etiqueta"
+                style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12 }}>Asignar nivel…</button>
+              <button onClick={() => setSel([])} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>Limpiar</button>
             </>
           )}
           <button disabled={!sel.length} onClick={() => onOpen(sel, false)}
@@ -1280,7 +1280,7 @@ export default function PlanNavigator({
           );
         })}
         {!sheets.length && (
-          <div style={{ padding: 40, textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>The workspace is empty — nothing stored.</div>
+          <div style={{ padding: 40, textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>El espacio de trabajo está vacío: no hay nada guardado.</div>
         )}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", borderTop: "1px solid var(--ink)", background: "var(--paper-bright)", flexWrap: "wrap" }}>

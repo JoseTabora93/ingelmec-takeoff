@@ -3,7 +3,7 @@
    surfaces on a cool field, cobalt the one saturated thing. Dark = "HUD" —
    true-black cockpit, electric blue, phosphor glow on the active instrument. */
 
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
   /* surfaces — role names kept from the paper era: bright = base surface,
@@ -49,8 +49,8 @@
   --grain-inverse-rgb: 255, 255, 255;
 
   /* type */
-  --f-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
-  --f-body:    "Inter", system-ui, sans-serif;
+  --f-display: "Inter", system-ui, sans-serif;
+  --f-body:    "Open Sans", "Inter", system-ui, sans-serif;
   --f-mono:    "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
   --f-mono-draft: "Space Mono", "JetBrains Mono", ui-monospace, monospace;
 

@@ -13,6 +13,10 @@
 // degrades to a single global setting in the browser-only build (folderId "").
 import { metaGet, metaPut } from "./store.js";
 import { activeProfile } from "./identity.js";
+// INGELMEC: the deliverable brand (fork default). OpenTakeoff stays the
+// credited parent (OT_NAME/OT_CREDIT below) — the fork only renames what the
+// firm presents to its clients. Override with VITE_BRAND_NAME at build time.
+import { INGELMEC_NAME, INGELMEC_LOGO } from "./ingelmec.js";
 
 export const OT_NAME = "OpenTakeoff";
 export const OT_CREDIT = "Measured with OpenTakeoff";
@@ -36,17 +40,18 @@ export function resolveBranding(sel) {
   const clear = Boolean(profile);
   return {
     clear,
-    // full identity for the masthead firm block + cover identity column; null in
-    // default mode so every `company?.x` guard degrades to the OpenTakeoff path
-    company: clear ? { name: profile.name, address: profile.address, logo: profile.logo } : null,
+    // full identity for the masthead firm block + cover identity column; the
+    // INGELMEC fork defaults the firm block to the Ingelmec identity even in
+    // default mode (logo + name), so deliverables present as Ingelmec while
+    // OpenTakeoff keeps the credit line.
+    company: clear ? { name: profile.name, address: profile.address, logo: profile.logo } : { name: INGELMEC_NAME, logo: INGELMEC_LOGO },
     // firm text / "Prepared by" cell / export title tag — the trade name when
-    // clear-labelling (a logo-only profile has no name → keep OpenTakeoff)
-    brandName: (clear && profile.name) ? profile.name : OT_NAME,
-    // subtle parent credit — shown only when clear-labelling (default mode is
-    // already OpenTakeoff-branded throughout, so a separate credit is redundant)
-    credit: clear ? OT_CREDIT : null,
+    // clear-labelling (a logo-only profile has no name → keep Ingelmec)
+    brandName: (clear && profile.name) ? profile.name : INGELMEC_NAME,
+    // subtle parent credit — the fork always credits the upstream project
+    credit: OT_CREDIT,
     // marked-set cover wordmark — carries the OpenTakeoff prefix in default mode
-    coverTitle: clear ? "Marked Set" : "OpenTakeoff · Marked Set",
+    coverTitle: clear ? "Marked Set" : `${INGELMEC_NAME} · Marked Set`,
   };
 }
 

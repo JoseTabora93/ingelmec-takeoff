@@ -15,6 +15,7 @@ import {
   QUALITY_CEILING, MAX_CANVAS_DIM, MAX_PANEL_AREA,
   FLOORING_DEFAULTS,
 } from "./canvasConstants.js";
+import { INGELMEC_DEFAULTS } from "./ingelmec.js";
 
 // Largest pdf.js render scale a wPt×hPt-point page can use within the base budget;
 // prefers the baseline RENDER_SCALE, never above the ceiling — and never above the
@@ -74,4 +75,8 @@ export const instantiateTemplate = (t) => ({
 // Fresh-workspace seeding reads the user's template library first; the
 // built-in flooring defaults are only the empty-library fallback. Both paths
 // run instantiateTemplate — ONE condition constructor, no drift.
-export const seedConditions = (library) => (library?.length ? library : FLOORING_DEFAULTS).map(instantiateTemplate);
+// INGELMEC: the empty-library fallback is the Ingelmec discipline pack
+// (lib/ingelmec.js: NFPA 13 risk areas, HVAC, electrical, data, CCTV). The
+// upstream flooring defaults stay available via FLOORING_DEFAULTS below.
+export const seedConditions = (library) => (library?.length ? library : INGELMEC_DEFAULTS).map(instantiateTemplate);
+

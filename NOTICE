@@ -1,2 +1,17 @@
 OpenTakeoff
 Copyright 2026 Kentucky AI and the OpenTakeoff contributors
+
+----------------------------------------------------------------------
+Ingelmec Takeoff (fork) — modifications
+Copyright 2026 Ingelmec
+
+This fork of OpenTakeoff is modified from the original
+https://github.com/Kentucky-ai/opentakeoff. Changes by Ingelmec (as of
+2026-10-10, phase T1): Spanish UI translations; metric units as the
+default; Ingelmec branding (logo, Inter/Open Sans typefaces); a default
+condition pack by engineering discipline (NFPA 13 hazard areas, HVAC,
+electrical, data/cabling, CCTV); prices/buy-list hidden by default
+(pre-sale mode); deployment configuration for takeoff.ingelmec.app.
+The full list of touched files lives in INGELMEC.md in this repository.
+The original OpenTakeoff remains licensed under the Apache License,
+Version 2.0; all credits and notices above are preserved.

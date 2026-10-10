@@ -36,43 +36,43 @@ export const GETTERS = {
 // Table columns: order + header + default visibility. foot(g) fills the tfoot
 // cell from grandTotals(rows); undefined → blank. ref: never in the tfoot.
 export const TABLE_PROFILE = [
-  { key: "finish",        header: "Finish",     defaultVisible: true, locked: true },
-  { key: "shapes",        header: "Shapes",     defaultVisible: true },
-  { key: "floor_sf",      header: "Floor SF",   defaultVisible: true },
-  { key: "wall_sf",       header: "Wall SF",    defaultVisible: true },
-  { key: "border_sf",     header: "Border SF",  defaultVisible: true },
+  { key: "finish",        header: "Acabado",    defaultVisible: true, locked: true },
+  { key: "shapes",        header: "Figuras",    defaultVisible: true },
+  { key: "floor_sf",      header: "Piso SF",    defaultVisible: true },
+  { key: "wall_sf",       header: "Muro SF",    defaultVisible: true },
+  { key: "border_sf",     header: "Borde SF",   defaultVisible: true },
   { key: "total_sf",      header: "Total SF",   defaultVisible: false, foot: (g) => g.total_sf },
   { key: "lf",            header: "LF",         defaultVisible: true },
-  { key: "ea",            header: "EA",         defaultVisible: true },
-  { key: "waste_pct",     header: "Waste",      defaultVisible: true },
-  { key: "total_sf_net",  header: "SF w/Waste", defaultVisible: true,  accent: true, foot: (g) => g.total_sf_net },
-  { key: "sy_net",        header: "SY w/Waste", defaultVisible: true,  accent: true, foot: (g) => g.sy_net },
+  { key: "ea",            header: "UND",        defaultVisible: true },
+  { key: "waste_pct",     header: "Desp. %",    defaultVisible: true },
+  { key: "total_sf_net",  header: "SF c/desp",  defaultVisible: true,  accent: true, foot: (g) => g.total_sf_net },
+  { key: "sy_net",        header: "SY c/desp",  defaultVisible: true,  accent: true, foot: (g) => g.sy_net },
   // grandTotals output carries all four keys the waste getters read, so the
   // TOTAL cells delegate to the same formulas as the body cells
-  { key: "waste_sf",      header: "Waste SF",   defaultVisible: false, foot: (g) => GETTERS.waste_sf(g) },
-  { key: "waste_lf",      header: "Waste LF",   defaultVisible: false, foot: (g) => GETTERS.waste_lf(g) },
-  { key: "perimeter_ref", header: "Perim LF (ref)", defaultVisible: false, ref: true },
+  { key: "waste_sf",      header: "Desp. SF",   defaultVisible: false, foot: (g) => GETTERS.waste_sf(g) },
+  { key: "waste_lf",      header: "Desp. LF",   defaultVisible: false, foot: (g) => GETTERS.waste_lf(g) },
+  { key: "perimeter_ref", header: "Perím LF (ref)", defaultVisible: false, ref: true },
 ];
 
 // CSV columns. The first 13 are the frozen v1 export (byte-stable, golden-
 // tested); opt-ins APPEND at the end — never reorder or rename the base 13.
 export const CSV_PROFILE = [
-  { key: "finish",       header: "Finish",              defaultVisible: true, locked: true },
-  { key: "shapes",       header: "Shapes",              defaultVisible: true },
-  { key: "multiplier",   header: "Multiplier",          defaultVisible: true },
-  { key: "waste_pct",    header: "Waste %",             defaultVisible: true },
-  { key: "floor_sf",     header: "Floor SF",            defaultVisible: true },
-  { key: "wall_sf",      header: "Wall SF",             defaultVisible: true },
-  { key: "border_sf",    header: "Border SF",           defaultVisible: true },
+  { key: "finish",       header: "Acabado",             defaultVisible: true, locked: true },
+  { key: "shapes",       header: "Figuras",             defaultVisible: true },
+  { key: "multiplier",   header: "×N",                  defaultVisible: true },
+  { key: "waste_pct",    header: "Desp. %",             defaultVisible: true },
+  { key: "floor_sf",     header: "Piso SF",             defaultVisible: true },
+  { key: "wall_sf",      header: "Muro SF",             defaultVisible: true },
+  { key: "border_sf",    header: "Borde SF",            defaultVisible: true },
   { key: "total_sf",     header: "Total SF",            defaultVisible: true },
   { key: "lf",           header: "LF",                  defaultVisible: true },
-  { key: "ea",           header: "EA",                  defaultVisible: true },
-  { key: "total_sf_net", header: "Total SF w/Waste",    defaultVisible: true },
-  { key: "lf_net",       header: "LF w/Waste",          defaultVisible: true },
-  { key: "sy_net",       header: "SY w/Waste",          defaultVisible: true },
-  { key: "waste_sf",      header: "Waste SF", defaultVisible: false },
-  { key: "waste_lf",      header: "Waste LF", defaultVisible: false },
-  { key: "perimeter_ref", header: "Perimeter LF (ref, incl. openings)", defaultVisible: false },
+  { key: "ea",           header: "UND",                 defaultVisible: true },
+  { key: "total_sf_net", header: "Total SF c/desp",     defaultVisible: true },
+  { key: "lf_net",       header: "LF c/desp",           defaultVisible: true },
+  { key: "sy_net",       header: "SY c/desp",           defaultVisible: true },
+  { key: "waste_sf",      header: "Desp. SF", defaultVisible: false },
+  { key: "waste_lf",      header: "Desp. LF", defaultVisible: false },
+  { key: "perimeter_ref", header: "Perímetro LF (ref, con vanos)", defaultVisible: false },
 ];
 
 // The one getter-resolution rule for a column descriptor: custom columns
@@ -155,12 +155,12 @@ export function customColProfile(conditionColumns) {
 // APPENDED (never inserted) so existing spec-column order in shipped exports is
 // preserved.
 export const SPEC_FIELDS = [
-  { field: "manufacturer", header: "Manufacturer" },
-  { field: "style",        header: "Style" },
-  { field: "color",        header: "Spec Color" },
-  { field: "size",         header: "Size" },
-  { field: "description",  header: "Description" },
-  { field: "remarks",      header: "Schedule Remarks" },
+  { field: "manufacturer", header: "Fabricante" },
+  { field: "style",        header: "Estilo" },
+  { field: "color",        header: "Color (cuadro)" },
+  { field: "size",         header: "Tamaño" },
+  { field: "description",  header: "Descripción" },
+  { field: "remarks",      header: "Notas del cuadro" },
 ];
 
 // The one visible-string rule for a spec value — a string with visible content
@@ -200,8 +200,8 @@ export function specColProfile(conditions) {
 // least one condition carries a visible value — a project that never uses
 // them produces zero extra columns.
 export const LABOR_FIELDS = [
-  { field: "laborType", header: "Labor Type" },
-  { field: "subfloorType", header: "Subfloor Type" },
+  { field: "laborType", header: "Tipo de mano de obra" },
+  { field: "subfloorType", header: "Tipo de contrapiso" },
 ];
 
 export function laborValue(labor, field) {
@@ -231,8 +231,8 @@ export function laborColProfile(conditions) {
 // opt-ins → custom → spec → labor → roll). ×N applies like every quantity —
 // N identical units are N cuttings of the same layout.
 export const ROLL_FIELDS = [
-  { key: "roll:order_lf", header: "Roll Order LF", get: (ri, mult) => round2(ri.orderFt * mult) },
-  { key: "roll:rolls", header: "Rolls", get: (ri, mult) => ri.rollCount * mult },
+  { key: "roll:order_lf", header: "Pedido de rollo LF", get: (ri, mult) => round2(ri.orderFt * mult) },
+  { key: "roll:rolls", header: "Rollos", get: (ri, mult) => ri.rollCount * mult },
   // The figured weld-rod / seam-tape length — where two cuts meet on the
   // floor, read off the layout rather than guessed as a share of perimeter.
   // 0 is a real answer: a layout whose rooms each take one strip has nothing

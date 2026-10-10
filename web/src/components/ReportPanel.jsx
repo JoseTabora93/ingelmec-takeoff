@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../brand/icons.jsx";
 import ToolMenu from "./ToolMenu.jsx";
 import { conditionTotals, grandTotals, sheetTotals, sheetGroupedRows, labelGroupedRows, authorGroupedRows, sheetLabelGroupedRows, round2, totalsToCsv, downloadText, materialsSummary, reportJson, hasMultipliers, BY_SHEET_BASE_NOTE } from "../lib/totals.js";
+import { PREVENTA_DEFAULT } from "../lib/ingelmec.js";
 import { TABLE_PROFILE, CSV_PROFILE, colGetter, customColProfile, specColProfile, laborColProfile, rollColProfile, partitionRowsBy, forceIncludeGroupCol, loadColPrefs, saveColPrefs, loadGroupBy, saveGroupBy, visibleCols, floorPerimeterLf, applyUnits } from "../lib/reportColumns.js";
 import { rollReportRows, seamLfByShape } from "../lib/rollTakeoff.js";
 import { areaVal, areaUnit, lenVal, lenUnit } from "../lib/units";
@@ -31,7 +32,7 @@ import { qtyLabels, resolveNote } from "../lib/noteFields.ts";
 const num = (v, d = 1) => (Number(v) || 0).toLocaleString(undefined, { maximumFractionDigits: d });
 
 // the report's one caveat line — page-strip on every printed page + masthead
-const DISCLAIMER = "Quantities derived from drawings at stated scales; verify in field.";
+const DISCLAIMER = "Cantidades derivadas de planos a las escalas indicadas; verificar en campo.";
 
 // one-line hints for the opt-in columns in the picker (waste hint sits under
 // the second waste checkbox so it reads once for the pair)
@@ -88,7 +89,16 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
   // welding on every sheet. Empty map for a project with no roll goods, which
   // makes every seam_lf row read 0 — the honest answer before a layout exists.
   const seamCtx = useMemo(() => ({ seamByShape: seamLfByShape(rollByCond) }), [rollByCond]);
-  const rows = useMemo(() => conditionTotals(conditions, shapes, seamCtx).filter((r) => r.shape_count > 0), [conditions, shapes, seamCtx]);
+  const rowsComputed = useMemo(() => conditionTotals(conditions, shapes, seamCtx).filter((r) => r.shape_count > 0), [conditions, shapes, seamCtx]);
+  // INGELMEC preventa (#brief T1.6): the buy list stays OUT of the report and
+  // every export by default — pre-construction quotes carry no materials
+  // takeoff. One toggle (Preventa button in the toolbar) brings it back for
+  // execution-stage work. Shadowing here means every consumer below (totals,
+  // CSV/XLSX/JSON, the materials section) reads the gated rows.
+  const [preventa, setPreventa] = useState(PREVENTA_DEFAULT);
+  const rows = useMemo(() => (preventa
+    ? rowsComputed.map((r) => (r.materials?.length ? { ...r, materials: [] } : r))
+    : rowsComputed), [preventa, rowsComputed]);
   const noteQty = useMemo(() => qtyLabels(rows, units), [rows, units]);   // {{qty}} in the annotations table (#474)
   const bySheet = useMemo(() => sheetTotals(conditions, shapes), [conditions, shapes]);
   const g = useMemo(() => grandTotals(rows), [rows]);
@@ -444,29 +454,29 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
           className="field-input" style={{ width: 260, padding: "5px 9px", fontSize: 13 }} />
         <div style={{ flex: 1 }} />
         <button className="btn-ghost" onClick={() => setShowInfo(true)}
-          title="Your company identity and the client/job details for the print header and marked-set cover">Project info</button>
+          title="Identidad de su empresa y datos del cliente/obra para el encabezado impreso y el juego marcado">Datos del proyecto</button>
         {/* always rendered, even with zero custom columns — Sheet grouping
             is useful on its own */}
         <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--ink)", whiteSpace: "nowrap" }}
-          title="Break the condition table into sections with subtotals">
-          Group:
+          title="Divide la tabla de condiciones en secciones con subtotales">
+          Agrupar:
           <select name="report-group-by" value={groupBy} onChange={(e) => { setGroupByRaw(e.target.value); saveGroupBy(e.target.value); }}
             style={{ padding: "5px 6px", border: "1px solid var(--ink-faint)", background: "transparent", fontSize: 12, maxWidth: 160 }}>
-            <option value="">None</option>
-            <option value="sheet">Sheet</option>
-            {shapeLabels.length > 0 && <option value="label">Label</option>}
-            {hasAuthors && <option value="author">Author</option>}
+            <option value="">Nada</option>
+            <option value="sheet">Hoja</option>
+            {shapeLabels.length > 0 && <option value="label">Etiqueta</option>}
+            {hasAuthors && <option value="author">Autor</option>}
             {conditionColumns.map((cc) => (
               <option key={cc.id} value={cc.id}>{columnLabel(cc)}</option>
             ))}
           </select>
         </label>
         <div ref={colsRef} style={{ position: "relative" }}>
-          <button className="btn-ghost" onClick={() => setShowCols((s) => !s)} title="Choose which columns the table and CSV show">Columns</button>
+          <button className="btn-ghost" onClick={() => setShowCols((s) => !s)} title="Elegir qué columnas muestran la tabla y el CSV">Columnas</button>
           {showCols && (
             <div className="report-modal" style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, zIndex: 70, width: 272, background: "var(--paper-bright)", border: "1px solid var(--ink)", boxShadow: "var(--shadow-2)", padding: "10px 12px", fontSize: 12.5, color: "var(--ink)" }}>
               <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
-                <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Columns</strong>
+                <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Columnas</strong>
                 <div style={{ flex: 1 }} />
                 <button onClick={applyLaborPreset} title="No-waste actuals per condition — hides SF/SY w/Waste, shows Total SF"
                   style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11.5, padding: "0 10px 0 0" }}>Labor view</button>
@@ -593,18 +603,25 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             ("Revisions noted" renders from markups alone); CSV stays rows-only.
             Every item keeps the exact disabled condition + tooltip its button
             carried. RFI exports stay their own controls, shown only when RFIs exist. */}
+        {/* INGELMEC preventa — buy list off by default (lib/ingelmec.js); this
+            is the ONE control that brings it back (execution-stage work). */}
+        <button className="btn-ghost" onClick={() => setPreventa((v) => !v)}
+          title={preventa ? "Preventa activa: la lista de compras está oculta en el reporte y las exportaciones. Clic para mostrarla (etapa de ejecución)." : "Clic para ocultar la lista de compras (modo preventa)."}
+          style={{ opacity: preventa ? 1 : 0.55 }}>
+          {preventa ? "Preventa: sin compras" : "Preventa: con compras"}
+        </button>
         <ToolMenu
           title="Download the report and shape data"
           disabled={!rows.length && !shapes.length && !markups.length && !rfis.length}
-          face={<><Icon name="document" size={13} />Export</>}
+          face={<><Icon name="document" size={13} />Exportar</>}
           items={[
-            { section: "Report" },
+            { section: "Reporte" },
             { id: "csv", icon: "document", label: "CSV", disabled: !rows.length, onSelect: exportCsv },
-            { id: "xlsx", icon: "document", label: "Excel", disabled: !rows.length, title: "Excel workbook — Conditions / By sheet / Materials / Shapes", onSelect: exportXlsx },
-            { id: "json", icon: "document", label: "JSON", disabled: !rows.length && !markups.length && !rfis.length, title: "JSON — works markups-only / RFI-only too", onSelect: exportJson },
-            { section: "Shapes" },
-            { id: "shapes-csv", icon: "document", label: "Shapes CSV", disabled: !shapes.length, title: "Per-shape measured quantities — no multiplier, no waste", onSelect: exportShapesCsv },
-            { id: "shapes-json", icon: "document", label: "Shapes JSON", disabled: !shapes.length, title: "Per-shape measured quantities — no multiplier, no waste", onSelect: exportShapesJson },
+            { id: "xlsx", icon: "document", label: "Excel", disabled: !rows.length, title: "Libro de Excel: Condiciones / Por hoja / Materiales / Figuras", onSelect: exportXlsx },
+            { id: "json", icon: "document", label: "JSON", disabled: !rows.length && !markups.length && !rfis.length, title: "JSON: funciona solo con anotaciones o solo con RFI también", onSelect: exportJson },
+            { section: "Figuras" },
+            { id: "shapes-csv", icon: "document", label: "CSV de figuras", disabled: !shapes.length, title: "Cantidades medidas por figura: sin multiplicador ni desperdicio", onSelect: exportShapesCsv },
+            { id: "shapes-json", icon: "document", label: "JSON de figuras", disabled: !shapes.length, title: "Cantidades medidas por figura: sin multiplicador ni desperdicio", onSelect: exportShapesJson },
             { id: "dxf", icon: "document", label: dxfSheets.length > 1 ? `DXF (CAD) · ${dxfSheets.length} sheets` : "DXF (CAD)", disabled: !dxfSheets.length,
               title: !shapes.length ? "Nothing measured yet"
                 : !dxfSheets.length ? "Set the scale on a sheet with shapes first — a CAD file in pixels is worse than none"
@@ -615,32 +632,32 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
         <ToolMenu
           title="Print the report, or generate the marked-set PDF"
           disabled={!rows.length && !markups.length && !rfis.length /* both items are disabled exactly here: with no rows/rfis, the marked-set condition also collapses to true */}
-          face={<span>Print</span>}
+          face={<span>Imprimir</span>}
           items={[
-            { id: "print", label: "Print report", disabled: !rows.length && !markups.length && !rfis.length, title: "Print the on-screen report (browser print / save as PDF)", onSelect: () => window.print() },
+            { id: "print", label: "Imprimir reporte", disabled: !rows.length && !markups.length && !rfis.length, title: "Imprimir el reporte en pantalla (imprimir del navegador / guardar como PDF)", onSelect: () => window.print() },
             ...(onMarkedSet ? [
               "divider",
-              { section: "Marked set" },
-              ...(markups.length > 0 ? [{ id: "inc-markups", label: "Include markups", checked: includeMarkups, stayOpen: true, title: "Include your markups (clouds, callouts, notes, highlights) in the Marked Set PDF. Independent of the canvas layer toggle.", onSelect: () => setIncludeMarkups((v) => !v) }] : []),
-              { id: "marked-set", icon: "document", label: `Download marked set${markedSetDark ? " ☾" : ""}`, disabled: !rows.length && (!includeMarkups || !markups.length) && !rfis.length, title: `Distribution PDF — marked sheets with the takeoff burned in, plus a legend cover${markedSetDark ? " (dark, following your view)" : ""}`, onSelect: () => onMarkedSet(includeMarkups) },
+              { section: "Juego marcado" },
+              ...(markups.length > 0 ? [{ id: "inc-markups", label: "Incluir anotaciones", checked: includeMarkups, stayOpen: true, title: "Incluye sus anotaciones (nubes, llamadas, notas, resaltados) en el PDF del juego marcado. Es independiente del interruptor de la capa del lienzo.", onSelect: () => setIncludeMarkups((v) => !v) }] : []),
+              { id: "marked-set", icon: "document", label: `Download marked set${markedSetDark ? " ☾" : ""}`, disabled: !rows.length && (!includeMarkups || !markups.length) && !rfis.length, title: `PDF de distribución: hojas marcadas con el takeoff quemado, más una portada con leyenda${markedSetDark ? " (oscuro, según su vista)" : ""}`, onSelect: () => onMarkedSet(includeMarkups) },
             ] : []),
           ]}
         />
         {rfis.length > 0 && (
           <>
             <button className="btn-ghost" onClick={exportRfisCsv}
-              title="RFI log — one row per RFI with linked markups/sheets derived"><Icon name="rfi" size={13} />RFI CSV</button>
+              title="Registro de RFI: una fila por RFI, con anotaciones/hojas vinculadas derivadas"><Icon name="rfi" size={13} />RFI CSV</button>
             <button className="btn-ghost" onClick={exportRfisJson}
-              title="RFI log as JSON"><Icon name="rfi" size={13} />RFI JSON</button>
+              title="Registro de RFI como JSON"><Icon name="rfi" size={13} />RFI JSON</button>
           </>
         )}
         <button className="btn-primary" onClick={() => setShowContribute(true)} disabled={!rows.length}
-          title="Optionally contribute this takeoff's derived data to the open flooring model">
-          <Icon name="oneClick" size={13} />Contribute
+          title="Contribuir opcionalmente los datos derivados de este takeoff al modelo abierto de pisos">
+          <Icon name="oneClick" size={13} />Contribuir
         </button>
-        <button onClick={onClose} title="Back to the canvas (Esc)"
+        <button onClick={onClose} title="Volver al lienzo (Esc)"
           style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12.5 }}>
-          <Icon name="close" size={12} />Close
+          <Icon name="close" size={12} />Cerrar
         </button>
       </div>
 
@@ -649,7 +666,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             the top of every printed page (screen hides it) — a fixed footer would
             overlap the last row of intermediate pages */}
         <table className="report-flow"><thead><tr><td>
-          {projectName || "Untitled project"} — {DISCLAIMER}
+          {projectName || "Proyecto sin nombre"} — {DISCLAIMER}
         </td></tr></thead><tbody><tr><td>
         {/* print-only masthead — hidden on screen via app.css. Title-block header
             (logo/firm row · project title · bordered fact grid), the drafting-
@@ -672,22 +689,28 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   )}
                 </>
               ) : (
-                <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 12.5, lineHeight: 1.15 }}>{brand.brandName}</div>
+                <>
+                  {/* INGELMEC fork: default mode presents the Ingelmec identity
+                      (logo + name) instead of plain text — resolveBranding now
+                      fills company in default mode too. */}
+                  {company?.logo && <img src={company.logo} alt="" style={{ maxHeight: 46, maxWidth: 170, objectFit: "contain", display: "block" }} />}
+                  <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 12.5, lineHeight: 1.15 }}>{brand.brandName}</div>
+                </>
               )}
             </div>
-            <div style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ink-muted)", whiteSpace: "nowrap" }}>Takeoff Report</div>
+            <div style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ink-muted)", whiteSpace: "nowrap" }}>Reporte de mediciones</div>
           </div>
 
           {/* project title */}
-          <div style={{ fontFamily: "var(--f-display)", fontSize: 25, fontWeight: 700, letterSpacing: "0.005em", textTransform: "uppercase", lineHeight: 0.98, margin: "11px 0 9px" }}>{projectName || "Untitled project"}</div>
+          <div style={{ fontFamily: "var(--f-display)", fontSize: 25, fontWeight: 700, letterSpacing: "0.005em", textTransform: "uppercase", lineHeight: 0.98, margin: "11px 0 9px" }}>{projectName || "Proyecto sin nombre"}</div>
 
           {/* title-block fact grid */}
           {(() => {
             const cells = [
-              ["Client", clientInfo.client_name],
-              ["Reference", clientInfo.reference],
-              ["Date", clientInfo.date || new Date().toLocaleDateString()],
-              ["Prepared by", brand.brandName],
+              ["Cliente", clientInfo.client_name],
+              ["Referencia", clientInfo.reference],
+              ["Fecha", clientInfo.date || new Date().toLocaleDateString()],
+              ["Elaboró", brand.brandName],
             ];
             return (
               <div style={{ display: "grid", gridTemplateColumns: `repeat(${cells.length}, 1fr)`, border: "1px solid var(--ink)", marginBottom: hasClient && clientInfo.client_address ? 8 : 12 }}>
@@ -709,9 +732,9 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
           {/* meta footer: scale provenance · attribution · disclaimer */}
           <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-muted)", lineHeight: 1.6, borderTop: "1px solid var(--ink-faint)", paddingTop: 6, marginBottom: 12 }}>
             {scaleInfo.map((si) => (
-              <div key={si.sheet_id}>{sheetLabel ? sheetLabel(si.sheet_id) : si.sheet_id} — {!si.scale_source || si.scale_source === "unknown" ? "scale set — provenance unrecorded" : si.scale_source}{si.scale_confirmed === false ? <span style={{ color: "var(--c-warning)", fontWeight: 700 }}> · agent-set, UNCONFIRMED</span> : null}</div>
+              <div key={si.sheet_id}>{sheetLabel ? sheetLabel(si.sheet_id) : si.sheet_id} — {!si.scale_source || si.scale_source === "unknown" ? "escala fijada — procedencia sin registrar" : si.scale_source}{si.scale_confirmed === false ? <span style={{ color: "var(--c-warning)", fontWeight: 700 }}> · fijada por agente, SIN CONFIRMAR</span> : null}</div>
             ))}
-            <div>Generated {new Date().toLocaleDateString()}</div>
+            <div>Generado {new Date().toLocaleDateString()}</div>
             <div>{DISCLAIMER}</div>
           </div>
         </div>
@@ -721,7 +744,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
         {!rows.length ? (
           markups.length ? null : (
             <div style={{ padding: 48, textAlign: "center", color: "var(--ink-muted)" }}>
-              Nothing measured yet — trace some areas, then come back for the breakdown.
+              Aún no hay mediciones: trace algunas áreas y vuelva por el desglose.
             </div>
           )
         ) : (
@@ -733,7 +756,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               the partition degenerates to one group. */}
           {grouped && (
             <p style={{ maxWidth: 980, margin: "0 auto 8px", fontSize: 11.5, color: "var(--ink-muted)" }}>
-              Grouped by <strong>{groupCol ? columnLabel(groupCol) : groupBy === "label" ? "label" : groupBy === "author" ? "author" : "sheet"}</strong>
+              Agrupado por <strong>{groupCol ? columnLabel(groupCol) : groupBy === "label" ? "etiqueta" : groupBy === "author" ? "autor" : "hoja"}</strong>
             </p>
           )}
           <table style={{ width: "100%", maxWidth: 980, margin: "0 auto", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
@@ -795,7 +818,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             })}
             <tfoot>
               <tr>
-                <td style={{ ...td, textAlign: "left", borderTop: "2px solid var(--ink)", borderBottom: "2px solid var(--ink)", background: "var(--paper-cream)", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "var(--f-mono)" }}>Total</td>
+                <td style={{ ...td, textAlign: "left", borderTop: "2px solid var(--ink)", borderBottom: "2px solid var(--ink)", background: "var(--paper-cream)", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "var(--f-mono)" }}>TOTAL</td>
                 {/* finish is always first & locked; every other visible column gets its
                     own td — footed columns render foot(g), ref columns never foot */}
                 {tableCols.slice(1).map((c) => (
@@ -812,28 +835,28 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
         )}
         {rows.length > 0 && (
           <p style={{ maxWidth: 980, margin: "14px auto 0", fontSize: 11.5, color: "var(--ink-muted)", lineHeight: 1.6 }}>
-            <strong>{AU} w/Waste</strong> = measured quantity × waste %. Waste is set per condition in the canvas. Wall {AU} comes from Surface-Area
-            traces (run × height); Border {AU} from Linear runs with a thickness.{M ? " Supporting-material coverage rates stay as entered (SF/LF-based)." : ""}
+            <strong>{AU} con desperdicio</strong> = cantidad medida × % de desperdicio. El desperdicio se fija por condición en el lienzo. El {AU} de muro viene de trazos de área de muro
+            (tramo × altura); el {AU} de borde, de tramos lineales con espesor.{M ? " Los rendimientos de los materiales de apoyo quedan como se escribieron (basados en m²/ML)." : ""}
             {tableCols.some((c) => c.key === "perimeter_ref") && (
-              <> Perim {LU} (ref) sums floor-trace perimeters — includes door openings and shared walls; reference only, never totaled or waste-adjusted.</>
+              <> Perím {LU} (ref) suma los perímetros del trazo de piso: incluye vanos de puerta y muros compartidos; solo referencia, nunca se suma ni lleva desperdicio.</>
             )}
             {/* bridge to the base-quantity By-sheet section below — the two
                 slice the same shapes with different semantics */}
             {groupBy === "sheet" && grouped && (
-              <> Groups show w/Waste quantities (waste and ×N applied per sheet); the By-sheet section below shows base measured quantities.</>
+              <> Los grupos muestran cantidades con desperdicio (desperdicio y ×N por hoja); la sección Por hoja muestra las cantidades base medidas.</>
             )}
           </p>
         )}
         {rows.length > 0 && bySheet.length > 0 && (
           <div style={{ maxWidth: 980, margin: "26px auto 0" }}>
-            <h3 style={{ fontFamily: "var(--f-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink)", margin: "0 0 10px", paddingBottom: 5, borderBottom: "1.25px solid var(--ink)" }}>By sheet</h3>
+            <h3 style={{ fontFamily: "var(--f-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink)", margin: "0 0 10px", paddingBottom: 5, borderBottom: "1.25px solid var(--ink)" }}>Por hoja</h3>
             {bySheet.map((gp) => (
               <div key={gp.sheet_id} style={{ margin: "0 0 14px" }}>
                 <h3 style={{ fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.06em", color: "var(--ink-muted)", margin: "0 0 6px" }}>{sheetLabel ? sheetLabel(gp.sheet_id) : gp.sheet_id}</h3>
                 <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
                   <thead>
                     <tr>
-                      <th style={{ ...th, textAlign: "left" }}>Finish</th>
+                      <th style={{ ...th, textAlign: "left" }}>Acabado</th>
                       <th style={th}>Floor {AU}</th>
                       <th style={th}>Wall {AU}</th>
                       <th style={th}>Border {AU}</th>
@@ -878,9 +901,9 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
               <thead>
                 <tr>
-                  <th style={{ ...th, textAlign: "left" }}>Type</th>
-                  <th style={{ ...th, textAlign: "left" }}>Sheet</th>
-                  <th style={{ ...th, textAlign: "left" }}>Note</th>
+                  <th style={{ ...th, textAlign: "left" }}>Tipo</th>
+                  <th style={{ ...th, textAlign: "left" }}>Hoja</th>
+                  <th style={{ ...th, textAlign: "left" }}>Nota</th>
                 </tr>
               </thead>
               <tbody>
@@ -898,13 +921,13 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               </tbody>
             </table>
             <p style={{ margin: "10px auto 0", fontSize: 11.5, color: "var(--ink-muted)", lineHeight: 1.6 }}>
-              Markups are annotations, not measurements — quantities above are unaffected.
+              Las anotaciones no son mediciones: las cantidades de arriba no cambian.
             </p>
           </div>
         )}
         {matSummary.length > 0 && (
           <div style={{ maxWidth: 980, margin: "26px auto 0" }}>
-            <h3 style={{ fontFamily: "var(--f-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink)", margin: "0 0 10px", paddingBottom: 5, borderBottom: "1.25px solid var(--ink)" }}>Supporting materials — buy list</h3>
+            <h3 style={{ fontFamily: "var(--f-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink)", margin: "0 0 10px", paddingBottom: 5, borderBottom: "1.25px solid var(--ink)" }}>Materiales de apoyo — lista de compras</h3>
             <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
               <thead>
                 <tr>
@@ -924,7 +947,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               </tbody>
             </table>
             <p style={{ maxWidth: 980, margin: "10px auto 0", fontSize: 11.5, color: "var(--ink-muted)", lineHeight: 1.7 }}>
-              <strong>By finish:</strong>{" "}
+              <strong>Por acabado:</strong>{" "}
               {rows.filter((r) => r.materials?.length).map((r) => (
                 // inline-block + a trailing space outside the span: each finish
                 // moves to the next line as a unit when it fits, and wraps
@@ -937,7 +960,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   </span>{" "}
                 </React.Fragment>
               ))}
-              <br />Each quantity = measured {`{area / linear / count}`} ÷ your coverage rate, rounded up to whole units.
+              <br />Cada cantidad = medido {`{área / lineal / conteo}`} ÷ su rendimiento, redondeado a unidades enteras.
             </p>
           </div>
         )}
@@ -1052,7 +1075,7 @@ function ProjectInfoModal({ clientInfo = {}, onClientInfo, onSaved, onClose }) {
       <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: 520, maxWidth: "100%", maxHeight: "90%", overflow: "auto", background: "var(--paper-bright)", boxShadow: "var(--shadow-2)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderBottom: "1px solid var(--ink)" }}>
           <Icon name="document" size={16} />
-          <strong style={{ fontFamily: "var(--f-display)", fontSize: 15 }}>Project info</strong>
+          <strong style={{ fontFamily: "var(--f-display)", fontSize: 15 }}>Datos del proyecto</strong>
         </div>
         <div style={{ padding: 16, fontSize: 13, lineHeight: 1.6, color: "var(--ink)" }}>
           <div style={section}>Company — your trade names, saved on this device</div>

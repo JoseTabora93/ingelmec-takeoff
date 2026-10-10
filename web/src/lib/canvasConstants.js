@@ -68,27 +68,27 @@ export { SNAP_CELL };   // snap-grid bucket, raster px (Spline runs 12 — its b
 
 // toolbar menus — STACK-style: the menu face shows the armed tool
 export const MEASURE_TOOLS = [
-  { id: "oneclick", icon: "oneClick", label: "One-Click Area", shortcut: "O" },
-  { id: "area", icon: "area", label: "Area", shortcut: "A" },
-  { id: "rect", icon: "rectTool", label: "Rectangle", shortcut: "R" },
-  { id: "linear", icon: "linear", label: "Linear", shortcut: "L" },
-  { id: "surface", icon: "surface", label: "Surface Area", shortcut: "S" },
-  { id: "count", icon: "count", label: "Count", shortcut: "C" },
-  { id: "symbol", icon: "symbol", label: "Symbol — marquee ONE instance, count every placement (#264)", shortcut: "Y" },
+  { id: "oneclick", icon: "oneClick", label: "Área de un clic", shortcut: "O" },
+  { id: "area", icon: "area", label: "Área", shortcut: "A" },
+  { id: "rect", icon: "rectTool", label: "Rectángulo", shortcut: "R" },
+  { id: "linear", icon: "linear", label: "Lineal", shortcut: "L" },
+  { id: "surface", icon: "surface", label: "Área de muro", shortcut: "S" },
+  { id: "count", icon: "count", label: "Conteo", shortcut: "C" },
+  { id: "symbol", icon: "symbol", label: "Símbolo — marque UNA instancia y cuente todas (#264)", shortcut: "Y" },
 ];
 export const CUT_TOOLS = [
-  { id: "deduct", icon: "deduct", label: "Deduct shape", shortcut: "D" },
-  { id: "deduct-rect", icon: "deductRect", label: "Deduct rectangle", shortcut: "⇧D" },
+  { id: "deduct", icon: "deduct", label: "Deducir figura", shortcut: "D" },
+  { id: "deduct-rect", icon: "deductRect", label: "Deducir rectángulo", shortcut: "⇧D" },
 ];
 export const MARKUP_TOOLS = [
-  { id: "highlighter", icon: "highlighter", label: "Highlighter", shortcut: "H" },
-  { id: "cloud", icon: "cloud", label: "Revision cloud" },
-  { id: "callout", icon: "callout", label: "Callout" },
-  { id: "text", icon: "textNote", label: "Text note" },
-  { id: "highlight", icon: "highlight", label: "Highlight box" },
+  { id: "highlighter", icon: "highlighter", label: "Resaltador", shortcut: "H" },
+  { id: "cloud", icon: "cloud", label: "Nube de revisión" },
+  { id: "callout", icon: "callout", label: "Llamada" },
+  { id: "text", icon: "textNote", label: "Nota de texto" },
+  { id: "highlight", icon: "highlight", label: "Cuadro de resaltado" },
   // N, not M — M is the push-to-talk dictation hold, globally
-  { id: "dimension", icon: "dimension", label: "Dimension line", shortcut: "N" },
-  { id: "image", icon: "image", label: "Image — marquee a region, or upload a file" },
+  { id: "dimension", icon: "dimension", label: "Línea de cota", shortcut: "N" },
+  { id: "image", icon: "image", label: "Imagen — marque una región o suba un archivo" },
 ];
 export const MARKUP_IDS = MARKUP_TOOLS.map((t) => t.id);
 // highlighter inks — literal hex (SVG attrs; CSS vars don't resolve there).

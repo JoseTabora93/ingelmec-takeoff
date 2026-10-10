@@ -45,9 +45,9 @@ export default function WorkspacePanel({ open, shapes, conditions, selectedId, s
       <div id="workspace-agent-view" role="tabpanel" aria-labelledby="workspace-agent-tab" hidden={tab !== "agent"} className="workspace-agent-view">{children}</div>
       <div id="workspace-work-view" role="tabpanel" aria-labelledby="workspace-work-tab" hidden={tab !== "work"} className="workspace-work-view">
         <div className="workspace-filters">
-          <label className="workspace-search"><span>Find work</span><input name="work-search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Condition, sheet, label, or author" /></label>
+          <label className="workspace-search"><span>Buscar trabajo</span><input name="work-search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Condición, hoja, etiqueta o autor" /></label>
           <div className="workspace-filter-buttons" aria-label="Filter measurements">
-            {[["all", "All work"], ["pending", `Needs review · ${pending}`], ["agent", "Agent"]].map(([id, label]) =>
+            {[["all", "Todo el trabajo"], ["pending", `Por revisar · ${pending}`], ["agent", "Agente"]].map(([id, label]) =>
               <button type="button" key={id} aria-pressed={filter === id} onClick={() => setFilter(id)}>{label}</button>)}
           </div>
         </div>

@@ -23,7 +23,7 @@ export const TOUR_STEPS = [
     id: "tool",
     title: "Arm the Area tool",
     body: "Press A, or click the Area tile in the tool rail on the left.",
-    target: 'button[aria-label="Area"]',
+    target: 'button[aria-label="Área"]',
   },
   {
     id: "trace",
