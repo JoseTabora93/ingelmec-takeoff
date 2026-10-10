@@ -26,6 +26,7 @@ import { useGoogleAuth } from "../lib/google/AuthContext.jsx";
 import { parseSheetKey, extractSheetNumber, detectScale, RENDER_SCALE, MAX_GROUP } from "../lib/sheets";
 import { isGoogleConfigured } from "../lib/google/auth.js";
 import { projectHomeFolderId } from "../lib/projectHome.js";
+import { SIN_PREMIUM } from "../lib/ingelmec.js";
 import { isFolderSyncSupported, loadFolderLink, linkFolder, forgetFolder, queryFolderPermission } from "../lib/fs/fsAccess.js";
 import { listConflictCopies } from "../lib/fs/fsProvider.js";
 import { m365Config, M365_ENABLED_KEY } from "../lib/msgraph/config.js";
@@ -769,12 +770,12 @@ export default function PlanNavigator({
   };
 
   // ══ RENDER ════════════════════════════════════════════════════════════════
-  const title = mode === "browse" ? "Add sheets from Drive" : mode === "manage" ? "Manage plan set" : "Plan set";
+  const title = mode === "browse" ? "Agregar hojas desde Drive" : mode === "manage" ? "Administrar juego de planos" : "Juego de planos";
   const subtitle = mode === "browse"
-    ? "pick the PDFs to open — specs & as-builts stay unopened"
+    ? "elija los PDF que abrirá: los planos de specs y as-built quedan sin abrir"
     : mode === "manage"
-      ? `${sheets.length} PDF${sheets.length === 1 ? "" : "s"} stored in this workspace — remove what this takeoff doesn't need`
-      : `${allKeys.length || "…"} sheets · pick one or several — the order you pick is the left-to-right order`;
+      ? `${sheets.length} PDF almacenados en este espacio: quite los que este takeoff no necesita`
+      : `${allKeys.length || "…"} hojas · elija una o varias — el orden que elija es el orden de izquierda a derecha`;
   // the search's count and indexing progress sit beside its box, so the
   // header (and the grid under it) never moves while a query is typed
   // only the hit count is announced; the indexing ticks aren't
@@ -784,7 +785,7 @@ export default function PlanNavigator({
   const header = (
     <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", borderBottom: "1px solid var(--ink)", background: "var(--paper-bright)", flexWrap: "wrap" }}>
       {/* LEFT up-chain: back + title + (cloud) Projects crumb + (browse) breadcrumb */}
-      <button onClick={back} disabled={!canGoBack} title={mode === "browse" ? "Back" : "Back to the canvas (Esc)"}
+      <button onClick={back} disabled={!canGoBack} title={mode === "browse" ? "Atrás" : "Volver al lienzo (Esc)"}
         style={{ ...ctrlBtn, padding: "6px 8px", opacity: canGoBack ? 1 : 0.35, cursor: canGoBack ? "pointer" : "default" }}>
         <Icon name="chevronLeft" size={14} />
       </button>
@@ -815,7 +816,7 @@ export default function PlanNavigator({
       <div style={{ flex: 1 }} />
 
       {/* RIGHT: source toggle · browse filters · add plans · account */}
-      {onPremium && <button type="button" data-premium-trigger onClick={onPremium} style={{...ctrlBtn, color:"var(--cobalt)", borderColor:"var(--cobalt)"}}>Solicitar Premium</button>}
+      {onPremium && !SIN_PREMIUM && <button type="button" data-premium-trigger onClick={onPremium} style={{...ctrlBtn, color:"var(--cobalt)", borderColor:"var(--cobalt)"}}>Solicitar Premium</button>}
       {browseEnabled && (
         <div style={{ display: "inline-flex", border: "1px solid var(--ink-faint)", borderRadius: 2, overflow: "hidden" }}>
           <button onClick={() => setMode("plan")} style={{ ...ctrlBtn, border: "none", background: mode === "plan" ? "var(--ink)" : "transparent", color: mode === "plan" ? "var(--paper-bright)" : "var(--ink-muted)" }}>Juego de planos</button>
@@ -1124,15 +1125,15 @@ export default function PlanNavigator({
                       <button type="button" onClick={doLinkFolder}
                         title="Elija una carpeta que su equipo ya sincronice (un recurso de red, una librería de documentos sincronizada): el takeoff se sincroniza por ahí como un archivo JSON. Sin cuenta ni credenciales; el cliente de sincronización de la carpeta hace el transporte."
                         style={{ border: "none", background: "transparent", padding: 0, color: "var(--cobalt)", cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
-                        or sincronice este espacio por una carpeta compartida
+                        o sincronice este espacio por una carpeta compartida
                       </button>
                     ) : (
                       <span style={{ color: "var(--ink-muted)" }}>
-                        syncing through folder <strong style={{ color: "var(--ink)" }}>“{folderLink.name}”</strong>
+                        sincronizando por la carpeta <strong style={{ color: "var(--ink)" }}>“{folderLink.name}”</strong>
                         {" · "}
                         <button type="button" onClick={doForgetFolder}
                           style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
-                          stop
+                          detener
                         </button>
                       </span>
                     )}
@@ -1167,7 +1168,7 @@ export default function PlanNavigator({
                 </button>
                 <div style={{ fontFamily: "var(--f-body)", fontSize: 12.5, color: "var(--ink-muted)", marginTop: 11, lineHeight: 1.6 }}>
                   Un <strong style={{ color: "var(--ink)" }}>plano real de acabados</strong> de un centro médico: la escala se lee de la hoja;
-                  pick a finish and trace a flooring takeoff in seconds.
+                  elija un acabado y trace un takeoff de piso en segundos.
                 </div>
                 {onConnect && (
                   <div style={{ marginTop: 14, fontFamily: "var(--f-body)", fontSize: 12.5, color: "var(--ink-muted)" }}>

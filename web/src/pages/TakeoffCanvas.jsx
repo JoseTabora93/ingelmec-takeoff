@@ -161,6 +161,7 @@ import AgentPanel from "../components/AgentPanel.jsx";
 import WorkspacePanel from "../components/WorkspacePanel.jsx";
 import PremiumInterest from "../components/PremiumInterest.jsx";
 import { shouldAutoPromptPremium, readPremiumPrompt } from "../lib/premiumInterest.js";
+import { SIN_PREMIUM } from "../lib/ingelmec.js";
 import "../styles/premiumWorkspace.css";
 import { WorkspaceChrome, WorkspaceNavigator, WorkspaceCommandMenu } from "../components/WorkspaceChrome.jsx";
 import { useWorkspaceLayout, WorkspaceLayoutDialog, DockHandle, DockTargets } from "../components/WorkspaceLayout.jsx";
@@ -3383,7 +3384,7 @@ export default function TakeoffCanvas() {
         if (poly.length) return;   // a trace in flight is never abandoned by a shortcut
         const sel = selectedId ? shapes.find((s) => s.id === selectedId) : null;
         const plan = sel ? repeatPlan(sel) : null;
-        if (!plan) { setCommitMsg("Select a shape first — T arms its condition and the tool that drew it."); return; }
+        if (!plan) { setCommitMsg("Elija primero una figura — T arma su condición y la herramienta que la trazó."); return; }
         if (plan.conditionId && conditions.some((c) => c.id === plan.conditionId)) activateCondition(plan.conditionId, { reassign: false });
         setCurveMode(plan.curve);
         selectShape(null);
@@ -4883,7 +4884,7 @@ export default function TakeoffCanvas() {
     const first = panelAt(points[0][0]);
     return points.some((q) => panelAt(q[0]) !== first);
   }
-  const SPAN_MSG = "That trace crosses onto another sheet — the gap between sheets isn't real distance. To work a floor split at a match line as one surface, stitch the sheets (Sheets → gallery → select both → Stitch).";
+  const SPAN_MSG = "Ese trazo cruza a otra hoja — la separación entre hojas no es distancia real. Para trabajar un piso dividido en una línea de encuentro como una sola superficie, empalme las hojas (Hojas → galería → elija ambas → Empalmar).";
   function commitPoly(points, asDeduct, opts = {}) {
     if (points.length < 3) return;
     if (spansPanels(points)) { setCommitMsg(SPAN_MSG); return; }
@@ -5719,7 +5720,7 @@ export default function TakeoffCanvas() {
                                 ...(sel.height_override ? { height_override: true } : {}), ...(sel.label ? { label: sel.label } : {}), ...cloneOrigin(sel.origin) });
   function copySelected() {
     const sel = shapes.find((s) => s.id === selectedId);
-    if (!sel) { setCommitMsg("Select a takeoff to copy."); return; }
+    if (!sel) { setCommitMsg("Elija un takeoff que copiar."); return; }
     clipRef.current = [clipEntry(sel)];
     setCommitMsg("Copied — ⌘V pastes onto the sheet under your cursor.");
   }
@@ -6109,10 +6110,23 @@ export default function TakeoffCanvas() {
     const thr = 8 / tfRef.current.scale;
     const shape = [...stackedShapes].reverse().find((s) => s.sheet_id === tp.key
       && hitShapeC(s, p[0] - tp.xOffset, p[1], tp.img.w, tp.img.h, thr));
-    dispatchApproval({ type: "add", approvals: [{ actor: "estimator", sheet_id: tp.key, at: [nx, ny], ...(shape ? { shape_id: shape.id } : {}) }] });
+    // INGELMEC (T4): el sello también puede sellar una TARJETA (markup) — las
+    // guardas de los motores llegan como notas ancladas a la hoja y la persona
+    // las firma con el mismo sello humano. El nombre declarado del autor va en
+    // `by` (auto-declarado, el mismo modelo de confianza que git user.name).
+    const mk = !shape && [...markups].reverse().find((m) => m.sheet_id === tp.key && hitMarkup(m, p, thr));
+    const by = authorName();
+    dispatchApproval({ type: "add", approvals: [{
+      actor: "estimator", sheet_id: tp.key, at: [nx, ny],
+      ...(shape ? { shape_id: shape.id } : {}),
+      ...(!shape && mk ? { markup_id: mk.id } : {}),
+      ...(by ? { by } : {}),
+    }] });
     setCommitMsg(shape
       ? `Approved — seal on ${condById[shape.condition_id]?.finish_tag || "shape"} (⌘Z undoes).`
-      : "Sheet point approved — seal placed (⌘Z undoes).");
+      : mk
+        ? `Aprobada la tarjeta: ${String(mk.text || "nota").slice(0, 40)} (⌘Z deshace).`
+        : "Sheet point approved — seal placed (⌘Z undoes).");
   }
   // Save the selected markup as a single-element stamp (the palette's define
   // flow). markupToStampElement re-expresses its coords as anchor-relative
@@ -8720,27 +8734,27 @@ export default function TakeoffCanvas() {
   }));
   const workspaceDockHandle = (dock, label) => workspaceLayout && <DockHandle dock={dock} label={label} locked={workspaceArrangement.locked} onDrag={setWorkspaceDragging} onMove={workspacePrefs.move} />;
   const workspaceActions = [
-    ...MEASURE_TOOLS.filter((t) => t.id !== "oneclick" || oneClickEnabled()).concat(CUT_TOOLS).map((t) => ({ id: `tool-${t.id}`, label: t.label, shortcut: t.shortcut, group: "Measuring tools", run: () => { setView("canvas"); setTool(t.id); } })),
-    { id: "select", label: "Select and edit a measurement", group: "Tools", shortcut: "V", run: () => setTool("select") },
-    { id: "zone", label: "Zone check — what's inside a traced region", group: "Tools", run: () => { setView("canvas"); setTool("zone"); } },
-    { id: "textcopy", label: "Copy text — box a region, its text goes on the clipboard", group: "Tools", run: () => { setView("canvas"); if (tool !== "textcopy") armCopyText(); } },
-    { id: "undo", label: "Undo", group: "Edit", shortcut: "⌘Z", run: () => poly.length ? dropLastPoint() : undoShapeCommand() },
-    { id: "redo", label: "Redo", group: "Edit", shortcut: "⇧⌘Z", run: redoShapeCommand },
-    { id: "finish", label: "Finish shape", group: "Edit", shortcut: "↵", disabled: !finishOk, run: finishShape },
-    { id: "copy", label: "Copy selected", group: "Edit", shortcut: "⌘C", disabled: !selectedId, run: copySelected },
-    { id: "paste", label: "Paste", group: "Edit", shortcut: "⌘V", disabled: !clipRef.current.length, run: () => pasteClipboard() },
-    { id: "report", label: "Open report", group: "Workspace", run: () => setShowReport(true) },
-    { id: "tour", label: "Guided first takeoff — learn it on the sample plan", group: "Help", run: startTour },
-    { id: "guide", label: "How OpenTakeoff works — shortcuts and the five-minute path", group: "Help", shortcut: "?", run: () => setGuideOpen(true) },
-    { id: "connect-ai", label: "Connect your AI — Claude, Codex, Cursor", group: "Help", run: () => setConnectOpen(true) },
-    { id: "work", label: "Open work and review", group: "Workspace", run: () => setAgentOpen(true) },
-    { id: "layout", label: "Arrange and save your layout", group: "Workspace", run: () => setWorkspaceLayoutOpen(true) },
-    { id: "fit", label: "Fit sheet to view", group: "View", disabled: !stage.w, run: () => fitToView(stage.w, stage.h) },
-    { id: "focus", label: "Focus mode", group: "View", shortcut: "F", run: toggleFocusMode },
-    { id: "theme", label: workspaceArrangement.look === "light" ? "Backlit graphite" : "Studio light", group: "Appearance", run: () => workspacePrefs.update({ look: workspaceArrangement.look === "light" ? "graphite" : "light" }) },
-    { id: "addcondition", label: "Add condition", group: "Conditions", run: addCondition },
-    ...scaleItems.filter((item) => item.onSelect).map((item) => ({ ...item, id: `scale-${item.id}`, group: "Scale", run: item.onSelect })),
-    ...sheetMenuItems.filter((item) => item.onSelect).map((item) => ({ ...item, id: `file-${item.id}`, group: "Plans and files", run: item.onSelect })),
+    ...MEASURE_TOOLS.filter((t) => t.id !== "oneclick" || oneClickEnabled()).concat(CUT_TOOLS).map((t) => ({ id: `tool-${t.id}`, label: t.label, shortcut: t.shortcut, group: "Herramientas de medición", run: () => { setView("canvas"); setTool(t.id); } })),
+    { id: "select", label: "Seleccionar y editar una medición", group: "Herramientas", shortcut: "V", run: () => setTool("select") },
+    { id: "zone", label: "Chequeo de zona — qué hay dentro de una región trazada", group: "Herramientas", run: () => { setView("canvas"); setTool("zone"); } },
+    { id: "textcopy", label: "Copy text — box a region, its text goes on the clipboard", group: "Herramientas", run: () => { setView("canvas"); if (tool !== "textcopy") armCopyText(); } },
+    { id: "undo", label: "Deshacer", group: "Edición", shortcut: "⌘Z", run: () => poly.length ? dropLastPoint() : undoShapeCommand() },
+    { id: "redo", label: "Rehacer", group: "Edición", shortcut: "⇧⌘Z", run: redoShapeCommand },
+    { id: "finish", label: "Terminar figura", group: "Edición", shortcut: "↵", disabled: !finishOk, run: finishShape },
+    { id: "copy", label: "Copiar selección", group: "Edición", shortcut: "⌘C", disabled: !selectedId, run: copySelected },
+    { id: "paste", label: "Pegar", group: "Edición", shortcut: "⌘V", disabled: !clipRef.current.length, run: () => pasteClipboard() },
+    { id: "report", label: "Abrir reporte", group: "Espacio", run: () => setShowReport(true) },
+    { id: "tour", label: "Primer takeoff guiado — apréndalo en el plano de ejemplo", group: "Ayuda", run: startTour },
+    { id: "guide", label: "Cómo funciona la app — atajos y la ruta de cinco minutos", group: "Ayuda", shortcut: "?", run: () => setGuideOpen(true) },
+    { id: "connect-ai", label: "Conecte su IA — Claude, Codex, Cursor", group: "Ayuda", run: () => setConnectOpen(true) },
+    { id: "work", label: "Abrir trabajo y revisión", group: "Espacio", run: () => setAgentOpen(true) },
+    { id: "layout", label: "Organice y guarde su disposición", group: "Espacio", run: () => setWorkspaceLayoutOpen(true) },
+    { id: "fit", label: "Ajustar hoja a la vista", group: "Vista", disabled: !stage.w, run: () => fitToView(stage.w, stage.h) },
+    { id: "focus", label: "Modo enfoque", group: "Vista", shortcut: "F", run: toggleFocusMode },
+    { id: "theme", label: workspaceArrangement.look === "light" ? "Grafito retroiluminado" : "Luz de estudio", group: "Apariencia", run: () => workspacePrefs.update({ look: workspaceArrangement.look === "light" ? "graphite" : "light" }) },
+    { id: "addcondition", label: "Agregar condición", group: "Condiciones", run: addCondition },
+    ...scaleItems.filter((item) => item.onSelect).map((item) => ({ ...item, id: `scale-${item.id}`, group: "Escala", run: item.onSelect })),
+    ...sheetMenuItems.filter((item) => item.onSelect).map((item) => ({ ...item, id: `file-${item.id}`, group: "Planos y archivos", run: item.onSelect })),
     ...workspaceSheets.map((sheet) => ({ id: `sheet-${sheet.key}`, label: sheet.label, group: sheet.file, run: () => openSheets([sheet.key], false) })),
   ];
 
@@ -8783,7 +8797,7 @@ export default function TakeoffCanvas() {
       onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer?.files); }}
       style={{ position: "relative", display: "flex", flexDirection: "column", height: "100vh", "--workspace-glow-strength": workspaceArrangement.backlight / 100 }}>
       {pinWindow}
-      {premiumOpen && <PremiumInterest onClose={() => setPremiumOpen(false)} onOpenChange={onMenuDepth} />}
+      {!SIN_PREMIUM && premiumOpen && <PremiumInterest onClose={() => setPremiumOpen(false)} onOpenChange={onMenuDepth} />}
       {/* file inputs — always mounted (drag-drop and the ⋯ import path need
           the refs even while focus mode hides the bar) */}
       <input name="sheet-file" ref={fileInputRef} type="file" accept=".pdf,application/pdf,image/*,.zip,application/zip,application/x-zip-compressed,.otk" multiple style={{ display: "none" }}
@@ -8815,13 +8829,13 @@ export default function TakeoffCanvas() {
         onPremium={() => setPremiumOpen(true)} onReport={() => setShowReport(true)} onFocus={toggleFocusMode} onClassic={() => workspacePrefs.setEnabled(false)}
         onControls={() => setWorkspaceControlsOpen((v) => !v)} controlsOpen={workspaceControlsOpen} onSearch={() => setWorkspaceSearchOpen(true)}
         pinControl={pinButton}
-        panelTools={<div className="calm-panel-tools" role="group" aria-label="Quantity and review tools">
-          {panelBtn(() => setLeftTab((t) => (t === "markup" ? null : "markup")), "document", "Markup list — existing clouds, callouts, and notes", leftTab === "markup", markupCount)}
-          {panelBtn(() => setLeftTab((t) => (t === "stamp" ? null : "stamp")), "stamp", "Stamps — reusable annotations dropped click-to-place", leftTab === "stamp", stampLib.stamps.length)}
-          {panelBtn(() => setLeftTab((t) => (t === "rfi" ? null : "rfi")), "rfi", "RFI register — raise, track, and export Requests For Information", leftTab === "rfi", rfis.length)}
+        panelTools={<div className="calm-panel-tools" role="group" aria-label="Herramientas de cantidades y revisión">
+          {panelBtn(() => setLeftTab((t) => (t === "markup" ? null : "markup")), "document", "Lista de anotaciones: nubes, llamadas y notas existentes", leftTab === "markup", markupCount)}
+          {panelBtn(() => setLeftTab((t) => (t === "stamp" ? null : "stamp")), "stamp", "Sellos: anotaciones reutilizables que se colocan con un clic", leftTab === "stamp", stampLib.stamps.length)}
+          {panelBtn(() => setLeftTab((t) => (t === "rfi" ? null : "rfi")), "rfi", "Registro de RFI: levante, siga y exporte solicitudes de información", leftTab === "rfi", rfis.length)}
           {rollByCond.size > 0 && panelBtn(() => setRollPanelOpen((o) => !o), "roll", "Roll goods — the cut diagram, cutting order, and figured order footage", rollPanelOpen, rollByCond.size)}
           {layerEntries.length > 0 && panelBtn(() => setLayersOpen((o) => !o), "layers", "PDF layers — drawing layers", layersOpen, layerEntries.reduce((n, e) => n + e.layers.length, 0))}
-          {panelBtn(() => setShowRevisions(true), "revisions", "Revisions — save the takeoff at each bid revision, compare what moved", showRevisions)}
+          {panelBtn(() => setShowRevisions(true), "revisions", "Revisiones: guarde el takeoff en cada revisión de oferta y compare qué cambió", showRevisions)}
         </div>}
         layoutMenu={<button type="button" onClick={() => setWorkspaceLayoutOpen(true)} title="Organizar paneles, bloquear posiciones y guardar disposiciones"><Icon name="sliders" size={16} />Disposición</button>}
         helpMenu={<ToolMenu title="Aprender a usar la app o conectar un agente de IA" face={<span>Ayuda</span>} onOpenChange={onMenuDepth} items={[
@@ -8832,9 +8846,9 @@ export default function TakeoffCanvas() {
         fileMenu={<><ToolMenu title="Archivos y espacio de trabajo" face={<span>Archivo</span>} onOpenChange={onMenuDepth} items={sheetMenuItems} /><PresenceChip bridge={store.syncBridge} /><AccountChip note={cloudMode ? "Sincronizado a Google Drive" : "Espacio local"} onOpenChange={onMenuDepth} /></>}
         conditionControl={<><label className="calm-condition-label" htmlFor="workspace-condition">Condición</label><select id="workspace-condition" value={activeCond || ""} onChange={(e) => activateCondition(e.target.value)} title={tool === "select" && selectedId ? "Reasignar la medición seleccionada" : "Condición para la próxima medición"}>
           {!conditions.length && <option value="">No conditions</option>}{conditions.map((c) => <option key={c.id} value={c.id}>{c.finish_tag}</option>)}</select>
-          <button type="button" onClick={addCondition} title="Add condition" aria-label="Add condition"><Icon name="plus" size={14} /></button>
+          <button type="button" onClick={addCondition} title="Agregar condición" aria-label="Agregar condición"><Icon name="plus" size={14} /></button>
           <button type="button" onClick={() => setWorkspaceDetailsOpen((v) => !v)} aria-expanded={workspaceDetailsOpen} disabled={!aCond}>Propiedades</button></>}
-        history={<><button type="button" onClick={() => poly.length ? dropLastPoint() : undoShapeCommand()} title="Undo (⌘Z)" aria-label="Undo"><Icon name="undo" size={16} /></button><button type="button" onClick={redoShapeCommand} title="Redo (⇧⌘Z)" aria-label="Redo"><span style={{ display: "flex", transform: "scaleX(-1)" }}><Icon name="undo" size={16} /></span></button></>}
+        history={<><button type="button" onClick={() => poly.length ? dropLastPoint() : undoShapeCommand()} title="Deshacer (⌘Z)" aria-label="Deshacer"><Icon name="undo" size={16} /></button><button type="button" onClick={redoShapeCommand} title="Rehacer (⇧⌘Z)" aria-label="Rehacer"><span style={{ display: "flex", transform: "scaleX(-1)" }}><Icon name="undo" size={16} /></span></button></>}
         aids={<><button type="button" aria-pressed={tool === "zone"} onClick={() => setTool((t) => (t === "zone" ? "select" : "zone"))} title="Chequeo de zona: trace una región (un apartamento, un ala) para leer las cantidades de cada condición dentro de ella, materiales incluidos. No se guarda nada; el contorno se borra al salir de la herramienta."><Icon name="zone" size={15} />Zona</button><button type="button" aria-pressed={snapOn} onClick={() => setSnapOn((v) => !v)} title="Imantar a líneas/esquinas del plano (beta)"><Icon name="snap" size={15} />Imán</button><button type="button" aria-pressed={angleOn} onClick={() => setAngleOn((v) => !v)} title="Guías de ángulo 45°/90°"><Icon name="angle" size={15} />45°</button>{draftMenu}<span className="calm-separator" />{annotations.control}</>}
         action={finishOk && <button type="button" onClick={finishShape}>Terminar ({poly.length})</button>}
         scaleMenu={<><button type="button" onClick={() => setUnits((u) => u === "metric" ? "imperial" : "metric")} title="Cambiar unidades de visualización">{units === "metric" ? "m" : "ft"}</button><ToolMenu title={scaleTitle} onOpenChange={onScaleMenuDepth} face={<span data-tour="scale">{scaleFace}</span>} faceStyle={{ fontFamily: "var(--f-mono)", fontSize: 11.5, ...scaleFaceStyle }} menuStyle={{ minWidth: 250 }} items={scaleItems} /></>}
@@ -8856,9 +8870,9 @@ export default function TakeoffCanvas() {
           style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: "1px solid var(--ink)", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}>
           <Icon name="plus" size={14} />Abrir</button>
         <button type="button" onClick={() => setView("gallery")}
-          title={`Plan set — the visual gallery; open one or several sheets (G)${sheetGroup.length ? ` · ${sheetGroup.length} side-by-side now` : ""}`}
+          title={`Juego de planos — la galería visual; abra una o varias hojas (G)${sheetGroup.length ? ` · ${sheetGroup.length} lado a lado ahora` : ""}`}
           style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1px solid ${sheetGroup.length ? "var(--cobalt)" : "var(--ink-faint)"}`, background: sheetGroup.length ? "var(--cobalt)" : "transparent", color: sheetGroup.length ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}>
-          <Icon name="sheets" size={15} />Sheets
+          <Icon name="sheets" size={15} />Hojas
         </button>
         {pinButton}
         {sheets.length > 0 && (
@@ -8882,22 +8896,22 @@ export default function TakeoffCanvas() {
           <ToolMenu
             title="Editar mediciones"
             onOpenChange={onMenuDepth}
-            face={<span>Edit</span>}
+            face={<span>Editar</span>}
             items={[
-              { id: "copy", icon: "copy", label: "Copy", shortcut: "⌘C", disabled: !selectedId, onSelect: copySelected },
-              { id: "paste", icon: "paste", label: "Paste", shortcut: "⌘V", disabled: !clipRef.current.length, onSelect: () => pasteClipboard() },
-              { id: "dup", icon: "duplicate", label: "Duplicate", shortcut: "⌘D", disabled: !selectedId, onSelect: duplicateSelected },
+              { id: "copy", icon: "copy", label: "Copiar", shortcut: "⌘C", disabled: !selectedId, onSelect: copySelected },
+              { id: "paste", icon: "paste", label: "Pegar", shortcut: "⌘V", disabled: !clipRef.current.length, onSelect: () => pasteClipboard() },
+              { id: "dup", icon: "duplicate", label: "Duplicar", shortcut: "⌘D", disabled: !selectedId, onSelect: duplicateSelected },
               "divider",
-              { id: "flipH", label: "Flip Horizontal", disabled: !selectedId, onSelect: () => flipSelected("h") },
-              { id: "flipV", label: "Flip Vertical", disabled: !selectedId, onSelect: () => flipSelected("v") },
-              { id: "tidy", label: "Tidy shape", disabled: !selectedId, onSelect: tidySelected },
+              { id: "flipH", label: "Voltear horizontal", disabled: !selectedId, onSelect: () => flipSelected("h") },
+              { id: "flipV", label: "Voltear vertical", disabled: !selectedId, onSelect: () => flipSelected("v") },
+              { id: "tidy", label: "Ordenar figura", disabled: !selectedId, onSelect: tidySelected },
               "divider",
-              { id: "finish", icon: "check", label: `Finish shape${poly.length ? ` (${poly.length} pts)` : ""}`, shortcut: "↵", disabled: !finishOk, onSelect: finishShape },
-              { id: "undopt", icon: "undo", label: "Undo last point", shortcut: "⌘Z", disabled: !poly.length, onSelect: dropLastPoint },
-              { id: "undoshape", icon: "undo", label: "Undo last shape", disabled: !visibleShapes.length, onSelect: undoLast },
-              { id: "redo", label: "Redo", shortcut: "⇧⌘Z", onSelect: redoShapeCommand },
+              { id: "finish", icon: "check", label: `Terminar figura${poly.length ? ` (${poly.length} pts)` : ""}`, shortcut: "↵", disabled: !finishOk, onSelect: finishShape },
+              { id: "undopt", icon: "undo", label: "Deshacer último punto", shortcut: "⌘Z", disabled: !poly.length, onSelect: dropLastPoint },
+              { id: "undoshape", icon: "undo", label: "Deshacer última figura", disabled: !visibleShapes.length, onSelect: undoLast },
+              { id: "redo", label: "Rehacer", shortcut: "⇧⌘Z", onSelect: redoShapeCommand },
               "divider",
-              { id: "del", icon: "close", label: "Delete selected", shortcut: "⌫", disabled: !selectedId, tint: "var(--c-danger)", onSelect: deleteSelected },
+              { id: "del", icon: "close", label: "Eliminar selección", shortcut: "⌫", disabled: !selectedId, tint: "var(--c-danger)", onSelect: deleteSelected },
             ]}
           />
         </>)}
@@ -8907,7 +8921,7 @@ export default function TakeoffCanvas() {
             <button onClick={() => setTool((t) => (t === "stitch-align" ? "select" : "stitch-align"))}
               title="Alinear la línea de encuentro: haga clic en un punto junto a la unión y luego en el MISMO punto donde la otra hoja lo dibuja; esa hoja se desliza hasta coincidir. Hágalo antes de trazar (un empalme con mediciones no se realinea)."
               style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1px solid ${tool === "stitch-align" ? "var(--cobalt)" : "var(--ink-faint)"}`, background: tool === "stitch-align" ? "var(--cobalt)" : "transparent", color: tool === "stitch-align" ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}>
-              <Icon name="calibrate" size={15} />Align
+              <Icon name="calibrate" size={15} />Alinear
             </button>
           )}
           <button onClick={() => setTool((t) => (t === "zone" ? "select" : "zone"))}
@@ -9034,7 +9048,7 @@ export default function TakeoffCanvas() {
           onOpenChange={onMenuDepth}
           face={<span style={{ fontWeight: 700, letterSpacing: "0.08em" }}>⋯</span>}
           items={[
-            { id: "premium-interest", label: "Solicitar Premium — lista de acceso anticipado", highlight: true, onSelect: () => setPremiumOpen(true) },
+            ...(!SIN_PREMIUM ? [{ id: "premium-interest", label: "Solicitar Premium — lista de acceso anticipado", highlight: true, onSelect: () => setPremiumOpen(true) }] : []),
             { id: "workspace-preview", label: workspaceLayout ? "Disposición clásica" : "Disposición premium — controles compactos", onSelect: () => workspacePrefs.setEnabled(!workspaceLayout) },
             { id: "guide", label: "Cómo funciona la app", shortcut: "?", onSelect: () => setGuideOpen(true) },
             { id: "tour", label: "Primer takeoff guiado", onSelect: startTour },
@@ -10571,11 +10585,11 @@ export default function TakeoffCanvas() {
               is stopped so rapid clicks can't finishShape() */}
           <div onPointerDown={(e) => { if (e.button === 0 && !spaceRef.current) e.stopPropagation(); }} onDoubleClick={(e) => e.stopPropagation()}
             style={{ position: "absolute", left: 14, bottom: 14, display: "flex", flexDirection: "column", gap: 6 }}>
-            <button onClick={() => stage.w && fitToView(stage.w, stage.h)} title="Ajustar hoja a la vista" style={{ width: 34, height: 34, borderRadius: 0, border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", fontSize: 12 }}>fit</button>
-            <button onClick={() => setDarkMode((d) => !d)} title={darkMode ? "Sheet back to positive print" : "Invert sheet — negative print (affects marked-set export)"}
+            <button onClick={() => stage.w && fitToView(stage.w, stage.h)} title="Ajustar hoja a la vista" style={{ width: 34, height: 34, borderRadius: 0, border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", fontSize: 12 }}>⤢</button>
+            <button onClick={() => setDarkMode((d) => !d)} title={darkMode ? "Hoja de vuelta a copia positiva" : "Invertir hoja — copia negativa (afecta la exportación del juego marcado)"}
               style={{ width: 34, height: 34, borderRadius: 0, border: `1px solid ${darkMode ? "var(--cobalt)" : "var(--ink-faint)"}`, background: darkMode ? "var(--cobalt)" : "var(--paper-bright)", color: darkMode ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", fontSize: 13 }}>
               {darkMode ? "☀" : "☾"}</button>
-            <button onClick={() => toggleFocusMode()} title={focusMode ? "Focus off — show all chrome (F)" : "Focus — trade chrome for canvas height (F)"}
+            <button onClick={() => toggleFocusMode()} title={focusMode ? "Enfoque apagado — muestre todos los controles (F)" : "Enfoque — cambie controles por altura de lienzo (F)"}
               style={{ width: 34, height: 34, borderRadius: 0, border: `1px solid ${focusMode ? "var(--cobalt)" : "var(--ink-faint)"}`, background: focusMode ? "var(--cobalt)" : "var(--paper-bright)", color: focusMode ? "var(--accent-contrast)" : "var(--ink)", cursor: "pointer", fontSize: 13 }}>⛶</button>
           </div>
 
@@ -10923,14 +10937,14 @@ export default function TakeoffCanvas() {
             takeoffs toggle mirrors the DOCKED panel's collapsed pref — the rail
             rides the canvas edge, so it stays visible either way. */}
         <div data-panel-rail style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", display: workspaceLayout && !focusMode ? "none" : "flex", flexDirection: "column", gap: 6, zIndex: 8 }}>
-          {panelBtn(() => setLeftTab((t) => (t === "markup" ? null : "markup")), "document", "Markup list — existing clouds, callouts, and notes", leftTab === "markup", markupCount)}
-          {panelBtn(() => setLeftTab((t) => (t === "stamp" ? null : "stamp")), "stamp", "Stamps — reusable annotations dropped click-to-place", leftTab === "stamp", stampLib.stamps.length)}
-          {panelBtn(() => setLeftTab((t) => (t === "rfi" ? null : "rfi")), "rfi", "RFI register — raise, track, and export Requests For Information", leftTab === "rfi", rfis.length)}
+          {panelBtn(() => setLeftTab((t) => (t === "markup" ? null : "markup")), "document", "Lista de anotaciones: nubes, llamadas y notas existentes", leftTab === "markup", markupCount)}
+          {panelBtn(() => setLeftTab((t) => (t === "stamp" ? null : "stamp")), "stamp", "Sellos: anotaciones reutilizables que se colocan con un clic", leftTab === "stamp", stampLib.stamps.length)}
+          {panelBtn(() => setLeftTab((t) => (t === "rfi" ? null : "rfi")), "rfi", "Registro de RFI: levante, siga y exporte solicitudes de información", leftTab === "rfi", rfis.length)}
           {(!workspaceLayout || focusMode) && panelBtn(toggleTakeoffs, "takeoffs", "Takeoffs — conditions + running totals", takeoffsOpen, visibleShapes.length)}
           {(!workspaceLayout || focusMode) && panelBtn(() => setAgentOpen((o) => !o), "target", "Work and review — measurements and agent proposals", agentOpen, agentProposals.length)}
           {rollByCond.size > 0 && panelBtn(() => setRollPanelOpen((o) => !o), "roll", "Roll goods — the cut diagram, cutting order, and figured order footage", rollPanelOpen, rollByCond.size)}
           {layerEntries.length > 0 && panelBtn(() => setLayersOpen((o) => !o), "layers", "PDF layers — what this drawing's own layer table states each ink is; set what One-Click treats as wall and what it ignores", layersOpen, layerEntries.reduce((n, e) => n + e.layers.length, 0))}
-          {panelBtn(() => setShowRevisions(true), "revisions", "Revisions — save the takeoff at each bid revision, compare what moved", showRevisions)}
+          {panelBtn(() => setShowRevisions(true), "revisions", "Revisiones: guarde el takeoff en cada revisión de oferta y compare qué cambió", showRevisions)}
         </div>
 
        </div>
@@ -11111,7 +11125,7 @@ export default function TakeoffCanvas() {
           sheetLabel={(k) => tabLabel(k)}
           sheetDims={(k) => panelByKey(k)?.img}
           onMarkedSet={exportMarkedSet} markedSetDark={darkMode}
-          onClose={() => { setShowReport(false); if (!premiumPrompted.current && shouldAutoPromptPremium(readPremiumPrompt(), shapes.length)) { premiumPrompted.current = true; setPremiumOpen(true); } }}
+          onClose={() => { setShowReport(false); if (!SIN_PREMIUM && !premiumPrompted.current && shouldAutoPromptPremium(readPremiumPrompt(), shapes.length)) { premiumPrompted.current = true; setPremiumOpen(true); } }}
         />
       )}
 

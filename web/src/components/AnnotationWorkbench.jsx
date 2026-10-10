@@ -229,7 +229,7 @@ export function useAnnotationWorkbench(options) {
   const [lastKey,lastLabel,lastIcon]=tools.find(t=>t[0]===mode)||tools[0];
   const control=<span className="annotation-split" role="group" aria-label="Annotate">
     <button type="button" aria-pressed={active} disabled={!options.ready} onClick={()=>active?options.setTool('select'):arm(lastKey)} title={active?`${lastLabel} armed — click to put it down`:`Annotate — ${lastLabel}`}>{toolIcon(lastIcon)}<span>{lastLabel}</span></button>
-    <ToolMenu title="All annotate tools" disabled={!options.ready} onOpenChange={options.onMenuDepth} faceStyle={{padding:'4px 5px'}} face={null} items={[
+    <ToolMenu title="Todas las herramientas de anotación" disabled={!options.ready} onOpenChange={options.onMenuDepth} faceStyle={{padding:'4px 5px'}} face={null} items={[
       {section:'Annotate'},
       ...tools.map(([key,label,icon])=>({id:key,checked:active&&mode===key,iconNode:toolIcon(icon),label,onSelect:()=>arm(key),title:key==='selection'?'Sweep a box to select editable markups; Shift-click adds individual marks':label})),
       'divider',

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../brand/icons.jsx";
 import { keyText } from "../lib/keys.ts";
+import { SIN_PREMIUM } from "../lib/ingelmec.js";
 import "./workspaceChrome.css";
 
 // Workspace chrome. All actions are supplied by the existing canvas;
@@ -11,9 +12,9 @@ export function WorkspaceChrome({ title, onOpen, onNavigate, navigationOpen, onT
   return <>
     <header className="calm-header">
       <strong className="calm-brand">ingelmec<span>takeoff</span></strong>
-      <div className="calm-project" title={title}><span>{title || "Espacio sin nombre"}</span><small>Espacio premium</small></div>
+      <div className="calm-project" title={title}><span>{title || "Espacio sin nombre"}</span><small>Ingelmec Takeoff</small></div>
       <div className="calm-header-actions">
-        <button type="button" onClick={onOpen} title="Open plans"><Icon name="plus" size={16} /><span>Open</span></button>
+        <button type="button" onClick={onOpen} title="Abrir planos"><Icon name="plus" size={16} /><span>Abrir</span></button>
         {fileMenu}
         <button type="button" aria-pressed={navigationOpen} onClick={onNavigate}><Icon name="sheets" size={16} />Hojas</button>
         {pinControl}
@@ -22,14 +23,14 @@ export function WorkspaceChrome({ title, onOpen, onNavigate, navigationOpen, onT
         <button type="button" ref={workButtonRef} aria-expanded={workOpen} onClick={onWork} className="calm-work">Trabajo{running ? <span className="calm-badge">En curso</span> : pending > 0 ? <span className="calm-badge">{pending}</span> : null}</button>
         {panelTools}
         <button type="button" onClick={onReport} className="calm-report" data-tour="report"><Icon name="document" size={16} />Reporte</button>
-        {layoutMenu}{helpMenu}<button type="button" className="calm-premium" data-premium-trigger onClick={onPremium}>Solicitar Premium</button><button type="button" onClick={onClassic} className="calm-classic" title="Volver a la disposición actual sin recargar el plano">Disposición clásica</button>
+        {layoutMenu}{helpMenu}{!SIN_PREMIUM && <button type="button" className="calm-premium" data-premium-trigger onClick={onPremium}>Solicitar Premium</button>}<button type="button" onClick={onClassic} className="calm-classic" title="Volver a la disposición actual sin recargar el plano">Disposición clásica</button>
       </div>
     </header>
     <div className="calm-context" aria-label="Current drawing settings">
       <div className="calm-context-scroll">{conditionControl}<span className="calm-separator" />{history}<span className="calm-separator" />{aids}</div>
       <div className="calm-context-pinned">{action}{scaleMenu}
         <button type="button" onClick={onFocus} title="Enfoque: oculta el chrome y deja las herramientas de medición (F)"><Icon name="focus" size={16} /><span className="calm-focus-label">Enfoque</span></button>
-        <button type="button" onClick={onControls} aria-expanded={controlsOpen} title="All existing toolbar controls and settings">{controlsOpen ? "Cerrar controles" : "Todos los controles"}</button>
+        <button type="button" onClick={onControls} aria-expanded={controlsOpen} title="Todos los controles y ajustes de la barra">{controlsOpen ? "Cerrar controles" : "Todos los controles"}</button>
       </div>
     </div>
   </>;

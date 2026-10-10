@@ -139,7 +139,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
           title="Snapshot the current takeoff (conditions, shapes, markups) as a named revision">
           <Icon name="revisions" size={13} />Save revision
         </button>
-        <button onClick={onClose} title="Back to the canvas"
+        <button onClick={onClose} title="Volver al lienzo"
           style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12.5 }}>
           <Icon name="close" size={12} />Close
         </button>

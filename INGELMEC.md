@@ -64,3 +64,24 @@ siguen disponibles desde la pestaña Plantillas del panel de Mediciones.
 - Tipografías: **Inter** (títulos) y **Open Sans** (cuerpo). Nunca Montserrat.
 - Crédito obligatorio a OpenTakeoff en los entregables («Measured with
   OpenTakeoff») — requerido por la licencia Apache-2.0 del proyecto original.
+
+## Cambios de la fase T3/T4 (2026-10-10)
+
+- **Premium apagado** (`SIN_PREMIUM = true` en `lib/ingelmec.js`): el botón
+  «Solicitar Premium» (barra compacta y galería), el ítem del menú ⋯, el diálogo
+  automático tras cerrar el reporte y el render del modal quedan sin efecto. El
+  módulo original (`premiumInterest.js` / `PremiumInterest.jsx`) queda intacto:
+  ninguna superficie hace el POST del formulario. El rótulo del espacio en la
+  barra pasa de «Espacio premium» a «Ingelmec Takeoff».
+- **Segunda pasada de español** (barra compacta, galería «Juego de planos ·
+  elija una o varias…», menú Editar completo, paleta de comandos, pins, sellos,
+  RFI, revisiones, ayudas). Sigue en inglés lo listado arriba, más el vocabulario
+  de tool MCP en la barra de estado (`TOOL_VERB`: son los NOMBRES reales de las
+  herramientas del agente; traducirlos mentiría).
+- **Sello Aprobado sobre tarjetas y con nombre** (`placeApproval` en
+  `TakeoffCanvas.jsx`, marcado `INGELMEC (T4)`): además de sellar una forma, el
+  sello humano ahora puede sellar un **markup** (la tarjeta de una guarda del
+  motor — se registra `markup_id`) y guarda el **nombre declarado** del autor
+  (`by`, el mismo modelo de autodeclaración que `git user.name`). Ambos campos
+  son aditivos: pasan intactos por `sanitizeApprovals`, el export/import y el
+  PDF marcado. `firmas_desde_takeoff` (motor dxf-takeoff) es el consumidor.

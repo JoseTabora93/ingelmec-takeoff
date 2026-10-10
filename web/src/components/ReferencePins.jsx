@@ -6,7 +6,7 @@ import "./ReferencePins.css";
 export function PinButton({ armed, disabled, onCapture, count, onShow }) {
   return <span className="reference-pin-buttons">
     <button type="button" aria-label="Fijar" aria-pressed={armed} disabled={disabled} onClick={onCapture}
-      title="Pin any part of this sheet — click two corners to keep a reference beside your takeoff">
+      title="Fije cualquier parte de esta hoja: haga clic en dos esquinas para conservar la referencia junto a su takeoff">
       <Icon name="pin" size={16} />Pin
     </button>
     {count > 0 && <button type="button" aria-label={`Show pins (${count})`} title="Show saved pins" onClick={onShow}>{count}<Icon name="chevronDown" size={12} /></button>}
