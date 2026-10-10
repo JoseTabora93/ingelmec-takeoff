@@ -449,8 +449,8 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
     <div className="report-panel" style={{ ...theme.vars, position: "absolute", inset: 0, zIndex: 50, display: "flex", flexDirection: "column", background: "var(--paper-cream)" }}>
       <div className="report-toolbar" style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 18px", borderBottom: "1px solid var(--ink)", background: "var(--paper-bright)" }}>
         <Icon name="takeoffs" size={18} />
-        <strong style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)" }}>Takeoff report</strong>
-        <input name="project-name" value={projectName} onChange={(e) => onProjectName(e.target.value)} placeholder="Project name (optional)"
+        <strong style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)" }}>Reporte de mediciones</strong>
+        <input name="project-name" value={projectName} onChange={(e) => onProjectName(e.target.value)} placeholder="Nombre del proyecto (opcional)"
           className="field-input" style={{ width: 260, padding: "5px 9px", fontSize: 13 }} />
         <div style={{ flex: 1 }} />
         <button className="btn-ghost" onClick={() => setShowInfo(true)}
@@ -513,17 +513,17 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
           )}
         </div>
         <div ref={templatesRef} style={{ position: "relative" }}>
-          <button className="btn-ghost" onClick={() => setShowTemplates((s) => !s)} title="Save and recall report layouts (columns + grouping)">Templates{templates.length ? ` (${templates.length})` : ""}</button>
+          <button className="btn-ghost" onClick={() => setShowTemplates((s) => !s)} title="Guardar y recordar disposiciones del reporte (columnas + agrupación)">Plantillas{templates.length ? ` (${templates.length})` : ""}</button>
           {showTemplates && (
             <div className="report-modal" style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, zIndex: 70, width: 260, background: "var(--paper-bright)", border: "1px solid var(--ink)", boxShadow: "var(--shadow-2)", padding: "10px 12px", fontSize: 12.5, color: "var(--ink)" }}>
               <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
-                <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Templates</strong>
+                <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Plantillas</strong>
                 <div style={{ flex: 1 }} />
                 <button onClick={() => setShowTemplates(false)} title="Close"
                   style={{ border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>✕</button>
               </div>
-              <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.4, marginBottom: 6 }}>Saved column + grouping layouts (this device). Click one to apply.</div>
-              {templates.length === 0 && <div style={{ fontSize: 10.5, color: "var(--ink-muted)", marginBottom: 6 }}>No saved templates yet.</div>}
+              <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.4, marginBottom: 6 }}>Disposiciones de columnas + agrupación guardadas (en este equipo). Haga clic para aplicar.</div>
+              {templates.length === 0 && <div style={{ fontSize: 10.5, color: "var(--ink-muted)", marginBottom: 6 }}>Aún no hay plantillas guardadas.</div>}
               {templates.map((t) => (
                 <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 0" }}>
                   <button onClick={() => applyTemplate(t)} title="Apply this layout"
@@ -561,11 +561,11 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
           )}
         </div>
         <div ref={themeRef} style={{ position: "relative" }}>
-          <button className="btn-ghost" onClick={() => setShowTheme((s) => !s)} title="Apply an imported design-token theme to the report (colors + fonts)">Theme{theme.name ? " ●" : ""}</button>
+          <button className="btn-ghost" onClick={() => setShowTheme((s) => !s)} title="Aplicar un tema de design-tokens importado al reporte (colores + fuentes)">Tema{theme.name ? " ●" : ""}</button>
           {showTheme && (
             <div className="report-modal" style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, zIndex: 70, width: 292, background: "var(--paper-bright)", border: "1px solid var(--ink)", boxShadow: "var(--shadow-2)", padding: "10px 12px", fontSize: 12.5, color: "var(--ink)" }}>
               <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
-                <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Report theme</strong>
+                <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Tema del reporte</strong>
                 <div style={{ flex: 1 }} />
                 <button onClick={() => setShowTheme(false)} title="Close"
                   style={{ border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>✕</button>

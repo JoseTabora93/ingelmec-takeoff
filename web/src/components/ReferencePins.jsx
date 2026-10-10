@@ -5,7 +5,7 @@ import "./ReferencePins.css";
 
 export function PinButton({ armed, disabled, onCapture, count, onShow }) {
   return <span className="reference-pin-buttons">
-    <button type="button" aria-label="Pin" aria-pressed={armed} disabled={disabled} onClick={onCapture}
+    <button type="button" aria-label="Fijar" aria-pressed={armed} disabled={disabled} onClick={onCapture}
       title="Pin any part of this sheet — click two corners to keep a reference beside your takeoff">
       <Icon name="pin" size={16} />Pin
     </button>
@@ -41,7 +41,7 @@ export default function ReferencePins({ pins, selectedId, onSelect, onClose, onS
         onPointerDown={startDrag} onPointerMove={e => { const d = drag.current; if (d) move(d.left + e.clientX - d.x, d.top + e.clientY - d.y); }}
         onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }}
         onKeyDown={e => { const delta = { ArrowLeft: [-20, 0], ArrowRight: [20, 0], ArrowUp: [0, -20], ArrowDown: [0, 20] }[e.key]; if (delta) { e.preventDefault(); const r = frame.current.getBoundingClientRect(); move(r.left + delta[0], r.top + delta[1]); } }}>
-        <Icon name="pin" size={15} /><span>Pin</span>
+        <Icon name="pin" size={15} /><span>Fijar</span>
       </button>
       <select aria-label="Pinned reference" value={pin.id} onChange={e => { onSelect(e.target.value); setZoom(1); }}>
         {pins.map(p => <option key={p.id} value={p.id}>{p.text || p.src_label || "Reference"}</option>)}

@@ -6,7 +6,7 @@ import './AnnotationWorkbench.css';
 
 const supported = m => !m.reference_only && ['arrow','highlight','callout','cloud','text'].includes(m.type);
 const colors = ['#dc3d43','#2563eb','#249268','#8b5cf6','#172033','#ffd60a','#ff9f0a'];
-const tools = [['arrow','Arrow','arrow'],['highlighter','Highlighter','highlighter'],['callout','Callout','callout'],['cloud','Cloud + note','cloud'],['sweep','Sweep','symbol'],['selection','Select markups','select']];
+const tools = [['arrow','Flecha','arrow'],['highlighter','Resaltador','highlighter'],['callout','Llamada','callout'],['cloud','Nube + nota','cloud'],['sweep','Barrido','symbol'],['selection','Seleccionar anotaciones','select']];
 const ArrowIcon = () => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M5 19 19 5M9 5h10v10"/></svg>;
 const toolIcon = name => name === 'arrow' ? <ArrowIcon/> : name === 'symbol' ? <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5"/><circle cx="9" cy="9" r="1.5"/><circle cx="15" cy="9" r="1.5"/><circle cx="9" cy="15" r="1.5"/><circle cx="15" cy="15" r="1.5"/></svg> : <Icon name={name} size={17}/>;
 const norm = (q,p) => [(q[0]-p.xOffset)/p.img.w,q[1]/p.img.h];

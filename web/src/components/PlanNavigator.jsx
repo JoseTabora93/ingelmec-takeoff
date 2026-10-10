@@ -846,7 +846,7 @@ export default function PlanNavigator({
           <button onClick={() => (browseEnabled ? setAddMenu((v) => !v) : fileRef.current?.click())}
             title="Agregar planos: desde su equipo o Google Drive"
             style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", border: "1px solid var(--ink)", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 600, fontSize: 12.5 }}>
-            <Icon name="plus" size={13} />Add plans{browseEnabled && <Icon name="chevronDown" size={12} />}
+            <Icon name="plus" size={13} />Agregar planos{browseEnabled && <Icon name="chevronDown" size={12} />}
           </button>
           {addMenu && browseEnabled && (
             <>
@@ -1075,7 +1075,7 @@ export default function PlanNavigator({
                 <button onClick={() => fileRef.current?.click()}
                   style={{ display: "block", width: "100%", margin: "24px auto 0", padding: "44px 24px", border: "2px dashed var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", color: "var(--ink-muted)", fontFamily: "var(--f-body)", fontSize: 13.5, lineHeight: 1.7 }}>
                   <div style={{ fontFamily: "var(--f-display)", fontSize: 20, color: "var(--ink)", marginBottom: 8 }}>Abra sus planos</div>
-                  Drag a PDF, an image, or a whole .zip plan set here — or click to choose. Nothing leaves your browser.
+                  Arrastre aquí un PDF, una imagen o un juego de planos .zip completo — o haga clic para elegir. Nada sale de su navegador.
                 </button>
                 {isGoogleConfigured() && (!user || projectHomeFolderId()) && (
                   <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.6 }}>
@@ -1084,7 +1084,7 @@ export default function PlanNavigator({
                         <button type="button" onClick={handleDriveSignIn} disabled={driveBusy}
                           title="Inicie sesión con la cuenta de Google de su equipo para abrir proyectos guardados en Drive"
                           style={{ border: "none", background: "transparent", padding: 0, color: "var(--cobalt)", cursor: driveBusy ? "default" : "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
-                          {driveBusy ? "Signing in…" : "or sign in with Google Drive"}
+                          {driveBusy ? "Iniciando sesión…" : "o inicie sesión con Google Drive"}
                         </button>
                         {driveErr ? <div style={{ color: "var(--c-danger)", fontSize: 11.5, marginTop: 5 }}>Falló el inicio de sesión: {driveErr}</div> : null}
                       </>
@@ -1100,7 +1100,7 @@ export default function PlanNavigator({
                     {!m365Active ? (
                       <>
                         <button type="button" onClick={doLinkM365}
-                          title="Sign in with your work account and sync this workspace through the configured document library. Experimental (issue #315) — tokens stay in this browser."
+                          title="Inicie sesión con su cuenta de trabajo y sincronice este espacio por la librería de documentos configurada. Experimental (issue #315); los tokens se quedan en este navegador."
                           style={{ border: "none", background: "transparent", padding: 0, color: "var(--cobalt)", cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
                           or sync through your Microsoft 365 library (experimental)
                         </button>
@@ -1108,7 +1108,7 @@ export default function PlanNavigator({
                       </>
                     ) : (
                       <span style={{ color: "var(--ink-muted)" }}>
-                        syncing through your <strong style={{ color: "var(--ink)" }}>Microsoft 365 library</strong>
+                        sincronizando por su <strong style={{ color: "var(--ink)" }}>librería de Microsoft 365</strong>
                         {" · "}
                         <button type="button" onClick={doStopM365}
                           style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
@@ -1124,7 +1124,7 @@ export default function PlanNavigator({
                       <button type="button" onClick={doLinkFolder}
                         title="Elija una carpeta que su equipo ya sincronice (un recurso de red, una librería de documentos sincronizada): el takeoff se sincroniza por ahí como un archivo JSON. Sin cuenta ni credenciales; el cliente de sincronización de la carpeta hace el transporte."
                         style={{ border: "none", background: "transparent", padding: 0, color: "var(--cobalt)", cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
-                        or sync this workspace through a shared folder
+                        or sincronice este espacio por una carpeta compartida
                       </button>
                     ) : (
                       <span style={{ color: "var(--ink-muted)" }}>
@@ -1139,7 +1139,7 @@ export default function PlanNavigator({
                   </div>
                 )}
                 <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px auto 16px", color: "var(--text-faint)", fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-                  <span style={{ flex: 1, height: 1, background: "var(--ink-faint)" }} />new here?<span style={{ flex: 1, height: 1, background: "var(--ink-faint)" }} />
+                  <span style={{ flex: 1, height: 1, background: "var(--ink-faint)" }} />¿Primera vez?<span style={{ flex: 1, height: 1, background: "var(--ink-faint)" }} />
                 </div>
                 {onStartTour && (
                   <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "12px 18px", marginBottom: 14, textAlign: "left" }}>
@@ -1147,39 +1147,39 @@ export default function PlanNavigator({
                         still under reduced motion (the poster shows; controls play it) */}
                     <video src={`${demoBase}demo/first-takeoff.mp4`} poster={`${demoBase}demo/first-takeoff-poster.jpg`}
                       autoPlay={!reducedMotion} controls={reducedMotion} muted loop playsInline preload="metadata"
-                      aria-label="A recorded run of the guided first takeoff: open the sample plan, set its scale, arm Area, trace a patient room, open the Report"
+                      aria-label="Corrida grabada del primer takeoff guiado: abrir el plano de ejemplo, fijar su escala, armar Área, trazar un recinto y abrir el Reporte"
                       onClick={reducedMotion ? undefined : onStartTour}
                       style={{ width: 220, aspectRatio: "960 / 618", border: "1px solid var(--ink-faint)", background: "var(--paper-shadow)", cursor: reducedMotion ? "default" : "pointer", display: "block" }} />
                     <div style={{ maxWidth: 250 }}>
                       <button onClick={onStartTour} title="Abrir el plano de ejemplo y hacer un takeoff real, paso a paso — unos dos minutos"
                         style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "13px 22px", border: "1px solid var(--ink)", background: "var(--cobalt)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 700, fontSize: 14, fontFamily: "var(--f-body)" }}>
-                        <Icon name="takeoff" size={16} />Guided first takeoff
+                        <Icon name="takeoff" size={16} />Primer takeoff guiado
                       </button>
                       <div style={{ fontFamily: "var(--f-body)", fontSize: 12.5, color: "var(--ink-muted)", marginTop: 8, lineHeight: 1.5 }}>
-                        Two minutes, five steps, on a real plan. You do each step; it checks it off.
+                        Dos minutos, cinco pasos, sobre un plano real. Usted hace cada paso; la app lo va verificando.
                       </div>
                     </div>
                   </div>
                 )}
                 <button onClick={loadSample} disabled={sampleBusy} title="Abrir un plano real de acabados de piso y probar un takeoff"
                   style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: onStartTour ? "9px 16px" : "13px 22px", border: "1px solid var(--ink)", background: onStartTour ? "transparent" : "var(--cobalt)", color: onStartTour ? "var(--ink)" : "var(--paper-bright)", cursor: sampleBusy ? "default" : "pointer", opacity: sampleBusy ? 0.65 : 1, fontWeight: 700, fontSize: onStartTour ? 13 : 14, fontFamily: "var(--f-body)" }}>
-                  <Icon name="takeoff" size={16} />{sampleBusy ? "Loading sample…" : onStartTour ? "Just open the sample plan" : "Load sample plan"}
+                  <Icon name="takeoff" size={16} />{sampleBusy ? "Cargando el ejemplo…" : onStartTour ? "Solo abrir el plano de ejemplo" : "Cargar plano de ejemplo"}
                 </button>
                 <div style={{ fontFamily: "var(--f-body)", fontSize: 12.5, color: "var(--ink-muted)", marginTop: 11, lineHeight: 1.6 }}>
-                  A real medical-center <strong style={{ color: "var(--ink)" }}>floor finish plan</strong> — its scale is read off the sheet;
+                  Un <strong style={{ color: "var(--ink)" }}>plano real de acabados</strong> de un centro médico: la escala se lee de la hoja;
                   pick a finish and trace a flooring takeoff in seconds.
                 </div>
                 {onConnect && (
                   <div style={{ marginTop: 14, fontFamily: "var(--f-body)", fontSize: 12.5, color: "var(--ink-muted)" }}>
-                    Working with Claude, Codex or Cursor?{" "}
+                    ¿Trabaja con Claude, Codex o Cursor?{" "}
                     <button type="button" onClick={onConnect}
                       style={{ border: "none", background: "transparent", padding: 0, color: "var(--cobalt)", cursor: "pointer", fontSize: 12.5, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
-                      Connect your AI
+                      Conecte su IA
                     </button>
                   </div>
                 )}
                 <div style={{ marginTop: 30, fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.1em", color: "var(--text-faint)" }}>
-                  Apache-2.0 open source · an open project by{" "}
+                  Código abierto Apache-2.0 · un proyecto abierto de{" "}
                   <a href="https://kentucky-ai.com" target="_blank" rel="noopener" style={{ color: "var(--ink-muted)" }}>Kentucky&nbsp;AI</a>
                 </div>
               </div>
@@ -1188,7 +1188,7 @@ export default function PlanNavigator({
                 <div style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)", marginBottom: 6 }}>No se pudieron leer esos PDF</div>
                 None of the opened files would render — try opening them again.
               </>
-            ) : "Reading the plan set…"}
+            ) : "Leyendo el juego de planos…"}
           </div>
         )}
       </div>

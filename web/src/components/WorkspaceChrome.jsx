@@ -10,26 +10,26 @@ export function WorkspaceChrome({ title, onOpen, onNavigate, navigationOpen, onT
   onControls, controlsOpen, onSearch, pinControl, panelTools, layoutMenu, helpMenu, fileMenu, scaleMenu, conditionControl, aids, history, action }) {
   return <>
     <header className="calm-header">
-      <strong className="calm-brand">open<span>takeoff</span></strong>
+      <strong className="calm-brand">ingelmec<span>takeoff</span></strong>
       <div className="calm-project" title={title}><span>{title || "Espacio sin nombre"}</span><small>Espacio premium</small></div>
       <div className="calm-header-actions">
         <button type="button" onClick={onOpen} title="Open plans"><Icon name="plus" size={16} /><span>Open</span></button>
         {fileMenu}
-        <button type="button" aria-pressed={navigationOpen} onClick={onNavigate}><Icon name="sheets" size={16} />Sheets</button>
+        <button type="button" aria-pressed={navigationOpen} onClick={onNavigate}><Icon name="sheets" size={16} />Hojas</button>
         {pinControl}
         <button type="button" onClick={onSearch} className="calm-search-trigger" title="Buscar una herramienta o acción"><Icon name="search" size={16} /><span>Buscar acción</span><kbd>{keyText("⌘K")}</kbd></button>
-        <button type="button" aria-pressed={takeoffsOpen} onClick={onTakeoffs} title="Measured quantities, conditions, and supporting materials"><Icon name="product" size={16} />Quantities</button>
+        <button type="button" aria-pressed={takeoffsOpen} onClick={onTakeoffs} title="Cantidades medidas, condiciones y materiales de apoyo"><Icon name="product" size={16} />Cantidades</button>
         <button type="button" ref={workButtonRef} aria-expanded={workOpen} onClick={onWork} className="calm-work">Trabajo{running ? <span className="calm-badge">En curso</span> : pending > 0 ? <span className="calm-badge">{pending}</span> : null}</button>
         {panelTools}
-        <button type="button" onClick={onReport} className="calm-report" data-tour="report"><Icon name="document" size={16} />Report</button>
+        <button type="button" onClick={onReport} className="calm-report" data-tour="report"><Icon name="document" size={16} />Reporte</button>
         {layoutMenu}{helpMenu}<button type="button" className="calm-premium" data-premium-trigger onClick={onPremium}>Solicitar Premium</button><button type="button" onClick={onClassic} className="calm-classic" title="Volver a la disposición actual sin recargar el plano">Disposición clásica</button>
       </div>
     </header>
     <div className="calm-context" aria-label="Current drawing settings">
       <div className="calm-context-scroll">{conditionControl}<span className="calm-separator" />{history}<span className="calm-separator" />{aids}</div>
       <div className="calm-context-pinned">{action}{scaleMenu}
-        <button type="button" onClick={onFocus} title="Focus — hide chrome, keep measuring tools (F)"><Icon name="focus" size={16} /><span className="calm-focus-label">Focus</span></button>
-        <button type="button" onClick={onControls} aria-expanded={controlsOpen} title="All existing toolbar controls and settings">{controlsOpen ? "Close controls" : "All controls"}</button>
+        <button type="button" onClick={onFocus} title="Enfoque: oculta el chrome y deja las herramientas de medición (F)"><Icon name="focus" size={16} /><span className="calm-focus-label">Enfoque</span></button>
+        <button type="button" onClick={onControls} aria-expanded={controlsOpen} title="All existing toolbar controls and settings">{controlsOpen ? "Cerrar controles" : "Todos los controles"}</button>
       </div>
     </div>
   </>;
