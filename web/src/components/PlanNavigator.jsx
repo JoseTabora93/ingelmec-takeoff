@@ -26,7 +26,7 @@ import { useGoogleAuth } from "../lib/google/AuthContext.jsx";
 import { parseSheetKey, extractSheetNumber, detectScale, RENDER_SCALE, MAX_GROUP } from "../lib/sheets";
 import { isGoogleConfigured } from "../lib/google/auth.js";
 import { projectHomeFolderId } from "../lib/projectHome.js";
-import { SIN_PREMIUM } from "../lib/ingelmec.js";
+import { SIN_PREMIUM, SIN_EXTERNOS } from "../lib/ingelmec.js";
 import { isFolderSyncSupported, loadFolderLink, linkFolder, forgetFolder, queryFolderPermission } from "../lib/fs/fsAccess.js";
 import { listConflictCopies } from "../lib/fs/fsProvider.js";
 import { m365Config, M365_ENABLED_KEY } from "../lib/msgraph/config.js";
@@ -1146,11 +1146,12 @@ export default function PlanNavigator({
                   <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "12px 18px", marginBottom: 14, textAlign: "left" }}>
                     {/* the guided takeoff itself, a real recorded run at 2× — muted, and
                         still under reduced motion (the poster shows; controls play it) */}
-                    <video src={`${demoBase}demo/first-takeoff.mp4`} poster={`${demoBase}demo/first-takeoff-poster.jpg`}
+                    {/* INGELMEC: el video del original muestra su marca y su botón de pago: retirado */}
+                    {!SIN_EXTERNOS && <video src={`${demoBase}demo/first-takeoff.mp4`} poster={`${demoBase}demo/first-takeoff-poster.jpg`}
                       autoPlay={!reducedMotion} controls={reducedMotion} muted loop playsInline preload="metadata"
                       aria-label="Corrida grabada del primer takeoff guiado: abrir el plano de ejemplo, fijar su escala, armar Área, trazar un recinto y abrir el Reporte"
                       onClick={reducedMotion ? undefined : onStartTour}
-                      style={{ width: 220, aspectRatio: "960 / 618", border: "1px solid var(--ink-faint)", background: "var(--paper-shadow)", cursor: reducedMotion ? "default" : "pointer", display: "block" }} />
+                      style={{ width: 220, aspectRatio: "960 / 618", border: "1px solid var(--ink-faint)", background: "var(--paper-shadow)", cursor: reducedMotion ? "default" : "pointer", display: "block" }} />}
                     <div style={{ maxWidth: 250 }}>
                       <button onClick={onStartTour} title="Abrir el plano de ejemplo y hacer un takeoff real, paso a paso — unos dos minutos"
                         style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "13px 22px", border: "1px solid var(--ink)", background: "var(--cobalt)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 700, fontSize: 14, fontFamily: "var(--f-body)" }}>
@@ -1180,8 +1181,8 @@ export default function PlanNavigator({
                   </div>
                 )}
                 <div style={{ marginTop: 30, fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.1em", color: "var(--text-faint)" }}>
-                  Código abierto Apache-2.0 · un proyecto abierto de{" "}
-                  <a href="https://kentucky-ai.com" target="_blank" rel="noopener" style={{ color: "var(--ink-muted)" }}>Kentucky&nbsp;AI</a>
+                  {/* INGELMEC: crédito Apache-2.0 en texto plano, sin enlace que saque del sitio */}
+                  Basado en OpenTakeoff · Apache-2.0 · modificado por Ingelmec
                 </div>
               </div>
             ) : enumerated ? (

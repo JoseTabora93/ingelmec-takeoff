@@ -43,6 +43,8 @@ const EXPIRY_SKEW_MS = 60_000;
 // time-boxed, since a human is expected to take their time on it.
 const SILENT_TIMEOUT_MS = 4000;
 
+import { SIN_EXTERNOS } from "../ingelmec.js"; // INGELMEC
+
 // ── in-memory state (never persisted) ───────────────────────────────────────
 let tokenClient = null;         // the GIS token client, created once
 let scriptPromise = null;       // de-dupes the <script> injection
@@ -54,6 +56,8 @@ let requestSeq = 0;             // monotonic id — correlates a GIS callback ba
 const listeners = new Set();
 
 function clientId() {
+  // INGELMEC: SIN_EXTERNOS apaga el inicio de sesión con Google (y su script de accounts.google.com)
+  if (SIN_EXTERNOS) return "";
   // Vite inlines this at build; empty string = cloud mode off.
   return (import.meta.env && import.meta.env.VITE_GOOGLE_CLIENT_ID) || "";
 }

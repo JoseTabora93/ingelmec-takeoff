@@ -14,6 +14,7 @@
   min-height:var(--topbar-h);
 }
 .calm-brand {
+  color:var(--ink); /* INGELMEC: en la disposición grafito el texto heredado era azul oscuro sobre fondo oscuro (marca ilegible) */
   font-family:var(--f-display);
   font-size:var(--fs-xl);
   letter-spacing:-.03em;

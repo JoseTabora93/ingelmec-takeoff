@@ -3,7 +3,7 @@
    surfaces on a cool field, cobalt the one saturated thing. Dark = "HUD" —
    true-black cockpit, electric blue, phosphor glow on the active instrument. */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* INGELMEC: las tipografías (Inter, Open Sans, JetBrains Mono, Space Mono, IBM Plex Mono) se sirven desde el propio sitio vía @fontsource (src/styles/ingelmec-fonts.js). Se retiró el @import de Google Fonts: cero peticiones a terceros. */
 
 :root {
   /* surfaces — role names kept from the paper era: bright = base surface,

@@ -19,7 +19,7 @@ import { inOtherModal, otherModalOpen } from "../lib/modalKeys";
 import { Z, S } from "../lib/ui.js";
 import { keyLabel, keyText, isApplePlatform } from "../lib/keys.ts";
 
-const GUIDE_URL = "https://github.com/Kentucky-ai/opentakeoff/blob/main/docs/USER_GUIDE.md";
+// INGELMEC: sin enlace a la guía larga del original (GUIDE_URL retirado): la app no saca de este sitio.
 
 function Kbd({ children }) {
   return (
@@ -146,7 +146,7 @@ export default function UserGuide({ onClose, onTour, onConnect }) {
         onKeyDown={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label="OpenTakeoff user guide"
+        aria-label="Guía de Ingelmec Takeoff"
         className="panel"
         style={{
           width: "min(760px, 100%)", background: "var(--paper-bright)", color: "var(--ink)",
@@ -154,13 +154,13 @@ export default function UserGuide({ onClose, onTour, onConnect }) {
           boxShadow: "var(--shadow-2)",
         }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, marginBottom: 4 }}>
-          <strong style={{ fontFamily: "var(--f-display)", fontSize: 17, letterSpacing: "-0.02em" }}>How OpenTakeoff works</strong>
+          <strong style={{ fontFamily: "var(--f-display)", fontSize: 17, letterSpacing: "-0.02em" }}>Cómo funciona Ingelmec Takeoff</strong>
           <button onClick={onClose} title="Close (Esc)"
             style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: 18, cursor: "pointer", lineHeight: 1, padding: 4 }}>×</button>
         </div>
         <p style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.5, margin: "0 0 22px" }}>
           A takeoff canvas with a local workspace — no account required. Optional cloud and AI connections share data with the services you choose. Open a plan,
-          set the scale, measure the finishes, export a priced quantity report.
+          set the scale, measure the finishes, export a quantity report.
         </p>
 
         {(onTour || onConnect) && (
@@ -180,9 +180,9 @@ export default function UserGuide({ onClose, onTour, onConnect }) {
           </div>
         )}
 
+        {/* INGELMEC: páginas legales del original (Kentucky AI / Netlify) reemplazadas por la página local de licencias */}
         <nav aria-label="Legal" style={{ display: "flex", gap: 16, marginBottom: 22, fontSize: 12.5 }}>
-          <a href="/privacy/" target="_blank" rel="noreferrer">Privacy Policy</a>
-          <a href="/terms/" target="_blank" rel="noreferrer">Terms of Service</a>
+          <a href="/licencias.html" target="_blank" rel="noreferrer">Licencias y créditos</a>
         </nav>
 
         <Section title="Five minutes to a takeoff">
@@ -202,8 +202,7 @@ export default function UserGuide({ onClose, onTour, onConnect }) {
 
         <div style={{ borderTop: "1px solid var(--ink-faint)", paddingTop: 14, fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.5 }}>
           This is the short version. The full manual covers conditions, markups and RFIs, revisions,
-          the report and exports, the Agent panel, and driving OpenTakeoff from an AI agent over MCP —{" "}
-          <a href={GUIDE_URL} target="_blank" rel="noreferrer" style={{ color: "var(--cobalt)" }}>read the complete guide</a>.
+          the report and exports, and the Agent panel.
         </div>
       </div>
     </div>

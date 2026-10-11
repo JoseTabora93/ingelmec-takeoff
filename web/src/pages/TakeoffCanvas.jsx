@@ -161,7 +161,8 @@ import AgentPanel from "../components/AgentPanel.jsx";
 import WorkspacePanel from "../components/WorkspacePanel.jsx";
 import PremiumInterest from "../components/PremiumInterest.jsx";
 import { shouldAutoPromptPremium, readPremiumPrompt } from "../lib/premiumInterest.js";
-import { SIN_PREMIUM } from "../lib/ingelmec.js";
+import { SIN_PREMIUM, SIN_EXTERNOS } from "../lib/ingelmec.js";
+import IngelmecAbout from "../components/IngelmecAbout.jsx"; // INGELMEC: crédito Apache-2.0 en texto plano
 import "../styles/premiumWorkspace.css";
 import { WorkspaceChrome, WorkspaceNavigator, WorkspaceCommandMenu } from "../components/WorkspaceChrome.jsx";
 import { useWorkspaceLayout, WorkspaceLayoutDialog, DockHandle, DockTargets } from "../components/WorkspaceLayout.jsx";
@@ -575,6 +576,7 @@ export default function TakeoffCanvas() {
   // half-remembered one over a different plan.
   const [tour, setTour] = useState(null);
   const [tourSampleBusy, setTourSampleBusy] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);   // INGELMEC: Acerca de y licencias
   const [connectOpen, setConnectOpen] = useState(false);   // Connect your AI (components/ConnectAI.jsx)
   const [proposal, setProposal] = useState(null);  // One-Click selection under review: { key, regions: [{kind:'pos'|'neg', seed, poly, area_sf, perim_lf}] } — panel-LOCAL px
   // ── in-canvas takeoff agent state ──────────────────────────────────────────
@@ -8746,7 +8748,8 @@ export default function TakeoffCanvas() {
     { id: "report", label: "Abrir reporte", group: "Espacio", run: () => setShowReport(true) },
     { id: "tour", label: "Primer takeoff guiado — apréndalo en el plano de ejemplo", group: "Ayuda", run: startTour },
     { id: "guide", label: "Cómo funciona la app — atajos y la ruta de cinco minutos", group: "Ayuda", shortcut: "?", run: () => setGuideOpen(true) },
-    { id: "connect-ai", label: "Conecte su IA — Claude, Codex, Cursor", group: "Ayuda", run: () => setConnectOpen(true) },
+    ...(!SIN_EXTERNOS ? [{ id: "connect-ai", label: "Conecte su IA — Claude, Codex, Cursor", group: "Ayuda", run: () => setConnectOpen(true) }] : []),
+    { id: "about", label: "Acerca de y licencias", group: "Ayuda", run: () => setAboutOpen(true) }, // INGELMEC
     { id: "work", label: "Abrir trabajo y revisión", group: "Espacio", run: () => setAgentOpen(true) },
     { id: "layout", label: "Organice y guarde su disposición", group: "Espacio", run: () => setWorkspaceLayoutOpen(true) },
     { id: "fit", label: "Ajustar hoja a la vista", group: "Vista", disabled: !stage.w, run: () => fitToView(stage.w, stage.h) },
@@ -8838,10 +8841,11 @@ export default function TakeoffCanvas() {
           {panelBtn(() => setShowRevisions(true), "revisions", "Revisiones: guarde el takeoff en cada revisión de oferta y compare qué cambió", showRevisions)}
         </div>}
         layoutMenu={<button type="button" onClick={() => setWorkspaceLayoutOpen(true)} title="Organizar paneles, bloquear posiciones y guardar disposiciones"><Icon name="sliders" size={16} />Disposición</button>}
-        helpMenu={<ToolMenu title="Aprender a usar la app o conectar un agente de IA" face={<span>Ayuda</span>} onOpenChange={onMenuDepth} items={[
+        helpMenu={<ToolMenu title="Aprender a usar la app, créditos y licencias" face={<span>Ayuda</span>} onOpenChange={onMenuDepth} items={[
           { id: "tour", label: "Primer takeoff guiado", onSelect: startTour },
           { id: "guide", label: "Cómo funciona la app", shortcut: "?", onSelect: () => setGuideOpen(true) },
-          { id: "connect-ai", label: "Conectar su IA", onSelect: () => setConnectOpen(true) },
+          ...(!SIN_EXTERNOS ? [{ id: "connect-ai", label: "Conectar su IA", onSelect: () => setConnectOpen(true) }] : []),
+          { id: "about", label: "Acerca de y licencias", onSelect: () => setAboutOpen(true) }, // INGELMEC
         ]} />}
         fileMenu={<><ToolMenu title="Archivos y espacio de trabajo" face={<span>Archivo</span>} onOpenChange={onMenuDepth} items={sheetMenuItems} /><PresenceChip bridge={store.syncBridge} /><AccountChip note={cloudMode ? "Sincronizado a Google Drive" : "Espacio local"} onOpenChange={onMenuDepth} /></>}
         conditionControl={<><label className="calm-condition-label" htmlFor="workspace-condition">Condición</label><select id="workspace-condition" value={activeCond || ""} onChange={(e) => activateCondition(e.target.value)} title={tool === "select" && selectedId ? "Reasignar la medición seleccionada" : "Condición para la próxima medición"}>
@@ -9049,10 +9053,11 @@ export default function TakeoffCanvas() {
           face={<span style={{ fontWeight: 700, letterSpacing: "0.08em" }}>⋯</span>}
           items={[
             ...(!SIN_PREMIUM ? [{ id: "premium-interest", label: "Solicitar Premium — lista de acceso anticipado", highlight: true, onSelect: () => setPremiumOpen(true) }] : []),
-            { id: "workspace-preview", label: workspaceLayout ? "Disposición clásica" : "Disposición premium — controles compactos", onSelect: () => workspacePrefs.setEnabled(!workspaceLayout) },
+            { id: "workspace-preview", label: workspaceLayout ? "Disposición clásica" : "Disposición compacta — controles agrupados", onSelect: () => workspacePrefs.setEnabled(!workspaceLayout) },
             { id: "guide", label: "Cómo funciona la app", shortcut: "?", onSelect: () => setGuideOpen(true) },
             { id: "tour", label: "Primer takeoff guiado", onSelect: startTour },
-            { id: "connect-ai", label: "Conectar su IA", onSelect: () => setConnectOpen(true) },
+            ...(!SIN_EXTERNOS ? [{ id: "connect-ai", label: "Conectar su IA", onSelect: () => setConnectOpen(true) }] : []),
+            { id: "about", label: "Acerca de y licencias", onSelect: () => setAboutOpen(true) }, // INGELMEC
             { id: "theme", label: theme === "dark" ? "Tema claro" : "Tema oscuro", onSelect: toggleTheme },
             "divider",
             { id: "schedule", icon: "rectTool", label: "Importar desde cuadro de acabados", active: tool === "schedule", onSelect: () => { setScheduleAnchor(null); setTool((t) => (t === "schedule" ? "select" : "schedule")); } },
@@ -11056,7 +11061,7 @@ export default function TakeoffCanvas() {
         <PlanNavigator
           onPremium={() => setPremiumOpen(true)}
           onStartTour={() => { startTour(); loadSampleForTour(); }}
-          onConnect={() => setConnectOpen(true)}
+          onConnect={SIN_EXTERNOS ? undefined : () => setConnectOpen(true)}
           canClose={openTabs.length > 0}
           onExit={() => setView("canvas")}
           initialMode={view === "picker" ? "browse" : "plan"}
@@ -11267,12 +11272,13 @@ export default function TakeoffCanvas() {
       {/* live counter (mock) — floating running totals, drag to park anywhere */}
       {!focusMode && (!workspaceLayout || workspaceArrangement.counter) && !agentOpen && !showReport && <LiveCounter rows={liveCounterRows} onActivate={(id) => activateCondition(id, { reassign: false })} />}
       {/* the manual, last in the tree so it sits above every panel and dock */}
-      {guideOpen && <UserGuide onClose={() => setGuideOpen(false)} onTour={startTour} onConnect={() => { setGuideOpen(false); setConnectOpen(true); }} />}
-      {connectOpen && <ConnectAI onClose={() => setConnectOpen(false)} />}
+      {guideOpen && <UserGuide onClose={() => setGuideOpen(false)} onTour={startTour} onConnect={SIN_EXTERNOS ? undefined : () => { setGuideOpen(false); setConnectOpen(true); }} />}
+      {!SIN_EXTERNOS && connectOpen && <ConnectAI onClose={() => setConnectOpen(false)} />}
+      {aboutOpen && <IngelmecAbout onClose={() => setAboutOpen(false)} />}
       {tour && view === "canvas" && !focusMode && !guideOpen && !connectOpen && (
         <FirstTakeoffTour done={tour.done} step={currentStep(tour.done)} sheetOpen={tourSheetOpen}
           sampleBusy={tourSampleBusy} onLoadSample={loadSampleForTour} result={tourResult}
-          onClose={() => setTour(null)} onConnect={() => { setTour(null); setConnectOpen(true); }} />
+          onClose={() => setTour(null)} onConnect={SIN_EXTERNOS ? undefined : () => { setTour(null); setConnectOpen(true); }} />
       )}
       {/* on-device OCR's download notice (#471): modal over everything, the
           gallery and the guide included. Keys stop here so the canvas's

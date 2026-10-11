@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="description" content="Ingelmec Takeoff — lienzo de cómputo (takeoff) de planos para preventa: mida áreas, longitudes y conteos con escala trazable. Fork en español de OpenTakeoff (Apache-2.0)." />
+    <meta name="description" content="Ingelmec Takeoff — lienzo de cómputo (takeoff) de planos para preventa: mida áreas, longitudes y conteos con escala trazable." />
+    <meta name="robots" content="noindex" />
     <title>Ingelmec Takeoff — cómputo de planos para preventa</title>
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Ingelmec Takeoff — cómputo de planos para preventa" />
@@ -25,13 +26,11 @@
   <body>
     <div id="root"><div class="ot-static">
       <h1>Ingelmec Takeoff</h1>
-      <p>Ingelmec Takeoff es el lienzo de cómputo de planos de Ingelmec para preventa, basado en el proyecto abierto <a href="https://github.com/Kentucky-ai/opentakeoff">OpenTakeoff</a> (Apache-2.0). Una persona mide planos en este lienzo del navegador; un agente de IA maneja la misma geometría y las mismas cantidades por MCP. Cada medición registra su escala, su método y si la hizo una persona o un agente.</p>
+      <p>Ingelmec Takeoff es el lienzo de cómputo de planos de Ingelmec para preventa. Una persona mide planos en este lienzo del navegador y cada medición registra su escala, su método y quién la hizo.</p>
       <p>Esta página es la propia aplicación y necesita JavaScript.</p>
       <h2>Para el ingeniero</h2>
       <p>Arrastre un PDF, una imagen o un juego de planos en <code>.zip</code>; no hay cuenta y abrir un plano no sube nada. Fije la escala por hoja, trace los recintos y obtenga m², m y unidades, cantidades con desperdicio, condiciones por disciplina (riesgo NFPA 13, HVAC, eléctrico, datos, CCTV) y exportaciones a CSV, Excel y PDF marcado.</p>
-      <h2>Para el agente de IA</h2>
-      <p><code>npx -y opentakeoff-mcp</code> pone el motor en stdio para cualquier cliente MCP. El agente abre el plano, adopta la escala, mide los recintos y exporta un juego marcado; su trabajo queda pendiente hasta que una persona lo apruebe en este lienzo.</p>
-      <p><a href="https://github.com/JoseTabora93/ingelmec-takeoff">Código fuente (fork)</a> · <a href="https://github.com/Kentucky-ai/opentakeoff">Proyecto original OpenTakeoff</a></p>
+      <p>Basado en OpenTakeoff (Apache-2.0), modificado por Ingelmec. Licencias y créditos: /licencias.html</p>
     </div></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

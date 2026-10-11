@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../brand/icons.jsx";
 import ToolMenu from "./ToolMenu.jsx";
 import { conditionTotals, grandTotals, sheetTotals, sheetGroupedRows, labelGroupedRows, authorGroupedRows, sheetLabelGroupedRows, round2, totalsToCsv, downloadText, materialsSummary, reportJson, hasMultipliers, BY_SHEET_BASE_NOTE } from "../lib/totals.js";
-import { PREVENTA_DEFAULT } from "../lib/ingelmec.js";
+import { PREVENTA_DEFAULT, SIN_EXTERNOS } from "../lib/ingelmec.js";
 import { TABLE_PROFILE, CSV_PROFILE, colGetter, customColProfile, specColProfile, laborColProfile, rollColProfile, partitionRowsBy, forceIncludeGroupCol, loadColPrefs, saveColPrefs, loadGroupBy, saveGroupBy, visibleCols, floorPerimeterLf, applyUnits } from "../lib/reportColumns.js";
 import { rollReportRows, seamLfByShape } from "../lib/rollTakeoff.js";
 import { areaVal, areaUnit, lenVal, lenUnit } from "../lib/units";
@@ -651,10 +651,11 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               title="Registro de RFI como JSON"><Icon name="rfi" size={13} />RFI JSON</button>
           </>
         )}
-        <button className="btn-primary" onClick={() => setShowContribute(true)} disabled={!rows.length}
+        {/* INGELMEC: «Contribuir» envía datos al modelo abierto del original: retirado (SIN_EXTERNOS) */}
+        {!SIN_EXTERNOS && <button className="btn-primary" onClick={() => setShowContribute(true)} disabled={!rows.length}
           title="Contribuir opcionalmente los datos derivados de este takeoff al modelo abierto de pisos">
           <Icon name="oneClick" size={13} />Contribuir
-        </button>
+        </button>}
         <button onClick={onClose} title="Volver al lienzo (Esc)"
           style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12.5 }}>
           <Icon name="close" size={12} />Cerrar

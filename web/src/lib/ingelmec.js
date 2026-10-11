@@ -24,6 +24,23 @@ export const INGELMEC_COLORS = ["#003B5C", "#1F6FB2", "#00A7B5", "#7AB648", "#B5
 // (premiumInterest.js / PremiumInterest.jsx) queda intacto y sin efectos.
 export const SIN_PREMIUM = true;
 
+// SIN EXTERNOS (limpieza 2026-10-11): ninguna superficie de la app saca a la
+// persona del sitio ni habla con terceros. Con la bandera encendida: sin enlaces
+// a Kentucky AI / GitHub / documentación del original, sin «Conecte su IA»
+// (descargas de GitHub y nodejs.org), sin «Contribuir» (envío de datos al modelo
+// abierto del original), sin video de demostración del original, sin inicio de
+// sesión de Google ni de Microsoft 365, y las tipografías se sirven desde el
+// propio sitio (sin Google Fonts). El crédito exigido por Apache-2.0 vive en
+// «Ayuda > Acerca de y licencias» como texto plano y en /licencias.html.
+export const SIN_EXTERNOS = true;
+
+export const INGELMEC_ATRIBUCION = [
+  "Ingelmec Takeoff es una versión modificada de OpenTakeoff, software libre publicado bajo la licencia Apache 2.0.",
+  "Proyecto original: OpenTakeoff, de Kentucky AI. Copyright de los autores originales.",
+  "Esta versión fue modificada por Ingelmec: traducción al español, unidades métricas, marca, condiciones por disciplina y retiro de enlaces y servicios externos.",
+  "El software se entrega «tal cual», sin garantías de ningún tipo (ver licencia).",
+].join("\n");
+
 // Preventa: por omisión el reporte y las exportaciones NO muestran la lista
 // de compras con costos (la web no calcula precios monetarios; el BOM con
 // precios vive en los motores de Ingelmec). Un toggle en el Reporte la vuelve

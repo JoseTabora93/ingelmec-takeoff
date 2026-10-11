@@ -7,11 +7,14 @@ Copyright 2026 Ingelmec
 
 This fork of OpenTakeoff is modified from the original
 https://github.com/Kentucky-ai/opentakeoff. Changes by Ingelmec (as of
-2026-10-10, phase T1): Spanish UI translations; metric units as the
+2026-10-11): Spanish UI translations; metric units as the
 default; Ingelmec branding (logo, Inter/Open Sans typefaces); a default
 condition pack by engineering discipline (NFPA 13 hazard areas, HVAC,
 electrical, data/cabling, CCTV); prices/buy-list hidden by default
-(pre-sale mode); deployment configuration for takeoff.ingelmec.app.
+(pre-sale mode); deployment configuration for takeoff.ingelmec.app; removal of all outbound
+links, third-party requests (webfonts, analytics, sign-in scripts) and the
+original project's branding assets, with the Apache-2.0 attribution kept as
+plain text in the app (Help > About and licenses) and in /licencias.html.
 The full list of touched files lives in INGELMEC.md in this repository.
 The original OpenTakeoff remains licensed under the Apache License,
 Version 2.0; all credits and notices above are preserved.

@@ -90,13 +90,13 @@ export default function FirstTakeoffTour({ done, step, sheetOpen, sampleBusy, on
             </strong>
             <p style={{ fontSize: 12.5, lineHeight: 1.55, color: "var(--ink-soft)", margin: "6px 0 12px" }}>
               Same loop for every finish: pick a condition, trace, read the Report. Press <kbd>?</kbd> any time for the shortcuts.
-              Next, hand the same engine to an AI agent.
+              {onConnect ? "Next, hand the same engine to an AI agent." : null}
             </p>
             <div style={{ display: "flex", gap: 8 }}>
-              <button type="button" onClick={onConnect}
+              {onConnect && <button type="button" onClick={onConnect}
                 style={{ padding: "8px 13px", border: "none", background: "var(--cobalt)", color: "var(--accent-contrast)", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>
                 Connect your AI
-              </button>
+              </button>}
               <button type="button" onClick={onClose}
                 style={{ padding: "8px 13px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", fontSize: 12.5, cursor: "pointer" }}>
                 Close

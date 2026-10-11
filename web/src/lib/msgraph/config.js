@@ -15,7 +15,11 @@
 // to decide whether to render the entry point; MSAL itself loads dynamically
 // only when the user opts in.
 
-export function m365Config(env = import.meta.env) {
+import { SIN_EXTERNOS } from "../ingelmec.js"; // INGELMEC
+
+// INGELMEC: con SIN_EXTERNOS el valor por omisión es un entorno vacío → sin 365 (sin
+// login.microsoftonline.com); quien pase `env` explícito (pruebas) conserva el comportamiento original.
+export function m365Config(env = SIN_EXTERNOS ? {} : import.meta.env) {
   const clientId = env?.VITE_MSAL_CLIENT_ID || "";
   const driveId = env?.VITE_GRAPH_DRIVE_ID || "";
   if (!clientId || !driveId) return null;
