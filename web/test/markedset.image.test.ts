@@ -17,7 +17,7 @@ test("workspace pins never create a marked sheet or embed their reference image"
     markups: [{ id: "pin", type: "image", reference_only: true, sheet_id: "sample.pdf", src: PNG, at: [.5, .5], w: .2, aspect: 1 }],
     conditions: [], company: null, clientInfo: null, loadPdfData: null,
     getPage: () => { throw new Error("A reference must not load a page for export"); },
-  }), /Nothing to export/);
+  }), /Nada que exportar/);
 });
 
 // pdf.js-style viewport transform: rotate 0 → [s,0,0,-s,0,H·s]; a 90°-rotated page
@@ -284,7 +284,7 @@ test("marked set cover prints linear waste in LF (and m), not zero area", async 
       getPage: async () => mockPage(612, 792, 0), loadPdfData: async () => srcBytes,
     });
     const text = await pageText(bytes, 0);
-    assert.ok(text.includes(units === "imperial" ? "waste 10% -> 110 LF" : "waste 10% -> 33.5 m"), text);
+    assert.ok(text.includes(units === "imperial" ? "desperdicio 10% -> 110 LF" : "desperdicio 10% -> 33.5 m"), text);
     assert.ok(!text.includes("waste 10% -> 0 SF"), text);
   }
 });

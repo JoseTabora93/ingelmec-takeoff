@@ -73,7 +73,7 @@ async function unzipBytes(bytes, onSkip, budget) {
         if (!(isPdf(bn) || isImage(bn) || isZip(bn))) { onSkip?.(bn, "unsupported type"); return false; }
         if (budget.entries <= 0) { onSkip?.(bn, "too many files"); return false; }
         const size = f.originalSize || 0;
-        if (size > budget.bytes) { onSkip?.(bn, "archive too large"); return false; }
+        if (size > budget.bytes) { onSkip?.(bn, "archivo demasiado grande"); return false; }
         budget.bytes -= size;
         budget.entries -= 1;
         return true;
@@ -183,12 +183,12 @@ export async function ingestFiles(
       if (isZip(name, file.type) || (await looksLikeZip(file))) {
         // Stop runaway recursion from self-nesting archives before we even read
         // the bytes — a zip that contains itself would otherwise loop forever.
-        if (depth >= maxZipDepth) { skipped.push({ name: baseName(name), reason: "nested too deep" }); return; }
+        if (depth >= maxZipDepth) { skipped.push({ name: baseName(name), reason: "anidado demasiado profundo" }); return; }
         onProgress?.(`Unzipping ${baseName(name)}…`);
         const entries = await unzipBytes(new Uint8Array(await file.arrayBuffer()),
           (bn, reason) => skipped.push({ name: bn, reason }), budget);
         const paths = Object.keys(entries);
-        if (!paths.length) { skipped.push({ name: baseName(name), reason: "no plans found in zip" }); return; }
+        if (!paths.length) { skipped.push({ name: baseName(name), reason: "no se encontraron planos en el zip" }); return; }
         for (const path of paths) {
           const bn = baseName(path);
           if (isPdf(bn)) pushPdf(new File([entries[path]], bn, { type: "application/pdf" }));
@@ -197,9 +197,9 @@ export async function ingestFiles(
         }
         return;
       }
-      skipped.push({ name: baseName(name), reason: "unsupported type" });
+      skipped.push({ name: baseName(name), reason: "tipo no admitido" });
     } catch (e) {
-      skipped.push({ name: baseName(name), reason: (e && e.message) || "couldn't read" });
+      skipped.push({ name: baseName(name), reason: (e && e.message) || "no se pudo leer" });
     }
   }
 

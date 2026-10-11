@@ -119,3 +119,30 @@ exportaciones ya guardados.
 
 Pruebas: el repo ya traía 43 fallas de pruebas doradas desde T1 (encabezados al
 español en `reportColumns`, `branding`, CSV/Excel); esta limpieza no agrega ninguna.
+
+## Español completo, agente cerrado y suite en verde (2026-10-11)
+
+- **Agente en el lienzo CERRADO** (`SIN_EXTERNOS`): `isAiConfigured()` devuelve siempre falso
+  (`lib/ai.js`), el panel Trabajo > Agente y el diálogo de ajustes dicen en español que en
+  Ingelmec el agente se usa desde OpenCode por el MCP (`components/AgentPanel.jsx`,
+  `components/AiSettings.jsx`). La CSP de Caddy no incluye llm.ingelmec.app.
+- **Interfaz, tour, guía, tooltips, mensajes, exportaciones y PDF en español**: se tradujeron
+  los textos visibles de `web/src` (componentes, páginas, `lib/*`). El prefijo de error
+  «Couldn't…» pasó a «No se pudo…» y `isDangerMsg` (`lib/canvasUtil.js`) acepta ambos.
+  Se conservan en inglés, a propósito: la gramática de los comandos de voz y de la línea de
+  comandos (`waste 7`, `label …`, `note …`: el reconocedor es inglés), los nombres de
+  herramienta del MCP, las instrucciones y respuestas dirigidas a un LLM (`agentLoop.js`,
+  `agentTools.js`, `ai.js`), los textos de bibliotecas de terceros, el crédito
+  «Measured with OpenTakeoff» y los textos legales (`/licencias.html`).
+- **Unidad de conteo**: `EA` pasa a `UND` en todo texto visible y exportado.
+- **Cabeceras de exportación** (CSV, XLSX, PDF marcado, DXF): en español. Las claves del JSON
+  de exportación y los esquemas `opentakeoff.*` NO cambian (contrato con el MCP).
+- **Reporte legible en ambos temas**: `workspaceChrome.css` fija `color: var(--ink)` en
+  `.premium-workspace` (el texto heredado quedaba en el azul oscuro del tema claro sobre
+  fondo grafito).
+- **Pruebas**: toda la suite en verde (3446 pruebas, 0 fallas). Se actualizaron las
+  expectativas al español, se regeneró el dorado `test/fixtures/report.golden.csv`, se retiró la
+  prueba de detección estática de Netlify (`premiumInterest.test.ts`) y se corrigió un
+  hallazgo real: la constante del analizador `NOT IN CONTRACT` (`notUsed.ts`) debe seguir en
+  inglés porque lee el texto impreso del plano.
+- **Caddy**: `config.ingelmec.app/takeoff*` redirige (308) a `https://takeoff.ingelmec.app/`.

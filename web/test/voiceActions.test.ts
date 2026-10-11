@@ -105,7 +105,7 @@ test("activate unknown that already exists (case-insensitive) → dedup, no mint
 test("defensive: known tag missing from conditions → fail, ZERO calls", () => {
   const { caps, log } = makeCtx();
   const out = applyVoiceIntent(caps, { kind: "activate_condition", tag: "GHOST-9", known: true });
-  assert.deepEqual(out, { ok: false, message: "Couldn't find condition GHOST-9." });
+  assert.deepEqual(out, { ok: false, message: "No se pudo encontrar la condición GHOST-9." });
   assert.deepEqual(log, []);
 });
 
@@ -119,7 +119,7 @@ test("set_waste → one by-id update on the active condition", () => {
 test("set_waste guard: no active condition → exact message, ZERO calls", () => {
   const { caps, log } = makeCtx({ getActiveConditionId: () => "" });
   const out = applyVoiceIntent(caps, { kind: "set_waste", waste: 7 });
-  assert.deepEqual(out, { ok: false, message: "Couldn't set waste, no active condition." });
+  assert.deepEqual(out, { ok: false, message: "No se pudo fijar el desperdicio: no hay condición activa." });
   assert.deepEqual(log, []);
 });
 
@@ -252,14 +252,14 @@ test("bare deixis: traceAt on the ACTIVE condition, nothing re-armed", () => {
 test("deixis stale aim (getAimSeed null) → exact message, ZERO calls, nothing half-arms", () => {
   const { caps, log } = makeCtx({ getAimSeed: () => null });
   const out = runVoiceCommand(caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: false, message: "Couldn't place that, aim went stale. Put the cursor on the room and say it again." });
+  assert.deepEqual(out, { ok: false, message: "No se pudo colocar eso: la puntería quedó obsoleta. Ponga el cursor sobre el recinto y dígalo de nuevo." });
   assert.deepEqual(log, []);
 });
 
 test("deixis off-sheet aim (sheetId \"\") → exact message, ZERO calls", () => {
   const { caps, log } = makeCtx({ getAimSeed: () => ({ x: -40, y: 9999, sheetId: "" }) });
   const out = runVoiceCommand(caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: false, message: "Couldn't place that, aim at a sheet." });
+  assert.deepEqual(out, { ok: false, message: "No se pudo colocar eso: apunte a una hoja." });
   assert.deepEqual(log, []);
 });
 
@@ -302,13 +302,13 @@ test("deixis async traceAt: the promise outcome rides through runVoiceCommand", 
 
 test("every failure message starts with \"Couldn't\" (the isDangerMsg red/sticky contract)", () => {
   for (const msg of Object.values(REJECTION_MESSAGES))
-    assert.ok(msg.startsWith("Couldn't"), msg);
+    assert.ok(msg.startsWith("No se pudo"), msg);
   const { caps } = makeCtx({ getActiveConditionId: () => "" });
   const fails: VoiceOutcome[] = [
     applyVoiceIntent(caps, { kind: "set_waste", waste: 7 }),
     applyVoiceIntent(caps, { kind: "activate_condition", tag: "GHOST-9", known: true }),
   ];
-  for (const f of fails) assert.ok(!f.ok && f.message.startsWith("Couldn't"), f.message);
+  for (const f of fails) assert.ok(!f.ok && f.message.startsWith("No se pudo"), f.message);
 });
 
 // ── Part B: state-model deep-equal (RFC bullet 7 verbatim) ─────────────────
@@ -457,7 +457,7 @@ test("state-equal: set_waste with no active condition mutates NOTHING", async ()
   app.state.activeCond = "";
   const before = structuredClone(app.state);
   const out = await runVoiceCommand(app.caps, "waste 7");
-  assert.deepEqual(out, { ok: false, message: "Couldn't set waste, no active condition." });
+  assert.deepEqual(out, { ok: false, message: "No se pudo fijar el desperdicio: no hay condición activa." });
   assert.deepEqual(app.state, before);
 });
 
@@ -479,7 +479,7 @@ test("deixis stale aim mutates NOTHING, not even the condition arms", async () =
   app.box.aim = null;
   const before = structuredClone(app.state);
   const out = await runVoiceCommand(app.caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: false, message: "Couldn't place that, aim went stale. Put the cursor on the room and say it again." });
+  assert.deepEqual(out, { ok: false, message: "No se pudo colocar eso: la puntería quedó obsoleta. Ponga el cursor sobre el recinto y dígalo de nuevo." });
   assert.deepEqual(app.state, before);
 });
 
@@ -488,7 +488,7 @@ test("deixis off-sheet aim mutates NOTHING", async () => {
   app.box.aim = { x: -12, y: 400, sheetId: "" };
   const before = structuredClone(app.state);
   const out = await runVoiceCommand(app.caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: false, message: "Couldn't place that, aim at a sheet." });
+  assert.deepEqual(out, { ok: false, message: "No se pudo colocar eso: apunte a una hoja." });
   assert.deepEqual(app.state, before);
 });
 
@@ -514,7 +514,7 @@ test("PINNED: only unrecognized × configured offers, every near-miss reason nev
 
 test("router: ok outcomes and reasonless dispatcher failures never offer", () => {
   assert.equal(shouldOfferAgentHandoff({ ok: true, message: "CPT-1 active." }, true), false);
-  assert.equal(shouldOfferAgentHandoff({ ok: false, message: "Couldn't set waste, no active condition." }, true), false);
+  assert.equal(shouldOfferAgentHandoff({ ok: false, message: "No se pudo fijar el desperdicio: no hay condición activa." }, true), false);
 });
 
 test("router: runVoiceCommand surfaces the reason on parse rejections only", () => {

@@ -32,9 +32,9 @@ test('marked set: {{qty}} prints the linked count; an unlinked field prints lite
     const stream: any = out.context.lookup(ref), filter = stream.dict.lookup(PDFName.of('Filter'));
     contents += Buffer.from(String(filter) === '/FlateDecode' ? inflateSync(stream.contents) : stream.contents).toString('latin1');
   }
-  assert.ok(contents.includes(hex('x2 EA lights')), 'the linked note prints the measured count');
-  assert.ok(contents.includes(hex('need 2 EA')), 'the toolbar callout resolves too');
+  assert.ok(contents.includes(hex('x2 UND lights')), 'the linked note prints the measured count');
+  assert.ok(contents.includes(hex('need 2 UND')), 'the toolbar callout resolves too');
   assert.ok(contents.includes(hex('x{{qty}} spare')), 'the unlinked field prints literally, never blank or 0');
-  assert.ok(!contents.includes(hex('x0 EA')));
+  assert.ok(!contents.includes(hex('x0 UND')));
   assert.ok(contents.includes(WARN), 'the unresolved note is drawn in the warning ink');
 });

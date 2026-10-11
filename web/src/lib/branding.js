@@ -51,7 +51,7 @@ export function resolveBranding(sel) {
     // subtle parent credit — the fork always credits the upstream project
     credit: OT_CREDIT,
     // marked-set cover wordmark — carries the OpenTakeoff prefix in default mode
-    coverTitle: clear ? "Marked Set" : `${INGELMEC_NAME} · Marked Set`,
+    coverTitle: clear ? "Juego marcado" : `${INGELMEC_NAME} · Juego marcado`,
   };
 }
 

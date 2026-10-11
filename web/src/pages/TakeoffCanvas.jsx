@@ -308,6 +308,14 @@ const TOOL_VERB = {
   textcopy: "read_sheet_text",
 };
 
+// INGELMEC: lo que se ve en la barra de estado (los nombres de herramienta del MCP no cambian)
+const TOOL_VERB_ES = {
+  select: "seleccionar", measure_polygon: "medir área", cut_out: "recortar", measure_line: "medir línea",
+  measure_surface: "medir superficie", place_count: "contar", one_click: "one-click", set_scale: "fijar escala",
+  symbol_sweep: "barrer símbolo", check_dimension: "verificar cota", zone_check: "chequeo de zona",
+  stitch_align: "alinear empalme", find_schedule: "buscar cuadro", annotate: "anotar", read_sheet_text: "leer texto",
+};
+
 // Pure geometry helpers (star/cloud paths, snap grid, angle lock, metrics,
 // hit-testing) live in lib/geometry.js — byte-identical with Spline's copy.
 
@@ -1292,7 +1300,7 @@ export default function TakeoffCanvas() {
           dims[k] = { w: vp.width, h: vp.height };
         });
       }
-    } catch (e) { setCommitMsg(`Couldn't read those sheets to stitch them: ${e.message || e}`); return; }
+    } catch (e) { setCommitMsg(`No se pudo leer esas hojas para empalmarlas: ${e.message || e}`); return; }
     const st = { id: mintStitchId(), name: ks.map((k) => tabLabel(k)).join(" + "), members: autoButt(ks, dims), created_at: nowIso() };
     setStitches((s) => [...s, st]);
     const upps = ks.map((k) => scales[k]);
@@ -1301,14 +1309,14 @@ export default function TakeoffCanvas() {
     setSheetGroup([st.id]);
     setFocusKey(st.id);
     setView("canvas");
-    setCommitMsg("Stitched, drag to pan, then Align (toolbar) joins the match line: click the same point on both sheets.");
+    setCommitMsg("Empalmado: arrastre para desplazar; luego Alinear (barra) une la línea de empalme: haga clic en el mismo punto de ambas hojas.");
   }
   // Deleting a stitch is refused while takeoffs live on it — quantities are
   // never silently orphaned (the close-PDF confirm precedent, but stricter:
   // a stitch has no file to re-add, so there is no restore path).
   function deleteStitch(id) {
     const n = shapes.filter((s) => s.sheet_id === id).length + markups.filter((m) => m.sheet_id === id).length;
-    if (n) { setCommitMsg(`This stitch carries ${n} takeoff${n === 1 ? "" : "s"}/markup${n === 1 ? "" : "s"}, delete or move them first.`); return; }
+    if (n) { setCommitMsg(`Este empalme tiene ${n} takeoff${n === 1 ? "" : "s"}/anotaci${n === 1 ? "ón" : "ones"}: elimínelos o muévalos primero.`); return; }
     setStitches((s) => s.filter((st) => st.id !== id));
     setOpenTabs((t) => t.filter((k) => k !== id));
     if (sheetGroup.includes(id)) { const f = sheetGroup.filter((k) => k !== id); setSheetGroup(f.length >= 2 || (f.length === 1 && isStitchKey(f[0])) ? f : []); }
@@ -1357,7 +1365,7 @@ export default function TakeoffCanvas() {
   // sheet reads "PLAN-2", not the compound "Level 1 · PLAN · 2" that would nest
   // badly inside an image name like "…-01".
   const sheetBaseLabel = (k) => {
-    if (isStitchKey(k)) return stitchById[k]?.name || "Stitched";
+    if (isStitchKey(k)) return stitchById[k]?.name || "Empalme";
     if (galleryLabels[k]) return galleryLabels[k];
     const t = parseSheetKey(k);
     if (t.file === active && pageLabels[t.page]) return pageLabels[t.page];
@@ -1796,7 +1804,7 @@ export default function TakeoffCanvas() {
     forgetPages(names);
     const list = await refreshSheets();
     reconcileAfterRemoval(names.includes(active) ? active : "", list);
-    setCommitMsg(`Removed ${names.length} PDF${names.length === 1 ? "" : "s"} from the plan set, takeoffs on them stay in the project and restore on re-add.`);
+    setCommitMsg(`Se ${names.length === 1 ? "quitó" : "quitaron"} ${names.length} PDF del juego de planos; los takeoffs ${names.length === 1 ? "de ese" : "de esos"} se quedan en el proyecto y se restauran al volver a agregarlos.`);
   }, [refreshSheets, reconcileAfterRemoval, evictDoc, forgetPages, active]);
   // Remove-from-project (cloud only): the DESTRUCTIVE variant — delete the Drive
   // file, then drop it from the working set.
@@ -1826,18 +1834,18 @@ export default function TakeoffCanvas() {
     // ingest it as a plan
     const prof = incoming.find((f) => isProfileFile(f.name));
     if (prof) { await importProfileFile(prof); return; }
-    setCommitMsg("Reading files…");
+    setCommitMsg("Leyendo archivos…");
     let pdfs = [], skipped = [];
     try { ({ pdfs, skipped } = await ingestFiles(incoming, { onProgress: setCommitMsg })); }
-    catch (e) { setCommitMsg(`Couldn't read those files: ${e.message || e}`); return; }
+    catch (e) { setCommitMsg(`No se pudo leer esos archivos: ${e.message || e}`); return; }
     if (!pdfs.length) {
       setCommitMsg(skipped.length
-        ? `Nothing to open, ${skipped.length} file${skipped.length === 1 ? "" : "s"} skipped. OpenTakeoff reads PDFs, images, and .zip plan sets.`
+        ? `Nada que abrir: se omitió ${skipped.length} archivo${skipped.length === 1 ? "" : "s"}. La aplicación lee PDF, imágenes y juegos de planos .zip.`
         : "No se encontraron archivos soportados. Arrastre un PDF, una imagen o un juego .zip de planos.");
       return;
     }
     const results = [];
-    for (const f of pdfs) { try { results.push(await store.addPdf(f)); } catch (e) { setCommitMsg(`Couldn't open ${f.name}: ${e.message || e}`); } }
+    for (const f of pdfs) { try { results.push(await store.addPdf(f)); } catch (e) { setCommitMsg(`No se pudo abrir ${f.name}: ${e.message || e}`); } }
     // A re-added name's search entry, OCR reads and thumbnail records (whose
     // text-layer flag seeds the index) start over unless its bytes are known
     // to be the same (readdEffects); a cached read goes back into the
@@ -1865,7 +1873,7 @@ export default function TakeoffCanvas() {
       setDocEpoch((e) => e + 1);
     }
     const names = pdfs.map((f) => f.name);
-    const tail = skipped.length ? ` · ${skipped.length} skipped` : "";
+    const tail = skipped.length ? ` · ${skipped.length} omitido${skipped.length === 1 ? "" : "s"}` : "";
     if (names.length === 1) {
       setOpenTabs((t) => (t.includes(names[0]) ? t : [...t, names[0]]));
       goToSheet(names[0]);
@@ -1881,10 +1889,10 @@ export default function TakeoffCanvas() {
       const hot = revised.filter((r) => inked(r.name));
       const label = (r) => `${r.name} → rev ${r.rev}`;
       setCommitMsg(hot.length
-        ? `Sheet changed under your markups: ${hot.map(label).join(", ")}, earlier revision kept; re-check the affected takeoff.`
-        : `Sheet updated: ${revised.map(label).join(", ")}, earlier revision kept.`);
+        ? `La hoja cambió bajo sus anotaciones: ${hot.map(label).join(", ")}; se conservó la revisión anterior; revise de nuevo el takeoff afectado.`
+        : `Hoja actualizada: ${revised.map(label).join(", ")}; se conservó la revisión anterior.`);
     } else {
-      setCommitMsg(`Opened ${names.length} sheet${names.length === 1 ? "" : "s"}${tail}.`);
+      setCommitMsg(`Se abrió ${names.length} hoja${names.length === 1 ? "" : "s"}${tail}.`);
     }
   }
   // The empty-project landing view (the Drive picker for an empty cloud project,
@@ -2076,7 +2084,7 @@ export default function TakeoffCanvas() {
       // Cloud project whose saved takeoff couldn't be read (Drive error / unreadable
       // annotations): same rule as a stale tab — leave autosave DISARMED so empty
       // defaults can't overwrite the real project in Drive. (cloudStore tags these.)
-      if (e?.name === "CloudLoadError") { setCommitMsg(e.message || "Couldn't load this project from Drive, reload to retry."); return; }
+      if (e?.name === "CloudLoadError") { setCommitMsg(e.message || "No se pudo cargar este proyecto desde Drive: recargue para reintentar."); return; }
       // Do NOT arm autosave on any other failed load either: the in-memory
       // state is empty, so the first edit would overwrite the intact saved
       // takeoff with nothing. Leave it disarmed (hydrated stays false) and say
@@ -2553,7 +2561,7 @@ export default function TakeoffCanvas() {
             // change): no retry on every render pass, and no Read row
             if (stale()) return;
             measuredRef.current.add(m.key);
-            console.warn(`Couldn't measure ${m.key}'s text layer and pictures:`, err);
+            console.warn(`No se pudo medir la capa de texto e imágenes de ${m.key}:`, err);
           });
         }
         // read the drawn scale note off this panel's page text (best-effort),
@@ -2859,16 +2867,16 @@ export default function TakeoffCanvas() {
       const imported = parseTakeoffImport(await file.text());
       const { payload, note } = mergeTakeoffImport(buildPayload(), imported, sheets.map((s) => s.name));
       restoreSavedPayload(payload);
-      const parts = [`Imported ${note.shapes_added} shape${note.shapes_added === 1 ? "" : "s"}`];
-      if (note.shapes_pending) parts.push(`${note.shapes_pending} dashed pending your review, Accept turns pencil to ink`);
-      if (note.conditions_added) parts.push(`${note.conditions_added} new condition${note.conditions_added === 1 ? "" : "s"}`);
-      if (note.conditions_merged) parts.push(`${note.conditions_merged} matched your finish tags`);
-      if (note.unknown_files.length) parts.push(`some shapes reference ${note.unknown_files.join(", ")}, open that file to see them`);
+      const parts = [`Se importó ${note.shapes_added} figura${note.shapes_added === 1 ? "" : "s"}`];
+      if (note.shapes_pending) parts.push(`${note.shapes_pending} punteadas pendientes de su revisión: Aceptar pasa de lápiz a tinta`);
+      if (note.conditions_added) parts.push(`${note.conditions_added} condici${note.conditions_added === 1 ? "ón" : "ones"} nueva${note.conditions_added === 1 ? "" : "s"}`);
+      if (note.conditions_merged) parts.push(`${note.conditions_merged} coincidieron con sus etiquetas de acabado`);
+      if (note.unknown_files.length) parts.push(`algunas figuras hacen referencia a ${note.unknown_files.join(", ")}: abra ese archivo para verlas`);
       setCommitMsg(parts.join(" · ") + ".");
     } catch (e) {
       // module copy already speaks "Couldn't…" (the sticky danger convention);
       // anything unexpected gets wrapped into it rather than aging out unread
-      setCommitMsg(String(e?.message || "").startsWith("Couldn't") ? e.message : `Couldn't import takeoff: ${e?.message || e}`);
+      setCommitMsg(String(e?.message || "").startsWith("No se pudo") ? e.message : `No se pudo importar el takeoff: ${e?.message || e}`);
     }
   };
 
@@ -2890,7 +2898,7 @@ export default function TakeoffCanvas() {
     const base = (projectName || "takeoff").trim().replace(/[^\w.\- ]+/g, "").replace(/\s+/g, "-").replace(/^[-.]+|[-.]+$/g, "") || "takeoff";
     downloadText(`${base}.takeoff.json`, JSON.stringify(payload, null, 2), "application/json");
     const n = shapes.length;
-    setCommitMsg(`Exported ${base}.takeoff.json, ${n} takeoff${n === 1 ? "" : "s"}, ${conditions.length} condition${conditions.length === 1 ? "" : "s"}. The plan PDF isn't in it: to restore, open the same PDF, then Import takeoff.`);
+    setCommitMsg(`Se exportó ${base}.takeoff.json: ${n} takeoff${n === 1 ? "" : "s"}, ${conditions.length} condici${conditions.length === 1 ? "ón" : "ones"}. El PDF del plano no va incluido: para restaurar, abra el mismo PDF y luego Importar takeoff.`);
   };
 
   // "Clear workspace" (#301) — the deliberate start-fresh: every stored PDF
@@ -2904,7 +2912,7 @@ export default function TakeoffCanvas() {
     const names = sheets.map((s) => s.name);
     let saved = false;
     if (shapes.length || conditions.length || markups.length) {
-      try { await store.saveSnapshot(`Before Clear workspace, ${new Date().toLocaleString()}`, buildPayload()); saved = true; }
+      try { await store.saveSnapshot(`Antes de limpiar el espacio, ${new Date().toLocaleString()}`, buildPayload()); saved = true; }
       catch { /* best-effort (quota), clearing continues; message says what happened */ }
     }
     for (const n of names) { try { await store.removePdf(n); } catch { /* already gone */ } evictDoc(n); }
@@ -2915,8 +2923,8 @@ export default function TakeoffCanvas() {
     reconcileAfterRemoval("", await refreshSheets());
     restoreSavedPayload(emptyAnnotations());
     setCommitMsg(saved
-      ? `Workspace cleared, ${names.length} PDF${names.length === 1 ? "" : "s"} removed. The takeoff was snapshotted first: Revisions → restore brings it back (re-open the same PDFs to see its shapes).`
-      : `Workspace cleared, ${names.length} PDF${names.length === 1 ? "" : "s"} removed.`);
+      ? `Espacio de trabajo limpio, ${names.length} PDF quitado${names.length === 1 ? "" : "s"}. Antes se guardó una copia del takeoff: Revisiones → restaurar lo devuelve (vuelva a abrir los mismos PDF para ver sus figuras).`
+      : `Espacio limpio: ${names.length} PDF quitado${names.length === 1 ? "" : "s"}.`);
   };
 
   // "Export project archive…" (#300) — the whole job as ONE portable .otk:
@@ -2924,7 +2932,7 @@ export default function TakeoffCanvas() {
   // of the #285 pair: Export takeoff is the annotation record alone (open the
   // same PDF to restore); this is the archive that carries its own paper.
   const exportProjectArchive = async () => {
-    if (!sheets.length) { setCommitMsg("Couldn't export project: no plans are open."); return; }
+    if (!sheets.length) { setCommitMsg("No se pudo exportar el proyecto: no hay planos abiertos."); return; }
     const base = (projectName || "project").trim().replace(/[^\w.\- ]+/g, "").replace(/\s+/g, "-").replace(/^[-.]+|[-.]+$/g, "") || "project";
     try {
       const data = await buildProjectArchive({
@@ -2935,9 +2943,9 @@ export default function TakeoffCanvas() {
         onProgress: setCommitMsg,
       });
       downloadArchive(`${base}.otk`, data);
-      setCommitMsg(`Exported ${base}.otk, ${sheets.length} PDF${sheets.length === 1 ? "" : "s"} + the full takeoff (${shapes.length} shape${shapes.length === 1 ? "" : "s"}). Self-contained: open it on any machine, or hand it to another estimator.`);
+      setCommitMsg(`Se exportó ${base}.otk: ${sheets.length} PDF y el takeoff completo (${shapes.length} figura${shapes.length === 1 ? "" : "s"}). Es autocontenido: ábralo en cualquier equipo o entréguelo a otro estimador.`);
     } catch (e) {
-      setCommitMsg(`Couldn't export project: ${e?.message || e}`);
+      setCommitMsg(`No se pudo exportar el proyecto: ${e?.message || e}`);
     }
   };
 
@@ -2946,14 +2954,14 @@ export default function TakeoffCanvas() {
   // snapshotted first so opening an archive is never a silent overwrite.
   const importProjectArchive = async (file) => {
     try {
-      setCommitMsg(`Opening ${file.name}…`);
+      setCommitMsg(`Abriendo ${file.name}…`);
       const { takeoff, pdfs } = await parseProjectArchive(new Uint8Array(await file.arrayBuffer()));
       if (shapes.length || conditions.length || markups.length) {
-        try { await store.saveSnapshot(`Before opening ${file.name}, ${new Date().toLocaleString()}`, buildPayload()); }
+        try { await store.saveSnapshot(`Antes de abrir ${file.name}, ${new Date().toLocaleString()}`, buildPayload()); }
         catch { /* best-effort, the open continues; archives are additive to PDFs */ }
       }
       for (const f of pdfs) {
-        setCommitMsg(`Restoring ${f.name}…`);
+        setCommitMsg(`Restaurando ${f.name}…`);
         await store.addPdf(f);        // same-name different-bytes archives a revision (CO-1), never a silent overwrite
         evictDoc(f.name);             // stale docs must re-read the restored bytes
       }
@@ -2962,9 +2970,9 @@ export default function TakeoffCanvas() {
       await refreshSheets();
       restoreSavedPayload(takeoff);
       const n = Array.isArray(takeoff.shapes) ? takeoff.shapes.length : 0;
-      setCommitMsg(`Opened ${file.name}, ${pdfs.length} PDF${pdfs.length === 1 ? "" : "s"}, ${n} takeoff${n === 1 ? "" : "s"}.${shapes.length || conditions.length ? " Your previous takeoff was snapshotted, Revisions restores it." : ""}`);
+      setCommitMsg(`Se abrió ${file.name}: ${pdfs.length} PDF, ${n} takeoff${n === 1 ? "" : "s"}.${shapes.length || conditions.length ? " Se guardó una copia de su takeoff anterior: Revisiones la restaura." : ""}`);
     } catch (e) {
-      setCommitMsg(String(e?.message || "").startsWith("Couldn't") ? e.message : `Couldn't open project: ${e?.message || e}`);
+      setCommitMsg(String(e?.message || "").startsWith("No se pudo") ? e.message : `No se pudo abrir el proyecto: ${e?.message || e}`);
     }
   };
 
@@ -2981,13 +2989,13 @@ export default function TakeoffCanvas() {
     stampLibRef.current = lib; setStampLib(lib);
   };
   const profileSummary = (p) =>
-    `${(p.condition_templates || []).length} condition template${(p.condition_templates || []).length === 1 ? "" : "s"}, ${(p.material_library || []).length} material${(p.material_library || []).length === 1 ? "" : "s"}, ${(p.stamp_library?.stamps || []).length} stamp${(p.stamp_library?.stamps || []).length === 1 ? "" : "s"}, ${(p.report_templates || []).length} report template${(p.report_templates || []).length === 1 ? "" : "s"}`;
+    `${(p.condition_templates || []).length} plantilla${(p.condition_templates || []).length === 1 ? "" : "s"} de condición, ${(p.material_library || []).length} material${(p.material_library || []).length === 1 ? "" : "es"}, ${(p.stamp_library?.stamps || []).length} sello${(p.stamp_library?.stamps || []).length === 1 ? "" : "s"}, ${(p.report_templates || []).length} plantilla${(p.report_templates || []).length === 1 ? "" : "s"} de reporte`;
   const exportProfileFile = async () => {
     try {
       const p = await buildProfile();
       downloadText("opentakeoff-profile.otprofile", JSON.stringify(p, null, 2), "application/json");
-      setCommitMsg(`Exported opentakeoff-profile.otprofile, ${profileSummary(p)}. Import it on another machine to carry your setup over.`);
-    } catch (e) { setCommitMsg(`Couldn't export profile: ${e?.message || e}`); }
+      setCommitMsg(`Se exportó opentakeoff-profile.otprofile: ${profileSummary(p)}. Impórtelo en otro equipo para llevar su configuración.`);
+    } catch (e) { setCommitMsg(`No se pudo exportar el perfil: ${e?.message || e}`); }
   };
   const backupProfileFile = async () => {
     const backup = await buildProfile();
@@ -3000,9 +3008,9 @@ export default function TakeoffCanvas() {
       await backupProfileFile();
       const n = await applyProfile(p);
       await refreshLibraries();
-      setCommitMsg(`Applied profile${p.name ? ` "${p.name}"` : ""}, ${n.templates} condition template${n.templates === 1 ? "" : "s"}, ${n.materials} material${n.materials === 1 ? "" : "s"}, ${n.stamps} stamp${n.stamps === 1 ? "" : "s"}, ${n.reportTemplates} report template${n.reportTemplates === 1 ? "" : "s"}. Your previous setup downloaded as opentakeoff-profile-backup.otprofile.`);
+      setCommitMsg(`Perfil aplicado${p.name ? ` «${p.name}»` : ""}: ${n.templates} plantilla${n.templates === 1 ? "" : "s"} de condición, ${n.materials} material${n.materials === 1 ? "" : "es"}, ${n.stamps} sello${n.stamps === 1 ? "" : "s"}, ${n.reportTemplates} plantilla${n.reportTemplates === 1 ? "" : "s"} de reporte. Su configuración anterior se descargó como opentakeoff-profile-backup.otprofile.`);
     } catch (e) {
-      setCommitMsg(String(e?.message || "").startsWith("Couldn't") ? e.message : `Couldn't apply profile: ${e?.message || e}`);
+      setCommitMsg(String(e?.message || "").startsWith("No se pudo") ? e.message : `No se pudo aplicar el perfil: ${e?.message || e}`);
     }
   };
   const resetProfile = async () => {
@@ -3010,8 +3018,8 @@ export default function TakeoffCanvas() {
       await backupProfileFile();
       await resetProfileDefaults();
       await refreshLibraries();
-      setCommitMsg("Profile reset to OpenTakeoff defaults, your previous setup downloaded as opentakeoff-profile-backup.otprofile (Import profile restores it). Project takeoffs are untouched.");
-    } catch (e) { setCommitMsg(`Couldn't reset profile: ${e?.message || e}`); }
+      setCommitMsg("Perfil restablecido a los valores por omisión: su configuración anterior se descargó como opentakeoff-profile-backup.otprofile (Importar perfil la restaura). Los takeoffs de proyecto no se tocaron.");
+    } catch (e) { setCommitMsg(`No se pudo restablecer el perfil: ${e?.message || e}`); }
   };
 
   // markups MUST be in the deps (a cloud/callout/text or an RFI link is real work);
@@ -3393,7 +3401,7 @@ export default function TakeoffCanvas() {
         setTool(plan.tool);
         const label = [...MEASURE_TOOLS, ...CUT_TOOLS].find((x) => x.id === plan.tool)?.label || plan.tool;
         const tag = condById[plan.conditionId]?.finish_tag;
-        setCommitMsg(`${label} armed${tag ? ` under ${tag}` : ""}${plan.curve ? " · Curve" : ""}, trace the next one.`);
+        setCommitMsg(`${label} armado${tag ? ` bajo ${tag}` : ""}${plan.curve ? " · Curva" : ""}: trace el siguiente.`);
         return;
       }
       const map = { v: "select", a: "area", r: "rect", l: "linear", s: "surface", c: "count", d: "deduct", o: "oneclick", k: "check", h: "highlighter", n: "dimension", y: "symbol" };
@@ -3497,7 +3505,7 @@ export default function TakeoffCanvas() {
   // The moment the measurement is no longer complete — third-click restart,
   // Backspace below two points — the stale value must not grade the NEXT span:
   // it would render an instant confident verdict against the previous
-  // dimension's number and leave "Recalibrate to this" armed with it.
+  // dimension's number and leave "Recalibrar a esto" armed with it.
   useEffect(() => { if (check.length < 2 && checkStated) setCheckStated(""); }, [check.length]); // eslint-disable-line react-hooks/exhaustive-deps
   // Leaving the check tool discards the whole check: rendering is gated on
   // tool === "check", so surviving state would sit invisible and resurface —
@@ -3571,7 +3579,7 @@ export default function TakeoffCanvas() {
       // updated_at ⇒ ties → remote wins ⇒ the move vanishes).
       updateMarkup(id, { updated_at: nowIso() });
       selectMarkup(id);
-      setCommitMsg("Image placed.");
+      setCommitMsg("Imagen colocada.");
       return;
     }
     // snapRef/angleRef are drawing-tool aids maintained by moveCrosshair, which
@@ -3670,10 +3678,10 @@ export default function TakeoffCanvas() {
     const st = stitchById[groupKeys[0]];
     if (!st || panels.length !== 1) { setTool("select"); return; }
     const n = shapes.filter((s) => s.sheet_id === st.id).length;
-    if (n) { setCommitMsg(`Align before tracing, ${n} takeoff${n === 1 ? "" : "s"} already live on this stitch. Delete them (or a fresh stitch) to re-align.`); setTool("select"); return; }
+    if (n) { setCommitMsg(`Alinee antes de trazar: ya hay ${n} takeoff${n === 1 ? "" : "s"} en este empalme. Elimínelos (o use un empalme nuevo) para volver a alinear.`); setTool("select"); return; }
     if (!alignPt) {
       setAlignPt(p);
-      setCommitMsg("Match point set, now click the SAME point where the other sheet draws it.");
+      setCommitMsg("Punto de coincidencia fijado: ahora haga clic en el MISMO punto donde lo dibuja la otra hoja.");
       return;
     }
     const dims = panelSourceDimsRef.current.get(st.id) || {};
@@ -3682,7 +3690,7 @@ export default function TakeoffCanvas() {
     if (res.error) { setCommitMsg(res.error); return; }
     setStitches((list) => list.map((s) => (s.id === st.id ? { ...s, members: res.members } : s)));
     setTool("select");
-    setCommitMsg("Match line joined, the sheets now read as one surface. Trace straight across it.");
+    setCommitMsg("Línea de empalme unida: las hojas se leen ahora como una sola superficie. Trace de lado a lado.");
   }
   // Markups carry no verts_norm (cloud rect / callout at+target / text at), so
   // hitShape can't test them — this is a purpose-built bbox/point test in the
@@ -3925,7 +3933,7 @@ export default function TakeoffCanvas() {
     const closed = sel.measure_role !== "linear" && sel.measure_role !== "surface_area";
     const min = closed ? 3 : 2;
     if (sel.verts_norm.length <= min) {
-      setCommitMsg(closed ? "A shape needs at least 3 points, ⌫ again deletes the whole shape." : "A run needs at least 2 points, ⌫ again deletes the whole run.");
+      setCommitMsg(closed ? "Una figura necesita al menos 3 puntos: ⌫ otra vez elimina toda la figura." : "Un tramo necesita al menos 2 puntos: ⌫ otra vez elimina todo el tramo.");
       setSelVert(null); return;
     }
     // dropping a corner is as real an edit as dragging one — the vertexDelete
@@ -3979,8 +3987,8 @@ export default function TakeoffCanvas() {
       vals[key] = val;
     };
     if (chrome === "panelDark") {
-      row("This segment", "seg");
-      row("Total linear", "lin");
+      row("Este segmento", "seg");
+      row("Lineal total", "lin");
       row("Total area", "area");
     } else {
       const head = document.createElement("div");
@@ -3988,13 +3996,13 @@ export default function TakeoffCanvas() {
       chip.appendChild(head);
       vals.head = head;
       const sub = document.createElement("div");
-      sub.textContent = "This section only:";
+      sub.textContent = "Solo esta sección:";
       sub.style.opacity = "0.62"; sub.style.fontSize = "9.5px"; sub.style.marginBottom = "1px";
       chip.appendChild(sub);
-      row("Area", "area", areaUnit(units));
-      row("Linear", "lin", lenUnit(units));
-      row("Segments", "segs");
-      row("Points", "pts");
+      row("Área", "area", areaUnit(units));
+      row("Lineal", "lin", lenUnit(units));
+      row("Segmentos", "segs");
+      row("Puntos", "pts");
     }
     chip.__vals = vals;
   }
@@ -4144,7 +4152,7 @@ export default function TakeoffCanvas() {
           v.lin.textContent = fmtCheckLen(totLen, units);
           v.area.textContent = ringDraft ? `${num(areaVal(areaSf, units))} ${areaUnit(units)}` : "";
         } else {
-          v.head.textContent = aCond?.finish_tag || "No condition";
+          v.head.textContent = aCond?.finish_tag || "Sin condición";
           v.area.textContent = ringDraft ? num(areaVal(areaSf, units)) : "";
           v.lin.textContent = num(lenVal(totLen, units));
           // chain counts INCLUDING the live leg: placed edges + the rubber =
@@ -4304,7 +4312,7 @@ export default function TakeoffCanvas() {
   function describeShape(s) {
     const tag = condById[s.condition_id]?.finish_tag || "?";
     const a = s.computed?.area_sf || 0, lf = s.computed?.perimeter_lf || 0;
-    if (s.measure_role === "count") return `${tag} · ${num(s.computed?.count || 1, 0)} EA`;
+    if (s.measure_role === "count") return `${tag} · ${num(s.computed?.count || 1, 0)} UND`;
     // closed shapes carry their ring length too (#283) — a footprint's LF is
     // as much a takeoff number as its SF, and it's already computed
     if (s.measure_role === "deduct") return `${tag} · −${fa(a)} deduct${lf > 0 ? ` · ${fl(lf)} perim` : ""}`;
@@ -4314,7 +4322,7 @@ export default function TakeoffCanvas() {
       const h = s.height_override === true
         ? Number(s.height_ft) || 0
         : Number(s.height_ft) || Number(condById[s.condition_id]?.height_ft) || 0;
-      return `${tag} · ${fa(a)} wall (${fl(lf)} × ${num(h, 2)}′)`;
+      return `${tag} · ${fa(a)} de muro (${fl(lf)} × ${num(h, 2)}′)`;
     }
     if (s.measure_role === "linear") return `${tag} · ${fl(lf)}${a > 0 ? ` · ${fa(a)} border` : ""}`;
     return `${tag} · ${faSY(a)}${lf > 0 ? ` · ${fl(lf)} perim` : ""}`;
@@ -4688,7 +4696,7 @@ export default function TakeoffCanvas() {
     if (prior === upp) { confirmScale(key); return; } // re-picking the active scale, no reprice churn, no stash (mirrors the MCP guard)
     const sp = panels.find((p) => p.key === key);
     if (!sp?.img?.w && shapes.some((sh) => sh.sheet_id === key && sh.measure_role !== "count")) {
-      setCommitMsg("Open this sheet before recalibrating its measurements.");
+      setCommitMsg("Abra esta hoja antes de recalibrar sus mediciones.");
       return;
     }
     if (prior != null && shapes.some((sh) => sh.sheet_id === key)) {
@@ -4731,7 +4739,7 @@ export default function TakeoffCanvas() {
     if (!(feet > 0) || calib.length !== 2) return;
     const pa = panelAt(calib[0][0]), pb = panelAt(calib[1][0]);
     if (pa.key !== pb.key) {
-      setCommitMsg("Calibrate on one sheet, those two clicks landed on different sheets.");
+      setCommitMsg("Calibre en una sola hoja: esos dos clics cayeron en hojas distintas.");
       setCalib([]); setPendingLen(""); return;
     }
     const px = Math.hypot(calib[1][0] - calib[0][0], calib[1][1] - calib[0][1]);
@@ -4766,7 +4774,7 @@ export default function TakeoffCanvas() {
   // floor_area shape (turf boolean subtract, lib/cutout.js) instead of it
   // landing as a second independent overlay. Returns null (caller keeps the
   // legacy path) whenever the resolution is anything but unambiguous:
-  //   - zero or 2+ floor_area shapes on this sheet touch the deduct's ring
+  //   - zero or 2+ floor_area shapes en esta hoja touch the deduct's ring
   //     (ambiguous parent, or it spans more than one condition's shape);
   //   - the boolean op itself degenerates (deduct erases the parent, or
   //     splits it into disjoint pieces — subtractCutout refuses both).
@@ -4870,10 +4878,10 @@ export default function TakeoffCanvas() {
   }
   const runCutMsg = (runs) => {
     const bits = [];
-    if (runs.targets.length) bits.push(`cut ${runs.targets.length} run${runs.targets.length === 1 ? "" : "s"}`);
-    if (runs.mint.length) bits.push(`${runs.mint.length} left on the far side of the cut`);
-    if (runs.deleteIds.length) bits.push(`removed ${runs.deleteIds.length} outright`);
-    return `Cut Out: ${bits.join(" \u00b7 ")}.`;
+    if (runs.targets.length) bits.push(`${runs.targets.length} tramo${runs.targets.length === 1 ? "" : "s"} cortado${runs.targets.length === 1 ? "" : "s"}`);
+    if (runs.mint.length) bits.push(`${runs.mint.length} quedaron al otro lado del corte`);
+    if (runs.deleteIds.length) bits.push(`${runs.deleteIds.length} eliminado${runs.deleteIds.length === 1 ? "" : "s"} por completo`);
+    return `Recorte: ${bits.join(" \u00b7 ")}.`;
   };
   // A trace whose points span two side-by-side panels has no coherent
   // quantity — the inter-panel gap would be measured as real feet, and the
@@ -4892,8 +4900,8 @@ export default function TakeoffCanvas() {
     if (spansPanels(points)) { setCommitMsg(SPAN_MSG); return; }
     const tp = panelAt(points[0][0]);
     const upp = uppFor(tp.key);
-    if (!upp) { setCommitMsg(`Set the scale for ${labelFor(tp)} first.`); return; }
-    if (!activeCond) { setCommitMsg("Pick or add a condition first."); return; }
+    if (!upp) { setCommitMsg(`Fije primero la escala de ${labelFor(tp)}.`); return; }
+    if (!activeCond) { setCommitMsg("Elija o agregue primero una condición."); return; }
     const met = closedMetrics(points);
     // id + created_at are minted by the add command — the ONE creation gate
     const shape = {
@@ -4937,8 +4945,8 @@ export default function TakeoffCanvas() {
     if (spansPanels(points)) { setCommitMsg(SPAN_MSG); return; }
     const tp = panelAt(points[0][0]);
     const upp = uppFor(tp.key);
-    if (!upp) { setCommitMsg(`Set the scale for ${labelFor(tp)} first.`); return; }
-    if (!activeCond) { setCommitMsg("Pick or add a condition first."); return; }
+    if (!upp) { setCommitMsg(`Fije primero la escala de ${labelFor(tp)}.`); return; }
+    if (!activeCond) { setCommitMsg("Elija o agregue primero una condición."); return; }
     // curved: verts stay the clicked CONTROL points (drag one → re-smooths);
     // length always comes from the flattened spline
     // quantified by the ONE computer (shapeMetrics): border SF from the
@@ -4959,10 +4967,10 @@ export default function TakeoffCanvas() {
     if (spansPanels(points)) { setCommitMsg(SPAN_MSG); return; }
     const tp = panelAt(points[0][0]);
     const upp = uppFor(tp.key);
-    if (!upp) { setCommitMsg(`Set the scale for ${labelFor(tp)} first.`); return; }
-    if (!activeCond) { setCommitMsg("Pick or add a condition first."); return; }
+    if (!upp) { setCommitMsg(`Fije primero la escala de ${labelFor(tp)}.`); return; }
+    if (!activeCond) { setCommitMsg("Elija o agregue primero una condición."); return; }
     const h = Number(aCond?.height_ft) || 0;
-    if (!(h > 0)) { setCommitMsg(`Set a height for ${aCond?.finish_tag || "this condition"} (H in the condition editor), Surface Area = traced LF × height.`); return; }
+    if (!(h > 0)) { setCommitMsg(`Fije una altura para ${aCond?.finish_tag || "esta condición"} (H en el editor de la condición): Superficie = LF trazados × altura.`); return; }
     const LF = openLen(points) * upp;
     dispatchShape({ type: "add", shapes: [{
       sheet_id: tp.key, condition_id: activeCond, measure_role: "surface_area", height_ft: h,
@@ -5019,7 +5027,7 @@ export default function TakeoffCanvas() {
     const key = tp.key;
     const rect = [[a[0] - tp.xOffset, a[1]], [b[0] - tp.xOffset, b[1]]];
     const segs = vectorSegsRef.current.get(key);
-    if (!segs || !segs.length) { setCommitMsg("This sheet has no vector linework (likely a scan), the Symbol tool reads drawn segments."); return; }
+    if (!segs || !segs.length) { setCommitMsg("Esta hoja no tiene líneas vectoriales (probablemente un escaneo): la herramienta Símbolo lee segmentos dibujados."); return; }
     const lum = segLumRef.current.get(key);
     let res;
     try {
@@ -5069,22 +5077,22 @@ export default function TakeoffCanvas() {
     const tags = rows.map((r) => r.label?.label || null);
     const named = tags.filter(Boolean);
     if (!named.length) return null;
-    if (seedTag && named.length === rows.length && named.every((t) => t === seedTag)) return `drawing says ${seedTag} on all ${rows.length}`;
+    if (seedTag && named.length === rows.length && named.every((t) => t === seedTag)) return `el dibujo dice ${seedTag} en las ${rows.length}`;
     const byTag = {};
-    for (const t of tags) byTag[t || "no label"] = (byTag[t || "no label"] || 0) + 1;
+    for (const t of tags) byTag[t || "sin etiqueta"] = (byTag[t || "sin etiqueta"] || 0) + 1;
     return Object.entries(byTag).map(([t, n]) => `${t} ×${n}`).join(" · ");
   }
   function commitSweep() {
     const sw = sweep;
     if (!sw) return;
-    if (!activeCond) { setCommitMsg("Pick or add a condition first."); return; }
+    if (!activeCond) { setCommitMsg("Elija o agregue primero una condición."); return; }
     const rows = [];
     const off = new Set(sw.excludedTags);
     const tagKey = (m) => (m.label && m.label.label) || "\u2205";
     if (sw.includeSeed) rows.push({ at: sw.seed.center, score: 1, rotation: 0, mirrored: false, seedRow: true });
     for (const m of sw.matches) if (!off.has(tagKey(m))) rows.push(m);
     for (const q of sw.questions) if (q.state === "accepted") rows.push(q);
-    if (!rows.length) { setCommitMsg("Nothing to commit, no matches and no accepted questions."); return; }
+    if (!rows.length) { setCommitMsg("Nada que confirmar: no hay coincidencias ni preguntas aceptadas."); return; }
     // ONE dispatch = one undo step, the whole gesture — same batch discipline
     // as the MCP's set-wide commit
     dispatchShape({ type: "add", shapes: rows.map((m) => ({
@@ -5094,12 +5102,12 @@ export default function TakeoffCanvas() {
       origin: { method: "symbol_sweep", symbol: { score: m.score, rotation: m.rotation, mirrored: m.mirrored, seed: { source: "instance", sheet: sw.key, ...(m.seedRow ? { seed_instance: true } : {}) } } },
     })) });
     const skippedN = sw.matches.length - sw.matches.filter((m) => !off.has(tagKey(m))).length;
-    setCommitMsg(`Committed ${rows.length} EA under ${condById[activeCond]?.finish_tag || "condition"}${sw.includeSeed ? ", seed included" : ""}${skippedN ? ` · ${skippedN} excluded by label` : ""} · one undo step (${keyText("⌘Z")}).`);
+    setCommitMsg(`Se confirmaron ${rows.length} UND bajo ${condById[activeCond]?.finish_tag || "la condición"}${sw.includeSeed ? ", incluida la semilla" : ""}${skippedN ? ` · ${skippedN} excluidos por etiqueta` : ""} · un solo paso de deshacer (${keyText("⌘Z")}).`);
     setSweep(null);
   }
 
   function commitCount(p) {
-    if (!activeCond) { setCommitMsg("Pick or add a condition first."); return; }
+    if (!activeCond) { setCommitMsg("Elija o agregue primero una condición."); return; }
     const tp = panelAt(p[0]);
     dispatchShape({ type: "add", shapes: [{
       sheet_id: tp.key, condition_id: activeCond, measure_role: "count",
@@ -5270,7 +5278,7 @@ export default function TakeoffCanvas() {
   function proposeRegion(f, tp, local, negative, raster, prebuilt) {
     const region = prebuilt || buildOneClickRegion(f, tp, local, negative, raster);
     if (!region) {
-      if (uppFor(tp.key)) setCommitMsg("Couldn't trace that space, trace it with Area (A).");
+      if (uppFor(tp.key)) setCommitMsg("No se pudo trazar ese espacio: trácelo con Área (A).");
       return;
     }
     // Decide accept/dup/carve-reject INSIDE the functional updater, against
@@ -5321,19 +5329,19 @@ export default function TakeoffCanvas() {
         return { key: tp.key, regions: [...rs, region] };
       });
     });
-    if (outcome === "dup") setCommitMsg(negative ? "That cutout is already carved." : keyText("Already selected, ⌥-click carves an enclosed cutout; ⏎ creates."));
-    else if (outcome === "needsPos") setCommitMsg(keyText("⌥-click carves an enclosed area INSIDE the selection (a column or shaft), click its room first."));
+    if (outcome === "dup") setCommitMsg(negative ? "Ese recorte ya está hecho." : keyText("Ya está seleccionado: ⌥+clic abre un recorte cerrado; ⏎ crea."));
+    else if (outcome === "needsPos") setCommitMsg(keyText("⌥+clic abre un área cerrada DENTRO de la selección (una columna o un ducto): haga clic primero en su recinto."));
     // The measurement-policy receipts: when the engine sealed, wedged, or
     // ruled a passage out, the estimator hears it at stage time — the trace is
     // reviewable while the edge in question is still under the cursor.
     else if (!f) { /* net-engine region: the caller already set the message; there is no flood receipt to narrate */ }
-    else if (f.wedges && f.ringWedges >= f.wedges) setCommitMsg(`Measured to include the floor inside ${f.ringWedges === 1 ? "a closed ring" : `${f.ringWedges} closed rings`} drawn on the plan (a round column or a callout bubble), no door swing was involved. If that is a column you deduct rather than floor you cover, ${keyText("⌥-click carves it out. ⏎ creates.")}`);
-    else if (f.wedges && f.ringWedges) setCommitMsg(`Measured through the drawn door to the wall opening, the swing area is included. It also includes the floor inside ${f.ringWedges === 1 ? "a closed ring" : `${f.ringWedges} closed rings`} (a round column or callout bubble), which is not a door swing; ${keyText("⌥-click carves one out if it should be deducted. ⏎ creates.")}`);
-    else if (f.wedges) setCommitMsg("Measured through the drawn door to the wall opening, the swing area is included. ⏎ creates.");
+    else if (f.wedges && f.ringWedges >= f.wedges) setCommitMsg(`Se midió incluyendo el piso dentro de ${f.ringWedges === 1 ? "un anillo cerrado" : `${f.ringWedges} anillos cerrados`} dibujado${f.ringWedges === 1 ? "" : "s"} en el plano (una columna redonda o un globo de llamada); no intervino ningún abatimiento de puerta. Si es una columna que se deduce y no un piso que se cubre, ${keyText("⌥+clic la recorta. ⏎ crea.")}`);
+    else if (f.wedges && f.ringWedges) setCommitMsg(`Se midió a través de la puerta dibujada hasta el vano del muro: se incluye el área de abatimiento. También incluye el piso dentro de ${f.ringWedges === 1 ? "un anillo cerrado" : `${f.ringWedges} anillos cerrados`} (una columna redonda o un globo de llamada), que no es un abatimiento de puerta; ${keyText("⌥+clic recorta uno si debe deducirse. ⏎ crea.")}`);
+    else if (f.wedges) setCommitMsg("Se midió a través de la puerta dibujada hasta el vano del muro: se incluye el área de abatimiento. ⏎ crea.");
     else if (f.sealedPx) setCommitMsg(f.minPassPx
-      ? `That space isn't closed on the drawing, the gap is under ${MIN_PASS_FT} ft, so the minimum-passage rule bridged it rather than measuring through it. That call is at the limit of what this sheet's resolution can decide; review the edge, then ⏎ creates.`
-      : "That space wasn't fully enclosed, a small opening (a doorway or line gap) was sealed to bound it. Review the edge, then ⏎ creates.");
-    else if (f.minPassDelta) setCommitMsg(`A passage under ${MIN_PASS_FT} ft wide was treated as not connecting, measuring through it would have added ${Math.round(f.minPassDelta * 100)}% more area. Review that edge, then ⏎ creates.`);
+      ? `Ese espacio no está cerrado en el dibujo: el hueco es menor de ${MIN_PASS_FT} ft, así que la regla de paso mínimo lo cerró en lugar de medir a través. Esa decisión está en el límite de lo que permite la resolución de esta hoja`
+      : "Ese espacio no quedó totalmente cerrado: se selló una pequeña abertura (un vano o un hueco de línea) para delimitarlo. Revise el borde y luego ⏎ crea.");
+    else if (f.minPassDelta) setCommitMsg(`Un paso de menos de ${MIN_PASS_FT} ft de ancho se trató como no conectado: medir a través habría sumado ${Math.round(f.minPassDelta * 100)}% más de área. Revise ese borde y luego ⏎ crea.`);
     else setCommitMsg("");
   }
   // `direct` (voice deixis, RFC #59): { conditionId, label } — the human aimed
@@ -5349,15 +5357,15 @@ export default function TakeoffCanvas() {
     if (!oneClickEnabled()) return say(ONE_CLICK_GATE_MESSAGE);   // the TEMPORARY gate (lib/gate.js), every caller funnels here
     const tp = panelAt(p[0]);
     const upp = uppFor(tp.key);
-    if (!upp) return say(`Set the scale for ${labelFor(tp)} first.`);
-    if (!(direct ? direct.conditionId : activeCond)) return say("Pick or add a condition first.");
+    if (!upp) return say(`Fije primero la escala de ${labelFor(tp)}.`);
+    if (!(direct ? direct.conditionId : activeCond)) return say("Elija o agregue primero una condición.");
     // a click may EXTEND a same-sheet proposal; voice deixis commits whole and
     // must never swallow a selection the human is still reviewing — ANY pending
     // proposal rejects the utterance
     if (proposal && (direct || proposal.key !== tp.key)) {
       return say(direct
-        ? "Finish the pending one-click selection first, ⏎ creates it, Esc discards."
-        : `Finish the selection on ${labelFor(panelByKey(proposal.key))} first, ⏎ creates it, Esc discards.`);
+        ? "Termine primero la selección de One-Click pendiente: ⏎ la crea, Esc la descarta."
+        : `Termine primero la selección en ${labelFor(panelByKey(proposal.key))}: ⏎ la crea, Esc la descarta.`);
     }
     const local = [p[0] - tp.xOffset, p[1]];
     // Trigger policy: vector is exact and always wins where it works — including
@@ -5373,8 +5381,8 @@ export default function TakeoffCanvas() {
     if (netEngine && !direct && vectorViable) {
       const segs = vectorSegsRef.current.get(tp.key);
       const meta = segMetaRef.current.get(tp.key);
-      if (!segs || !meta) return say("Still reading this sheet's linework, One-Click arms as soon as that finishes (a dense sheet can take a few seconds). Try again in a moment.");
-      if (!netWorker) return say("One-Click needs Web Workers in this browser, trace it with Area (A).");
+      if (!segs || !meta) return say("Aún se leen las líneas de esta hoja: One-Click se arma en cuanto termine (una hoja densa puede tardar unos segundos). Intente de nuevo en un momento.");
+      if (!netWorker) return say("One-Click necesita Web Workers en este navegador: trace con Área (A).");
       // FRAMES: the vector segments live at the BASELINE render scale; a hi-res
       // sheet's click and its upp are in the hi-res frame (uppFor divides by
       // factorFor). Convert into the segments' frame for the engine and back
@@ -5390,8 +5398,8 @@ export default function TakeoffCanvas() {
         // LOUD, TICKING status: a dense sheet reads for tens of seconds and a
         // silent wait reads as failure (his call, Liminal 2026-08-24)
         const t0 = Date.now();
-        setCommitMsg("Reading the walls on this sheet… 0 s, the first click on a sheet builds its wall network; the page stays live.");
-        const tick = setInterval(() => setCommitMsg(`Reading the walls on this sheet… ${Math.round((Date.now() - t0) / 1000)} s, the first click on a sheet builds its wall network; the page stays live.`), 1000);
+        setCommitMsg("Leyendo los muros de esta hoja… 0 s: el primer clic en una hoja construye su red de muros; la página sigue activa.");
+        const tick = setInterval(() => setCommitMsg(`Leyendo los muros de esta hoja… ${Math.round((Date.now() - t0) / 1000)} s: el primer clic en una hoja construye su red de muros; la página sigue activa.`), 1000);
         netTickRef.current = tick;
         const subpathsIn = subpathsRef.current.get(tp.key) || null, textsIn = textMarksRef.current.get(tp.key) || [];
         // diagnostic record of EXACTLY what the engine was handed (read from devtools as window.__netLast)
@@ -5402,15 +5410,15 @@ export default function TakeoffCanvas() {
       }
       let info;
       try { info = await built; }
-      catch (err) { console.error("net engine build failed", err); return say("One-Click couldn't read this sheet's linework, trace it with Area (A)."); }
+      catch (err) { console.error("net engine build failed", err); return say("One-Click no pudo leer las líneas de esta hoja: trace con Área (A)."); }
       finally { if (netTickRef.current) { clearInterval(netTickRef.current); netTickRef.current = null; } }
       if (toolRef.current !== "oneclick" || (proposalRef.current && proposalRef.current.key !== tp.key)) { setCommitMsg(""); return { ok: false, message: "" }; }
       const field = !!fieldClick;
       const rm = await netCall({ type: "room", key: ck, x: local[0] * kF, y: local[1] * kF, ftPx, mode: field ? "field" : "room" });
       const r = rm.room;
       if (!r) return say(field
-        ? "No finish pattern under that ⇧-click, ⇧-click inside the tile or plank pattern to select the whole field."
-        : "That click isn't inside an enclosed space, click an open spot, ⇧-click an open finish field, or trace it with Area (A).");
+        ? "No hay patrón de acabado bajo ese ⇧+clic: haga ⇧+clic dentro del patrón de loseta o tabla para seleccionar todo el campo."
+        : "Ese clic no está dentro de un espacio cerrado: haga clic en un punto abierto, ⇧+clic en un campo de acabado abierto, o trace con Área (A).");
       const ring = r.ring.map(([x, y]) => [x / kF, y / kF]);      // back to the panel's frame
       try { Object.assign(window.__netLast, { lastClick: [local[0], local[1]], lastRing: ring.map(([x, y]) => [+x.toFixed(1), +y.toFixed(1)]), lastFaces: r.faces }); } catch { /* diagnostics only */ }
       const holes = (r.holes || []).map((h) => h.map(([x, y]) => [x / kF, y / kF]));
@@ -5422,13 +5430,13 @@ export default function TakeoffCanvas() {
         area_sf, perim_lf, hf: false, shs: 0, sl: 0, gap: 0, mp: 0, mpd: 0, wg: 0, rw: 0, rt: false,
         cf: 1, cff: [], net: true, netFaces: r.faces, netStarved: !!r.starved, netMode: field ? "field" : "room",
       };
-      setCommitMsg(`${field ? "Finish field" : "Room"}: ${area_sf.toFixed(0)} SF from ${r.faces} face${r.faces === 1 ? "" : "s"}${r.holes.length ? ` (${r.holes.length} interior void${r.holes.length === 1 ? "" : "s"} subtracted)` : ""}${info && info.ms ? ` · net built in ${(info.ms / 1000).toFixed(1)} s` : ""}, ⏎ creates, Esc discards.`);
+      setCommitMsg(`${field ? "Campo de acabado" : "Recinto"}: ${area_sf.toFixed(0)} SF de ${r.faces} cara${r.faces === 1 ? "" : "s"}${r.holes.length ? ` (${r.holes.length} hueco${r.holes.length === 1 ? "" : "s"} interior${r.holes.length === 1 ? "" : "es"} restado${r.holes.length === 1 ? "" : "s"})` : ""}${info && info.ms ? ` · red armada en ${(info.ms / 1000).toFixed(1)} s` : ""}: ⏎ crea, Esc descarta.`);
       proposeRegion(null, tp, local, negative, false, region);
       return { ok: true, message: "" };
     }
     if (!rasterEligible || vectorViable) {
       const mo = ensureMask(tp.key);
-      if (!mo && !rasterEligible) return say("Still reading this sheet's linework, try again in a second.");
+      if (!mo && !rasterEligible) return say("Aún se leen las líneas de esta hoja: intente de nuevo en un segundo.");
       if (mo) {
         // seal radii + wedge cap scale with the sheet: bridge up to a door-width
         // opening (mask px per foot = mask-per-image-px / units-per-image-px)
@@ -5437,18 +5445,18 @@ export default function TakeoffCanvas() {
         if (f.status === "ok") return settleRegion(f, tp, local, negative, false, direct);
         if (!rasterEligible) {
           return say(f.status === "leak"
-            ? "That space isn't enclosed on the plan linework, the fill spilled. Click a more enclosed spot, or trace it with Area (A)."
-            : "Landed in dense linework (hatching/text). Zoom in and click an open spot, or trace it with Area (A).");
+            ? "Ese espacio no está cerrado en las líneas del plano: el relleno se derramó. Haga clic en un punto más cerrado, o trace con Área (A)."
+            : "Cayó en líneas densas (achurado o texto). Acerque y haga clic en un punto abierto, o trace con Área (A).");
         }
       }
     }
-    setCommitMsg("Reading the scan…");
+    setCommitMsg("Leyendo el escaneo…");
     const seq = renderSeqRef.current;
     const rmo = await ensureRasterMask(tp.key);
     if (seq !== renderSeqRef.current) {   // sheet group changed mid-render, the new sheet must not be left showing a stale "Reading the scan…" ("…" messages never auto-expire, see commitMsg's 6s-timer effect
       setCommitMsg("");
       return direct
-        ? say("Couldn't place that, the sheet changed while reading the scan. Say it again.")
+        ? say("No se pudo colocar eso: la hoja cambió mientras se leía el escaneo. Dígalo de nuevo.")
         : { ok: false, message: "" };
     }
     // The raster render can take real time on a large scan; the user may have
@@ -5464,10 +5472,10 @@ export default function TakeoffCanvas() {
     if (direct ? proposalRef.current : (toolRef.current !== "oneclick" || (proposalRef.current && proposalRef.current.key !== tp.key))) {
       setCommitMsg("");
       return direct
-        ? say("Couldn't place that, a one-click selection started while reading the scan. Finish it (⏎/Esc), then say it again.")
+        ? say("No se pudo colocar eso: empezó una selección One-Click mientras se leía el escaneo. Termínela (⏎/Esc) y dígalo de nuevo.")
         : { ok: false, message: "" };
     }
-    if (!rmo) return say("Couldn't read this scan, trace it with Area (A).");
+    if (!rmo) return say("No se pudo leer este escaneo: trace con Área (A).");
     // The raster mask is single-tier (softCount 0), so the flood's hatch
     // escalation — and with it the Fill sensitivity knob — is structurally
     // inert on scans; the default sensitivity rides along. Gap sealing still
@@ -5475,8 +5483,8 @@ export default function TakeoffCanvas() {
     const f = floodRegionSealed(rmo, local[0], local[1], undefined, sealRadiiFor(rmo.ws / upp), doorWedgeCapPx(rmo.ws / upp), minPassRadiusFor(rmo.ws / upp));
     if (f.status !== "ok") {
       return say(f.status === "leak"
-        ? "That space isn't enclosed on the scan, the fill escaped through a gap (faded line or open doorway). Click a more enclosed spot, or trace it with Area (A)."
-        : "Landed on dense scan ink (text or hatching). Zoom in and click an open spot, or trace it with Area (A).");
+        ? "Ese espacio no está cerrado en el escaneo: el relleno se escapó por un hueco (línea desvanecida o vano abierto). Haga clic en un punto más cerrado, o trace con Área (A)."
+        : "Cayó en tinta densa del escaneo (texto o achurado). Acerque y haga clic en un punto abierto, o trace con Área (A).");
     }
     return settleRegion(f, tp, local, negative, true, direct);
   }
@@ -5487,7 +5495,7 @@ export default function TakeoffCanvas() {
   function settleRegion(f, tp, local, negative, raster, direct) {
     if (!direct) { proposeRegion(f, tp, local, negative, raster); return { ok: true, message: "" }; }
     const region = buildOneClickRegion(f, tp, local, negative, raster);
-    if (!region) return { ok: false, message: "Couldn't trace that space, trace it with Area (A)." };
+    if (!region) return { ok: false, message: "No se pudo trazar ese espacio: trácelo con Área (A)." };
     return commitOneClickRegions({ key: tp.key, regions: [region] }, direct);
   }
   // The ONE commit gate for one-click regions — the ⏎/dblclick Create AND a
@@ -5500,7 +5508,7 @@ export default function TakeoffCanvas() {
     const tp = panels.find((p) => p.key === prop.key && p.img.w);
     const upp = uppFor(prop.key);
     if (!tp || !upp) {
-      const message = "Open the proposal's sheet with its scale set before creating measurements.";
+      const message = "Abra la hoja de la propuesta con su escala fijada antes de crear mediciones.";
       setCommitMsg(message);
       return { ok: false, message };
     }
@@ -5538,7 +5546,7 @@ export default function TakeoffCanvas() {
     // condById is a render closure — a condition minted THIS utterance is only
     // in the live mirror, so fall through to it for the tag
     const tag = (condById[condId] || agentStateRef.current.conditions.find((c) => c.id === condId))?.finish_tag || "";
-    const message = `Created ${made.length} takeoff${made.length === 1 ? "" : "s"}, ${fa(sf)} ${tag}. Click the next room.`;
+    const message = `Se crearon ${made.length} takeoff${made.length === 1 ? "" : "s"}: ${fa(sf)} ${tag}. Haga clic en el siguiente recinto.`;
     setCommitMsg(message);
     return { ok: true, message };
   }
@@ -5686,7 +5694,7 @@ export default function TakeoffCanvas() {
     // Can't thin a triangle further. Deselect so the NEXT ⌫ falls through to the
     // remove-last-region branch — otherwise the ocSel guard keeps re-firing this
     // message and the space can never be dropped without an Esc first.
-    if (r.poly.length <= 3) { setOcSel(null); setCommitMsg("A space needs at least 3 points, ⌫ again drops the whole space."); return; }
+    if (r.poly.length <= 3) { setOcSel(null); setCommitMsg("Un espacio necesita al menos 3 puntos: ⌫ otra vez descarta todo el espacio."); return; }
     setProposal((pr) => {
       if (!pr) return pr;
       const regions = pr.regions.map((rr, ri) => {
@@ -5724,13 +5732,13 @@ export default function TakeoffCanvas() {
     const sel = shapes.find((s) => s.id === selectedId);
     if (!sel) { setCommitMsg("Elija un takeoff que copiar."); return; }
     clipRef.current = [clipEntry(sel)];
-    setCommitMsg("Copied, ⌘V pastes onto the sheet under your cursor.");
+    setCommitMsg("Copiado: ⌘V pega en la hoja bajo el cursor.");
   }
   function pasteClipboard(offset = 0.03) {
     if (!clipRef.current.length) return;
     const tp = lastPtrRef.current ? panelAt(toImage(lastPtrRef.current[0], lastPtrRef.current[1])[0]) : focusPanel;
     const needsScale = clipRef.current.some((c) => c.measure_role !== "count");
-    if (needsScale && !uppFor(tp.key)) { setCommitMsg(`Set the scale for ${labelFor(tp)} first, paste recomputes SF/LF there.`); return; }
+    if (needsScale && !uppFor(tp.key)) { setCommitMsg(`Fije primero la escala de ${labelFor(tp)}: al pegar se recalculan SF/LF ahí.`); return; }
     let cross = false;
     const made = clipRef.current.map((c) => {
       const same = c.from === tp.key;
@@ -5746,11 +5754,11 @@ export default function TakeoffCanvas() {
     const res = dispatchShape({ type: "add", shapes: made });
     selectShape(res.shapes[res.shapes.length - 1].id);
     setTool("select");
-    setCommitMsg(`Pasted ${made.length} takeoff${made.length === 1 ? "" : "s"}${cross ? ` onto ${labelFor(tp)}` : ""}, drag to position.`);
+    setCommitMsg(`Se pegó ${made.length} takeoff${made.length === 1 ? "" : "s"}${cross ? ` en ${labelFor(tp)}` : ""}: arrastre para ubicar.`);
   }
   function duplicateSelected() {
     const sel = shapes.find((s) => s.id === selectedId);
-    if (!sel) { setCommitMsg("Select a takeoff to duplicate."); return; }
+    if (!sel) { setCommitMsg("Seleccione un takeoff para duplicar."); return; }
     clipRef.current = [clipEntry(sel)];
     pasteClipboard();
   }
@@ -5760,7 +5768,7 @@ export default function TakeoffCanvas() {
   function flipSelected(axis) {
     const sel = shapes.find((s) => s.id === selectedId);
     if (!sel || !Array.isArray(sel.verts_norm) || sel.verts_norm.length < 2) {
-      setCommitMsg("Select an area or linear takeoff to flip."); return;
+      setCommitMsg("Seleccione un takeoff de área o lineal para voltear."); return;
     }
     const vn = reflectVertsNorm(sel.verts_norm, axis);
     dispatchShape({
@@ -5780,7 +5788,7 @@ export default function TakeoffCanvas() {
     const sel = shapes.find((s) => s.id === selectedId);
     if (!sel) return;
     if (sel.measure_role === "count" || sel.measure_role === "linear" || sel.measure_role === "surface_area") {
-      setCommitMsg("Tidy works on area takeoffs, a linear run's vertices are its measurement."); return;
+      setCommitMsg("Ordenar funciona en takeoffs de área: los vértices de un tramo lineal son su medición."); return;
     }
     const sp = panelByKey(sel.sheet_id);
     if (!sp || !sp.img.w || (sel.verts_norm || []).length < 3) return;
@@ -5788,13 +5796,13 @@ export default function TakeoffCanvas() {
     const rt = !!sel.origin?.raster_traced;   // no true endpoints on a scan, pure simplify+square
     const ringPx = sel.verts_norm.map(([nx, ny]) => [nx * sp.img.w, ny * sp.img.h]);
     const r = tidyRing(ringPx, { nearest: (x, y, dd) => (!rt && grid ? nearestSnap(grid, x, y, dd) : null) });
-    if (!r.changed) { setCommitMsg("Nothing to tidy, this takeoff is already clean."); return; }
+    if (!r.changed) { setCommitMsg("Nada que ordenar: este takeoff ya está limpio."); return; }
     const vn = r.ring.map(([x, y]) => [x / sp.img.w, y / sp.img.h]);
     dispatchShape({
       type: "geom", id: sel.id, editKind: "tidy",
       verts_norm: vn, computed: recomputeShape({ ...sel, verts_norm: vn }), prev: geomSnapshot(sel),
     });
-    setCommitMsg(`Tidied, ${ringPx.length} → ${r.ring.length} vertices; corners held to plan lines, near-square walls squared. ⌘Z undoes.`);
+    setCommitMsg(`Ordenado: ${ringPx.length} → ${r.ring.length} vértices; esquinas ajustadas a las líneas del plano, muros casi a escuadra cuadrados. ⌘Z deshace.`);
   }
   // ── markup (cloud / callout / text) — annotations, not measurements ─────────
   // markupDraft holds STAGE px (so the live preview spans panels); a markup
@@ -5836,7 +5844,7 @@ export default function TakeoffCanvas() {
   }
   async function exportMarkedSet(includeMarkups = true) {
     try {
-      setCommitMsg("Building the marked set…");
+      setCommitMsg("Armando el juego marcado…");
       const exportMarkups = includeMarkups ? markups : [];
       // approval seals are ink, not markups — the include-markups checkbox
       // never drops them, and a sheet carrying only a seal still exports
@@ -5863,7 +5871,7 @@ export default function TakeoffCanvas() {
       const { kept: sheetMeta, missingFiles } = splitLoadedSheets([...plainMeta, ...stitchMeta], sheets.map((s) => s.name));
       const skipped = skippedPdfsNote(missingFiles);
       if (!sheetMeta.length && missingFiles.length && !rfis.length) {
-        setCommitMsg(`Nothing to export, ${skipped}`);
+        setCommitMsg(`Nada que exportar: ${skipped}`);
         return;
       }
       // (source-caption label rides on each capture as m.src_label, frozen at
@@ -5879,9 +5887,9 @@ export default function TakeoffCanvas() {
         loadPdfData: (file) => store.loadPdfData(file),
       }).finally(pages.release);
       downloadBytes(filename, bytes);
-      setCommitMsg(`Marked set downloaded, ${filename}${skipped ? `, ${skipped}` : ""}`);
+      setCommitMsg(`Juego marcado descargado: ${filename}${skipped ? `; ${skipped}` : ""}`);
     } catch (e) {
-      setCommitMsg(`Marked set failed: ${e.message || e}`);
+      setCommitMsg(`Falló el juego marcado: ${e.message || e}`);
     }
   }
 
@@ -5924,7 +5932,7 @@ export default function TakeoffCanvas() {
       // not armed yet (or content changed since) — refuse THIS drag honestly
       // rather than shipping a stale sheet, and start the build for the next
       e.preventDefault();
-      if (sheetHasInk(k)) { armSheetDrag(k); setCommitMsg("Preparing the marked sheet, drag again in a moment."); }
+      if (sheetHasInk(k)) { armSheetDrag(k); setCommitMsg("Preparando la hoja marcada: arrastre de nuevo en un momento."); }
       return;
     }
     e.dataTransfer.setData("DownloadURL", downloadUrlEntry(hit.filename, hit.url));
@@ -6045,7 +6053,7 @@ export default function TakeoffCanvas() {
       // MCP annotate verb's doctrine). Gate on the FIRST click so the user
       // isn't refused after carefully picking both ends.
       if (!markupDraft) {
-        if (!uppFor(tp.key)) { setCommitMsg(`Set the scale for ${labelFor(tp)} first.`); return; }
+        if (!uppFor(tp.key)) { setCommitMsg(`Fije primero la escala de ${labelFor(tp)}.`); return; }
         setMarkupDraft(p);
       } else {
         if (spansPanels([markupDraft, p])) { setCommitMsg(SPAN_MSG); return; }
@@ -6067,7 +6075,7 @@ export default function TakeoffCanvas() {
   // save, sanitized at the store boundary.
   const persistStampLib = (next) => {
     stampLibRef.current = next; setStampLib(next);
-    store.saveStampLibrary(next).catch((e) => setCommitMsg(`Couldn't save the stamp library: ${e.message || e}`));
+    store.saveStampLibrary(next).catch((e) => setCommitMsg(`No se pudo guardar la biblioteca de sellos: ${e.message || e}`));
   };
   // Arm a stamp for placement: switch to the stamp tool and hold it in
   // armedStamp. Repeated clicks place multiple copies until you pick another
@@ -6081,7 +6089,7 @@ export default function TakeoffCanvas() {
     const tp = panelAt(p[0]);
     const cx = (p[0] - tp.xOffset) / tp.img.w, cy = p[1] / tp.img.h;
     const instances = instantiateStamp(armedStamp, [cx, cy]);
-    if (!instances.length) { setCommitMsg("This stamp has no placeable elements."); return; }
+    if (!instances.length) { setCommitMsg("Este sello no tiene elementos que se puedan colocar."); return; }
     let promptId = null;
     for (const inst of instances) {
       const { _prompt, ...m } = inst;
@@ -6089,7 +6097,7 @@ export default function TakeoffCanvas() {
       addMarkup({ ...m, id }, tp.key);
       if (_prompt && !promptId) promptId = id;
     }
-    setCommitMsg(`Placed “${armedStamp.name}”.`);
+    setCommitMsg(`Se colocó «${armedStamp.name}».`);
     if (promptId) openTextEditor({ anchorStage: p, commit: (t) => updateMarkup(promptId, { text: (t || "").trim() }) });
   }
   // ── approval seal (ink, human-only) — the estimator's stamp. One click: on
@@ -6107,7 +6115,7 @@ export default function TakeoffCanvas() {
     // normalized to sheet WIDTH, the bubble convention), topmost wins
     const seal = [...approvals].reverse().find((a) => a.sheet_id === tp.key
       && Math.hypot(nx - a.at[0], (ny - a.at[1]) * (tp.img.h / tp.img.w)) <= APPROVAL_R);
-    if (seal) { dispatchApproval({ type: "delete", ids: [seal.id] }); setCommitMsg("Approval seal lifted (⌘Z restores it)."); return; }
+    if (seal) { dispatchApproval({ type: "delete", ids: [seal.id] }); setCommitMsg("Sello de aprobación levantado (⌘Z lo restaura)."); return; }
     // topmost committed shape under the click — the selectAt scan, this panel only
     const thr = 8 / tfRef.current.scale;
     const shape = [...stackedShapes].reverse().find((s) => s.sheet_id === tp.key
@@ -6125,22 +6133,22 @@ export default function TakeoffCanvas() {
       ...(by ? { by } : {}),
     }] });
     setCommitMsg(shape
-      ? `Approved, seal on ${condById[shape.condition_id]?.finish_tag || "shape"} (⌘Z undoes).`
+      ? `Aprobado: sello sobre ${condById[shape.condition_id]?.finish_tag || "la figura"} (⌘Z deshace).`
       : mk
         ? `Aprobada la tarjeta: ${String(mk.text || "nota").slice(0, 40)} (⌘Z deshace).`
-        : "Sheet point approved, seal placed (⌘Z undoes).");
+        : "Punto de hoja aprobado, sello colocado (⌘Z deshace).");
   }
   // Save the selected markup as a single-element stamp (the palette's define
   // flow). markupToStampElement re-expresses its coords as anchor-relative
   // offsets so the stamp is position independent.
   function saveMarkupAsStamp(m) {
     const el = markupToStampElement(m);
-    if (!el) { setCommitMsg("This markup can't be saved as a stamp."); return; }
-    const name = (window.prompt("Name this stamp:", (m.text || el.type).trim() || "Stamp") || "").trim();
+    if (!el) { setCommitMsg("Esta anotación no se puede guardar como sello."); return; }
+    const name = (window.prompt("Nombre de este sello:", (m.text || el.type).trim() || "Sello") || "").trim();
     if (!name) return;
     const stamp = { id: uid("stmp"), name, elements: [el] };
     persistStampLib({ ...stampLibRef.current, stamps: [...stampLibRef.current.stamps, stamp] });
-    setCommitMsg(`Saved stamp “${name}”.`);
+    setCommitMsg(`Sello «${name}» guardado.`);
     setLeftTab("stamp");
   }
   const deleteStamp = (id) => {
@@ -6176,10 +6184,10 @@ export default function TakeoffCanvas() {
         sets: [...cur.sets.filter((s) => !inSetIds.has(s.id)), ...inSets],
       };
       persistStampLib(merged);   // persistStampLib → store sanitizes, dropping any malformed items
-      setCommitMsg(`Imported ${inStamps.length} stamp${inStamps.length === 1 ? "" : "s"}.`);
+      setCommitMsg(`Se importó ${inStamps.length} sello${inStamps.length === 1 ? "" : "s"}.`);
       setLeftTab("stamp");
     } catch (e) {
-      setCommitMsg(`Couldn't import stamps: ${e.message || e}`);
+      setCommitMsg(`No se pudo importar los sellos: ${e.message || e}`);
     }
   }
   // Import a real .svg FILE as a stamp: the browser's DOMParser extracts the
@@ -6192,12 +6200,12 @@ export default function TakeoffCanvas() {
       const base = (file.name || "Imported SVG").replace(/\.svg$/i, "");
       const extracted = extractSvgPrimitives(text, { name: base });
       const stamp = extracted && svgToStamp(extracted);
-      if (!stamp || !stamp.elements.length) { setCommitMsg("Couldn't read that SVG, no drawable vector shapes found."); return; }
+      if (!stamp || !stamp.elements.length) { setCommitMsg("No se pudo leer ese SVG: no se hallaron formas vectoriales dibujables."); return; }
       persistStampLib({ ...stampLibRef.current, stamps: [...stampLibRef.current.stamps, { id: uid("stmp"), name: stamp.name, elements: stamp.elements }] });
-      setCommitMsg(`Imported “${stamp.name}” as a stamp.`);
+      setCommitMsg(`Se importó «${stamp.name}» como sello.`);
       setLeftTab("stamp");
     } catch (e) {
-      setCommitMsg(`Couldn't import SVG: ${e.message || e}`);
+      setCommitMsg(`No se pudo importar el SVG: ${e.message || e}`);
     }
   }
 
@@ -6218,7 +6226,7 @@ export default function TakeoffCanvas() {
     setRfis((rs) => [...rs, rec]);
     updateMarkup(markup.id, { rfi_id: id });
     setLeftTab("rfi");
-    setCommitMsg(`Raised ${number}.`);
+    setCommitMsg(`Se levantó ${number}.`);
   }
   const linkRfi = (markup, rfiId) => { if (markup && rfiId) updateMarkup(markup.id, { rfi_id: rfiId }); };
   const unlinkRfi = (markup) => { if (markup) updateMarkup(markup.id, { rfi_id: "" }); };
@@ -6303,13 +6311,13 @@ export default function TakeoffCanvas() {
     if (panelKeySet.has(m.sheet_id)) {
       flyToMarkup(m);
       setPlacingImageId(m.id);
-      setCommitMsg("Placing image, the view centered on it; move the pointer and click to drop (Esc cancels).");
+      setCommitMsg("Colocando imagen: la vista se centró en ella; mueva el puntero y haga clic para soltarla (Esc cancela).");
     } else {
       pendingFlyRef.current = null;   // an outstanding fly-to (unrelated markup, sheet still opening) must not complete later and recenter the view mid cross-sheet placement, same race class as flyToMarkup clearing pendingSourceRef
       setShowMarkups(true);           // the cross-sheet branch skips flyToMarkup (which sets this for the same-sheet case), without it, a hidden markup layer means the drag preview is invisible until commit
       placeCrossSheetRef.current = m.id;
       setPlacingImageId(m.id);
-      setCommitMsg("Placing image on this sheet, move the pointer and click to drop (Esc cancels).");
+      setCommitMsg("Colocando imagen en esta hoja: mueva el puntero y haga clic para soltarla (Esc cancela).");
     }
   }
   // Center the view on a normalized [nx,ny] point within panel `sp` —
@@ -6490,14 +6498,14 @@ export default function TakeoffCanvas() {
   }
   function locateCondition(id) {
     setHiddenConds((h) => revealed(h, id));   // ⌖ on a hidden condition shows it, never fly to nothing
-    if (!frameShapes((s) => s.condition_id === id)) setCommitMsg(`No takeoffs for ${condById[id]?.finish_tag || "this condition"} on the open sheet${groupKeys.length > 1 ? "s" : ""} yet.`);
+    if (!frameShapes((s) => s.condition_id === id)) setCommitMsg(`Aún no hay takeoffs de ${condById[id]?.finish_tag || "esta condición"} en la${groupKeys.length > 1 ? "s" : ""} hoja${groupKeys.length > 1 ? "s" : ""} abierta${groupKeys.length > 1 ? "s" : ""}.`);
   }
   // scope collision (#366): Look frames the PAIR so the estimator sees both
   // rings at once, and selects nothing — deciding which one wins is theirs.
   function lookAtCollision(pair) {
     const ids = new Set([pair.a.shape_id, pair.b.shape_id]);
     if (!panelKeySet.has(pair.sheet_id)) openSheets([pair.sheet_id], false);
-    if (!frameShapes((s) => ids.has(s.id))) setCommitMsg(`Open ${tabLabel(pair.sheet_id)} to look at this pair.`);
+    if (!frameShapes((s) => ids.has(s.id))) setCommitMsg(`Abra ${tabLabel(pair.sheet_id)} para ver este par.`);
   }
 
   function locateWork(shape) {
@@ -6563,7 +6571,7 @@ export default function TakeoffCanvas() {
     return c;
   }
   function addCondition() {
-    const tag = (window.prompt("Finish tag for this condition (e.g. LVT-1):") || "").trim();
+    const tag = (window.prompt("Etiqueta de acabado de esta condición (p. ej. LVT-1):") || "").trim();
     if (!tag) return;
     const c = mintCondition(tag);
     activateCondition(c.id, { reassign: false });   // no reassign affordance on +condition; still dismisses a live bulk selection
@@ -6659,7 +6667,7 @@ export default function TakeoffCanvas() {
   // this probes and returns the ring; committing anything stays behind the gate.
   async function agentOneClickProbe(key, xn, yn) {
     const p = agentPanelFor(key);
-    if (!p) return { error: `Sheet ${key} isn't rendered yet, try again in a moment.` };
+    if (!p) return { error: `La hoja ${key} aún no está dibujada: intente de nuevo en un momento.` };
     const upp = agentUpp(key);
     if (upp == null) return { error: agentScaleGate(key, agentStateRef.current.detectedScales[key]?.label || "") };
     const local = [xn * p.img.w, yn * p.img.h];
@@ -6671,8 +6679,8 @@ export default function TakeoffCanvas() {
     if (vectorViable) {
       const segs = vectorSegsRef.current.get(key);
       const meta = segMetaRef.current.get(key);
-      if (!segs || !meta) return { error: "Still reading this sheet's linework, try again in a moment." };
-      if (!netWorker) return { error: "One-Click needs Web Workers in this browser." };
+      if (!segs || !meta) return { error: "Aún se leen las líneas de esta hoja: intente de nuevo en un momento." };
+      if (!netWorker) return { error: "One-Click necesita Web Workers en este navegador." };
       const kF = RENDER_SCALE / (renderScalesRef.current.get(key) || RENDER_SCALE);
       const ftPx = kF / upp;
       const ck = `${key}:${ftPx.toFixed(4)}`;
@@ -6682,12 +6690,12 @@ export default function TakeoffCanvas() {
           .then((m) => { if (m.error) { netCacheRef.current.delete(ck); throw new Error(m.error); } return m; });
         netCacheRef.current.set(ck, built);
       }
-      try { await built; } catch { return { error: "One-Click couldn't read this sheet's linework, the estimator will have to trace it." }; }
+      try { await built; } catch { return { error: "One-Click no pudo leer las líneas de esta hoja: la persona tendrá que trazarla." }; }
       const rm = await netCall({ type: "room", key: ck, x: local[0] * kF, y: local[1] * kF, ftPx, mode: "room" });
       const r = rm.room;
-      if (!r) return { error: "That seed isn't inside an enclosed space on the plan linework. Seed an open spot inside the room." };
+      if (!r) return { error: "Esa semilla no está dentro de un espacio cerrado en las líneas del plano. Coloque la semilla en un punto abierto dentro del recinto." };
       const ring = r.ring.map(([x, y]) => [x / kF, y / kF]);
-      if (ring.length < 3) return { error: "Couldn't trace that space into a polygon." };
+      if (ring.length < 3) return { error: "No se pudo trazar ese espacio como polígono." };
       const geometry = {
         measure_role: "floor_area",
         verts_norm: ring.map(([x, y]) => [x / p.img.w, y / p.img.h]),
@@ -6704,12 +6712,12 @@ export default function TakeoffCanvas() {
     }
     if (!f) {
       const rmo = await ensureRasterMask(key);
-      if (!rmo) return { error: "Couldn't read this scan, the estimator will have to trace it by hand." };
+      if (!rmo) return { error: "No se pudo leer este escaneo: la persona tendrá que trazarlo a mano." };
       const r = floodRegionSealed(rmo, local[0], local[1], undefined, sealRadiiFor(rmo.ws / upp), doorWedgeCapPx(rmo.ws / upp), minPassRadiusFor(rmo.ws / upp));
       if (r.status !== "ok") {
         return { error: r.status === "leak"
-          ? "That space isn't enclosed on the scan, the fill escaped through a gap (faded line or open doorway). Seed a more enclosed spot."
-          : "Landed on dense scan ink (text or hatching). Seed an open spot inside the room." };
+          ? "Ese espacio no está cerrado en el escaneo: el relleno se escapó por un hueco (línea desvanecida o vano abierto). Coloque la semilla en un punto más cerrado."
+          : "Cayó en tinta densa del escaneo (texto o achurado). Coloque la semilla en un punto abierto dentro del recinto." };
       }
       f = r; raster = true;
     }
@@ -6717,7 +6725,7 @@ export default function TakeoffCanvas() {
     const ring = raster
       ? oneClickRing(f, { raster: true, rasterEps: RASTER_RDP_EPS })
       : oneClickRing(f, { nearest: (x, y, d) => (grid ? nearestSnap(grid, x, y, d) : null) });
-    if (ring.length < 3) return { error: "Couldn't trace that space into a polygon." };
+    if (ring.length < 3) return { error: "No se pudo trazar ese espacio como polígono." };
     const area_sf = +(ringArea(ring) * upp * upp).toFixed(2);
     const conf = traceConfidence(floodSignals(f, { raster, mppf: f.ws / upp, areaSF: area_sf }));
     return {
@@ -6815,11 +6823,11 @@ export default function TakeoffCanvas() {
   // stale. Failures wrap into the commitMsg bar's "Couldn't" convention.
   async function voiceTraceAt(seed, conditionId, label) {
     const tp = panelByKey(seed.sheetId);
-    if (!tp || tp.key !== seed.sheetId || !tp.img.w) return { ok: false, message: "Couldn't place that, aim at a sheet." };
+    if (!tp || tp.key !== seed.sheetId || !tp.img.w) return { ok: false, message: "No se pudo colocar eso: apunte a una hoja." };
     const out = await oneClickAt([seed.x + tp.xOffset, seed.y], false, { conditionId, label });
     if (out.ok) return out;
-    const m = out.message || "Couldn't place that, the view changed mid-trace. Say it again.";
-    return { ok: false, message: /^couldn'?t/i.test(m) ? m : `Couldn't place that, ${m.charAt(0).toLowerCase()}${m.slice(1)}` };
+    const m = out.message || "No se pudo colocar eso: la vista cambió a mitad del trazo. Dígalo de nuevo.";
+    return { ok: false, message: /^(no se pudo|couldn'?t)/i.test(m) ? m : `No se pudo colocar eso: ${m.charAt(0).toLowerCase()}${m.slice(1)}` };
   }
   // Voice-command capabilities (RFC #59 slice 2) — every entry binds an action
   // the UI already exposes; the dispatcher (voiceActions.ts) never touches
@@ -6898,7 +6906,7 @@ export default function TakeoffCanvas() {
   function offerAgentHandoff(transcript) {
     clearTimeout(agentOfferTimerRef.current);
     pendingAgentOfferRef.current = { transcript };
-    setVoiceChip({ text: 'not a command, ⏎ or say "ask the agent" to run it on YOUR agent (your endpoint, your key) · proposals land for review · Esc dismisses', tone: "offer" });
+    setVoiceChip({ text: 'no es un comando: ⏎ o diga «ask the agent» para ejecutarlo en SU agente (su endpoint, su clave) · las propuestas llegan para revisión · Esc lo descarta', tone: "offer" });
     agentOfferTimerRef.current = setTimeout(() => clearAgentOffer(), AGENT_OFFER_TTL_MS);
   }
   function clearAgentOffer() {
@@ -6922,10 +6930,10 @@ export default function TakeoffCanvas() {
     if (!voiceClientRef.current) {
       voiceClientRef.current = createVoiceRecognizerClient((s) => {
         voiceModelRef.current = s;
-        if (s.phase === "loading") setVoiceChip({ text: `voice model loading… ${s.pct}%`, tone: "busy" });
+        if (s.phase === "loading") setVoiceChip({ text: `cargando el modelo de voz… ${s.pct}%`, tone: "busy" });
         else if (s.phase === "ready") setVoiceChip((c) => (c && c.tone === "busy" ? null : c));
-        else if (s.phase === "uninstalled") { setVoiceChip(null); setCommitMsg("Voice isn't installed on this deployment, see docs/VOICE.md to stage the model."); }
-        else if (s.phase === "error") { setVoiceChip(null); setCommitMsg(`Couldn't load the voice model, ${s.message} Hold M to retry.`); }
+        else if (s.phase === "uninstalled") { setVoiceChip(null); setCommitMsg("La voz no está instalada en este despliegue: vea docs/VOICE.md para preparar el modelo."); }
+        else if (s.phase === "error") { setVoiceChip(null); setCommitMsg(`No se pudo cargar el modelo de voz: ${s.message} Mantenga M presionada para reintentar.`); }
       });
     }
     return voiceClientRef.current;
@@ -6938,7 +6946,7 @@ export default function TakeoffCanvas() {
       // (and kicks off/retries the load, so the affordance is also the fix)
       void client.ensureReady();
       if (voiceModelRef.current.phase === "loading")
-        setVoiceChip({ text: `voice model loading… ${voiceModelRef.current.pct ?? 0}%, try again shortly`, tone: "busy" });
+        setVoiceChip({ text: `cargando el modelo de voz… ${voiceModelRef.current.pct ?? 0}%: intente de nuevo en un momento`, tone: "busy" });
       return;
     }
     try {
@@ -6948,15 +6956,15 @@ export default function TakeoffCanvas() {
         session.cancel();
         voiceCaptureRef.current = null;
         setVoiceChip(null);
-        setCommitMsg("Couldn't finish dictation, the microphone was revoked.");
+        setCommitMsg("No se pudo terminar el dictado: se revocó el micrófono.");
       });
       voiceCaptureRef.current = session;
-      setVoiceChip({ text: "listening… release M to run · Esc to discard", tone: "live" });
+      setVoiceChip({ text: "escuchando… suelte M para ejecutar · Esc para descartar", tone: "live" });
     } catch (err) {
       setCommitMsg(
-        err?.reason === "mic_denied" ? "Couldn't start dictation, microphone permission denied. Allow the mic and try again."
-        : err?.reason === "no_mic_device" ? "Couldn't start dictation, no microphone found."
-        : "Couldn't start dictation, microphone unavailable.",
+        err?.reason === "mic_denied" ? "No se pudo iniciar el dictado: se negó el permiso del micrófono. Permita el micrófono e intente de nuevo."
+        : err?.reason === "no_mic_device" ? "No se pudo iniciar el dictado: no se encontró micrófono."
+        : "No se pudo iniciar el dictado: micrófono no disponible.",
       );
     }
   }
@@ -6967,7 +6975,7 @@ export default function TakeoffCanvas() {
     if (!commit) { session.cancel(); setVoiceChip(null); return; }
     const pcm = session.stop();
     if (pcm.length < 1600) { setVoiceChip(null); return; }   // <0.1 s, a key tap, not an utterance
-    setVoiceChip({ text: "decoding…", tone: "busy" });
+    setVoiceChip({ text: "decodificando…", tone: "busy" });
     voiceClientRef.current.transcribe(pcm).then((text) => {
       const t = text.trim();
       // the spoken router confirm is a FIXED LITERAL (never grammar): said
@@ -6975,7 +6983,7 @@ export default function TakeoffCanvas() {
       // and the trigger itself never becomes an offer
       if (isAgentHandoffTrigger(t)) {
         if (pendingAgentOfferRef.current) { setVoiceChip(null); agentOfferFnsRef.current.confirm(); return true; }
-        setVoiceChip({ text: "nothing to hand off, say the command first", tone: "info" });
+        setVoiceChip({ text: "nada que entregar: diga primero el comando", tone: "info" });
         clearTimeout(voiceFlashRef.current);
         voiceFlashRef.current = setTimeout(() => setVoiceChip((c) => (c && c.tone === "info" ? null : c)), 2400);
         return false;
@@ -6986,7 +6994,7 @@ export default function TakeoffCanvas() {
       clearTimeout(voiceFlashRef.current);
       voiceFlashRef.current = setTimeout(() => setVoiceChip((c) => (c && c.tone === "info" ? null : c)), 2400);
       return Promise.resolve(onVoiceCommandRef.current(t));
-    }).catch(() => { setVoiceChip(null); setCommitMsg("Couldn't decode that, try again."); });
+    }).catch(() => { setVoiceChip(null); setCommitMsg("No se pudo decodificar eso: intente de nuevo."); });
   }
   // live refs — the mount-once keyboard effect must never see stale closures
   const onVoiceCommandRef = useRef(null);
@@ -7017,7 +7025,7 @@ export default function TakeoffCanvas() {
       if (document.visibilityState === "hidden" && voiceCaptureRef.current) {
         voiceHoldRef.current = false;
         voiceFnsRef.current.end(false);
-        setCommitMsg("Dictation discarded, the tab went to the background.");
+        setCommitMsg("Dictado descartado: la pestaña pasó a segundo plano.");
       }
     };
     window.addEventListener("keydown", down);
@@ -7071,8 +7079,8 @@ export default function TakeoffCanvas() {
     }
     if (made.length) dispatchShape({ type: "add", shapes: made });   // ONE command, one undo entry for the batch
     setAgentProposals((ps) => ps.filter((p) => !accepted.has(p.id)));
-    if (made.length) setCommitMsg(`Accepted ${made.length} agent proposal${made.length === 1 ? "" : "s"}.${skippedClosed ? ` ${skippedClosed} skipped, open their sheet (with its scale set) to accept.` : ""}`);
-    else if (skippedClosed) setCommitMsg("Open that proposal's sheet (with its scale set) to accept it.");
+    if (made.length) setCommitMsg(`Se aceptó ${made.length} propuesta${made.length === 1 ? "" : "s"} del agente.${skippedClosed ? ` Se omitió ${skippedClosed}: abra su hoja (con la escala fijada) para aceptar.` : ""}`);
+    else if (skippedClosed) setCommitMsg("Abra la hoja de esa propuesta (con su escala fijada) para aceptarla.");
   }
   const acceptAgentProposal = (id) => acceptAgentProposals([id]);
   const acceptAllVisibleAgentProposals = () => acceptAgentProposals(agentProposals.filter((p) => panelKeySet.has(p.sheet_id)).map((p) => p.id));
@@ -7108,7 +7116,7 @@ export default function TakeoffCanvas() {
     }
     const candidates = applyRuleToProject(rule, shapes, sheetData);
     setRuleOffer(null);
-    if (!candidates.length) { setCommitMsg("No other enclosed regions match this rule on the open sheets."); return; }
+    if (!candidates.length) { setCommitMsg("No hay otras regiones cerradas que cumplan esta regla en las hojas abiertas."); return; }
     setRuleStage({ rule, candidates, proposed_ts: nowIso() });
   }
   function applyStagedRule() {
@@ -7142,7 +7150,7 @@ export default function TakeoffCanvas() {
     const ids = res.shapes.slice(-made.length).map((s) => s.id);
     // the rule persists WITH its audit trail — inspectable in the project file
     setRules((rs) => [...rs.filter((r) => r.id !== rule.id), { ...rule, applied_to: ids }]);
-    setCommitMsg(`Rule applied, ${made.length} deduct${made.length === 1 ? "" : "s"} added (⌘Z undoes all). ${rule.label}.`);
+    setCommitMsg(`Regla aplicada: ${made.length} deducci${made.length === 1 ? "ón" : "ones"} agregada${made.length === 1 ? "" : "s"} (⌘Z deshace todo). ${rule.label}.`);
   }
 
   // ── ⟂ Transitions (#202, canvas side) ──────────────────────────────────────
@@ -7172,9 +7180,9 @@ export default function TakeoffCanvas() {
 
   function deriveTransitionsOnto(idA, idB) {
     const target = condById[activeCond];
-    if (!target) return { error: "Pick the condition the transitions land on first." };
+    if (!target) return { error: "Elija primero la condición en la que caen las transiciones." };
     const ca = condById[idA], cb = condById[idB];
-    if (!ca || !cb) return { error: "Pick the two finishes that meet." };
+    if (!ca || !cb) return { error: "Elija los dos acabados que se encuentran." };
     const roomsOf = (id) => visibleShapes
       .filter((s) => s.condition_id === id && s.measure_role === "floor_area" && (s.verts_norm || []).length >= 3)
       .map((s) => ({ id: s.id, sheet_id: s.sheet_id, verts_norm: s.verts_norm }));
@@ -7210,11 +7218,11 @@ export default function TakeoffCanvas() {
     if (made.length) dispatchShape({ type: "add", shapes: made });   // ONE command, one undo entry for the whole sweep
     const total_lf = +made.reduce((n, s) => n + s.computed.perimeter_lf, 0).toFixed(2);
     if (made.length) {
-      setCommitMsg(`${made.length} transition${made.length === 1 ? "" : "s"} derived between ${a.tag} and ${b.tag}, ${total_lf} LF onto ${target.finish_tag}, dashed until you Accept (⌘Z undoes the sweep).`);
+      setCommitMsg(`${made.length} transici${made.length === 1 ? "ón" : "ones"} derivada${made.length === 1 ? "" : "s"} entre ${a.tag} y ${b.tag}: ${total_lf} LF sobre ${target.finish_tag}, punteadas hasta que acepte (⌘Z deshace el barrido).`);
     } else if (withheld.length) {
-      setCommitMsg(`Nothing to commit, every ${a.tag}/${b.tag} run is across a wall. See the Transitions panel.`);
+      setCommitMsg(`Nada que confirmar: cada tramo ${a.tag}/${b.tag} cruza un muro. Vea el panel de Transiciones.`);
     } else {
-      setCommitMsg(`${a.tag} and ${b.tag} never meet on the open sheets.`);
+      setCommitMsg(`${a.tag} y ${b.tag} nunca se encuentran en las hojas abiertas.`);
     }
     return { committed: made.length, total_lf, withheld, between: [a.tag, b.tag], onto: target.finish_tag };
   }
@@ -7243,12 +7251,12 @@ export default function TakeoffCanvas() {
   function acceptProposalGroup(g) {
     if (!g?.ids.length) return;
     dispatchShape({ type: "review", ids: g.ids });
-    setCommitMsg(`Accepted ${g.proposal ? `“${g.proposal.label}”, ` : ""}${g.ids.length} shape${g.ids.length === 1 ? "" : "s"}, pencil is now ink (⌘Z undoes).`);
+    setCommitMsg(`Se aceptó ${g.proposal ? `«${g.proposal.label}»: ` : ""}${g.ids.length} figura${g.ids.length === 1 ? "" : "s"}; el lápiz pasó a tinta (⌘Z deshace).`);
   }
   function rejectProposalGroup(g) {
     if (!g?.ids.length) return;
     dispatchShape({ type: "delete", ids: g.ids, reason: "proposal-reject" });
-    setCommitMsg(`Rejected ${g.proposal ? `“${g.proposal.label}”, ` : ""}${g.ids.length} proposed shape${g.ids.length === 1 ? "" : "s"} removed (⌘Z restores).`);
+    setCommitMsg(`Se rechazó ${g.proposal ? `«${g.proposal.label}»: ` : ""}${g.ids.length} figura${g.ids.length === 1 ? "" : "s"} propuesta${g.ids.length === 1 ? "" : "s"} quitada${g.ids.length === 1 ? "" : "s"} (⌘Z restaura).`);
   }
   // condition-edit proposals (#365): accept applies the diff through the same
   // patch path the panel editor writes (updateCondById), so the condition
@@ -7259,18 +7267,18 @@ export default function TakeoffCanvas() {
     const p = conditionEditProposals.find((x) => x.id === id);
     if (!p) return;
     const r = acceptConditionEditProposal(conditions, p, nowIso);
-    if (r.error) { setCommitMsg(`Couldn't accept the proposed change: ${r.error}`); return; }
+    if (r.error) { setCommitMsg(`No se pudo aceptar el cambio propuesto: ${r.error}`); return; }
     setConditions(r.conditions);
     agentStateRef.current = { ...agentStateRef.current, conditions: r.conditions };
     setConditionEditProposals((ps) => ps.filter((x) => x.id !== id));
     const tag = r.conditions.find((c) => c.id === p.condition_id)?.finish_tag || "";
-    setCommitMsg(`Accepted the proposed change on ${tag}.`);
+    setCommitMsg(`Se aceptó el cambio propuesto en ${tag}.`);
   }
   function rejectConditionEdit(id) {
     const p = conditionEditProposals.find((x) => x.id === id);
     if (!p) return;
     setConditionEditProposals((ps) => ps.filter((x) => x.id !== id));
-    setCommitMsg(`Rejected the proposed change on ${condById[p.condition_id]?.finish_tag || "that condition"}, nothing changed.`);
+    setCommitMsg(`Se rechazó el cambio propuesto en ${condById[p.condition_id]?.finish_tag || "esa condición"}: no cambió nada.`);
   }
   const rejectAllAgentProposals = () => setAgentProposals([]);
 
@@ -7284,20 +7292,20 @@ export default function TakeoffCanvas() {
           ? { kind: "error", text: `✗ ${ev.name}: ${ev.result.error}` }
           : { kind: "status", text: `✓ ${ev.name} ${trimJson({ ...ev.result, image_data_url: undefined, items: Array.isArray(ev.result?.items) ? `${ev.result.items.length} items` : undefined }, 160)}` })
       : ev.type === "error" ? { kind: "error", text: `Error: ${ev.message}` }
-      : ev.type === "aborted" ? { kind: "status", text: "Stopped." }
-      : ev.type === "max_iterations" ? { kind: "status", text: `Stopped at the ${ev.limit}-step cap, review what's staged.` }
-      : ev.type === "done" ? { kind: "status", text: "Done, review the dashed proposals." }
+      : ev.type === "aborted" ? { kind: "status", text: "Detenido." }
+      : ev.type === "max_iterations" ? { kind: "status", text: `Se detuvo en el tope de ${ev.limit} pasos: revise lo preparado.` }
+      : ev.type === "done" ? { kind: "status", text: "Listo: revise las propuestas punteadas." }
       : null;
     if (entry) setAgentLog((l) => [...l.slice(-199), entry]);
   }
   async function runAgent(goal) {
     if (agentRunning) return;
     if (!isAiConfigured()) { setShowAiSettings(true); return; }
-    if (agentStateRef.current.status !== "ready") { setCommitMsg("Sheet still loading, try again in a moment."); return; }
+    if (agentStateRef.current.status !== "ready") { setCommitMsg("La hoja aún carga: intente de nuevo en un momento."); return; }
     const ctl = new AbortController();
     agentAbortRef.current = ctl;
     setAgentRunning(true);
-    setAgentLog([{ kind: "status", text: `Goal: ${goal}` }]);
+    setAgentLog([{ kind: "status", text: `Objetivo: ${goal}` }]);
     const ctx = buildAgentCtx();
     try {
       await runAgentLoop({
@@ -7333,7 +7341,7 @@ export default function TakeoffCanvas() {
   function prefetchText(key) { const pg = pageObjsRef.current.get(key); if (pg) textContentOf(pg); }
   // rect in the page's rs-viewport px; null = the whole page
   function copyTextFrom(key, rect, scope) {
-    if (status !== "ready") { setCommitMsg("Sheet still loading, try again in a moment."); return; }
+    if (status !== "ready") { setCommitMsg("La hoja aún carga: intente de nuevo en un momento."); return; }
     // held until the copy settles: its text, or a box read waiting its turn,
     // can outlive a switch away
     const { page: pageObj, release } = holdSheetPage(key);
@@ -7399,7 +7407,7 @@ export default function TakeoffCanvas() {
         if (off) return Promise.resolve({ ok: false, status: off });
         return pageReader.readBox({
           file: parseSheetKey(key).file, rs, rect: r, getPage: async () => pageObj, signal: sig,
-          onPhase: (ph) => { if (!sig?.aborted) postBusy(ph === "waiting" ? "Waiting for another read…" : "Reading that box with the on-device text reader (OCR)…"); },
+          onPhase: (ph) => { if (!sig?.aborted) postBusy(ph === "waiting" ? "Esperando otra lectura…" : "Leyendo ese recuadro con el lector de texto del dispositivo (OCR)…"); },
         });
       };
       const ocrReadersFor = (tc) => {
@@ -7427,7 +7435,7 @@ export default function TakeoffCanvas() {
         // under way, else a read of each box ∩ picture). Otherwise the reader
         // chain, asked in order; the first with any token answers: the text
         // layer, then OCR — or, on a scan, OCR, then the text layer.
-        const failed = () => { clearBusy(); setCommitMsg("Couldn't read that region."); };
+        const failed = () => { clearBusy(); setCommitMsg("No se pudo leer esa región."); };
         const scan = scanLikeOf(tc);
         const plan = copyPlan({ scope, rect, scan, ...copyPictureInputs(planIndexRef.current.get(key)), rs, pageRead: !!pageReader.lines(key) });
         const hybrid = plan.kind === "hybrid";
@@ -7445,7 +7453,7 @@ export default function TakeoffCanvas() {
       const e = textContentOf(pageObj);
       const done = e.tc
         ? read(e.tc)
-        : e.p.then((tc) => { if (seq === renderSeqRef.current && !signal.aborted) return read(tc); }).catch(() => setCommitMsg("Couldn't read that sheet's text."));
+        : e.p.then((tc) => { if (seq === renderSeqRef.current && !signal.aborted) return read(tc); }).catch(() => setCommitMsg("No se pudo leer el texto de esa hoja."));
       Promise.resolve(done).finally(release);
     } catch (e) { release(); throw e; }
   }
@@ -7453,7 +7461,7 @@ export default function TakeoffCanvas() {
   function copyTextFromBox(a, b) {
     const pa = panelAt(a[0]);
     const box = boxOnPanel(a, b, pa, panelAt(b[0]));
-    if ("error" in box) { setCommitMsg(box.error === "cross" ? "Draw the box within a single sheet." : "Drag a larger box around the text."); return; }
+    if ("error" in box) { setCommitMsg(box.error === "cross" ? "Dibuje el recuadro dentro de una sola hoja." : "Arrastre un recuadro más grande alrededor del texto."); return; }
     copyTextFrom(pa.key, box.rect, "box");
   }
   // arming drops the shape selection (a copy box never edits a shape)
@@ -7489,13 +7497,13 @@ export default function TakeoffCanvas() {
     const isCurrent = () => ocrReadRef.current === mine && !mine.ctl.signal.aborted && seq === renderSeqRef.current;
     let release = () => {};
     try {
-      if (status !== "ready") { setCommitMsg("Sheet still loading, try again in a moment."); return; }
+      if (status !== "ready") { setCommitMsg("La hoja aún carga: intente de nuevo en un momento."); return; }
       const panel = panelAt(a[0]);
-      if (panelAt(b[0]).key !== panel.key) { setCommitMsg("Draw the box within a single sheet, around its schedule table."); return; }
+      if (panelAt(b[0]).key !== panel.key) { setCommitMsg("Dibuje el recuadro dentro de una sola hoja, alrededor de su cuadro."); return; }
       const held = holdSheetPage(panel.key);
       release = held.release;
       const pageObj = held.page;
-      if (!pageObj) { setCommitMsg("Open a sheet first."); return; }
+      if (!pageObj) { setCommitMsg("Abra primero una hoja."); return; }
       const rs = renderScalesRef.current.get(panel.key) || RENDER_SCALE;
       // rect in image (rs-viewport) px, clamped to the panel as
       // captureRegionMarkup does; the same rect is cropped and rendered
@@ -7518,7 +7526,7 @@ export default function TakeoffCanvas() {
         // same runs, pageTextIndex's reader): the dialog's "on the plans?"
         // check (#498) subtracts them from the schedule's own sheet
         boxTerms = buildSheetIndex("box", extractRegionText(tc, vp, rect)).terms;
-      } catch { if (isCurrent()) setCommitMsg("Couldn't read that region."); return; }
+      } catch { if (isCurrent()) setCommitMsg("No se pudo leer esa región."); return; }
       const box = { textRuns: countTextRuns(spans), pageHasText };
       const route = routeScheduleRead(readScheduleSpans(spans), box);
       if (route.kind === "rows") { setImportRead({ rows: route.rows, skipped: route.skipped ?? [], sourceKey: panel.key, boxTerms }); return; }
@@ -7545,7 +7553,7 @@ export default function TakeoffCanvas() {
       if (result.kind === "rows") setImportRead({ rows: result.rows, skipped: result.skipped ?? [], sourceKey: panel.key });
       else if (result.kind === "message") setCommitMsg(result.text);
     } catch {
-      if (isCurrent()) setCommitMsg("Couldn't read that region.");
+      if (isCurrent()) setCommitMsg("No se pudo leer esa región.");
     } finally {
       release();
       releaseImportRead(mine);
@@ -7560,11 +7568,11 @@ export default function TakeoffCanvas() {
   // importScheduleFromRect: sheet ready, both corners in one panel, a real source
   // page (refuse a stitched composite), a non-degenerate box.
   async function captureRegionMarkup(a, b, referenceOnly = false) {
-    if (status !== "ready") { setCommitMsg("Sheet still loading, try again in a moment."); return; }
+    if (status !== "ready") { setCommitMsg("La hoja aún carga: intente de nuevo en un momento."); return; }
     const panel = panelAt(a[0]);
-    if (panelAt(b[0]).key !== panel.key) { setCommitMsg("Draw the box within a single sheet."); return; }
+    if (panelAt(b[0]).key !== panel.key) { setCommitMsg("Dibuje el recuadro dentro de una sola hoja."); return; }
     return withSheetPage(panel.key, async (pageObj) => {
-      if (!pageObj) { setCommitMsg("Capture a region on a single sheet (not a stitched view)."); return; }
+      if (!pageObj) { setCommitMsg("Capture una región en una sola hoja (no en una vista empalmada)."); return; }
       const rs = renderScalesRef.current.get(panel.key) || RENDER_SCALE;
       // rect in image (rs-viewport) px, clamped to the panel bounds so an over-drag
       // past the sheet edge never parks the geometry off-sheet
@@ -7574,7 +7582,7 @@ export default function TakeoffCanvas() {
       const y0 = cl(Math.min(a[1], b[1]), 0, panel.img.h);
       const y1 = cl(Math.max(a[1], b[1]), 0, panel.img.h);
       const regW = x1 - x0, regH = y1 - y0;
-      if (!(regW >= 4 && regH >= 4)) { setCommitMsg("Drag a larger box to capture."); return; }
+      if (!(regW >= 4 && regH >= 4)) { setCommitMsg("Arrastre un recuadro más grande para capturar."); return; }
       // downscale to MARKUP_IMG_MAX (1600px) on the longest side
       const factor = Math.min(1, MARKUP_IMG_MAX / regW, MARKUP_IMG_MAX / regH);
       const bw = Math.max(1, Math.round(regW * factor)), bh = Math.max(1, Math.round(regH * factor));
@@ -7589,7 +7597,7 @@ export default function TakeoffCanvas() {
           transform: [1, 0, 0, 1, -x0 * factor, -y0 * factor],
         }).promise;
         src = canvas.toDataURL("image/png");
-      } catch { setCommitMsg("Couldn't capture that region."); return; }
+      } catch { setCommitMsg("No se pudo capturar esa región."); return; }
       const { at, w, aspect } = captureRectToImageGeom({ x0, y0, x1, y1 }, panel.img.w, panel.img.h);
       if (!(w > 0)) return;
       // FROZEN origin label. sheetBaseLabel resolves a detected sheet number only for
@@ -7640,7 +7648,7 @@ export default function TakeoffCanvas() {
   // autosave catch is the real backstop.
   function addImageMarkup(m, key) {
     const used = markups.reduce((n, x) => n + (x.type === "image" && typeof x.src === "string" ? x.src.length : 0), 0);
-    if (used + m.src.length > MAX_IMAGE_MARKUP_BYTES) { setCommitMsg("Too many/large images on this project, delete some before adding more."); return; }
+    if (used + m.src.length > MAX_IMAGE_MARKUP_BYTES) { setCommitMsg("Hay demasiadas imágenes o muy grandes en este proyecto: elimine algunas antes de agregar más."); return; }
     // Auto-name (stored in `text`, which the panel renders and the ✎ edits): the
     // sheet base + a per-sheet sequence ("AF101-01"). Uploads carry the file name.
     // Collisions after a delete are tolerated (a simple count, not a high-water
@@ -7657,11 +7665,11 @@ export default function TakeoffCanvas() {
       const pinId = uid("mk");
       setMarkups(ms => [...ms, { id: pinId, type: "image", sheet_id: key, rfi_id: "", condition_id: "", ...rest, text, created_at: new Date().toISOString() }]);
       setPinSelectedId(pinId); setPinsOpen(true);
-      setCommitMsg("Pinned, switch sheets and keep this reference beside your takeoff.");
+      setCommitMsg("Fijada: cambie de hoja y mantenga esta referencia junto a su takeoff.");
       return;
     }
     addMarkup({ type: "image", ...rest, text, ...(by ? { author: by } : {}) }, key);
-    setCommitMsg("Image placed.");
+    setCommitMsg("Imagen colocada.");
   }
 
   // Lazy, memory-only panel thumbnail: decode the src ONCE, downscale to a ~48px
@@ -7687,7 +7695,7 @@ export default function TakeoffCanvas() {
   // Provenance one-liner for the panel row's title tooltip (Kevin: not shown
   // prominently). Degrades: drops the author when none is declared.
   function imageProvenance(m) {
-    const verb = m.source === "upload" ? "Uploaded" : "Captured from";
+    const verb = m.source === "upload" ? "Subido" : "Capturado de";
     // src_sheet_id is the ORIGIN sheet; sheet_id is wherever the image lives NOW
     // and is rewritten on a cross-sheet place, so after a move reading sheet_id
     // here would misreport where it was captured. Fall back to sheet_id for
@@ -7711,11 +7719,11 @@ export default function TakeoffCanvas() {
     const name = file?.name || "";
     const isPngJpeg = !!file && (/^image\/(png|jpeg)$/.test(file.type) || /\.(png|jpe?g)$/i.test(name));
     if (!isPngJpeg) {
-      setCommitMsg("Pick a PNG or JPEG image."); return;
+      setCommitMsg("Elija una imagen PNG o JPEG."); return;
     }
     // cheap pre-decode gate: bail on a huge FILE before createImageBitmap allocates
     // anything (a small-file / huge-dims pixel bomb is caught by the area guard below).
-    if (file.size > MARKUP_UPLOAD_MAX_BYTES) { setCommitMsg(`That image file is too large (max ${Math.round(MARKUP_UPLOAD_MAX_BYTES / (1024 * 1024))} MB).`); return; }
+    if (file.size > MARKUP_UPLOAD_MAX_BYTES) { setCommitMsg(`Ese archivo de imagen es demasiado grande (máx. ${Math.round(MARKUP_UPLOAD_MAX_BYTES / (1024 * 1024))} MB).`); return; }
     try {
       // sniff intrinsic dimensions via an <img> FIRST — reading naturalWidth/Height
       // only needs the header, so a pixel bomb (small file, enormous declared dims)
@@ -7729,12 +7737,12 @@ export default function TakeoffCanvas() {
           im.onerror = () => rej(new Error("decode"));
           im.src = url;
         });
-        if (dims.w * dims.h > MARKUP_DECODE_MAX_AREA) { setCommitMsg("That image is too large (too many pixels)."); return; }
+        if (dims.w * dims.h > MARKUP_DECODE_MAX_AREA) { setCommitMsg("Esa imagen es demasiado grande (demasiados píxeles)."); return; }
       } finally { URL.revokeObjectURL(url); }
       const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
       // defense-in-depth: the oriented bitmap's own area, in case the sniff and the
       // decoder disagree (a markup-appropriate cap, NOT the 241M render-canvas cap).
-      if (bmp.width * bmp.height > MARKUP_DECODE_MAX_AREA) { bmp.close?.(); setCommitMsg("That image is too large (too many pixels)."); return; }
+      if (bmp.width * bmp.height > MARKUP_DECODE_MAX_AREA) { bmp.close?.(); setCommitMsg("Esa imagen es demasiado grande (demasiados píxeles)."); return; }
       const f = Math.min(1, MARKUP_IMG_MAX / Math.max(bmp.width, bmp.height));
       const bw = Math.max(1, Math.round(bmp.width * f)), bh = Math.max(1, Math.round(bmp.height * f));
       const canvas = document.createElement("canvas");
@@ -7754,7 +7762,7 @@ export default function TakeoffCanvas() {
         at = [cl01((c[0] - focusPanel.xOffset) / focusPanel.img.w), cl01(c[1] / focusPanel.img.h)];
       }
       addImageMarkup({ at, w: 0.2, aspect, src, source: "upload", name: (file?.name || "").replace(/\.[^.]+$/, "") }, focusPanel.key);
-    } catch { setCommitMsg("Couldn't read that image."); }
+    } catch { setCommitMsg("No se pudo leer esa imagen."); }
   }
 
   // Approved rows → conditions. Category drives hatch/waste, the palette the color (rowToSeed);
@@ -7777,10 +7785,10 @@ export default function TakeoffCanvas() {
       });
     }
     setImportRead(null);
-    if (!made.length) { setCommitMsg("Those finishes already exist or need review against an existing condition."); return; }
+    if (!made.length) { setCommitMsg("Esos acabados ya existen o necesitan revisión contra una condición existente."); return; }
     setConditions((cs) => [...cs, ...made]);
     activateCondition(made[0].id, { reassign: false });
-    setCommitMsg(`Created ${made.length} condition${made.length === 1 ? "" : "s"} from the schedule.`);
+    setCommitMsg(`Se crearon ${made.length} condici${made.length === 1 ? "ón" : "ones"} desde el cuadro.`);
   }
   // every condition-editor save lands here — a bare updated_at is the whole
   // provenance story for conditions (no origin machinery; they're all manual)
@@ -7795,7 +7803,7 @@ export default function TakeoffCanvas() {
     const c = condById[id];
     if (!c) return;
     const owned = shapes.filter((s) => s.condition_id === id);
-    if (owned.length && !window.confirm(`Delete ${c.finish_tag} and its ${owned.length} takeoff${owned.length === 1 ? "" : "s"}? This can't be undone.`)) return;
+    if (owned.length && !window.confirm(`¿Eliminar ${c.finish_tag} y ${owned.length === 1 ? "su takeoff" : "sus " + owned.length + " takeoffs"}? Esto no se puede deshacer.`)) return;
     // Lineage first, removal second: deleting a family parent must not orphan its twins. The
     // eldest survivor is promoted to root (its rows are already materialized — propagate-on-write
     // guarantees that) and the rest re-point at it, origin_ids remapped.
@@ -7817,7 +7825,7 @@ export default function TakeoffCanvas() {
     // no bulk-selection pruning needed here: the panel derives liveness from
     // the conditions prop (liveChecked = conditions ∩ checked), so a deleted
     // id left in its checked set is inert by construction
-    setCommitMsg(`Deleted ${c.finish_tag}${owned.length ? ` and ${owned.length} takeoff${owned.length === 1 ? "" : "s"}` : ""}.`);
+    setCommitMsg(`Se eliminó ${c.finish_tag}${owned.length ? ` y ${owned.length} takeoff${owned.length === 1 ? "" : "s"}` : ""}.`);
   }
 
   // custom columns: project-scoped vocabulary editing + per-condition assignment.
@@ -7836,7 +7844,7 @@ export default function TakeoffCanvas() {
   const addColumnValue = (colId, v) => setConditionColumns((cols) => cols.map((cc) => (cc.id === colId && !cc.values.includes(v) ? { ...cc, values: [...cc.values, v] } : cc)));
   const removeColumnValue = (colId, v) => setConditionColumns((cols) => cols.map((cc) => (cc.id === colId ? { ...cc, values: cc.values.filter((x) => x !== v) } : cc)));   // assigned conditions keep the string, selects show "(removed)"
   const renameColumnVal = (colId, oldV) => {
-    const newV = (window.prompt("Rename value:", oldV) || "").trim();
+    const newV = (window.prompt("Renombrar valor:", oldV) || "").trim();
     if (!newV || newV === oldV) return;
     // rename into an existing value = merge (values are unique — they key the chips and the select options)
     setConditionColumns((cols) => cols.map((cc) => (cc.id === colId ? { ...cc, values: cc.values.includes(newV) ? cc.values.filter((x) => x !== oldV) : cc.values.map((x) => (x === oldV ? newV : x)) } : cc)));
@@ -7844,7 +7852,7 @@ export default function TakeoffCanvas() {
   };
   const deleteColumn = (colId) => {
     const cc = conditionColumns.find((c) => c.id === colId);
-    if (!window.confirm(`Delete column "${columnLabel(cc)}" for the whole project? Conditions keep their values but they're no longer shown or exported.`)) return;
+    if (!window.confirm(`¿Eliminar la columna «${columnLabel(cc)}» de todo el proyecto? Las condiciones conservan sus valores, pero ya no se muestran ni se exportan.`)) return;
     setConditionColumns((cols) => cols.filter((c) => c.id !== colId));   // orphaned attrs[colId] stay behind, harmless, nothing iterates raw attrs
   };
 
@@ -7853,7 +7861,7 @@ export default function TakeoffCanvas() {
   const addLabel = (v) => setShapeLabels((ls) => (ls.includes(v) ? ls : [...ls, v]));
   const removeLabel = (v) => setShapeLabels((ls) => ls.filter((x) => x !== v));   // labeled shapes keep the string, it falls into an ad-hoc report group, nothing disappears from totals
   const renameLabel = (oldV) => {
-    const newV = (window.prompt("Rename label:", oldV) || "").trim();
+    const newV = (window.prompt("Renombrar etiqueta:", oldV) || "").trim();
     if (!newV || newV === oldV) return;
     // rename into an existing value = merge (labels are unique — they key the chips and the report's group headers)
     setShapeLabels((ls) => (ls.includes(newV) ? ls.filter((x) => x !== oldV) : ls.map((x) => (x === oldV ? newV : x))));
@@ -7914,7 +7922,7 @@ export default function TakeoffCanvas() {
     if (!src || !lab) return null;
     const tag = variantTag(src.finish_tag, lab);
     if (conditions.some((c) => normalizeTag(c.finish_tag) === normalizeTag(tag))) {
-      setCommitMsg(`A condition is already called ${tag}, pick another label.`);
+      setCommitMsg(`Ya hay una condición llamada ${tag}: elija otra etiqueta.`);
       return null;
     }
     const { twin, parentPatch } = mintTwin(src, {
@@ -7926,7 +7934,7 @@ export default function TakeoffCanvas() {
     agentStateRef.current = { ...agentStateRef.current, conditions: [...agentStateRef.current.conditions, twin] };
     setConditions((cs) => [...cs.map((c) => (c.id === src.id && parentPatch ? { ...c, ...parentPatch } : c)), twin]);
     activateCondition(twin.id, { reassign: false });
-    setCommitMsg(`Added ${twin.finish_tag}, its materials follow ${src.finish_tag} until you change them here.`);
+    setCommitMsg(`Se agregó ${twin.finish_tag}: sus materiales siguen a ${src.finish_tag} hasta que los cambie aquí.`);
     return twin;
   };
   // Cut a twin loose: every following row freezes where it stands. It KEEPS its family_id, so it
@@ -7936,9 +7944,9 @@ export default function TakeoffCanvas() {
     if (!c?.variant_of) return;
     const par = conditions.find((x) => x.id === c.variant_of);
     const n = (c.materials || []).filter((r) => r.inherited).length;
-    if (!window.confirm(`Split ${c.finish_tag} out of its family?\n\n${n} row${n === 1 ? "" : "s"} freeze at ${n === 1 ? "its" : "their"} current values, and edits to ${par?.finish_tag || "the original"} stop reaching it.\nIt keeps its name and still subtotals with the family.`)) return;
+    if (!window.confirm(`¿Separar ${c.finish_tag} de su familia?\n\n${n} fila${n === 1 ? "" : "s"} se congela${n === 1 ? "" : "n"} en ${n === 1 ? "su valor actual" : "sus valores actuales"}, y las ediciones de ${par?.finish_tag || "el original"} dejan de llegarle.\nConserva su nombre y sigue subtotalizando con la familia.`)) return;
     setConditions((cs) => splitFromFamily(cs, id));
-    setCommitMsg(`${c.finish_tag} no longer follows ${par?.finish_tag || "its family"}.`);
+    setCommitMsg(`${c.finish_tag} ya no sigue a ${par?.finish_tag || "su familia"}.`);
   };
   // Height/Thickness are LIVE parameters: changing them re-flows
   // every dependent shape on this condition — wall SF tracks the tile height.
@@ -8084,7 +8092,7 @@ export default function TakeoffCanvas() {
         .map((s) => [s.id, computeShapeMetrics(s, dimsBy.get(s.sheet_id), uppFor(s.sheet_id) || 0, condById[s.condition_id])]));
       if (!healed.size) return;
       dispatchShape({ type: "replace", shapes: shapes.map((s) => (healed.has(s.id) ? { ...s, computed: healed.get(s.id) } : s)) }, { reset: true });
-      setCommitMsg(`Repriced ${healed.size} takeoff${healed.size === 1 ? "" : "s"} that loaded without quantities.`);
+      setCommitMsg(`Se recalcularon ${healed.size} takeoff${healed.size === 1 ? "" : "s"} que cargaron sin cantidades.`);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reruns on load/shape/scale change; docCache/uppFor/condById read from the same render
   }, [status, shapes, scales, conditions]);
@@ -8255,7 +8263,7 @@ export default function TakeoffCanvas() {
   // condition — the "don't open the sidebar unless double-clicked" contract.
   const pinToPalette = (id) => {
     if (palette.includes(id)) return;   // already pinned, silent no-op (dropping a chip back on the band)
-    if (palette.length >= PALETTE_MAX) { setCommitMsg(`Palette is full (${PALETTE_MAX}), unpin one first.`); return; }
+    if (palette.length >= PALETTE_MAX) { setCommitMsg(`La paleta está llena (${PALETTE_MAX}): desfije una primero.`); return; }
     setPalette((p) => (p.includes(id) || p.length >= PALETTE_MAX ? p : [...p, id]));
   };
   const unpinFromPalette = (id) => setPalette((p) => p.filter((x) => x !== id));
@@ -8311,7 +8319,7 @@ export default function TakeoffCanvas() {
   // so counts and names here can never claim rows the list already lost.
   const bulkWasteConditions = (ids, v) => {
     setConditions((cs) => cs.map((c) => (ids.has(c.id) ? { ...c, waste_pct: v } : c)));
-    setCommitMsg(`Waste set to ${v}% on ${ids.size} condition${ids.size === 1 ? "" : "s"}.`);
+    setCommitMsg(`Desperdicio fijado en ${v}% en ${ids.size} condici${ids.size === 1 ? "ón" : "ones"}.`);
   };
   const bulkColorConditions = (ids, color) => setConditions((cs) => cs.map((c) => (ids.has(c.id) ? { ...c, color } : c)));
   // returns whether the delete went through — the panel clears its selection only then
@@ -8322,20 +8330,20 @@ export default function TakeoffCanvas() {
     const owned = dead.length;
     // name what dies while the list still reads at a glance (≤5); count beyond
     const what = live.length <= 5 ? live.map((c) => c.finish_tag).join(", ") : `${live.length} conditions`;
-    if (!window.confirm(`Delete ${what}${owned ? ` and their ${owned} takeoff${owned === 1 ? "" : "s"}` : ""}? This can't be undone.`)) return false;
+    if (!window.confirm(`¿Eliminar ${what}${owned ? ` y ${owned === 1 ? "su takeoff" : `sus ${owned} takeoffs`}` : ""}? Esto no se puede deshacer.`)) return false;
     setConditions((cs) => promoteOnDelete(cs, ids).filter((c) => !ids.has(c.id)));   // lineage repaired first
     // same cascade rule as deleteCondition: counted centrally, off the stack
     if (owned) dispatchShape({ type: "delete", ids: dead.map((s) => s.id), reason: "condition-delete" }, { record: false });
     setPalette((p) => p.filter((id) => !ids.has(id)));   // deleted conditions can't stay pinned
     if (ids.has(activeCond)) setActiveCond(conditions.find((c) => !ids.has(c.id))?.id || "");
-    setCommitMsg(`Deleted ${live.length} condition${live.length === 1 ? "" : "s"}${owned ? ` and ${owned} takeoff${owned === 1 ? "" : "s"}` : ""}.`);
+    setCommitMsg(`Se eliminó ${live.length} condici${live.length === 1 ? "ón" : "ones"}${owned ? ` y ${owned} takeoff${owned === 1 ? "" : "s"}` : ""}.`);
     return true;
   };
 
   // ── condition template library ops (browser-global; store meta key) ───────
   const persistTemplates = (next) => {
     templatesRef.current = next; setTemplates(next);
-    store.saveTemplates(next).catch((e) => setCommitMsg(`Couldn't save the library: ${e.message || e}`));
+    store.saveTemplates(next).catch((e) => setCommitMsg(`No se pudo guardar la biblioteca: ${e.message || e}`));
   };
   const condToTemplate = (c) => ({
     finish_tag: c.finish_tag, color: c.color, fill: c.fill, hatch: c.hatch || "solid",
@@ -8353,9 +8361,9 @@ export default function TakeoffCanvas() {
     if (!aCond) return;
     const tpl = condToTemplate(aCond);
     const at = templates.findIndex((t) => t.finish_tag === tpl.finish_tag);
-    if (at >= 0 && !window.confirm(`A “${tpl.finish_tag}” template is already in the library, replace it?`)) return;
+    if (at >= 0 && !window.confirm(`Ya hay una plantilla «${tpl.finish_tag}» en la biblioteca: ¿reemplazarla?`)) return;
     persistTemplates(at >= 0 ? templates.map((t, i) => (i === at ? tpl : t)) : [...templates, tpl]);
-    setCommitMsg(`Saved ${tpl.finish_tag} to the library.`);
+    setCommitMsg(`Se guardó ${tpl.finish_tag} en la biblioteca.`);
   };
   const applyTemplate = (t) => {
     const c = instantiateTemplate(t);
@@ -8364,7 +8372,7 @@ export default function TakeoffCanvas() {
     // still dismisses a live bulk selection like every other activation surface
     activateCondition(c.id, { reassign: false });
     // the panel switches itself back to the Takeoffs tab (its Apply handler)
-    setCommitMsg(`Added ${c.finish_tag} from the library.`);
+    setCommitMsg(`Se agregó ${c.finish_tag} desde la biblioteca.`);
   };
   // idx addresses the template BY POSITION (the panel's plain templates.map
   // index — it doesn't filter/sort). The focus-refresh above now skips the
@@ -8376,15 +8384,15 @@ export default function TakeoffCanvas() {
   // reports rather than throwing.
   const renameTemplate = (idx) => {
     const t = templates[idx];
-    if (!t) { setCommitMsg("The library changed in another tab, try again."); return; }
-    const tag = (window.prompt("Template tag:", t.finish_tag) || "").trim();
+    if (!t) { setCommitMsg("La biblioteca cambió en otra pestaña: intente de nuevo."); return; }
+    const tag = (window.prompt("Etiqueta de la plantilla:", t.finish_tag) || "").trim();
     if (!tag || tag === t.finish_tag) return;
     persistTemplates(templates.map((x, i) => (i === idx ? { ...x, finish_tag: tag } : x)));
   };
   const deleteTemplate = (idx) => {
     const t = templates[idx];
-    if (!t) { setCommitMsg("The library changed in another tab, try again."); return; }
-    if (!window.confirm(`Remove the ${t.finish_tag} template from the library? Existing conditions are unaffected.`)) return;
+    if (!t) { setCommitMsg("La biblioteca cambió en otra pestaña: intente de nuevo."); return; }
+    if (!window.confirm(`¿Quitar la plantilla ${t.finish_tag} de la biblioteca? Las condiciones existentes no se afectan.`)) return;
     persistTemplates(templates.filter((_, i) => i !== idx));
   };
 
@@ -8397,7 +8405,7 @@ export default function TakeoffCanvas() {
   const matLibById = useMemo(() => Object.fromEntries(matLib.map((m) => [m.id, m])), [matLib]);
   const persistMatLib = (next) => {
     setMatLib(next);
-    store.saveMaterialLibrary(next).catch((e) => setCommitMsg(`Couldn't save the material library: ${e.message || e}`));
+    store.saveMaterialLibrary(next).catch((e) => setCommitMsg(`No se pudo guardar la biblioteca de materiales: ${e.message || e}`));
   };
   // libFields / matFieldOverridden / the push+revert patch builders live in
   // lib/materials.js (pure, tested): they carry kind and the grout tile
@@ -8408,11 +8416,11 @@ export default function TakeoffCanvas() {
     updateCond({ materials: [...(aCond.materials || []), { id: uid("mat"), ...libFields(lm), lib_id: lm.id }] });
   };
   const promoteMaterial = (m) => {
-    if (!m.name) { setCommitMsg("Name the material before saving it to the library."); return; }
+    if (!m.name) { setCommitMsg("Ponga nombre al material antes de guardarlo en la biblioteca."); return; }
     const entry = { id: uid("lib"), ...libFields(m) };
     persistMatLib([...matLib, entry]);
     updateMaterial(m.id, { lib_id: entry.id });
-    setCommitMsg(`Saved ${m.name} to the material library.`);
+    setCommitMsg(`Se guardó ${m.name} en la biblioteca de materiales.`);
   };
   const revertMatField = (m, f) => {
     const lm = matLibById[m.lib_id];
@@ -8430,15 +8438,15 @@ export default function TakeoffCanvas() {
     const lm = matLibById[libId];
     if (!lm) return;
     const n = linkedCount(libId);
-    if (!n) { setCommitMsg("No condition lines link this material yet."); return; }
-    if (!window.confirm(`Update ${n} linked line${n === 1 ? "" : "s"} across conditions to the library values? Overrides on those lines are replaced.`)) return;
+    if (!n) { setCommitMsg("Ninguna línea de condición está vinculada a este material todavía."); return; }
+    if (!window.confirm(`¿Actualizar ${n} línea${n === 1 ? "" : "s"} vinculada${n === 1 ? "" : "s"} en todas las condiciones a los valores de la biblioteca? Las modificaciones de esas líneas se reemplazan.`)) return;
     setConditions((cs) => cs.map((c) => ({ ...c, materials: (c.materials || []).map((m) => (m.lib_id === libId ? libPushPatch(m, lm) : m)) })));
-    setCommitMsg(`Updated ${n} linked line${n === 1 ? "" : "s"} from the library.`);
+    setCommitMsg(`Se actualizaron ${n} línea${n === 1 ? "" : "s"} vinculada${n === 1 ? "" : "s"} desde la biblioteca.`);
   };
   const deleteLibMaterial = (libId) => {
     const lm = matLibById[libId];
     const n = linkedCount(libId);
-    if (!window.confirm(`Remove ${lm?.name || "this material"} from the library?${n ? (n === 1 ? " 1 linked line keeps its values, only the link is removed." : ` ${n} linked lines keep their values, only the links are removed.`) : ""}`)) return;
+    if (!window.confirm(`¿Quitar ${lm?.name || "este material"} de la biblioteca?${n ? (n === 1 ? " 1 línea vinculada conserva sus valores; solo se quita el vínculo." : ` ${n} líneas vinculadas conservan sus valores; solo se quitan los vínculos.`) : ""}`)) return;
     persistMatLib(matLib.filter((x) => x.id !== libId));
     if (n) setConditions((cs) => cs.map((c) => ({ ...c, materials: (c.materials || []).map((m) => { if (m.lib_id !== libId) return m; const { lib_id: _l, ...rest } = m; return rest; }) })));
     // condition templates carry lib_id too (so applying re-links to a live
@@ -8507,20 +8515,20 @@ export default function TakeoffCanvas() {
     legacyTools: { highlighter: "highlighter", cloud: "cloud", callout: "callout" },
     resetDraft: () => { leaveCanvas(); setMarkupDraft(null); },
     readText: key => withSheetPage(key, async page => {
-      if (!page) throw new Error("This sheet has no native PDF text available. Use Freehand for a scan or composite.");
+      if (!page) throw new Error("Esta hoja no tiene texto PDF nativo disponible. Use Mano alzada para un escaneo o compuesto.");
       const content = await page.getTextContent();
       return nativeTextRuns(content, page.getViewport({ scale: RENDER_SCALE }).transform);
     }),
     findSymbols: (key, rect) => {
       const segments = vectorSegsRef.current.get(key);
-      if (!segments?.length) throw new Error("No vector symbols are available on this sheet. Scans need a manual cloud or note.");
+      if (!segments?.length) throw new Error("No hay símbolos vectoriales disponibles en esta hoja. Los escaneos necesitan una nube o nota manual.");
       return sweepSymbols(segments, rect);
     },
   });
 
   const referencePins = markups.filter(m => m.type === "image" && (m.reference_only || m.id === pinSelectedId));
   const pinButton = <PinButton armed={tool === "pin"} disabled={status !== "ready"}
-    onCapture={() => { setTool(tool === "pin" ? "select" : "pin"); setImageAnchor(null); setCommitMsg(tool === "pin" ? "Pin cancelled." : "Pin, click two corners around any part of the sheet."); }}
+    onCapture={() => { setTool(tool === "pin" ? "select" : "pin"); setImageAnchor(null); setCommitMsg(tool === "pin" ? "Pin cancelled." : "Pin: haga clic en dos esquinas alrededor de cualquier parte de la hoja."); }}
     count={referencePins.length} onShow={() => setPinsOpen(v => !v)} />;
   const pinWindow = pinsOpen && <ReferencePins pins={referencePins} selectedId={pinSelectedId}
     onSelect={setPinSelectedId} onClose={() => setPinsOpen(false)} onSource={traceSource}
@@ -8561,7 +8569,7 @@ export default function TakeoffCanvas() {
   const levelOfPage = (n) => sheetLevels[n > 1 ? `${active}#${n}` : active] || "";
   const soloStitch = sheetGroup.length === 1 && isStitchKey(sheetGroup[0]) ? stitchById[sheetGroup[0]] : null;
   const sheetChipLabel = sheetGroup.length
-    ? (soloStitch ? `Stitched, ${soloStitch.name}` : `${sheetGroup.length} sheets side-by-side`)
+    ? (soloStitch ? `Empalme: ${soloStitch.name}` : `${sheetGroup.length} hojas lado a lado`)
     : `${levelOfPage(page) ? `${levelOfPage(page)} · ` : ""}${pageLabels[page] || (pageCount > 1 ? `Sheet ${page}` : active)}${pageCount > 1 ? ` · ${page}/${pageCount}` : ""}`;
   const sheetMenuItems = [];
   if (!sheetGroup.length && pageCount > 1) {
@@ -8694,12 +8702,12 @@ export default function TakeoffCanvas() {
   const activeDrawStyle = DRAW_STYLES[drawStyleId] || DRAW_STYLES[DRAW_STYLE_IDS[0]];
   const draftMenu = (
     <ToolMenu
-      title={`Draft, drawing style (${activeDrawStyle.label}), outline while drawing, straight or curve`}
+      title={`Borrador: estilo de dibujo (${activeDrawStyle.label}), contorno al dibujar, recta o curva`}
       onOpenChange={onMenuDepth}
       faceStyle={{ padding: "4px 6px" }}
       face={<><StylePreview t={activeDrawStyle} w={26} h={16} />{workspaceLayout && <span>Trazo</span>}</>}
       items={[
-        { section: "Drawing style" },
+        { section: "Estilo de dibujo" },
         ...DRAW_STYLE_IDS.map((id) => {
           const t = DRAW_STYLES[id];
           const on = id === drawStyleId;
@@ -8715,15 +8723,15 @@ export default function TakeoffCanvas() {
           ) };
         }),
         "divider",
-        { id: "draftoutline", checked: draftOutline, stayOpen: true, icon: "area", label: "Outline area while drawing", onSelect: () => setDraftOutline(!draftOutline),
-          title: "Draw Area / Deduct / Zone as an open outline (no fill) while tracing, it still commits closed on Enter or double-click." },
+        { id: "draftoutline", checked: draftOutline, stayOpen: true, icon: "area", label: "Contorno del área al dibujar", onSelect: () => setDraftOutline(!draftOutline),
+          title: "Dibujar Área / Deducción / Zona como contorno abierto (sin relleno) mientras traza; igual se confirma cerrada con Enter o doble clic." },
         "divider",
-        { section: "Bend" },
-        { id: "straight", checked: !curveMode, stayOpen: true, disabled: !curvable, label: "Straight", onSelect: () => setCurveMode(false),
-          title: "Straight places corners." },
-        { id: "curve", checked: curveMode, stayOpen: true, disabled: !curvable, icon: "curve", label: "Curve", shortcut: "Q", onSelect: () => setCurveMode(true),
-          title: "Curve takes two clicks, one anywhere ON the bow, then its far end, and lays the unique circle through those and the vertex you were on, so it sits on a radius wall instead of near it. Q flips it once a trace is going; ⌥-click places the OTHER kind for one point." },
-        { note: curvable ? "Switch as often as you like inside one measurement." : "Arm Area, Line, Cut Out or Surface Area to bend a trace." },
+        { section: "Curvar" },
+        { id: "straight", checked: !curveMode, stayOpen: true, disabled: !curvable, label: "Recta", onSelect: () => setCurveMode(false),
+          title: "Recta coloca esquinas." },
+        { id: "curve", checked: curveMode, stayOpen: true, disabled: !curvable, icon: "curve", label: "Curva", shortcut: "Q", onSelect: () => setCurveMode(true),
+          title: "La curva toma dos clics: uno en cualquier punto SOBRE el arco y luego su extremo final; traza el círculo único que pasa por esos puntos y el vértice en que estaba, así queda sobre un muro de radio y no cerca de él. Q la invierte una vez iniciado el trazo" },
+        { note: curvable ? "Cambie cuantas veces quiera dentro de una misma medición." : "Arme Área, Línea, Recorte o Superficie para curvar un trazo." },
       ]}
     />
   );
@@ -8739,7 +8747,7 @@ export default function TakeoffCanvas() {
     ...MEASURE_TOOLS.filter((t) => t.id !== "oneclick" || oneClickEnabled()).concat(CUT_TOOLS).map((t) => ({ id: `tool-${t.id}`, label: t.label, shortcut: t.shortcut, group: "Herramientas de medición", run: () => { setView("canvas"); setTool(t.id); } })),
     { id: "select", label: "Seleccionar y editar una medición", group: "Herramientas", shortcut: "V", run: () => setTool("select") },
     { id: "zone", label: "Chequeo de zona, qué hay dentro de una región trazada", group: "Herramientas", run: () => { setView("canvas"); setTool("zone"); } },
-    { id: "textcopy", label: "Copy text, box a region, its text goes on the clipboard", group: "Herramientas", run: () => { setView("canvas"); if (tool !== "textcopy") armCopyText(); } },
+    { id: "textcopy", label: "Copiar texto: encierre una región y su texto va al portapapeles", group: "Herramientas", run: () => { setView("canvas"); if (tool !== "textcopy") armCopyText(); } },
     { id: "undo", label: "Deshacer", group: "Edición", shortcut: "⌘Z", run: () => poly.length ? dropLastPoint() : undoShapeCommand() },
     { id: "redo", label: "Rehacer", group: "Edición", shortcut: "⇧⌘Z", run: redoShapeCommand },
     { id: "finish", label: "Terminar figura", group: "Edición", shortcut: "↵", disabled: !finishOk, run: finishShape },
@@ -8769,7 +8777,7 @@ export default function TakeoffCanvas() {
     const qaColors = [PALETTE[0], PALETTE[2]];
     return (
       <div style={{ padding: 20, background: darkMode ? "#14120e" : "var(--paper-bright)", minHeight: "100vh", overflow: "auto" }}>
-        <button onClick={() => setDarkMode((v) => !v)} style={{ marginBottom: 14, padding: "4px 12px", border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", fontSize: 12 }}>☾ toggle dark</button>
+        <button onClick={() => setDarkMode((v) => !v)} style={{ marginBottom: 14, padding: "4px 12px", border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", fontSize: 12 }}>☾ alternar oscuro</button>
         {HATCHES.map((h) => (
           <div key={h.id} style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 10 }}>
             <span style={{ width: 120, fontFamily: "var(--f-mono)", fontSize: 10, textTransform: "uppercase", letterSpacing: ".08em", color: darkMode ? "#c9c2b2" : "var(--ink-muted)" }}>{h.label}</span>
@@ -8836,8 +8844,8 @@ export default function TakeoffCanvas() {
           {panelBtn(() => setLeftTab((t) => (t === "markup" ? null : "markup")), "document", "Lista de anotaciones: nubes, llamadas y notas existentes", leftTab === "markup", markupCount)}
           {panelBtn(() => setLeftTab((t) => (t === "stamp" ? null : "stamp")), "stamp", "Sellos: anotaciones reutilizables que se colocan con un clic", leftTab === "stamp", stampLib.stamps.length)}
           {panelBtn(() => setLeftTab((t) => (t === "rfi" ? null : "rfi")), "rfi", "Registro de RFI: levante, siga y exporte solicitudes de información", leftTab === "rfi", rfis.length)}
-          {rollByCond.size > 0 && panelBtn(() => setRollPanelOpen((o) => !o), "roll", "Roll goods, the cut diagram, cutting order, and figured order footage", rollPanelOpen, rollByCond.size)}
-          {layerEntries.length > 0 && panelBtn(() => setLayersOpen((o) => !o), "layers", "PDF layers, drawing layers", layersOpen, layerEntries.reduce((n, e) => n + e.layers.length, 0))}
+          {rollByCond.size > 0 && panelBtn(() => setRollPanelOpen((o) => !o), "roll", "Material en rollo: el diagrama de cortes, el orden de corte y el metraje de pedido calculado", rollPanelOpen, rollByCond.size)}
+          {layerEntries.length > 0 && panelBtn(() => setLayersOpen((o) => !o), "layers", "Capas PDF: capas del dibujo", layersOpen, layerEntries.reduce((n, e) => n + e.layers.length, 0))}
           {panelBtn(() => setShowRevisions(true), "revisions", "Revisiones: guarde el takeoff en cada revisión de oferta y compare qué cambió", showRevisions)}
         </div>}
         layoutMenu={<button type="button" onClick={() => setWorkspaceLayoutOpen(true)} title="Organizar paneles, bloquear posiciones y guardar disposiciones"><Icon name="sliders" size={16} />Disposición</button>}
@@ -8849,7 +8857,7 @@ export default function TakeoffCanvas() {
         ]} />}
         fileMenu={<><ToolMenu title="Archivos y espacio de trabajo" face={<span>Archivo</span>} onOpenChange={onMenuDepth} items={sheetMenuItems} /><PresenceChip bridge={store.syncBridge} /><AccountChip note={cloudMode ? "Sincronizado a Google Drive" : "Espacio local"} onOpenChange={onMenuDepth} /></>}
         conditionControl={<><label className="calm-condition-label" htmlFor="workspace-condition">Condición</label><select id="workspace-condition" value={activeCond || ""} onChange={(e) => activateCondition(e.target.value)} title={tool === "select" && selectedId ? "Reasignar la medición seleccionada" : "Condición para la próxima medición"}>
-          {!conditions.length && <option value="">No conditions</option>}{conditions.map((c) => <option key={c.id} value={c.id}>{c.finish_tag}</option>)}</select>
+          {!conditions.length && <option value="">Sin condiciones</option>}{conditions.map((c) => <option key={c.id} value={c.id}>{c.finish_tag}</option>)}</select>
           <button type="button" onClick={addCondition} title="Agregar condición" aria-label="Agregar condición"><Icon name="plus" size={14} /></button>
           <button type="button" onClick={() => setWorkspaceDetailsOpen((v) => !v)} aria-expanded={workspaceDetailsOpen} disabled={!aCond}>Propiedades</button></>}
         history={<><button type="button" onClick={() => poly.length ? dropLastPoint() : undoShapeCommand()} title="Deshacer (⌘Z)" aria-label="Deshacer"><Icon name="undo" size={16} /></button><button type="button" onClick={redoShapeCommand} title="Rehacer (⇧⌘Z)" aria-label="Rehacer"><span style={{ display: "flex", transform: "scaleX(-1)" }}><Icon name="undo" size={16} /></span></button></>}
@@ -8896,7 +8904,7 @@ export default function TakeoffCanvas() {
           </span>
         )}
         {vRule}
-        {cluster("Edit", <>
+        {cluster("Editar", <>
           <ToolMenu
             title="Editar mediciones"
             onOpenChange={onMenuDepth}
@@ -8920,7 +8928,7 @@ export default function TakeoffCanvas() {
           />
         </>)}
         {vRule}
-        {cluster("Aids", <>
+        {cluster("Ayudas", <>
           {panels.length === 1 && isStitchKey(panels[0].key) && (
             <button onClick={() => setTool((t) => (t === "stitch-align" ? "select" : "stitch-align"))}
               title="Alinear la línea de encuentro: haga clic en un punto junto a la unión y luego en el MISMO punto donde la otra hoja lo dibuja; esa hoja se desliza hasta coincidir. Hágalo antes de trazar (un empalme con mediciones no se realinea)."
@@ -8931,11 +8939,11 @@ export default function TakeoffCanvas() {
           <button onClick={() => setTool((t) => (t === "zone" ? "select" : "zone"))}
             title="Chequeo de zona: trace una región (un apartamento, un ala) para leer las cantidades de cada condición dentro de ella, materiales incluidos. No se guarda nada; el contorno se borra al salir de la herramienta."
             style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1px solid ${tool === "zone" ? "var(--cobalt)" : "var(--ink-faint)"}`, background: tool === "zone" ? "var(--cobalt)" : "transparent", color: tool === "zone" ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}>
-            <Icon name="zone" size={15} />Zone
+            <Icon name="zone" size={15} />Zona
           </button>
           <button onClick={() => setSnapOn((v) => !v)} title="Imantar a líneas/esquinas del plano (beta)"
             style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1px solid ${snapOn ? "var(--c-positive)" : "var(--ink-faint)"}`, background: snapOn ? "var(--c-positive)" : "transparent", color: snapOn ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}>
-            <Icon name="snap" size={15} />Snap
+            <Icon name="snap" size={15} />Imán
           </button>
           <button onClick={() => setAngleOn((v) => !v)} title="Guías de ángulo 45°/90°: el siguiente tramo se fija a la familia de 45° mientras dibuja (mantenga ⇧ para forzar el ángulo exacto)"
             style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1px solid ${angleOn ? "var(--cobalt)" : "var(--ink-faint)"}`, background: angleOn ? "var(--cobalt)" : "transparent", color: angleOn ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}>
@@ -8947,20 +8955,20 @@ export default function TakeoffCanvas() {
             dropdown. Style and Outline came up from the ⋯ menu, Straight/Curve
             over from the readout (2026-09-12): a convention you set before
             tracing belongs beside the aids, one click from the sheet. */}
-        {cluster("Draft", draftMenu)}
+        {cluster("Borrador", draftMenu)}
         {/* The caption always shows the ACTIVE label (+ the cobalt highlight keyed
             on it) so what a new trace will get is never hidden, even in Select
             mode, where the dropdown VALUE instead shows the selected shape's label
             so changing it reliably re-labels that shape (a value-always-active
             select couldn't reassign to the already-active label, onChange wouldn't fire). */}
         {shapeLabels.length > 0 && cluster(
-          tool === "select" && selectedId ? `Label · ${activeLabel || "none"} → shape` : (activeLabel ? `Label · ${activeLabel}` : "Label"),
+          tool === "select" && selectedId ? `Etiqueta · ${activeLabel || "ninguna"} → figura` : (activeLabel ? `Etiqueta · ${activeLabel}` : "Etiqueta"),
           <select
             value={tool === "select" && selectedId ? shapeLabelValue(shapes.find((s) => s.id === selectedId)) : (activeLabel || "")}
             onChange={(e) => activateLabel(e.target.value || null)}
             title="Etiqueta de fase/área. La leyenda muestra la etiqueta ACTIVA (la que reciben las mediciones nuevas). Con una figura seleccionada (herramienta Seleccionar), el desplegable reetiqueta esa figura. Administre la lista en la pestaña Columnas."
             style={{ fontFamily: "var(--f-mono)", fontSize: 11.5, padding: "5px 6px", border: `1px solid ${activeLabel ? "var(--cobalt)" : "var(--ink-faint)"}`, background: activeLabel ? "var(--cobalt)" : "transparent", color: activeLabel ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", maxWidth: 150 }}>
-            <option value="">No label</option>
+            <option value="">Sin etiqueta</option>
             {shapeLabels.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
         )}
@@ -8969,11 +8977,11 @@ export default function TakeoffCanvas() {
             path. Focus suppresses canvas shortcuts via the existing INPUT guards.
             Deixis: focus marks the utterance's start, "this room" then needs an
             aim placed AFTER it (park the pointer on the room, type, Enter). */}
-        {commandBoxEnabled() && cluster("Command",
+        {commandBoxEnabled() && cluster("Comando",
           <input
             type="text"
             placeholder="cpt 1 · waste 7 · this room"
-            title={'Command line (RFC #59): a condition tag ("CPT-1", "carpet one", "tile 2 waste 5"), "waste 7", "label Phase 1", "clear label", "author <your name>" (new marks sign it, the report can group by author), or "note …", Enter runs it through the same actions the buttons use. End with "this room" / "here" while the pointer rests on a room to trace and commit it there ("carpet one, this room"). Push-to-talk dictation will feed this box.'}
+            title={'Línea de comandos (RFC #59): una etiqueta de condición («CPT-1», «carpet one», «tile 2 waste 5»), «waste 7», «label Fase 1», «clear label», «author <su nombre>» (las marcas nuevas la firman, el reporte puede agrupar por autor), o «note …'}
             onFocus={() => { voiceAimMarkRef.current = aimSeqRef.current; }}
             onKeyDown={(e) => {
               if (e.key !== "Enter") return;
@@ -8996,35 +9004,35 @@ export default function TakeoffCanvas() {
         {/* Push-to-talk (RFC #59 recognizer): hold the button (or M) to dictate
             into the same grammar the Command box runs. Hidden entirely where
             capture is unsupported, graceful feature-absence, never broken. */}
-        {commandBoxEnabled() && captureSupported() && cluster("Voice",
+        {commandBoxEnabled() && captureSupported() && cluster("Voz",
           <button
-            title={'Hold to talk (or hold M anywhere on the canvas): speak a command, "carpet one, waste seven", "label phase two", "note …", or end with "this room" to trace at the cursor. Release to run; Esc discards. Audio is processed on-device and never leaves the browser.'}
+            title={'Mantenga para hablar (o mantenga M en cualquier parte del lienzo): diga un comando, «carpet one, waste seven», «label phase two», «note …», o termine con «this room» para trazar en el cursor. Suelte para ejecutar; Esc descarta. El audio se procesa'}
             onPointerDown={(e) => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); voiceHoldRef.current = true; voiceFnsRef.current.start(); }}
             onPointerUp={() => { if (voiceHoldRef.current) { voiceHoldRef.current = false; voiceFnsRef.current.end(true); } }}
             onPointerCancel={() => { if (voiceHoldRef.current) { voiceHoldRef.current = false; voiceFnsRef.current.end(false); } }}
             style={{ padding: "5px 10px", border: `1px solid ${voiceChip?.tone === "live" ? "var(--cobalt)" : "var(--ink-faint)"}`, background: voiceChip?.tone === "live" ? "var(--cobalt)" : "transparent", color: voiceChip?.tone === "live" ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", fontFamily: "var(--f-mono)", fontSize: 11, fontWeight: 700, lineHeight: 1 }}>
-            {voiceChip?.tone === "live" ? "● talking" : "talk · M"}
+            {voiceChip?.tone === "live" ? "● hablando" : "hablar · M"}
           </button>
         )}
         <div style={{ flex: 1 }} />
-        {cluster("Action",
+        {cluster("Acción",
           <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: 6, minWidth: 150 }}>
-            {markupDraft && (tool === "cloud" || tool === "callout" || tool === "highlight" || tool === "dimension") && <span style={{ fontSize: 11, color: "var(--cobalt)" }}>click the {tool === "callout" ? "label spot" : tool === "dimension" ? "other end" : "opposite corner"}…</span>}
+            {markupDraft && (tool === "cloud" || tool === "callout" || tool === "highlight" || tool === "dimension") && <span style={{ fontSize: 11, color: "var(--cobalt)" }}>haga clic en {tool === "callout" ? "el punto de la etiqueta" : tool === "dimension" ? "el otro extremo" : "la esquina opuesta"}…</span>}
             {finishOk && (
-              <button onClick={finishShape} title="Terminar figura (↵ o doble clic)" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", border: "none", background: "var(--c-positive)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}><Icon name="check" size={14} />Finish ({poly.length})</button>
+              <button onClick={finishShape} title="Terminar figura (↵ o doble clic)" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", border: "none", background: "var(--c-positive)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}><Icon name="check" size={14} />Terminar ({poly.length})</button>
             )}
             {proposal?.regions.length > 0 && (
-              <button onClick={createProposal} title="Crear las mediciones seleccionadas (↵). ⌫ quita el último clic; Esc descarta la selección." style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", border: "none", background: "var(--c-positive)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}><Icon name="check" size={14} />Create ({proposal.regions.length})</button>
+              <button onClick={createProposal} title="Crear las mediciones seleccionadas (↵). ⌫ quita el último clic; Esc descarta la selección." style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", border: "none", background: "var(--c-positive)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 600, fontSize: 12.5, lineHeight: 1 }}><Icon name="check" size={14} />Crear ({proposal.regions.length})</button>
             )}
           </span>
         )}
         <div style={{ flex: 1 }} />
         </div>
         <span data-topbar-pinned style={{ display: "inline-flex", alignItems: "center", gap: 7, flexShrink: 0, paddingTop: 16 }}>
-        {cluster(`Scale, ${labelFor(focusPanel)}`,
+        {cluster(`Escala, ${labelFor(focusPanel)}`,
           <>
             <button onClick={() => setUnits((u) => (u === "metric" ? "imperial" : "metric"))}
-              title={units === "metric" ? "Metric display (m² / m), click for imperial. Calibrate in meters; 1:50-style scales in the list. Display only, stored takeoffs never change." : "Imperial display (SF / LF), click for metric (m² / m, calibrate in meters, 1:50-style scales). Display only, stored takeoffs never change."}
+              title={units === "metric" ? "Pantalla métrica (m² / m): clic para imperial. Calibre en metros; las escalas tipo 1:50 están en la lista. Solo visualización: los takeoffs guardados nunca cambian." : "Pantalla imperial (SF / LF): clic para métrico (m² / m, calibrar en metros, escalas tipo 1:50). Solo visualización: los takeoffs guardados nunca cambian."}
               style={{ padding: "6px 10px", border: `1px solid ${units === "metric" ? "var(--cobalt)" : "var(--ink-faint)"}`, background: units === "metric" ? "var(--cobalt)" : "transparent", color: units === "metric" ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", fontWeight: 700, fontFamily: "var(--f-mono)", fontSize: 11, lineHeight: 1 }}>
               {units === "metric" ? "m" : "ft"}
             </button>
@@ -9041,7 +9049,7 @@ export default function TakeoffCanvas() {
         <button type="button" ref={workspaceLayout ? undefined : workButtonRef} aria-expanded={agentOpen} onClick={() => setAgentOpen((v) => !v)}
           title="Trabajo y revisión: mediciones, procedencia y propuestas del agente"
           style={{ minHeight: "var(--ctl-m)", padding: "var(--sp-1) var(--sp-3)", border: "1px solid var(--cobalt)", background: agentOpen ? "var(--cobalt)" : "transparent", color: agentOpen ? "var(--accent-contrast)" : "var(--cobalt)", cursor: "pointer", fontSize: "var(--fs-s)", fontWeight: 600 }}>
-          Work{agentRunning ? " · Working" : shapes.some((s) => s.origin?.reviewed === false) ? ` · ${shapes.filter((s) => s.origin?.reviewed === false).length}` : ""}
+          Trabajo{agentRunning ? " · Trabajando" : shapes.some((s) => s.origin?.reviewed === false) ? ` · ${shapes.filter((s) => s.origin?.reviewed === false).length}` : ""}
         </button>
         <button data-tour="report" onClick={() => setShowReport(true)} disabled={!conditions.length} title="Abrir el reporte del takeoff: desglose por condición con desperdicio, más exportación CSV / JSON."
           style={{ padding: "8px 14px", border: "none", background: conditions.length ? "var(--ink)" : "var(--text-faint)", color: "var(--paper-bright)", cursor: conditions.length ? "pointer" : "default", fontWeight: 700, fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase" }}>Reporte</button>
@@ -9097,7 +9105,7 @@ export default function TakeoffCanvas() {
           onDrop={(e) => { if (!e.dataTransfer.types.includes(CONDITION_DND_MIME)) return; e.preventDefault(); e.stopPropagation(); const id = e.dataTransfer.getData(CONDITION_DND_MIME); if (id) pinToPalette(id); }}
           style={{ padding: "5px 14px", borderBottom: "1px solid var(--ink-faint)", background: "var(--paper-bright)" }}>
           <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
-            <span title="Quick-access conditions, drag a condition here (or use a row's pushpin) to pin it, up to 9. Press 1 a 9 to activate by this order; click a chip to activate; double-click to open the panel."
+            <span title="Condiciones de acceso rápido: arrastre una condición aquí (o use la chincheta de una fila) para fijarla, hasta 9. Presione 1 a 9 para activar según este orden; clic en una ficha para activar; doble clic para abrir el panel."
               style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--ink-muted)" }}>Condiciones</span>
             {paletteConds.length === 0 ? (
               <span style={{ fontSize: 11.5, color: "var(--ink-muted)", fontStyle: "italic", padding: "3px 8px", border: "1px dashed var(--ink-faint)" }}>arrastre condiciones aquí (o fije una fila) para acceso con 1-9</span>
@@ -9130,7 +9138,7 @@ export default function TakeoffCanvas() {
             )}
             {/* add a condition without opening the (now-collapsed) sidebar */}
             <button type="button" onClick={addCondition} title="Agregar una condición nueva"
-              style={{ padding: "3px 9px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", cursor: "pointer", fontSize: 12, color: "var(--ink-muted)" }}>+ condition</button>
+              style={{ padding: "3px 9px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", cursor: "pointer", fontSize: 12, color: "var(--ink-muted)" }}>+ condición</button>
           </div>
           {/* the active condition's appearance editor, restored to the top bar,
               same component the docked panel row renders (one source of truth) */}
@@ -9151,7 +9159,7 @@ export default function TakeoffCanvas() {
         <div data-sheet-tabs style={{ display: "flex", gap: 5, alignItems: "center", padding: "5px 14px", flexWrap: openTabs.length > MANY_TABS ? "nowrap" : "wrap", borderBottom: "1px solid var(--ink-faint)", background: "var(--paper-bright)", minWidth: 0 }}>
           <span style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--ink-muted)", flexShrink: 0 }}>Hojas</span>
           {openTabs.length > MANY_TABS && (
-            <button type="button" onClick={() => scrollTabStrip(-1)} title="Scroll sheets left" aria-label="Scroll sheets left" style={{ flexShrink: 0, padding: "4px 5px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", display: "inline-flex" }}><Icon name="chevronLeft" size={12} /></button>
+            <button type="button" onClick={() => scrollTabStrip(-1)} title="Desplazar hojas a la izquierda" aria-label="Desplazar hojas a la izquierda" style={{ flexShrink: 0, padding: "4px 5px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", display: "inline-flex" }}><Icon name="chevronLeft" size={12} /></button>
           )}
           <div ref={tabStripRef} data-sheet-tab-strip style={{ display: "flex", gap: 5, alignItems: "center", flexWrap: openTabs.length > MANY_TABS ? "nowrap" : "wrap", overflowX: openTabs.length > MANY_TABS ? "auto" : "visible", minWidth: 0, flex: openTabs.length > MANY_TABS ? 1 : "0 1 auto", scrollbarWidth: "none", overscrollBehaviorX: "contain" }}>
           {openTabs.map((k) => {
@@ -9163,17 +9171,17 @@ export default function TakeoffCanvas() {
                 draggable={!isStitchKey(k) && sheetHasInk(k)}
                 onMouseEnter={() => armSheetDrag(k)}
                 onDragStart={(e) => onSheetTabDragStart(k, e)}
-                title={!isStitchKey(k) && sheetHasInk(k) ? "Drag this tab out of the app to export the marked sheet" : undefined}
+                title={!isStitchKey(k) && sheetHasInk(k) ? "Arrastre esta pestaña fuera de la aplicación para exportar la hoja marcada" : undefined}
                 style={{ display: "inline-flex", alignItems: "center", gap: 5, flexShrink: 0, border: "1px solid var(--ink-faint)", borderBottom: on ? "2px solid var(--cobalt)" : "1px solid var(--ink-faint)", background: on ? "var(--paper-cream)" : "transparent", padding: "3px 6px 2px 9px", maxWidth: 190 }}>
                 <button onClick={() => goToSheet(k)} title={k} style={{ border: "none", background: "none", cursor: "pointer", fontWeight: on ? 700 : 500, fontSize: 11.5, color: "var(--ink)", fontFamily: "var(--f-mono)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 140, padding: 0 }}>{lbl}</button>
-                <button onClick={() => toggleInGroup(k)} title={inGroup ? "Remove from side-by-side" : "Side-by-side with the current sheet"} style={{ border: "none", background: "none", cursor: "pointer", color: inGroup ? "var(--cobalt)" : "var(--ink-faint)", padding: 0, display: "inline-flex" }}><Icon name="sideBySide" size={11} /></button>
+                <button onClick={() => toggleInGroup(k)} title={inGroup ? "Quitar de lado a lado" : "Lado a lado con la hoja actual"} style={{ border: "none", background: "none", cursor: "pointer", color: inGroup ? "var(--cobalt)" : "var(--ink-faint)", padding: 0, display: "inline-flex" }}><Icon name="sideBySide" size={11} /></button>
                 <button onClick={() => closeTab(k)} title="Cerrar pestaña" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0, display: "inline-flex" }}><Icon name="close" size={10} /></button>
               </span>
             );
           })}
           </div>
           {openTabs.length > MANY_TABS && (
-            <button type="button" onClick={() => scrollTabStrip(1)} title="Scroll sheets right" aria-label="Scroll sheets right" style={{ flexShrink: 0, padding: "4px 5px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", display: "inline-flex" }}><Icon name="chevronRight" size={12} /></button>
+            <button type="button" onClick={() => scrollTabStrip(1)} title="Desplazar hojas a la derecha" aria-label="Desplazar hojas a la derecha" style={{ flexShrink: 0, padding: "4px 5px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", display: "inline-flex" }}><Icon name="chevronRight" size={12} /></button>
           )}
           {openTabs.length > 1 && openTabs.length <= MANY_TABS && (
             <ToolMenu
@@ -9193,7 +9201,7 @@ export default function TakeoffCanvas() {
           from the panel header, persisted with the panel prefs. */}
       {!focusMode && !workspaceLayout && panelPrefs.strip && (
         <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "7px 14px", flexWrap: "wrap", borderBottom: "1px solid var(--ink-faint)", background: "var(--paper-bright)" }}>
-          <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.4, color: "var(--ink-muted)" }}>Conditions</span>
+          <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.4, color: "var(--ink-muted)" }}>Condiciones</span>
           {conditions.map((c, i) => {
             const on = c.id === activeCond;
             // the 1–9 badge follows the same rule as the hotkeys: palette order
@@ -9202,32 +9210,32 @@ export default function TakeoffCanvas() {
             const hIdx = pinnedPal ? palette.indexOf(c.id) : i;
             const hot = hIdx >= 0 && hIdx < 9;
             return (
-              <button key={c.id} draggable onDragStart={(e) => { e.dataTransfer.setData(CONDITION_DND_MIME, c.id); e.dataTransfer.effectAllowed = "copy"; }} onClick={() => activateCondition(c.id)} title={tool === "select" && selectedId ? "Reassign selected shape to this condition" : (hot ? `Press ${hIdx + 1} · drag to the palette to pin` : "Drag to the palette to pin")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "3px 10px 3px 4px", borderRadius: 0, border: on ? `2px solid ${c.color}` : (tool === "select" && selectedId ? "1px dashed var(--cobalt)" : "1px solid var(--ink-faint)"), background: on ? "var(--surface-pop)" : "transparent", cursor: "pointer", fontWeight: on ? 700 : 500, fontSize: 12.5 }}>
+              <button key={c.id} draggable onDragStart={(e) => { e.dataTransfer.setData(CONDITION_DND_MIME, c.id); e.dataTransfer.effectAllowed = "copy"; }} onClick={() => activateCondition(c.id)} title={tool === "select" && selectedId ? "Reasignar la figura seleccionada a esta condición" : (hot ? `Presione ${hIdx + 1} · arrastre a la paleta para fijar` : "Arrastre a la paleta para fijar")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "3px 10px 3px 4px", borderRadius: 0, border: on ? `2px solid ${c.color}` : (tool === "select" && selectedId ? "1px dashed var(--cobalt)" : "1px solid var(--ink-faint)"), background: on ? "var(--surface-pop)" : "transparent", cursor: "pointer", fontWeight: on ? 700 : 500, fontSize: 12.5 }}>
                 {hot && <span style={{ fontSize: 9, fontFamily: "var(--f-mono,monospace)", color: pinnedPal ? "var(--cobalt)" : "var(--ink-muted)", border: `1px solid ${pinnedPal ? "var(--cobalt)" : "var(--ink-faint)"}`, borderRadius: 3, padding: "0 3px" }}>{hIdx + 1}</span>}
                 <span style={{ borderRadius: 4, overflow: "hidden", lineHeight: 0 }}><HatchSwatch type={c.hatch || "solid"} line={c.color} fill={c.fill} /></span>{c.finish_tag}
               </button>
             );
           })}
-          <button onClick={addCondition} style={{ padding: "4px 10px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", cursor: "pointer", fontSize: 12.5, color: "var(--ink-muted)" }}>+ condition</button>
+          <button onClick={addCondition} style={{ padding: "4px 10px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", cursor: "pointer", fontSize: 12.5, color: "var(--ink-muted)" }}>+ condición</button>
         </div>
       )}
 
       {/* Copy text prompt (#471), the calibrate/check prompt-bar idiom */}
       {tool === "textcopy" && (
         <div style={{ padding: "8px 14px", background: "var(--paper-bright)", borderBottom: "1px solid var(--hairline-warm)", fontSize: 14, display: "flex", alignItems: "center", gap: "var(--sp-3)" }}>
-          <span>Copy text: click two corners around the text ({textAnchor ? 1 : 0}/2). Rotated runs are left out and counted.</span>
-          <button type="button" className="btn-ghost" onClick={() => copyTextFrom(focusPanel.key, null, "page")}>Copy page text</button>
+          <span>Copiar texto: haga clic en dos esquinas alrededor del texto ({textAnchor ? 1 : 0}/2). Los fragmentos rotados se omiten y se cuentan.</span>
+          <button type="button" className="btn-ghost" onClick={() => copyTextFrom(focusPanel.key, null, "page")}>Copiar texto de la página</button>
         </div>
       )}
 
       {/* calibration prompt */}
       {tool === "calibrate" && (
         <div style={{ padding: "8px 14px", background: "var(--paper-bright)", borderBottom: "1px solid var(--hairline-warm)", fontSize: 14 }}>
-          {calib.length < 2 ? <span>Custom scale: click two points along a known dimension ({calib.length}/2). Tip: use the longest dimension. (Or just pick a standard scale above.)</span> : (
-            <span>Real length:{" "}
+          {calib.length < 2 ? <span>Escala personalizada: haga clic en dos puntos sobre una dimensión conocida ({calib.length}/2). Consejo: use la dimensión más larga. (O simplemente elija arriba una escala estándar.)</span> : (
+            <span>Longitud real:{" "}
               <input name="calibration-length" type="number" value={pendingLen} onChange={(e) => setPendingLen(e.target.value)} onKeyDown={(e) => e.key === "Enter" && applyCalibration()} placeholder={units === "metric" ? "meters" : "feet"} autoFocus style={{ width: 90, padding: 5, borderRadius: 0, border: "1px solid var(--ink-faint)" }} /> {units === "metric" ? "m" : "ft"}
-              <button onClick={applyCalibration} style={{ marginLeft: 8, padding: "5px 12px", borderRadius: 0, border: "none", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer" }}>Apply</button>
-              <button onClick={() => setCalib([])} style={{ marginLeft: 6, padding: "5px 10px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", cursor: "pointer" }}>Reset</button>
+              <button onClick={applyCalibration} style={{ marginLeft: 8, padding: "5px 12px", borderRadius: 0, border: "none", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer" }}>Aplicar</button>
+              <button onClick={() => setCalib([])} style={{ marginLeft: 6, padding: "5px 10px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", cursor: "pointer" }}>Restablecer</button>
             </span>
           )}
         </div>
@@ -9238,16 +9246,16 @@ export default function TakeoffCanvas() {
       {tool === "check" && (
         <div style={{ padding: "8px 14px", background: "var(--paper-bright)", borderBottom: "1px solid var(--hairline-warm)", fontSize: 14 }}>
           {check.length < 2 ? (
-            <span>Check a dimension: click both ends of a printed dimension ({check.length}/2). The measured length shows here, compare it with what the drawing says.</span>
+            <span>Verificar una dimensión: haga clic en ambos extremos de una cota impresa ({check.length}/2). La longitud medida aparece aquí; compárela con lo que dice el dibujo.</span>
           ) : checkCross ? (
-            <span style={{ color: "var(--c-danger)" }}>Check on one sheet, those two clicks landed on different sheets. <button onClick={() => { setCheck([]); setCheckStated(""); }} style={{ marginLeft: 6, padding: "5px 10px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", cursor: "pointer" }}>Reset</button></span>
+            <span style={{ color: "var(--c-danger)" }}>Verifique en una sola hoja: esos dos clics cayeron en hojas distintas. <button onClick={() => { setCheck([]); setCheckStated(""); }} style={{ marginLeft: 6, padding: "5px 10px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", cursor: "pointer" }}>Restablecer</button></span>
           ) : !checkUpp ? (
-            <span style={{ color: "var(--c-danger)" }}>No scale set for {labelFor(checkPanel)}, pick a standard scale or calibrate first, then check it here.</span>
+            <span style={{ color: "var(--c-danger)" }}>No hay escala fijada para {labelFor(checkPanel)}: elija una escala estándar o calibre primero, y luego verifique aquí.</span>
           ) : checkPx <= 0 ? (
-            <span style={{ color: "var(--c-danger)" }}>Those two clicks landed on the same point, click the two <b>ends</b> of a printed dimension.</span>
+            <span style={{ color: "var(--c-danger)" }}>Esos dos clics cayeron en el mismo punto: haga clic en los dos <b>ends</b> de una dimensión impresa.</span>
           ) : (
             <span>
-              measures <b style={{ fontFamily: "var(--f-mono)" }}>{fmtCheckLen(checkFeet, units)}</b> at {stdValue || "custom scale"} · drawing says{" "}
+              measures <b style={{ fontFamily: "var(--f-mono)" }}>{fmtCheckLen(checkFeet, units)}</b> a {stdValue || "escala personalizada"} · el dibujo dice{" "}
               <input name="check-stated-length" value={checkStated} onChange={(e) => setCheckStated(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} placeholder={units === "metric" ? "meters" : `feet (12'6, 6" ok)`} autoFocus style={{ width: 100, padding: 5, borderRadius: 0, border: "1px solid var(--ink-faint)" }} /> {units === "metric" ? "m" : "ft"}
               {checkErrPct != null && (() => {
                 // checkVerdict grades the ROUNDED value the chip displays (and
@@ -9257,16 +9265,16 @@ export default function TakeoffCanvas() {
                 const pct = `${v.shown >= 0 ? "+" : ""}${v.shown.toFixed(1)}%`;
                 return (
                   <b style={{ marginLeft: 8, color: v.grade === "match" ? "var(--c-positive)" : v.grade === "close" ? "var(--c-warning)" : "var(--c-danger)" }}>
-                    {v.grade === "match" ? `matches, scale checks out (${pct})`
-                      : v.grade === "close" ? `off by ${pct}, re-check or recalibrate`
-                      : `off by ${pct}, wrong scale; recalibrate`}
+                    {v.grade === "match" ? `coincide, la escala es correcta (${pct})`
+                      : v.grade === "close" ? `difiere en ${pct}: revise de nuevo o recalibre`
+                      : `difiere en ${pct}: escala errónea, recalibre`}
                   </b>
                 );
               })()}
               {checkStatedFeet > 0 && (
-                <button onClick={recalibrateFromCheck} style={{ marginLeft: 8, padding: "5px 12px", borderRadius: 0, border: "none", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer" }}>Recalibrate to this</button>
+                <button onClick={recalibrateFromCheck} style={{ marginLeft: 8, padding: "5px 12px", borderRadius: 0, border: "none", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer" }}>Recalibrar a esto</button>
               )}
-              <button onClick={() => { setCheck([]); setCheckStated(""); }} style={{ marginLeft: 6, padding: "5px 10px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", cursor: "pointer" }}>Reset</button>
+              <button onClick={() => { setCheck([]); setCheckStated(""); }} style={{ marginLeft: 6, padding: "5px 10px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", cursor: "pointer" }}>Restablecer</button>
             </span>
           )}
         </div>
@@ -9274,22 +9282,22 @@ export default function TakeoffCanvas() {
 
       {/* canvas + issue desk */}
       <div data-canvas-workspace style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0, position: "relative" /* anchors the narrow-screen panel overlay */ }}>
-       {workspaceLayout && <><WorkspaceNavigator open={!focusMode && workspaceNavigationOpen} items={workspaceSheets} current={sheetKey} onSelect={(key) => openSheets([key], false)} onClose={() => setWorkspaceNavigationOpen(false)} onGallery={() => { setView("gallery"); setWorkspaceNavigationOpen(false); }} dockSide={workspaceArrangement.sheets} width={workspaceArrangement.sheetWidth} dockHandle={workspaceDockHandle("sheets", "Sheets")} /><DockTargets dragging={workspaceDragging} /></>}
+       {workspaceLayout && <><WorkspaceNavigator open={!focusMode && workspaceNavigationOpen} items={workspaceSheets} current={sheetKey} onSelect={(key) => openSheets([key], false)} onClose={() => setWorkspaceNavigationOpen(false)} onGallery={() => { setView("gallery"); setWorkspaceNavigationOpen(false); }} dockSide={workspaceArrangement.sheets} width={workspaceArrangement.sheetWidth} dockHandle={workspaceDockHandle("sheets", "Hojas")} /><DockTargets dragging={workspaceDragging} /></>}
        {/* tool rail, machined faces grouped by MCP module (the concept shell).
            Individual tiles replace deck 2's Measure/Cut Out menus; Markup keeps
            its variety flyout on one tile (five markup kinds don't earn five
            faces). Lives in the canvas row so docked panels + canvas reflow
            beside it; survives focus mode, it IS the tool access. */}
        {view === "canvas" && (
-       <nav data-tool-rail data-dock-side={workspaceLayout ? workspaceArrangement.tools : undefined} role="toolbar" aria-label="Tools" style={{ order: workspaceLayout ? workspaceArrangement.tools === "right" ? 30 : -30 : undefined, width: "var(--rail-w)", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--sp-1)", paddingTop: "var(--sp-2)", borderRight: "1px solid var(--ink-faint)", background: "var(--paper-bright)", overflowY: "auto", overflowX: "visible" }}>
+       <nav data-tool-rail data-dock-side={workspaceLayout ? workspaceArrangement.tools : undefined} role="toolbar" aria-label="Herramientas" style={{ order: workspaceLayout ? workspaceArrangement.tools === "right" ? 30 : -30 : undefined, width: "var(--rail-w)", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--sp-1)", paddingTop: "var(--sp-2)", borderRight: "1px solid var(--ink-faint)", background: "var(--paper-bright)", overflowY: "auto", overflowX: "visible" }}>
          {workspaceDockHandle("tools", "Tools")}
          {railLabel("SEL")}
-         {railTile("select", "select", "Select, pick a takeoff, drag points; drag open canvas to pan", "V")}
+         {railTile("select", "select", "Seleccionar: elija un takeoff, arrastre puntos; arrastre el lienzo abierto para desplazar", "V")}
          {railLabel("MEAS")}
          {MEASURE_TOOLS.filter((t) => t.id !== "oneclick" || oneClickEnabled()).map((t) => railTile(t.id, t.icon, t.label, t.shortcut))}
-         {railLabel("CUT")}
+         {railLabel("CORTE")}
          {CUT_TOOLS.map((t) => railTile(t.id, t.icon, t.label, t.shortcut, null, { tint: "var(--c-danger)" }))}
-         {railLabel("MARK")}
+         {railLabel("MARCA")}
          <span ref={(el) => { if (el) markTileTopRef.current = el.getBoundingClientRect().top; }} style={{ position: "relative", display: "inline-flex" }}>
            <ToolMenu
              title="Crear anotación: nube, llamada, texto, resaltado o cota"
@@ -9298,7 +9306,7 @@ export default function TakeoffCanvas() {
              flyout="right"
              face={<Icon name="markup" size={17} />}
              items={[
-               { section: "Markup, notes on the plan, never measured" },
+               { section: "Anotación: notas en el plano, nunca se miden" },
                ...MARKUP_TOOLS.map((t) => ({ id: t.id, icon: t.icon, label: t.label, shortcut: t.shortcut, active: tool === t.id, onSelect: () => { setTool(t.id); setMarkupDraft(null); } })),
              ]}
            />
@@ -9306,7 +9314,7 @@ export default function TakeoffCanvas() {
                (fixed, not absolute: the rail's scroll box would clip it) */}
            {tool === "highlighter" && (
              <div style={{ position: "fixed", left: "calc(var(--rail-w) + 8px)", top: markTileTopRef.current || 200, zIndex: Z.popover, background: "var(--paper-bright)", border: "1px solid var(--ink-faint)", borderRadius: 0, boxShadow: "var(--shadow-pop)", padding: "8px 10px", display: "flex", flexDirection: "column", gap: 7 }}>
-               <div style={{ display: "flex", gap: 6 }} title="Ink">
+               <div style={{ display: "flex", gap: 6 }} title="Tinta">
                  {HL_INKS.map((c) => (
                    <button key={c} onClick={() => setHlStyle((st) => ({ ...st, color: c }))}
                      style={{ width: 16, height: 16, padding: 0, background: c, border: hlStyle.color === c ? "2px solid var(--ink)" : "1px solid var(--ink-faint)", cursor: "pointer" }} />
@@ -9314,7 +9322,7 @@ export default function TakeoffCanvas() {
                </div>
                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                  {HL_SIZES.map(([lbl, px]) => (
-                   <button key={lbl} onClick={() => setHlStyle((st) => ({ ...st, size: px }))} title={`${lbl === "F" ? "Fine" : lbl === "M" ? "Medium" : "Broad"} tip`}
+                   <button key={lbl} onClick={() => setHlStyle((st) => ({ ...st, size: px }))} title={`Punta ${lbl === "F" ? "fina" : lbl === "M" ? "media" : "ancha"}`}
                      style={{ width: 22, height: 20, padding: 0, fontFamily: "var(--f-mono)", fontSize: 10, cursor: "pointer", border: hlStyle.size === px ? "1px solid var(--ink)" : "1px solid var(--ink-faint)", background: hlStyle.size === px ? "var(--ink)" : "transparent", color: hlStyle.size === px ? "var(--paper-bright)" : "var(--ink)" }}>{lbl}</button>
                  ))}
                  <span style={{ width: 1, alignSelf: "stretch", background: "var(--ink-faint)" }} />
@@ -9333,12 +9341,12 @@ export default function TakeoffCanvas() {
          {/* Approval stamp, ink over pencil. Human-only by design: this tile
              is the ONLY way an estimator seal is minted (no MCP tool, no agent
              path), so the mark means a person looked. */}
-         {railTile("approve", "approve", "Approval stamp, the estimator's ink. Click a committed takeoff to approve it, or empty plan to approve the sheet; click a seal to lift it. ⌘Z undoes. Human-only.", null,
+         {railTile("approve", "approve", "Sello de aprobación: la tinta del estimador. Haga clic en un takeoff confirmado para aprobarlo, o en un plano vacío para aprobar la hoja; haga clic en un sello para levantarlo. ⌘Z deshace. Solo personas.", null,
            () => setTool((t) => (t === "approve" ? "select" : "approve")), { tint: tool === "approve" ? "var(--c-positive)" : undefined, armed: tool === "approve" })}
-         {railLabel("READ")}
-         {railTile("textcopy", "copyText", "Copy text, click two corners around a note or schedule; its text goes on your clipboard", null, armCopyText)}
-         {railLabel("CAL")}
-         {railTile("calibrate", "calibrate", "Calibrate, click two points of a known dimension", null)}
+         {railLabel("LEER")}
+         {railTile("textcopy", "copyText", "Copiar texto: haga clic en dos esquinas alrededor de una nota o cuadro; su texto va al portapapeles", null, armCopyText)}
+         {railLabel("CAL.")}
+         {railTile("calibrate", "calibrate", "Calibrar: haga clic en dos puntos de una dimensión conocida", null)}
        </nav>
        )}
        {/* docked LEFT panel, one of Markups/Stamps/RFIs at a time. Reflows the
@@ -9365,18 +9373,18 @@ export default function TakeoffCanvas() {
                  <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "6px 10px", borderBottom: "1px solid var(--ink-faint)" }}>
                    <button
                      onClick={() => { const nv = !showMarkups; setShowMarkups(nv); if (!nv) setSelectedMarkupId(null); }}
-                     title={showMarkups ? "Hide the markup layer on the canvas" : "Show the markup layer on the canvas"}
+                     title={showMarkups ? "Ocultar la capa de anotaciones en el lienzo" : "Mostrar la capa de anotaciones en el lienzo"}
                      style={{ background: "transparent", border: "1px solid var(--ink-faint)", color: "var(--ink)", fontSize: 11, cursor: "pointer", padding: "2px 7px" }}>
-                     {showMarkups ? "Hide layer" : "Show layer"}
+                     {showMarkups ? "Ocultar capa" : "Mostrar capa"}
                    </button>
                  </div>
                  <div style={{ padding: "8px 10px", color: "var(--ink-muted)" }}>
-                   Open <b>Create annotation</b> in the drawing toolbar to choose a cloud, highlight, callout, text note, or dimension, then click the plan to annotate it. <b>🖼 Image</b> marquees a region (two clicks), or use <b>Upload image…</b> in Captures below.
+                   Abra <b>Crear anotación</b> en la barra de dibujo para elegir una nube, resaltado, llamada, nota de texto o cota; luego haga clic en el plano para anotar. <b>🖼 Imagen</b> encierra una región (dos clics), o use <b>Subir imagen…</b> en Capturas, abajo.
                  </div>
                  {markups.filter((m) => panelKeySet.has(m.sheet_id) && m.type !== "image").length === 0 && (
                    <div style={{ padding: "4px 12px 14px", color: "var(--ink-muted)" }}>
-                     No markups {groupKeys.length > 1 ? "on these sheets" : "on this sheet"} yet.
-                     <div style={{ marginTop: 4, fontSize: 11 }}>Images now live in <b>Captures</b> below.</div>
+                     Aún no hay anotaciones {groupKeys.length > 1 ? "en estas hojas" : "en esta hoja"}.
+                     <div style={{ marginTop: 4, fontSize: 11 }}>Las imágenes ahora viven en <b>Capturas</b>, abajo.</div>
                    </div>
                  )}
                  {markups.filter((m) => panelKeySet.has(m.sheet_id) && m.type !== "image").map((m) => (
@@ -9400,7 +9408,7 @@ export default function TakeoffCanvas() {
                            // shown resolved ({{qty}} → "5 EA", #474); the edit box keeps the template
                            const rm = resolveMarkup(m, noteQtyLabels);
                            const warn = rm.unresolved.length > 0;
-                           return <span title={warn ? `Can't fill ${rm.unresolved.join(", ")}: link this note to a condition that has a quantity` : (rm.m !== m ? m.text : undefined)} style={{ flex: 1, color: warn ? "var(--c-danger)" : "var(--ink)" }}>{m.type === "svg" ? <em style={{ color: "var(--ink-muted)" }}>(vector symbol)</em> : ([m.type === "dimension" && Number(m.len_ft) > 0 ? dimLabel(m.len_ft) : "", rm.m.text].filter(Boolean).join(" · ") || <em style={{ color: "var(--ink-muted)" }}>(no text)</em>)}</span>;
+                           return <span title={warn ? `No se puede completar ${rm.unresolved.join(", ")}: vincule esta nota a una condición que tenga cantidad` : (rm.m !== m ? m.text : undefined)} style={{ flex: 1, color: warn ? "var(--c-danger)" : "var(--ink)" }}>{m.type === "svg" ? <em style={{ color: "var(--ink-muted)" }}>(símbolo vectorial)</em> : ([m.type === "dimension" && Number(m.len_ft) > 0 ? dimLabel(m.len_ft) : "", rm.m.text].filter(Boolean).join(" · ") || <em style={{ color: "var(--ink-muted)" }}>(sin texto)</em>)}</span>;
                          })()
                        )}
                        {m.type !== "svg" && <button onClick={(e) => { e.stopPropagation(); setPanelEditId((id) => (id === m.id ? null : m.id)); }} title="Editar texto" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)" }}>✎</button>}
@@ -9418,7 +9426,7 @@ export default function TakeoffCanvas() {
                        </select>
                        {/* line weight, a multiplier over the element's base stroke width (default
                            ×1, clamped 0.5 a 3); additive, absent = ×1 so legacy markups are unchanged */}
-                       <span style={{ fontSize: 10.5, color: "var(--ink-muted)", marginLeft: 4 }}>Weight</span>
+                       <span style={{ fontSize: 10.5, color: "var(--ink-muted)", marginLeft: 4 }}>Grosor</span>
                        <select name="markup-weight" value={String(snapWeight(m.weight))} onChange={(e) => updateMarkup(m.id, { weight: Number(e.target.value) })} title="Grosor de línea (× base)" style={{ fontSize: 11, border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", padding: "1px 3px" }}>
                          {WEIGHT_STEPS.map((wv) => <option key={wv} value={wv}>{wv}×</option>)}
                        </select>
@@ -9442,7 +9450,7 @@ export default function TakeoffCanvas() {
                          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 7, flexWrap: "wrap" }}>
                            {lc ? (
                              <>
-                               <span title={`Annotation is about ${lc.finish_tag}`}
+                               <span title={`La anotación trata de ${lc.finish_tag}`}
                                  style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--f-mono)", fontSize: 11, fontWeight: 700 }}>
                                  <span style={{ width: 9, height: 9, background: lc.color, border: "1px solid var(--ink-faint)" }} />
                                  {lc.finish_tag}
@@ -9453,7 +9461,7 @@ export default function TakeoffCanvas() {
                            ) : conditions.length > 0 && (
                              <select name="link-condition" value="" onChange={(e) => { if (e.target.value) linkCondition(m, e.target.value); }}
                                title="Vincular esta anotación a una condición" style={{ ...ctrl, background: "var(--paper-bright)", maxWidth: 170 }}>
-                               <option value="">Attach to condition…</option>
+                               <option value="">Adjuntar a una condición…</option>
                                {conditions.map((c) => <option key={c.id} value={c.id}>{c.finish_tag}</option>)}
                              </select>
                            )}
@@ -9478,7 +9486,7 @@ export default function TakeoffCanvas() {
                                {rfis.length > 0 && (
                                  <select name="link-rfi" value="" onChange={(e) => { if (e.target.value) linkRfi(m, e.target.value); }}
                                    title="Vincular esta anotación a un RFI existente" style={{ ...ctrl, background: "var(--paper-bright)", maxWidth: 150 }}>
-                                   <option value="">Link existing…</option>
+                                   <option value="">Vincular existente…</option>
                                    {rfis.map((r) => <option key={r.id} value={r.id}>{r.number}{r.subject ? ` · ${r.subject}` : ""}</option>)}
                                  </select>
                                )}
@@ -9498,21 +9506,19 @@ export default function TakeoffCanvas() {
 , see isTraceable). */}
                  <div style={{ borderTop: "2px solid var(--ink-faint)" }}>
                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 10px", borderBottom: "1px solid var(--ink-faint)", gap: 8 }}>
-                     <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Captures</span>
+                     <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Capturas</span>
                      {/* hidden input reused by the Upload button, re-encoded through addImageFromFile */}
                      <input name="markup-image-file" ref={imageInputRef} type="file" accept="image/*" style={{ display: "none" }}
                        onChange={(e) => { const f = e.target.files?.[0]; if (f) addImageFromFile(f); e.target.value = ""; }} />
                      <button
                        onClick={() => imageInputRef.current?.click()}
                        title="Subir una imagen (PNG o JPEG) como anotación flotante en la hoja actual"
-                       style={{ background: "transparent", border: "1px solid var(--ink-faint)", color: "var(--ink)", fontSize: 11, cursor: "pointer", padding: "2px 7px" }}>
-                       Upload image…
-                     </button>
+                       style={{ background: "transparent", border: "1px solid var(--ink-faint)", color: "var(--ink)", fontSize: 11, cursor: "pointer", padding: "2px 7px" }}>Subir imagen…</button>
                    </div>
                    {/* always-on name search, mirrors the condQuery idiom
                        (TakeoffsPanel ~:718/763/1054-1056) */}
                    <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", borderBottom: "1px solid var(--ink-faint)" }}>
-                     <input name="capture-filter" value={captureQuery} onChange={(e) => setCaptureQuery(e.target.value)} placeholder="filter captures…"
+                     <input name="capture-filter" value={captureQuery} onChange={(e) => setCaptureQuery(e.target.value)} placeholder="filtrar capturas…"
                        style={{ flex: 1, minWidth: 0, padding: "4px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", fontSize: 12 }} />
                      {captureQuery && <button onClick={() => setCaptureQuery("")} title="Limpiar el filtro" style={{ border: "none", background: "none", color: "var(--ink-muted)", cursor: "pointer", fontSize: 13, padding: 0 }}>×</button>}
                    </div>
@@ -9524,10 +9530,10 @@ export default function TakeoffCanvas() {
                      const allCaptures = filterCaptures(markups, "");
                      const captures = filterCaptures(allCaptures, captureQuery);
                      if (allCaptures.length === 0) {
-                       return <div style={{ padding: "4px 12px 14px", color: "var(--ink-muted)" }}>No captures yet. Marquee a region with 🖼 or use Upload image… above.</div>;
+                       return <div style={{ padding: "4px 12px 14px", color: "var(--ink-muted)" }}>Aún no hay capturas. Encierre una región con 🖼 o use Subir imagen… arriba.</div>;
                      }
                      if (captures.length === 0) {
-                       return <div style={{ padding: "4px 12px 14px", color: "var(--ink-muted)" }}>No captures match “{captureQuery}”.</div>;
+                       return <div style={{ padding: "4px 12px 14px", color: "var(--ink-muted)" }}>Ninguna captura coincide con «{captureQuery}».</div>;
                      }
                      return captures.map((m) => {
                        // Captures-only gate for ◎ + the caption toggle — legacy
@@ -9553,11 +9559,11 @@ export default function TakeoffCanvas() {
                                  onBlur={(e) => { updateMarkup(m.id, { text: e.currentTarget.value.trim() }); setPanelEditId(null); }}
                                  style={{ flex: 1, minWidth: 0, fontSize: 12.5, padding: "1px 4px", border: "1px solid var(--cobalt)", borderRadius: 0, outline: "none" }} />
                              ) : (
-                               <span style={{ flex: "0 1 auto", minWidth: 0, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.text || <em style={{ color: "var(--ink-muted)" }}>(no name)</em>}</span>
+                               <span style={{ flex: "0 1 auto", minWidth: 0, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.text || <em style={{ color: "var(--ink-muted)" }}>(sin nombre)</em>}</span>
                              )}
                              <button onClick={(e) => { e.stopPropagation(); setPanelEditId((id) => (id === m.id ? null : m.id)); }} title="Editar nombre" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)" }}>✎</button>
                              <span style={{ color: "var(--ink-faint)" }}>·</span>
-                             <span title={`Currently on ${sheetBaseLabel(m.sheet_id)}`} style={{ fontSize: 10.5, color: "var(--ink-muted)", padding: "1px 6px", border: "1px solid var(--ink-faint)", borderRadius: 4, background: "var(--paper-cream)", whiteSpace: "nowrap" }}>{sheetBaseLabel(m.sheet_id)}</span>
+                             <span title={`Actualmente en ${sheetBaseLabel(m.sheet_id)}`} style={{ fontSize: 10.5, color: "var(--ink-muted)", padding: "1px 6px", border: "1px solid var(--ink-faint)", borderRadius: 4, background: "var(--paper-cream)", whiteSpace: "nowrap" }}>{sheetBaseLabel(m.sheet_id)}</span>
                              {/* legacy/imported captures can predate created_at (see
                                  imageProvenance's own guard on the same field), a
                                  blank relativeAge must not leave a dangling "·" */}
@@ -9571,7 +9577,7 @@ export default function TakeoffCanvas() {
                                ) : null;
                              })()}
                              <button onClick={(e) => { e.stopPropagation(); setPinSelectedId(m.id); setPinsOpen(true); }} title="Dejar esta captura fija junto a su takeoff al cambiar de hoja">Fijar</button>
-                             {!m.reference_only && (<button onClick={(e) => { e.stopPropagation(); beginPlace(m); }} title={panelKeySet.has(m.sheet_id) ? "Reposition: centers the view on the image, then it follows the cursor, click the sheet to drop it" : "Place this image on the current sheet, it follows the cursor until you click to drop it"} style={{ border: "1px solid var(--ink-faint)", background: placingImageId === m.id ? "var(--cobalt)" : "transparent", color: placingImageId === m.id ? "#fff" : "var(--cobalt)", cursor: "pointer", fontSize: 11, padding: "1px 7px" }}>Place</button>)}
+                             {!m.reference_only && (<button onClick={(e) => { e.stopPropagation(); beginPlace(m); }} title={panelKeySet.has(m.sheet_id) ? "Reubicar: centra la vista en la imagen y luego sigue al cursor; haga clic en la hoja para soltarla" : "Colocar esta imagen en la hoja actual: sigue al cursor hasta que haga clic para soltarla"} style={{ border: "1px solid var(--ink-faint)", background: placingImageId === m.id ? "var(--cobalt)" : "transparent", color: placingImageId === m.id ? "#fff" : "var(--cobalt)", cursor: "pointer", fontSize: 11, padding: "1px 7px" }}>Colocar</button>)}
 
                              {traceable && (
                                <button onClick={(e) => { e.stopPropagation(); traceSource(m); }} title="Ir a la hoja de origen y resaltar la región capturada" style={{ border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11, padding: "1px 7px", whiteSpace: "nowrap" }}>
@@ -9582,7 +9588,7 @@ export default function TakeoffCanvas() {
                                <button onClick={(e) => { e.stopPropagation(); updateMarkup(m.id, { source_label: !m.source_label }); }}
                                  title="Mostrar/ocultar la leyenda de origen sobre la imagen"
                                  style={{ padding: "2px 7px", border: `1px solid ${m.source_label ? "var(--cobalt)" : "var(--ink-faint)"}`, background: m.source_label ? "var(--cobalt)" : "transparent", color: m.source_label ? "var(--paper-bright)" : "var(--ink-muted)", cursor: "pointer", fontSize: 10.5, fontFamily: "var(--f-mono)", lineHeight: 1.4 }}>
-                                 caption
+                                 leyenda
                                </button>
                              )}
                              <button onClick={(e) => { e.stopPropagation(); deleteMarkup(m.id); }} title="Eliminar captura" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--c-danger)" }}>🗑</button>
@@ -9597,7 +9603,7 @@ export default function TakeoffCanvas() {
                                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 7, flexWrap: "wrap" }}>
                                  {lc ? (
                                    <>
-                                     <span title={`Annotation is about ${lc.finish_tag}`}
+                                     <span title={`La anotación trata de ${lc.finish_tag}`}
                                        style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: "var(--f-mono)", fontSize: 11, fontWeight: 700 }}>
                                        <span style={{ width: 9, height: 9, background: lc.color, border: "1px solid var(--ink-faint)" }} />
                                        {lc.finish_tag}
@@ -9608,7 +9614,7 @@ export default function TakeoffCanvas() {
                                  ) : conditions.length > 0 && (
                                    <select name="link-condition" value="" onChange={(e) => { if (e.target.value) linkCondition(m, e.target.value); }}
                                      title="Vincular esta anotación a una condición" style={{ ...ctrl, background: "var(--paper-bright)", maxWidth: 170 }}>
-                                     <option value="">Attach to condition…</option>
+                                     <option value="">Adjuntar a una condición…</option>
                                      {conditions.map((c) => <option key={c.id} value={c.id}>{c.finish_tag}</option>)}
                                    </select>
                                  )}
@@ -9634,7 +9640,7 @@ export default function TakeoffCanvas() {
                                      {rfis.length > 0 && (
                                        <select name="link-rfi" value="" onChange={(e) => { if (e.target.value) linkRfi(m, e.target.value); }}
                                          title="Vincular esta anotación a un RFI existente" style={{ ...ctrl, background: "var(--paper-bright)", maxWidth: 150 }}>
-                                         <option value="">Link existing…</option>
+                                         <option value="">Vincular existente…</option>
                                          {rfis.map((r) => <option key={r.id} value={r.id}>{r.number}{r.subject ? ` · ${r.subject}` : ""}</option>)}
                                        </select>
                                      )}
@@ -9709,7 +9715,7 @@ export default function TakeoffCanvas() {
             <input name="inline-editor" autoComplete="off" ref={editorInputRef} autoFocus defaultValue={editor.value}
               onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); finishEditor(true); } else if (e.key === "Escape") { e.preventDefault(); finishEditor(false); } }}
               onBlur={() => finishEditor(true)}
-              placeholder="Type, Enter to place · Esc cancels"
+              placeholder="Escriba, Intro para colocar · Esc cancela"
               style={{ position: "absolute", left: editor.left, top: editor.top, zIndex: 9, minWidth: 160, padding: "3px 6px", font: "13px var(--f-body, sans-serif)", color: "var(--ink)", background: "var(--paper-bright)", border: "1px solid var(--cobalt)", boxShadow: "0 2px 10px rgba(0,0,0,.18)", borderRadius: 0, cursor: "text", outline: "none" }} />
           )}
           {/* No permanent will-change here: the stage is compositor-promoted only
@@ -10157,7 +10163,7 @@ export default function TakeoffCanvas() {
                           <g key={a.id} style={{ pointerEvents: "none" }}>
                             <path d={dia(1)} fill={backing} stroke={ink} strokeWidth={rad * 0.07} strokeLinejoin="round" />
                             <path d={dia(0.72)} fill="none" stroke={ink} strokeWidth={rad * 0.035} strokeLinejoin="round" />
-                            <text x={cx} y={cy} fill={ink} fontSize={rad * 0.3} fontWeight="700" letterSpacing={rad * 0.02} textAnchor="middle" dominantBaseline="central">AGENT</text>
+                            <text x={cx} y={cy} fill={ink} fontSize={rad * 0.3} fontWeight="700" letterSpacing={rad * 0.02} textAnchor="middle" dominantBaseline="central">AGENTE</text>
                           </g>
                         );
                       }
@@ -10247,13 +10253,13 @@ export default function TakeoffCanvas() {
                       const evBits = [
                         ev.schedule_row_tag ? `schedule ${ev.schedule_row_tag}` : "",
                         ev.matched_text && ev.matched_text !== ev.schedule_row_tag ? `matched "${ev.matched_text}"` : "",
-                        Array.isArray(ev.seed_norm) ? "seeded by one-click" : "",
+                        Array.isArray(ev.seed_norm) ? "sembrada por One-Click" : "",
                       ].filter(Boolean).join(", ");
                       return (
                         <g key={ap.id} style={{ pointerEvents: clickable ? "auto" : "none", cursor: clickable ? "pointer" : undefined }}
                           onPointerDown={(e) => { if (clickable) e.stopPropagation(); }}
                           onClick={(e) => { if (clickable) { e.stopPropagation(); acceptAgentProposal(ap.id); } }}>
-                          <title>{`Agent proposal, ${condById[ap.condition_id]?.finish_tag || "?"}${ded ? " (deduct)" : ""}, ${fa(ap.area_sf)}. ${evBits ? `Evidence: ${evBits}. ` : ""}Click to accept (⏎ accepts all visible); reject from the Agent panel.`}</title>
+                          <title>{`Propuesta del agente, ${condById[ap.condition_id]?.finish_tag || "?"}${ded ? " (deducción)" : ""}, ${fa(ap.area_sf)}. ${evBits ? `Evidencia: ${evBits}. ` : ""}Clic para aceptar (⏎ acepta todas las visibles); rechace desde el panel Agente.`}</title>
                           <path d={[pts, ...(ap.verts_norm_holes || []).map((h) => h.map(([x, y]) => [x * p.img.w, y * p.img.h]))].map((ring) => `M${ring.map((q) => q.join(",")).join("L")}Z`).join(" ")} fillRule="evenodd"
                             fill={ded ? "rgba(176,58,38,.10)" : "rgba(31,63,199,.07)"}
                             stroke={col} strokeOpacity={0.9} strokeWidth={2 / s}
@@ -10275,7 +10281,7 @@ export default function TakeoffCanvas() {
                       const pts = c.verts_norm.map(([x, y]) => [x * p.img.w, y * p.img.h]);
                       return (
                         <g key={`rulecand-${i}`} style={{ pointerEvents: "none" }}>
-                          <title>{`Rule candidate, −${fa(c.area_sf)} deduct. ${ruleStage.rule.label}.`}</title>
+                          <title>{`Candidato de la regla: deducción de −${fa(c.area_sf)}. ${ruleStage.rule.label}.`}</title>
                           <polygon points={pts.map((q) => q.join(",")).join(" ")}
                             fill="rgba(176,58,38,.10)" stroke="#b03a26" strokeOpacity={0.9}
                             strokeWidth={2 / s} strokeDasharray={`${3.5 / s} ${3.5 / s}`} strokeLinejoin="round" />
@@ -10305,7 +10311,7 @@ export default function TakeoffCanvas() {
                           onPointerDown={(e) => beginRollCut(e, ct, "body")}
                           onPointerMove={moveRollCut} onPointerUp={endRollCut} onPointerCancel={endRollCut}
                           onDoubleClick={() => rollEdit && resetRollCut(ct)}>
-                          <title>{`Cut ${ct.num}, ${condById[ct.condId]?.finish_tag || "?"}: ${fmtCheckLen(ct.lenFt, units)} × ${fmtCheckLen(ct.widthFt, units)}${ct.multi ? ` · lane ${ct.laneIndex + 1}/${ct.laneCount}` : ""}${ct.overRoll ? " · LONGER THAN ONE ROLL, needs a cross-seam" : ""}${rollEdit ? " · drag to slide, pull the square handles to resize, double-click to reset" : ""}`}</title>
+                          <title>{`Corte ${ct.num}, ${condById[ct.condId]?.finish_tag || "?"}: ${fmtCheckLen(ct.lenFt, units)} × ${fmtCheckLen(ct.widthFt, units)}${ct.multi ? ` · carril ${ct.laneIndex + 1}/${ct.laneCount}` : ""}${ct.overRoll ? " · MÁS LARGO QUE UN ROLLO, requiere un traslape cruzado" : ""}${rollEdit ? " · arrastre para deslizar, tire de los tiradores cuadrados para cambiar el tamaño, doble clic para restablecer" : ""}`}</title>
                           <rect x={ct.x} y={ct.y} width={ct.w} height={ct.h}
                             fill={col + "38"} stroke={strokeCol}
                             strokeWidth={(ct.overRoll ? 2.6 : 1.8) / s}
@@ -10547,7 +10553,7 @@ export default function TakeoffCanvas() {
                 // "at 1/8″ = 1′-0″" reads right for a scale string; a source word ("calibrated", "custom") reads better parenthesized
                 const scaleTxt = /[=:]/.test(scaleGuide.label) ? `at ${scaleGuide.label}` : `(${scaleGuide.label})`;
                 const lbl = units === "metric" ? `${nUnits} m ${scaleTxt}` : `${scaleGuide.feet}′ ${scaleTxt}`;
-                const cap = units === "metric" ? "a door is about 0.9 m, if this bar looks wildly off, the scale is wrong" : "a door opening is about 3′, if this bar looks wildly off, the scale is wrong";
+                const cap = units === "metric" ? "una puerta mide unos 0.9 m: si esta barra se ve muy desviada, la escala está mal" : "un vano de puerta mide unos 3′: si esta barra se ve muy desviada, la escala está mal";
                 return (
                   <g style={{ pointerEvents: "none" }}>
                     <line x1={gx} y1={gy} x2={gx + scaleGuide.px} y2={gy} stroke="#fff" strokeWidth={7 / z} strokeLinecap="round" />
@@ -10573,8 +10579,8 @@ export default function TakeoffCanvas() {
 
           {status !== "ready" && (
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-muted)", fontSize: 15 }}>
-              {status === "loading" && "Loading sheets…"}
-              {status === "rendering" && "Rendering sheet…"}
+              {status === "loading" && "Cargando hojas…"}
+              {status === "rendering" && "Dibujando la hoja…"}
               {status === "empty" && "Aún no hay planos: haga clic en «Abrir planos» o arrastre un plano al lienzo."}
               {status === "error" && <span style={{ color: "var(--c-danger)" }}>Error: {err}</span>}
             </div>
@@ -10632,21 +10638,19 @@ export default function TakeoffCanvas() {
         {(ruleOffer || ruleStage) && (
           <div style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 10, padding: "8px 14px", background: "var(--paper-bright)", border: "1.5px dashed var(--c-danger)", boxShadow: "var(--shadow-1)", fontSize: 12.5, color: "var(--ink)", maxWidth: "100%" }}>
             {ruleOffer ? (<>
-              <span>Make this a rule for all <b>{ruleOffer.tag}</b> rooms? Excludes enclosed regions under <b>{ruleOffer.seed.max_area_sf} SF</b>.</span>
+              <span>Hacer de esto una regla para todas las <b>{ruleOffer.tag}</b> recintos? Excluye las regiones cerradas de menos de <b>{ruleOffer.seed.max_area_sf} SF</b>.</span>
               <button onClick={previewRule}
-                style={{ padding: "4px 12px", background: "var(--paper-bright)", border: "1.5px solid var(--cobalt)", color: "var(--cobalt)", fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>
-                Preview</button>
+                style={{ padding: "4px 12px", background: "var(--paper-bright)", border: "1.5px solid var(--cobalt)", color: "var(--cobalt)", fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Vista previa</button>
               <button onClick={() => setRuleOffer(null)}
-                style={{ padding: "4px 12px", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)", color: "var(--ink-muted)", fontSize: 12, cursor: "pointer" }}>
-                Dismiss</button>
+                style={{ padding: "4px 12px", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)", color: "var(--ink-muted)", fontSize: 12, cursor: "pointer" }}>Descartar</button>
             </>) : (<>
-              <span><b>{ruleStage.candidates.length}</b> matching region{ruleStage.candidates.length === 1 ? "" : "s"} staged as dashed deducts, {ruleStage.rule.label}.</span>
+              <span><b>{ruleStage.candidates.length}</b> regi{ruleStage.candidates.length === 1 ? "ón" : "ones"} coincidente{ruleStage.candidates.length === 1 ? "" : "s"} preparada{ruleStage.candidates.length === 1 ? "" : "s"} como deducciones punteadas: {ruleStage.rule.label}.</span>
               <button onClick={applyStagedRule}
                 style={{ padding: "4px 12px", background: "var(--paper-bright)", border: "1.5px solid var(--cobalt)", color: "var(--cobalt)", fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>
-                Apply {ruleStage.candidates.length}</button>
+                Aplicar {ruleStage.candidates.length}</button>
               <button onClick={() => setRuleStage(null)}
                 style={{ padding: "4px 12px", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)", color: "var(--ink-muted)", fontSize: 12, cursor: "pointer" }}>
-                Cancel</button>
+                Cancelar</button>
             </>)}
           </div>
         )}
@@ -10664,20 +10668,20 @@ export default function TakeoffCanvas() {
             forty; un-batched pending shapes keep the original pill. */}
         {pendingGroups.map((g) => {
           const n = g.ids.length;
-          const label = g.proposal ? g.proposal.label : `${n} proposed shape${n === 1 ? "" : "s"}`;
+          const label = g.proposal ? g.proposal.label : `${n} figura${n === 1 ? "" : "s"} propuesta${n === 1 ? "" : "s"}`;
           const key = g.proposal ? g.proposal.id : "_loose";
           return (
             <div key={key} data-proposal-pill={key} style={{ pointerEvents: "auto", display: "flex", alignItems: "stretch", background: "var(--paper-bright)", border: "1.5px dashed var(--cobalt)", boxShadow: "var(--shadow-1)", fontSize: 12.5, fontWeight: 600, color: "var(--cobalt)" }}>
               <button onClick={() => acceptProposalGroup(g)}
                 title={g.proposal
-                  ? `Proposal “${g.proposal.label}”${g.proposal.rationale ? `, ${g.proposal.rationale}` : ""}. ${n} shape${n === 1 ? "" : "s"} render${n === 1 ? "s" : ""} dashed pending your review. Accept makes the whole batch ink in one step (⌘Z undoes).`
-                  : `${n} machine-proposed shape${n === 1 ? "" : "s"} render${n === 1 ? "s" : ""} dashed pending your review. Accept makes them ink (⌘Z undoes); to reject one, select it and press Delete.`}
+                  ? `Propuesta «${g.proposal.label}»${g.proposal.rationale ? `: ${g.proposal.rationale}` : ""}. ${n} figura${n === 1 ? "" : "s"} se muestra${n === 1 ? "" : "n"} punteada${n === 1 ? "" : "s"} pendiente${n === 1 ? "" : "s"} de su revisión. Aceptar las convierte en tinta de un solo paso (⌘Z deshace).`
+                  : `${n} figura${n === 1 ? "" : "s"} propuesta${n === 1 ? "" : "s"} por máquina se muestra${n === 1 ? "" : "n"} punteada${n === 1 ? "" : "s"} pendiente${n === 1 ? "" : "s"} de su revisión. Aceptar las convierte en tinta (⌘Z deshace); para rechazar una, selecciónela y presione Suprimir.`}
                 style={{ padding: "6px 12px", border: "none", background: "transparent", color: "inherit", font: "inherit", cursor: "pointer" }}>
-                Accept {g.proposal ? <>“{label}” <span style={{ fontWeight: 500, color: "var(--ink-muted)" }}>· {n}</span></> : label}
+                Aceptar {g.proposal ? <>«{label}» <span style={{ fontWeight: 500, color: "var(--ink-muted)" }}>· {n}</span></> : label}
               </button>
               <button onClick={() => rejectProposalGroup(g)}
-                title={`Reject ${g.proposal ? `“${g.proposal.label}”` : "these shapes"}, removes ${n === 1 ? "the pending shape" : `all ${n} pending shapes`} (⌘Z restores).`}
-                aria-label="Reject proposal"
+                title={`Rechazar ${g.proposal ? `«${g.proposal.label}»` : "estas figuras"}: quita ${n === 1 ? "la figura pendiente" : `las ${n} figuras pendientes`} (⌘Z restaura).`}
+                aria-label="Rechazar propuesta"
                 style={{ padding: "6px 9px", border: "none", borderLeft: "1px dashed var(--cobalt)", background: "transparent", color: "var(--c-danger)", font: "inherit", cursor: "pointer" }}>✕</button>
             </div>
           );
@@ -10704,7 +10708,7 @@ export default function TakeoffCanvas() {
           ? { left: 10, right: 10, bottom: 64, maxHeight: "36%", padding: "8px 12px" }
           : { right: RAIL_CLEAR, top: CANVAS_EDGE, minWidth: 200, maxWidth: 260, maxHeight: `calc(100% - ${2 * CANVAS_EDGE}px)`, padding: "12px 16px" }),
           background: "var(--paper-bright)", border: "1px solid var(--ink-faint)", borderRadius: 0, overflowY: "auto", boxShadow: "var(--shadow-pop)", fontVariantNumeric: "tabular-nums", zIndex: Z.canvasUi }}>
-          <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, opacity: 0.55, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool === "zone" ? "Zone check" : (aCond?.finish_tag || "No condition")}</div>
+          <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, opacity: 0.55, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool === "zone" ? "Chequeo de zona" : (aCond?.finish_tag || "Sin condición")}</div>
           {tool === "oneclick" && proposal?.regions.length ? (() => {
             const pos = proposal.regions.filter((r) => r.kind === "pos");
             const neg = proposal.regions.filter((r) => r.kind === "neg");
@@ -10713,10 +10717,10 @@ export default function TakeoffCanvas() {
               <>
                 <div style={{ fontSize: 22, fontWeight: 700, color: "var(--cobalt)" }}>{num(areaVal(sf, units))} <span style={{ fontSize: 13, fontWeight: 600 }}>{areaUnit(units)} selected</span></div>
                 <div style={{ fontSize: 12.5, color: "var(--ink-secondary)", marginTop: 2 }}>{pos.length} space{pos.length === 1 ? "" : "s"}{neg.length ? ` − ${neg.length} cutout${neg.length === 1 ? "" : "s"}` : ""}{units === "metric" ? "" : ` · ${num(sf / 9)} SY`}</div>
-                <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 4 }}>{ocSel ? "drag to move · Delete drops this point · Esc deselects" : "hover a fill to edit: drag a corner or edge · shift-click an edge adds a point"}</div>
-                <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }}>click adds a space · ⌥-click carves a cutout · ⏎ Create · ⌫ undo · Esc cancel</div>
+                <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 4 }}>{ocSel ? "arrastre para mover · Suprimir quita este punto · Esc deselecciona" : "pase sobre un relleno para editar: arrastre una esquina o un borde · Mayús+clic en un borde agrega un punto"}</div>
+                <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }}>clic agrega un espacio · ⌥+clic abre un recorte · ⏎ Crear · ⌫ deshacer · Esc cancelar</div>
                 {proposal.regions.some((r) => r.rt) && (
-                  <div style={{ fontSize: 11.5, color: "var(--c-warning)", marginTop: 4 }}>Traced from scan pixels, verify edges before Create.</div>
+                  <div style={{ fontSize: 11.5, color: "var(--c-warning)", marginTop: 4 }}>Trazado a partir de píxeles del escaneo: verifique los bordes antes de Crear.</div>
                 )}
               </>
             );
@@ -10728,15 +10732,15 @@ export default function TakeoffCanvas() {
                   <div style={{ fontSize: 22, fontWeight: 700, color: "var(--ink)" }}>{num(areaVal(liveLF * condH, units))} <span style={{ fontSize: 13, fontWeight: 600 }}>{areaUnit(units)} wall</span></div>
                   <div style={{ fontSize: 12.5, color: "var(--ink-secondary)", marginTop: 2 }}>{fl(liveLF)} × {num(heightVal(condH, units), 2)} {heightUnit(units)}</div>
                 </>
-              ) : <div style={{ fontSize: 12.5, color: "var(--c-danger)" }}>Set a height for {aCond?.finish_tag || "this condition"}, H in the condition editor</div>;
+              ) : <div style={{ fontSize: 12.5, color: "var(--c-danger)" }}>Fije una altura para {aCond?.finish_tag || "esta condición"}: H en el editor de la condición</div>;
             })()
           ) : tool === "zone" && poly.length >= 1 ? (
             zoneTraceCross ? (
-              <span style={{ color: "var(--c-danger)", fontSize: 12.5 }}>Zone on one sheet, that point landed on a different sheet. Finish is disabled; Esc or Undo last point to fix it.</span>
+              <span style={{ color: "var(--c-danger)", fontSize: 12.5 }}>Zona en una sola hoja: ese punto cayó en otra hoja. Terminar está deshabilitado; Esc o Deshacer último punto para corregir.</span>
             ) : (
               <>
-                {liveArea != null && poly.length >= 3 && <div style={{ fontSize: 22, fontWeight: 700, color: "var(--cobalt)" }}>{num(areaVal(liveArea, units))} <span style={{ fontSize: 13, fontWeight: 600 }}>{areaUnit(units)} in zone</span></div>}
-                <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 4 }}>⏎, double-click, or the Finish button closes the zone and lists everything inside · Esc cancels</div>
+                {liveArea != null && poly.length >= 3 && <div style={{ fontSize: 22, fontWeight: 700, color: "var(--cobalt)" }}>{num(areaVal(liveArea, units))} <span style={{ fontSize: 13, fontWeight: 600 }}>{areaUnit(units)} en la zona</span></div>}
+                <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 4 }}>⏎, doble clic o el botón Terminar cierra la zona y lista todo lo que hay dentro · Esc cancela</div>
               </>
             )
           ) : liveArea != null && poly.length >= 3 ? (
@@ -10744,8 +10748,8 @@ export default function TakeoffCanvas() {
               <div style={{ fontSize: 22, fontWeight: 700, color: tool === "deduct" ? "var(--c-danger)" : "var(--ink)" }}>{tool === "deduct" ? "−" : ""}{num(areaVal(liveArea, units))} <span style={{ fontSize: 13, fontWeight: 600 }}>{areaUnit(units)}</span></div>
               <div style={{ fontSize: 12.5, color: "var(--ink-secondary)", marginTop: 2 }}>{units === "metric" ? `${fl(livePerim)} perim` : `${num(liveArea / 9)} SY  ·  ${num(livePerim)} LF perim`}</div>
               {dimsLine(fdims(curveIdx.length ? flattenArcRing(poly, curveIdx, !bowOpen) : poly, liveUpp), condH)}
-              {condH > 0 && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }}>@H {num(heightVal(condH, units), 2)}{units === "metric" ? " m" : "′"}: {fa(livePerim * condH)} vert · {fv(liveArea * condH)}</div>}
-              {CURVABLE.has(tool) && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 4 }}>{bowOpen ? "Bow set, click the far END of the arc" : curveMode && poly.length ? "Click a point ON the bow, then its far end" : curveIdx.length ? `${curveIdx.length} arc${curveIdx.length === 1 ? "" : "s"}, each one a true circle through 3 points` : "Q or Draft ▾ Curve draws an arc · ⌥-click flips one point"}</div>}
+              {condH > 0 && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }}>@H {num(heightVal(condH, units), 2)}{units === "metric" ? " m" : "′"}: {fa(livePerim * condH)} vert. · {fv(liveArea * condH)}</div>}
+              {CURVABLE.has(tool) && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 4 }}>{bowOpen ? "Arco iniciado: haga clic en el EXTREMO final del arco" : curveMode && poly.length ? "Haga clic en un punto SOBRE el arco y luego en su extremo final" : curveIdx.length ? `${curveIdx.length} arco${curveIdx.length === 1 ? "" : "s"}: cada uno es un círculo verdadero por 3 puntos` : "Q o Borrador ▾ Curva dibuja un arco · ⌥+clic invierte un punto"}</div>}
             </>
           ) : selShape ? (
             // #283 — a FINISHED takeoff reads the same as it did mid-trace.
@@ -10761,8 +10765,8 @@ export default function TakeoffCanvas() {
                 <div style={{ fontSize: 22, fontWeight: 700, color: col || "var(--ink)" }}>{txt} <span style={{ fontSize: 13, fontWeight: 600 }}>{unit}</span></div>
               );
               const sub = (txt) => <div style={{ fontSize: 12.5, color: "var(--ink-secondary)", marginTop: 2 }}>{txt}</div>;
-              const foot = <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 4 }}>{shTag} · selected{selShape.origin === "agent" ? " · agent" : ""}</div>;
-              if (selShape.measure_role === "count") return <>{big(num(c.count || 1, 0), "EA")}{foot}</>;
+              const foot = <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 4 }}>{shTag} · seleccionada{selShape.origin === "agent" ? " · agente" : ""}</div>;
+              if (selShape.measure_role === "count") return <>{big(num(c.count || 1, 0), "UND")}{foot}</>;
               if (selShape.measure_role === "linear") {
                 // #441 — a run with vertical legs reads as its parts: plan + ↑rise + ↓drop = total
                 const vert = Number(c.vertical_lf) || 0;
@@ -10785,7 +10789,7 @@ export default function TakeoffCanvas() {
                   {big(`${ded ? "−" : ""}${num(areaVal(a, units))}`, areaUnit(units), ded ? "var(--c-danger)" : undefined)}
                   {sub(units === "metric" ? `${fl(lf)} perim` : `${num(a / 9)} SY  ·  ${num(lf)} LF perim`)}
                   {dimsLine(fdims(shPx, shUpp), shH)}
-                  {shH > 0 && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }}>@H {num(heightVal(shH, units), 2)}{units === "metric" ? " m" : "′"}: {fa(lf * shH)} vert · {fv(a * shH)}</div>}
+                  {shH > 0 && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }}>@H {num(heightVal(shH, units), 2)}{units === "metric" ? " m" : "′"}: {fa(lf * shH)} vert. · {fv(a * shH)}</div>}
                   {foot}
                 </>
               );
@@ -10796,14 +10800,14 @@ export default function TakeoffCanvas() {
           {selShape?.measure_role === "surface_area" && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8 }} title="Altura SOLO para este muro: azulejo de piso a techo aquí, guarda de 1,2 m allá, en la misma condición. ↺ vuelve a la altura de la condición.">
               <Icon name="height" size={12} />
-              <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>this wall</span>
+              <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>este muro</span>
               <input name="shape-height-ft" type="number" min="0" step={heightStep(units)} value={shapeHDraft ?? dimInputStr(selShape.height_ft, units, "height")}
                 onChange={(e) => { setShapeHDraft(e.target.value); setShapeHeight(e.target.value); }}
                 onBlur={() => { if (shapeHDraft != null) setShapeHeight(shapeHDraft); setShapeHDraft(null); }}
                 style={{ width: 56, padding: "2px 5px", border: "1px solid var(--ink-faint)", fontSize: 12 }} />
               <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{heightUnit(units)} → {fa(selShape.computed?.area_sf || 0)}</span>
               {condH > 0 && Number(selShape.height_ft) !== condH && (
-                <button onClick={clearShapeHeight} title="Set this wall to the condition height" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0 }}>↺</button>
+                <button onClick={clearShapeHeight} title="Fijar este muro a la altura de la condición" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0 }}>↺</button>
               )}
             </div>
           )}
@@ -10814,7 +10818,7 @@ export default function TakeoffCanvas() {
             const own = selShape.rise_ft != null || selShape.drop_ft != null;
             const { rise, drop } = linearVerticalFt(selShape, shCond);
             const vInput = (field, val, label, glyph) => (
-              <label style={{ display: "flex", alignItems: "center", gap: 3 }} title={`${label} (${heightUnit(units)}) for THIS run only, the vertical leg added to its plan length. Blank the field or press ↺ to use the condition's default.`}>
+              <label style={{ display: "flex", alignItems: "center", gap: 3 }} title={`${label} (${heightUnit(units)}) solo para ESTE tramo: el tramo vertical que se suma a su longitud en planta. Deje el campo vacío o presione ↺ para usar el valor por omisión de la condición.`}>
                 <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{glyph} {label}</span>
                 <input name={`shape-${field}`} type="number" min="0" step={heightStep(units)} value={shapeVertDraft[field] ?? dimInputStr(val, units, "height")}
                   onChange={(e) => { setShapeVertDraft((d) => ({ ...d, [field]: e.target.value })); setShapeVertical(field, e.target.value); }}
@@ -10824,11 +10828,11 @@ export default function TakeoffCanvas() {
             );
             return (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>this run</span>
+                <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>este tramo</span>
                 {vInput("rise_ft", rise, "rise", "↑")}
                 {vInput("drop_ft", drop, "drop", "↓")}
                 <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{heightUnit(units)} → {fl(selShape.computed?.perimeter_lf || 0)}</span>
-                {own && <button onClick={clearShapeVertical} title="Use the condition's rise and drop for this run" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0 }}>↺</button>}
+                {own && <button onClick={clearShapeVertical} title="Usar la subida y la bajada de la condición para este tramo" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0 }}>↺</button>}
               </div>
             );
           })()}
@@ -10838,12 +10842,12 @@ export default function TakeoffCanvas() {
           {wallTotal > 0 && <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2 }}>{num(areaVal(wallTotal, units))} <span style={{ fontSize: 12, fontWeight: 600 }}>{areaUnit(units)} wall</span></div>}
           {borderTotal > 0 && <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2 }}>{num(areaVal(borderTotal, units))} <span style={{ fontSize: 12, fontWeight: 600 }}>{areaUnit(units)} border</span></div>}
           {lfTotal > 0 && <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2 }}>{num(lenVal(lfTotal, units))} <span style={{ fontSize: 12, fontWeight: 600 }}>{lenUnit(units)}</span></div>}
-          {countTotal > 0 && <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2 }}>{num(countTotal, 0)} <span style={{ fontSize: 12, fontWeight: 600 }}>EA</span></div>}
-          {vertTotal > 0 && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }} title="Display only, floor-area perimeters × this condition's height (not committed)">{fa(vertTotal)} vert (perim × H)</div>}
+          {countTotal > 0 && <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2 }}>{num(countTotal, 0)} <span style={{ fontSize: 12, fontWeight: 600 }}>UND</span></div>}
+          {vertTotal > 0 && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }} title="Solo visualización: perímetros de áreas de piso × altura de esta condición (no confirmado)">{fa(vertTotal)} vert. (perím. × H)</div>}
           {condTotal === 0 && lfTotal === 0 && countTotal === 0 && wallTotal === 0 && borderTotal === 0 && <div style={{ fontSize: 12.5, color: "var(--ink-muted)", marginTop: 2 }}></div>}
           {tally.length > 0 && (
             <>
-              <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.4, opacity: 0.5, marginTop: 8 }}>Measurements</div>
+              <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 0.4, opacity: 0.5, marginTop: 8 }}>Mediciones</div>
               <div style={{ fontFamily: "var(--f-mono)", fontSize: 11.5, lineHeight: 1.5, marginTop: 2 }}>
                 {tally.map((r) => (
                   <div key={r.id} style={{ display: "flex", gap: 6, whiteSpace: "nowrap" }}>
@@ -10854,14 +10858,14 @@ export default function TakeoffCanvas() {
                         ? <> × {num(heightVal(r.h, units), 2)} {heightUnit(units)} = {fa(r.sf)}</>
                         : r.vert > 0
                           ? <span style={{ color: "var(--ink-muted)" }}> = {fl(r.plan)} plan + {fl(r.vert)} vert</span>
-                          : <span style={{ color: "var(--ink-muted)" }}> linear</span>}
+                          : <span style={{ color: "var(--ink-muted)" }}>lineal</span>}
                     </span>
                   </div>
                 ))}
               </div>
             </>
           )}
-          <div style={{ fontSize: 10.5, opacity: 0.45, marginTop: 6 }}>{visibleShapes.length} shapes on {groupKeys.length > 1 ? `${groupKeys.length} sheets` : "sheet"} · zoom {(tf.scale * 100).toFixed(0)}%</div>
+          <div style={{ fontSize: 10.5, opacity: 0.45, marginTop: 6 }}>{visibleShapes.length} figura{visibleShapes.length === 1 ? "" : "s"} en {groupKeys.length > 1 ? `${groupKeys.length} hojas` : "la hoja"} · zoom {(tf.scale * 100).toFixed(0)}%</div>
         </div>
 
         {/* zone check results, ephemeral, clears with the tool/outline. Docked at
@@ -10883,12 +10887,12 @@ export default function TakeoffCanvas() {
         {zoneRows && (
           <div style={{ position: "absolute", right: RAIL_CLEAR, bottom: CANVAS_EDGE, width: ZONE_PANEL_W, maxHeight: `calc(100% - ${2 * CANVAS_EDGE}px)`, overflowY: "auto", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)", borderRadius: 0, boxShadow: "0 6px 22px rgba(0,0,0,.16)", zIndex: 7, fontSize: 12.5, fontVariantNumeric: "tabular-nums" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderBottom: "1px solid var(--ink-faint)" }}>
-              <b style={{ fontSize: 12.5 }}>Zone check</b>
-              <span style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, color: "var(--ink-muted)" }}>nothing saved</span>
+              <b style={{ fontSize: 12.5 }}>Chequeo de zona</b>
+              <span style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, color: "var(--ink-muted)" }}>sin guardar</span>
               <button onClick={resetZone} style={{ marginLeft: "auto", border: "none", background: "none", cursor: "pointer", fontSize: 15, lineHeight: 1, color: "var(--ink)" }}>×</button>
             </div>
             {zoneRows.length === 0 && (
-              <div style={{ padding: "10px 12px", color: "var(--ink-muted)", fontSize: 11.5 }}>No takeoffs inside this zone on this sheet.</div>
+              <div style={{ padding: "10px 12px", color: "var(--ink-muted)", fontSize: 11.5 }}>No hay takeoffs dentro de esta zona en esta hoja.</div>
             )}
             {zoneRows.map((zr) => {
               const parts = [];
@@ -10896,7 +10900,7 @@ export default function TakeoffCanvas() {
               if (zr.wall_sf) parts.push(`${fa(zr.wall_sf)} wall`);
               if (zr.border_sf) parts.push(`${fa(zr.border_sf)} border`);
               if (zr.lf) parts.push(fl(zr.lf));
-              if (zr.ea) parts.push(`${num(zr.ea, 0)} EA`);
+              if (zr.ea) parts.push(`${num(zr.ea, 0)} UND`);
               const open = zoneExpand === zr.id;
               return (
                 <div key={zr.id} style={{ padding: "8px 12px", borderBottom: "1px solid var(--ink-faint)" }}>
@@ -10922,8 +10926,8 @@ export default function TakeoffCanvas() {
               );
             })}
             <div style={{ padding: "7px 12px", fontSize: 10, color: "var(--ink-muted)" }}>
-              Shapes counted by their center point · same sheet only · counted shapes glow cobalt.
-              {zoneRows.some((r) => (r.multiplier || 1) > 1) && <> Rows marked ×N already have the condition's multiplier applied, the same convention as the Report's Groups section, not its base-quantity by-sheet rows.</>}
+              Las figuras se cuentan por su punto central · solo en la misma hoja · las figuras contadas brillan en cobalto.
+              {zoneRows.some((r) => (r.multiplier || 1) > 1) && <> Las filas marcadas ×N ya tienen aplicado el multiplicador de la condición, igual que la sección Grupos del Reporte, no sus filas de cantidad base por hoja.</>}
               {/* A deduct classifies by its OWN center, independent of its positive
                   area's center (same rule the Report's by-sheet "negative slices"
                   note already documents for a cross-sheet split), a zone edge
@@ -10932,7 +10936,7 @@ export default function TakeoffCanvas() {
                   link is never stored, only inferred by overlap, and geometric
                   containment pairing would guess wrong for nested/overlapping
                   positives. */}
-              {zoneRows.some((r) => r.total_sf < 0 || r.floor_sf < 0) && <> A negative row means a deduct here counted but its positive area's center fell outside the zone (or vice-versa), the zone edge split a deduct from its shape.</>}
+              {zoneRows.some((r) => r.total_sf < 0 || r.floor_sf < 0) && <> Una fila negativa significa que una deducción cuenta aquí pero el centro de su área positiva cayó fuera de la zona (o al revés): el borde de la zona separó una deducción de su figura.</>}
             </div>
           </div>
         )}
@@ -10945,10 +10949,10 @@ export default function TakeoffCanvas() {
           {panelBtn(() => setLeftTab((t) => (t === "markup" ? null : "markup")), "document", "Lista de anotaciones: nubes, llamadas y notas existentes", leftTab === "markup", markupCount)}
           {panelBtn(() => setLeftTab((t) => (t === "stamp" ? null : "stamp")), "stamp", "Sellos: anotaciones reutilizables que se colocan con un clic", leftTab === "stamp", stampLib.stamps.length)}
           {panelBtn(() => setLeftTab((t) => (t === "rfi" ? null : "rfi")), "rfi", "Registro de RFI: levante, siga y exporte solicitudes de información", leftTab === "rfi", rfis.length)}
-          {(!workspaceLayout || focusMode) && panelBtn(toggleTakeoffs, "takeoffs", "Takeoffs, conditions + running totals", takeoffsOpen, visibleShapes.length)}
-          {(!workspaceLayout || focusMode) && panelBtn(() => setAgentOpen((o) => !o), "target", "Work and review, measurements and agent proposals", agentOpen, agentProposals.length)}
-          {rollByCond.size > 0 && panelBtn(() => setRollPanelOpen((o) => !o), "roll", "Roll goods, the cut diagram, cutting order, and figured order footage", rollPanelOpen, rollByCond.size)}
-          {layerEntries.length > 0 && panelBtn(() => setLayersOpen((o) => !o), "layers", "PDF layers, what this drawing's own layer table states each ink is; set what One-Click treats as wall and what it ignores", layersOpen, layerEntries.reduce((n, e) => n + e.layers.length, 0))}
+          {(!workspaceLayout || focusMode) && panelBtn(toggleTakeoffs, "takeoffs", "Cantidades: condiciones y totales acumulados", takeoffsOpen, visibleShapes.length)}
+          {(!workspaceLayout || focusMode) && panelBtn(() => setAgentOpen((o) => !o), "target", "Trabajo y revisión: mediciones y propuestas del agente", agentOpen, agentProposals.length)}
+          {rollByCond.size > 0 && panelBtn(() => setRollPanelOpen((o) => !o), "roll", "Material en rollo: el diagrama de cortes, el orden de corte y el metraje de pedido calculado", rollPanelOpen, rollByCond.size)}
+          {layerEntries.length > 0 && panelBtn(() => setLayersOpen((o) => !o), "layers", "Capas PDF: lo que la tabla de capas del propio dibujo declara que es cada tinta; defina qué trata One-Click como muro y qué ignora", layersOpen, layerEntries.reduce((n, e) => n + e.layers.length, 0))}
           {panelBtn(() => setShowRevisions(true), "revisions", "Revisiones: guarde el takeoff en cada revisión de oferta y compare qué cambió", showRevisions)}
         </div>
 
@@ -10958,7 +10962,7 @@ export default function TakeoffCanvas() {
             Takeoffs panel). Honest empty state until the BYO-AI seam is
             configured; otherwise the goal box, the streaming run log, and the
             per-proposal accept/reject desk. */}
-          <WorkspacePanel dockSide={workspaceLayout ? workspaceArrangement.work : undefined} width={workspaceLayout ? workspaceArrangement.workWidth : undefined} dockHandle={workspaceDockHandle("work", "Work")} open={agentOpen} shapes={shapes} conditions={condById} selectedId={selectedId}
+          <WorkspacePanel dockSide={workspaceLayout ? workspaceArrangement.work : undefined} width={workspaceLayout ? workspaceArrangement.workWidth : undefined} dockHandle={workspaceDockHandle("work", "Trabajo")} open={agentOpen} shapes={shapes} conditions={condById} selectedId={selectedId}
             sheetLabel={tabLabel} fmtArea={(sf) => fa(sf, 2)} fmtLength={(lf) => fl(lf, 2)}
             scales={scales} scaleUnconfirmed={scaleUnconfirmed} running={agentRunning}
             proposalCount={agentProposals.length} onLocate={locateWork}
@@ -11025,7 +11029,7 @@ export default function TakeoffCanvas() {
             transform, the stage is anchored top-left, so a re-fit would be a
             jarring jump. */}
         <TakeoffsPanel
-          dockSide={workspaceLayout ? workspaceArrangement.takeoffs : undefined} layoutLocked={workspaceLayout && workspaceArrangement.locked} dockHandle={workspaceDockHandle("takeoffs", "Takeoffs")}
+          dockSide={workspaceLayout ? workspaceArrangement.takeoffs : undefined} layoutLocked={workspaceLayout && workspaceArrangement.locked} dockHandle={workspaceDockHandle("takeoffs", "Cantidades")}
           open={takeoffsOpen}
           width={panelW}
           overlay={isNarrow}
@@ -11110,10 +11114,9 @@ export default function TakeoffCanvas() {
       {loadError && (
         <div style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 60, display: "flex", alignItems: "center", gap: 12, maxWidth: 640, padding: "10px 14px", background: "var(--paper-bright)", border: "1px solid var(--c-danger)", boxShadow: "var(--shadow-2)", fontSize: 12.5, color: "var(--ink)" }}>
           <span>
-            <strong style={{ color: "var(--c-danger)" }}>Couldn't load this project's saved takeoff</strong> ({loadError}).
-            Autosave is paused so nothing overwrites your saved work, reload the tab to retry.
+            <strong style={{ color: "var(--c-danger)" }}>No se pudo cargar el takeoff guardado de este proyecto</strong> ({loadError}). El guardado automático está en pausa para que nada sobrescriba su trabajo guardado: recargue la pestaña para reintentar.
           </span>
-          <button onClick={() => window.location.reload()} style={{ whiteSpace: "nowrap", padding: "6px 12px", border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", fontSize: 12 }}>Reload</button>
+          <button onClick={() => window.location.reload()} style={{ whiteSpace: "nowrap", padding: "6px 12px", border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", fontSize: 12 }}>Recargar</button>
         </div>
       )}
 
@@ -11175,27 +11178,27 @@ export default function TakeoffCanvas() {
         return (
           <div style={{ position: "fixed", right: FLOAT_GAP, top: `calc(var(--topbar-h) + ${FLOAT_GAP}px)`, width: SWEEP_PANEL_W, zIndex: Z.popover, background: "var(--paper-cream)", border: "1px solid var(--ink-faint)", boxShadow: "var(--shadow-pop)", display: "flex", flexDirection: "column", fontSize: "var(--fs-m)" }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, padding: "10px 12px", borderBottom: "1px solid var(--ink-faint)" }}>
-              <span className="field-label">SYMBOL SWEEP</span>
+              <span className="field-label">BARRIDO DE SÍMBOLO</span>
               <span style={{ flex: 1 }} />
               {sweep.complete
-                ? <span style={{ fontFamily: "var(--f-mono)", fontSize: "var(--fs-2xs)", letterSpacing: ".1em", color: "var(--c-positive)", border: "1px solid var(--c-positive)", padding: "2px 6px" }}>COMPLETE</span>
-                : <span style={{ fontFamily: "var(--f-mono)", fontSize: "var(--fs-2xs)", letterSpacing: ".1em", color: "#fff", background: "var(--c-warning)", padding: "3px 6px" }}>FLOOR, NOT A TOTAL</span>}
+                ? <span style={{ fontFamily: "var(--f-mono)", fontSize: "var(--fs-2xs)", letterSpacing: ".1em", color: "var(--c-positive)", border: "1px solid var(--c-positive)", padding: "2px 6px" }}>COMPLETO</span>
+                : <span style={{ fontFamily: "var(--f-mono)", fontSize: "var(--fs-2xs)", letterSpacing: ".1em", color: "#fff", background: "var(--c-warning)", padding: "3px 6px" }}>PISO, NO UN TOTAL</span>}
             </div>
             {sweep.seed.segments <= 3 && (
               <div style={{ padding: "8px 12px", background: "var(--tint-select)", color: "var(--ink)", fontSize: "var(--fs-s)", lineHeight: 1.45 }}>
-                The seed is only {sweep.seed.segments} segment(s), likely a FRAGMENT, and fragments match everywhere (every square corner reads as one). Marquee the whole symbol.
+                La semilla tiene solo {sweep.seed.segments} segmento(s): probablemente es un FRAGMENTO, y los fragmentos coinciden en todas partes (toda esquina recta parece uno). Encierre el símbolo completo.
               </div>
             )}
             {!sweep.complete && (
               <div style={{ padding: "8px 12px", background: "var(--c-warning)", color: "#fff", fontSize: "var(--fs-s)", lineHeight: 1.45 }}>
-                {sweep.dropped} placement(s) were never scored, tighten the marquee around more distinctive linework before trusting this as a total.
+                {sweep.dropped} ubicación(es) nunca se puntuaron: ajuste el recuadro alrededor de líneas más distintivas antes de confiar en esto como total.
               </div>
             )}
             <div style={{ padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
-              <div><b style={{ fontFamily: "var(--f-display)", fontSize: "var(--fs-xl)" }}>{matchN}</b> of {sweep.matches.length} matched will commit{mLine && tagGroups.length <= 1 ? <span style={{ color: "var(--ink-soft)" }}>, {mLine}</span> : null}</div>
+              <div><b style={{ fontFamily: "var(--f-display)", fontSize: "var(--fs-xl)" }}>{matchN}</b> de {sweep.matches.length} coincidencias se confirmarán{mLine && tagGroups.length <= 1 ? <span style={{ color: "var(--ink-soft)" }}>, {mLine}</span> : null}</div>
               {tagGroups.length > 1 && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  <div className="field-label">BY LABEL, UNTICK A TAG TO EXCLUDE IT</div>
+                  <div className="field-label">POR ETIQUETA: DESMARQUE UNA ETIQUETA PARA EXCLUIRLA</div>
                   {tagGroups.map((g) => {
                     const isSeedTag = seedTag && g.tag === seedTag;
                     const isOff = offSet.has(g.tag);
@@ -11203,45 +11206,45 @@ export default function TakeoffCanvas() {
                       <label key={g.tag} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "var(--fs-s)", cursor: "pointer", color: isOff ? "var(--text-faint)" : !isSeedTag && g.tag !== "\u2205" ? "var(--c-warning)" : "var(--ink)" }}>
                         <input type="checkbox" checked={!isOff}
                           onChange={() => setSweep((sw2) => ({ ...sw2, excludedTags: isOff ? sw2.excludedTags.filter((t) => t !== g.tag) : [...sw2.excludedTags, g.tag] }))} />
-                        <span style={{ fontFamily: "var(--f-mono)", fontWeight: 600 }}>{g.tag === "\u2205" ? "no label" : g.tag}</span>
+                        <span style={{ fontFamily: "var(--f-mono)", fontWeight: 600 }}>{g.tag === "\u2205" ? "sin etiqueta" : g.tag}</span>
                         <span>×{g.n}</span>
-                        {isSeedTag && <span style={{ fontSize: "var(--fs-2xs)", color: "var(--ink-muted)" }}>seed's tag</span>}
-                        {!isSeedTag && g.tag !== "\u2205" && !isOff && <span style={{ fontSize: "var(--fs-2xs)" }}>different device?</span>}
+                        {isSeedTag && <span style={{ fontSize: "var(--fs-2xs)", color: "var(--ink-muted)" }}>etiqueta de la semilla</span>}
+                        {!isSeedTag && g.tag !== "\u2205" && !isOff && <span style={{ fontSize: "var(--fs-2xs)" }}>¿otro dispositivo?</span>}
                       </label>
                     );
                   })}
                 </div>
               )}
-              {unlabeled > 0 && tagGroups.length <= 1 && <div style={{ fontSize: "var(--fs-s)", color: "var(--c-warning)" }}>{unlabeled} match(es) carry no label while this family is labeled, look at those first.</div>}
-              <div><b style={{ fontFamily: "var(--f-display)", fontSize: "var(--fs-xl)", color: openQ ? "var(--c-warning)" : "var(--ink)" }}>{sweep.questions.length}</b> question(s){openQ ? <span style={{ color: "var(--ink-soft)" }}>, ↵ accept · X dismiss · → next</span> : <span style={{ color: "var(--ink-soft)" }}>, all answered</span>}</div>
+              {unlabeled > 0 && tagGroups.length <= 1 && <div style={{ fontSize: "var(--fs-s)", color: "var(--c-warning)" }}>{unlabeled} coincidencia(s) no llevan etiqueta mientras esta familia sí está etiquetada: revíselas primero.</div>}
+              <div><b style={{ fontFamily: "var(--f-display)", fontSize: "var(--fs-xl)", color: openQ ? "var(--c-warning)" : "var(--ink)" }}>{sweep.questions.length}</b> pregunta(s){openQ ? <span style={{ color: "var(--ink-soft)" }}>, ↵ aceptar · X descartar · → siguiente</span> : <span style={{ color: "var(--ink-soft)" }}>, todas respondidas</span>}</div>
               {sweep.questions.length > 0 && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 150, overflowY: "auto" }}>
                   {sweep.questions.map((q, i) => (
                     <button key={i} type="button" onClick={() => setSweep((s) => ({ ...s, qIndex: i }))}
                       style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", fontFamily: "var(--f-body)", fontSize: "var(--fs-s)", textAlign: "left", background: i === sweep.qIndex ? "var(--tint-select)" : "transparent", border: `1px solid ${i === sweep.qIndex ? "var(--c-warning)" : "var(--ink-faint)"}`, color: q.state === "dismissed" ? "var(--text-faint)" : "var(--ink)", textDecoration: q.state === "dismissed" ? "line-through" : "none", cursor: "pointer" }}>
                       <span style={{ fontFamily: "var(--f-mono)", fontWeight: 700, color: q.state === "accepted" ? "var(--c-positive)" : q.state === "dismissed" ? "var(--text-faint)" : DS.symbol.question }}>{q.state === "accepted" ? "✓" : q.state === "dismissed" ? "×" : "?"}</span>
-                      <span>{Math.round(q.score * 100)}%{q.label ? ` · ${q.label.label}` : ""}{q.readings > 1 ? ` · read ${q.readings} ways` : ""}</span>
+                      <span>{Math.round(q.score * 100)}%{q.label ? ` · ${q.label.label}` : ""}{q.readings > 1 ? ` · leída de ${q.readings} maneras` : ""}</span>
                     </button>
                   ))}
                 </div>
               )}
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "var(--fs-s)", cursor: "pointer" }}>
                 <input type="checkbox" checked={sweep.includeSeed} onChange={(e) => setSweep((s) => ({ ...s, includeSeed: e.target.checked }))} />
-                <span>Count the seed{seedTag ? <span>, drawing says <b style={{ fontFamily: "var(--f-mono)" }}>{seedTag}</b></span> : null}</span>
+                <span>Contar la semilla{seedTag ? <span>, el dibujo dice <b style={{ fontFamily: "var(--f-mono)" }}>{seedTag}</b></span> : null}</span>
               </label>
             </div>
             <div style={{ padding: "10px 12px", borderTop: "1px solid var(--ink-faint)", display: "flex", flexDirection: "column", gap: 6 }}>
               <button type="button" className="btn-primary" onClick={commitSweep} style={{ justifyContent: "center" }}>
-                Commit {commitN} as {condById[activeCond]?.finish_tag || "…"}
+                Confirmar {commitN} como {condById[activeCond]?.finish_tag || "…"}
               </button>
-              <button type="button" className="btn-ghost" onClick={() => setSweep(null)} style={{ justifyContent: "center" }}>Discard (Esc)</button>
+              <button type="button" className="btn-ghost" onClick={() => setSweep(null)} style={{ justifyContent: "center" }}>Descartar (Esc)</button>
             </div>
           </div>
         );
       })()}
       <footer className="ink-panel ticks"
         style={{ height: "var(--status-h)", flex: "0 0 auto", display: "flex", alignItems: "center", gap: 12, padding: "0 14px", fontFamily: "var(--f-mono)", fontSize: "var(--fs-xs)", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap", overflow: "hidden", userSelect: "none" }}>
-        <span style={{ color: "var(--status-acc)", textShadow: "var(--glow)" }}>{TOOL_VERB[tool] || tool}</span>
+        <span style={{ color: "var(--status-acc)", textShadow: "var(--glow)" }}>{TOOL_VERB_ES[TOOL_VERB[tool]] || TOOL_VERB[tool] || tool}</span>
         <span style={{ opacity: 0.25 }} aria-hidden="true">|</span>
         <span ref={statusCoordRef} aria-hidden="true" style={{ minWidth: 150 }} />
         <span style={{ opacity: 0.25 }} aria-hidden="true">|</span>
@@ -11257,12 +11260,12 @@ export default function TakeoffCanvas() {
         <span data-import-read-status="" aria-live="polite" style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: "var(--sp-2)" }}>
           {ocrRead && !ocrNotice && (<>
             <span>{ocrRead === "starting" ? OCR_STARTING_MESSAGE : ocrRead === "waiting" ? OCR_WAITING_MESSAGE : ocrReadingMessage(ocrReadProgress)}</span>
-            <button type="button" className="btn-ghost" onClick={cancelImportRead} style={{ padding: "var(--sp-1) var(--sp-2)" }}>Cancel</button>
+            <button type="button" className="btn-ghost" onClick={cancelImportRead} style={{ padding: "var(--sp-1) var(--sp-2)" }}>Cancelar</button>
           </>)}
         </span>
         <span style={{ marginLeft: "auto", display: "flex", gap: 12, opacity: 0.75 }} aria-live="polite">
-          <span>{shapes.filter((s) => panelKeySet.has(s.sheet_id)).length} shapes</span>
-          <span>{cloudMode ? "drive" : "local"}{saveState === "saving" ? " · saving…" : saveState === "saved" ? " · saved" : ""}</span>
+          <span>{shapes.filter((s) => panelKeySet.has(s.sheet_id)).length} figuras</span>
+          <span>{cloudMode ? "drive" : "local"}{saveState === "saving" ? " · guardando…" : saveState === "saved" ? " · guardado" : ""}</span>
         </span>
       </footer>
       {/* BYO-key AI settings, the single config surface for the ai.js seam

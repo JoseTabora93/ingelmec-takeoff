@@ -36,14 +36,14 @@ function RowBody({ row, onRead, onReadAgain, onCancel, onRetry }) {
   switch (view.kind) {
     case "read":
       return (<>
-        <button type="button" className="btn-ghost" style={btn} onClick={() => onRead(key)}>{what === "picture" ? "Read picture text" : "Read page text"}</button>
+        <button type="button" className="btn-ghost" style={btn} onClick={() => onRead(key)}>{what === "picture" ? "Leer texto de la imagen" : "Leer texto de la página"}</button>
         {view.note && <span aria-live="polite" style={{ color: "var(--c-danger)", whiteSpace: "normal" }}>{view.note}</span>}
       </>);
     case "reading":
       return (<>
         <span className="pip" aria-hidden="true" />
         <span aria-live="polite">{view.text}</span>
-        <button type="button" className="btn-ghost" style={btn} onClick={() => onCancel(key)}>Cancel</button>
+        <button type="button" className="btn-ghost" style={btn} onClick={() => onCancel(key)}>Cancelar</button>
       </>);
     case "stopping":
       return <span aria-live="polite" style={{ color: "var(--ink-muted)" }}>{view.text}</span>;
@@ -52,12 +52,12 @@ function RowBody({ row, onRead, onReadAgain, onCancel, onRetry }) {
     case "unreachable":
       return (<>
         <span aria-live="polite" style={{ color: "var(--c-danger)", whiteSpace: "normal" }}>{view.text}</span>
-        <button type="button" className="btn-ghost" style={btn} onClick={() => onRetry?.()}>Retry</button>
+        <button type="button" className="btn-ghost" style={btn} onClick={() => onRetry?.()}>Reintentar</button>
       </>);
     case "done":
       return (<>
         <span aria-live="polite">{view.text}</span>
-        {view.readAgain && <button type="button" className="btn-ghost" style={btn} onClick={() => onReadAgain(key)}>Read again</button>}
+        {view.readAgain && <button type="button" className="btn-ghost" style={btn} onClick={() => onReadAgain(key)}>Leer de nuevo</button>}
       </>);
     default:
       return null;
@@ -69,7 +69,7 @@ export default function PageReadControl({ rows, onRead, onReadAgain, onCancel, o
   if (!shown.length) return null;
   const labelled = rows.filter((r) => !r.background).length > 1;
   return (
-    <div role="group" aria-label="Read text from scans and pictures" data-page-read="" style={{ display: "flex", flexDirection: "column", gap: "var(--sp-1)", padding: "var(--sp-1) var(--sp-2)", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)", boxShadow: "var(--shadow-1)", maxWidth: READ_CONTROL_MAX_W }}>
+    <div role="group" aria-label="Leer texto de escaneos e imágenes" data-page-read="" style={{ display: "flex", flexDirection: "column", gap: "var(--sp-1)", padding: "var(--sp-1) var(--sp-2)", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)", boxShadow: "var(--shadow-1)", maxWidth: READ_CONTROL_MAX_W }}>
       {shown.map((row) => (
         <div key={row.key} style={{ ...S.monoReadout, fontSize: "var(--fs-xs)", display: "flex", alignItems: "center", gap: "var(--sp-2)", whiteSpace: "nowrap" }}>
           {labelled && !row.background && <span style={{ ...S.monoLabel, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>{row.label}</span>}

@@ -91,7 +91,7 @@ export interface OcrClientDeps {
 /** A read the worker never answered within its deadline. */
 export class OcrTimeoutError extends Error {
   constructor() {
-    super("The on-device reader stopped responding.");
+    super("El lector del dispositivo dejó de responder.");
     // Not AbortError: that reads as "page closed" and would hide this.
     this.name = "OcrTimeoutError";
   }
@@ -146,7 +146,7 @@ type Deadline = { fire: () => void; left: number; handle: unknown; since: number
  * read, so its deadline still stands. */
 type Job = { id: number; region: OcrRegion; resolve: (w: OcrWord[]) => void; reject: (e: Error) => void; aborted: boolean; cleanup: () => void; deadline: Deadline | null };
 
-const abortError = () => new DOMException("The OCR read was cancelled.", "AbortError");
+const abortError = () => new DOMException("Se canceló la lectura de OCR.", "AbortError");
 
 const defaultSpawn = (): WorkerLike =>
   new Worker(new URL("../../ocr.worker.ts", import.meta.url), { type: "module" }) as unknown as WorkerLike;
@@ -420,8 +420,8 @@ export function createOcrClient(deps: OcrClientDeps = {}) {
   /** Why the reads queued for a failed restart reject. */
   function restartError(r: Exclude<OcrReady, { ok: true }>): Error {
     if (r.reason === "error") return new Error(r.message);
-    if (r.reason === "consent-required") return new Error("OCR engine not ready: its files are no longer cached");
-    return new Error(`OCR engine not ready: ${r.reason}`);
+    if (r.reason === "consent-required") return new Error("El motor de OCR no está listo: sus archivos ya no están en caché");
+    return new Error(`El motor de OCR no está listo: ${r.reason}`);
   }
 
   /** Start a fresh worker from the cache for the queued reads. ensureReady
@@ -571,7 +571,7 @@ export function createOcrClient(deps: OcrClientDeps = {}) {
   function recognize(region: OcrRegion, opts: { signal?: AbortSignal } = {}): Promise<OcrWord[]> {
     return new Promise((resolve, reject) => {
       if (opts.signal?.aborted) return reject(abortError());
-      if (!restarting && (!worker || !ready)) return reject(new Error("OCR engine not ready"));
+      if (!restarting && (!worker || !ready)) return reject(new Error("El motor de OCR no está listo"));
       // A zero-length buffer was already transferred (to the worker, by an
       // earlier read of the same region): its pixels are gone.
       if (region.rgba.buffer.byteLength === 0) return reject(new Error("OCR region pixels were already sent; render the region again"));

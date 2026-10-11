@@ -330,7 +330,7 @@ test("abort as the last read's reply lands: the read rejects instead of returnin
 test("pdf.js cancelling the render (the document was closed) rejects as AbortError, signal or not", async () => {
   const cancelled = () => Object.assign(new Error("Rendering cancelled, page 3"), { name: "RenderingCancelledException" });
   const h = harness(INSIDE, { rasterizeThrows: (i) => (i === 1 ? cancelled() : undefined) });
-  await assert.rejects(readRegionText(fakePage(...PAGE_PT), RS, PAGE_RECT, h.opts), (e: Error) => e.name === "AbortError" && /closed/.test(e.message));
+  await assert.rejects(readRegionText(fakePage(...PAGE_PT), RS, PAGE_RECT, h.opts), (e: Error) => e.name === "AbortError" && /cerró/.test(e.message));
   assert.deepEqual(h.log, ["rasterize 0", "recognize 0", "rasterize 1"]);
 });
 

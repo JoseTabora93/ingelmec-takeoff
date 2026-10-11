@@ -225,7 +225,7 @@ test("a store that refuses the write doesn't fail the read, says it wasn't saved
     const r = await readPageText({ page: 1, rs: RS, getPage: page().getPage, pdfHash: async () => HASH, session: s.session, cache, readRegion: instantRegion() });
     assert.equal(r.ok, true);
     assert.equal(r.ok && r.saved, false);
-    assert.match(String(warned.calls[0]?.[0]), /OCR cache: couldn't save page read/);
+    assert.match(String(warned.calls[0]?.[0]), /Caché de OCR: no se pudo guardar la lectura de la página/);
   } finally { warned.restore(); }
   const ok = await readPageText({ page: 1, rs: RS, getPage: page().getPage, pdfHash: async () => HASH, session: s.session, cache: createPageCache(metaMap().deps), readRegion: instantRegion() });
   assert.equal(ok.ok && "saved" in ok, false, "a saved read carries no flag");
@@ -255,7 +255,7 @@ test("every session outcome maps to one typed status", async () => {
     [{ ok: false, reason: "uninstalled" }, { status: "uninstalled" }],
     [{ ok: false, reason: "error", message: "worker died" }, { status: "error", message: "worker died" }],
     [{ ok: false, reason: "failed", error: new Error("render failed") }, { status: "failed", message: "render failed" }],
-    [{ ok: false, reason: "failed", error: new DOMException("The page was closed during the read.", "AbortError") }, { status: "page-closed", message: "The page was closed during the read." }],
+    [{ ok: false, reason: "failed", error: new DOMException("La página se cerró durante la lectura.", "AbortError") }, { status: "page-closed", message: "La página se cerró durante la lectura." }],
     [{ ok: false, reason: "failed", error: "odd" }, { status: "failed", message: "odd" }],
   ];
   for (const [outcome, want] of cases) {
@@ -471,9 +471,9 @@ test("cancel of a page with no read running changes nothing", () => {
 });
 
 test("a failure is kept as the page's status", async () => {
-  const t = setup({ outcome: { ok: false, reason: "failed", error: new DOMException("The page was closed during the read.", "AbortError") } });
+  const t = setup({ outcome: { ok: false, reason: "failed", error: new DOMException("La página se cerró durante la lectura.", "AbortError") } });
   await t.reader.read(t.req("A.pdf"));
-  assert.deepEqual(t.reader.status("A.pdf"), { state: "page-closed", message: "The page was closed during the read." });
+  assert.deepEqual(t.reader.status("A.pdf"), { state: "page-closed", message: "La página se cerró durante la lectura." });
 });
 
 test("subscribers hear every status change", async () => {
@@ -666,9 +666,9 @@ test("pageReadView: after a failure Read shows again, with what happened", () =>
   const v = (status: PageReadStatus) => pageReadView({ textless: true, avail: "available", status });
   assert.deepEqual(v({ state: "declined" }), { kind: "read" });
   assert.deepEqual(v({ state: "aborted" }), { kind: "read" });
-  assert.deepEqual(v({ state: "page-closed", message: "The page was closed during the read." }), { kind: "read", note: "The page was closed during the read." });
-  assert.deepEqual(v({ state: "failed", message: "boom" }), { kind: "read", note: "Couldn't read this page: boom" });
-  assert.deepEqual(v({ state: "error", message: "worker" }), { kind: "read", note: "The on-device text reader (OCR) didn't start: worker" });
+  assert.deepEqual(v({ state: "page-closed", message: "La página se cerró durante la lectura." }), { kind: "read", note: "La página se cerró durante la lectura." });
+  assert.deepEqual(v({ state: "failed", message: "boom" }), { kind: "read", note: "No se pudo leer esta página: boom" });
+  assert.deepEqual(v({ state: "error", message: "worker" }), { kind: "read", note: "El lector de texto del dispositivo (OCR) no arrancó: worker" });
   assert.deepEqual(v({ state: "disabled" }), { kind: "hidden" });
   assert.deepEqual(v({ state: "uninstalled" }), { kind: "hidden" });
 });
@@ -809,7 +809,7 @@ test("dropFile aborts a running box read", async () => {
   assert.equal(d.calls[0].signal?.aborted, true);
   const out = await r;
   assert.equal(!out.ok && out.status, "page-closed", "the file went away: not the caller's cancel");
-  assert.equal(!out.ok && out.message, "The page was closed during the read.");
+  assert.equal(!out.ok && out.message, "La página se cerró durante la lectura.");
 });
 
 // ── lines: a finished read's lines, synchronously ────────────────────────────
@@ -990,7 +990,7 @@ test("a page too large to read is refused with no consent asked and nothing stor
   const s = fakeSession();
   const meta = metaMap();
   const r = await readPageText({ page: 1, rs: RS, getPage: sizedPage(200000, 200000), pdfHash: async () => HASH, session: s.session, cache: createPageCache(meta.deps), readRegion: instantRegion() });
-  assert.deepEqual(r, { ok: false, status: "too-large", message: "This page is too large for the on-device text reader (OCR)." });
+  assert.deepEqual(r, { ok: false, status: "too-large", message: "Esta página es demasiado grande para el lector de texto del dispositivo (OCR)." });
   assert.equal(s.runs(), 0, "no consent notice for a read that can't happen");
   assert.deepEqual(meta.puts, []);
 });
@@ -1005,14 +1005,14 @@ test("a 42 × 30 in sheet is read as usual", async () => {
 test("readBox: a box too large to read is refused with no consent asked", async () => {
   const t = setup();
   const r = await t.reader.readBox({ file: "A.pdf", rs: RS, rect: { x0: 0, y0: 0, x1: 200000 * RS, y1: 200000 * RS }, getPage: t.pg.getPage });
-  assert.deepEqual(r, { ok: false, status: "too-large", message: "This page is too large for the on-device text reader (OCR)." });
+  assert.deepEqual(r, { ok: false, status: "too-large", message: "Esta página es demasiado grande para el lector de texto del dispositivo (OCR)." });
   assert.equal(t.s.runs(), 0);
 });
 
 test("a too-large page shows why, and offers no Read", () => {
   assert.deepEqual(
-    pageReadView({ textless: true, avail: "available", status: { state: "too-large", message: "This page is too large for the on-device text reader (OCR)." } }),
-    { kind: "unreadable", text: "This page is too large for the on-device text reader (OCR)." },
+    pageReadView({ textless: true, avail: "available", status: { state: "too-large", message: "Esta página es demasiado grande para el lector de texto del dispositivo (OCR)." } }),
+    { kind: "unreadable", text: "Esta página es demasiado grande para el lector de texto del dispositivo (OCR)." },
   );
 });
 
@@ -1070,7 +1070,7 @@ test("a read the region reader refuses as too large is too-large, not failed", a
   const s = fakeSession();
   const readRegion: ReadRegion = async () => { throw Object.assign(new Error("more than 64 tiles"), { name: "PageTooLargeError" }); };
   const r = await readPageText({ page: 1, rs: RS, getPage: page().getPage, pdfHash: async () => HASH, session: s.session, cache: createPageCache(metaMap().deps), readRegion, tooLarge: () => false });
-  assert.deepEqual(r, { ok: false, status: "too-large", message: "This page is too large for the on-device text reader (OCR)." });
+  assert.deepEqual(r, { ok: false, status: "too-large", message: "Esta página es demasiado grande para el lector de texto del dispositivo (OCR)." });
 });
 
 test("a size check that fails (the reader's code didn't load) is a failed read, and later reads still run", async () => {
@@ -1108,7 +1108,7 @@ test("a read whose session rejects outright is failed, and the next read still g
 });
 
 test("pageReadView: a probe that couldn't reach the reader says so, with Retry, where Read would be", () => {
-  const unreachable = { kind: "unreachable", text: "The on-device text reader (OCR) couldn't be reached" };
+  const unreachable = { kind: "unreachable", text: "No se pudo conectar con el lector de texto del dispositivo (OCR)" };
   assert.deepEqual(pageReadView({ textless: true, avail: "error", status: undefined }), unreachable);
   assert.deepEqual(pageReadView({ textless: true, avail: "error", status: { state: "failed", message: "x" } }), unreachable);
   assert.deepEqual(pageReadView({ textless: false, avail: "error", status: undefined }), { kind: "hidden" }, "a vector sheet: nothing");
@@ -1180,7 +1180,7 @@ test("readBox's lines (Copy text's box read) are cleaned the same way", async ()
 
 const R1 = { x0: 20, y0: 10, x1: 120, y1: 60 }, R2 = { x0: 140, y0: 30, x1: 190, y1: 90 };
 const PICTURES: ReadPlan = { kind: "pictures", rects: [R1, R2] };
-const NO_PICTURE = { ok: false, status: "no-picture", message: "No picture on this sheet to read." };
+const NO_PICTURE = { ok: false, status: "no-picture", message: "No hay imagen en esta hoja para leer." };
 
 test("a pictures plan reads each picture on its own at rs, lines joined in order, and stores the read with pp", async () => {
   const s = fakeSession();
@@ -1237,8 +1237,8 @@ test("no picture to read: no-picture, said under the offer; no page opened, noth
   const r = await readPageText({ page: 1, rs: RS, getPage: pg.getPage, pdfHash: async () => HASH, session: s.session, cache: createPageCache(meta.deps), readRegion: async () => { reads++; return { lines: [], ms: 1, rasters: 1 }; }, plan: { kind: "none" } });
   assert.deepEqual(r, NO_PICTURE);
   assert.deepEqual([s.runs(), reads, meta.puts.length, pg.opens()], [0, 0, 0, 0]);
-  assert.deepEqual(pageReadView({ textless: true, avail: "available", status: { state: "no-picture", message: "No picture on this sheet to read." } }), { kind: "read", note: "No picture on this sheet to read." });
-  assert.deepEqual(pageReadView({ textless: true, avail: "available", status: { state: "no-picture" } }), { kind: "read", note: "No picture on this sheet to read." });
+  assert.deepEqual(pageReadView({ textless: true, avail: "available", status: { state: "no-picture", message: "No hay imagen en esta hoja para leer." } }), { kind: "read", note: "No hay imagen en esta hoja para leer." });
+  assert.deepEqual(pageReadView({ textless: true, avail: "available", status: { state: "no-picture" } }), { kind: "read", note: "No hay imagen en esta hoja para leer." });
 });
 
 test("an empty pictures plan is no picture: no consent, no size check, nothing read or stored", async () => {
@@ -1316,17 +1316,17 @@ test("any picture past the tile cap: too-large, checked for every picture before
     readRegion: async () => { reads++; return { lines: [], ms: 1, rasters: 1 }; }, plan: PICTURES,
     tooLarge: (rect) => { checked.push(rect); return rect === R2; },
   });
-  assert.deepEqual(r, { ok: false, status: "too-large", message: "This picture is too large for the on-device text reader (OCR).", what: "picture" });
+  assert.deepEqual(r, { ok: false, status: "too-large", message: "Esta imagen es demasiado grande para el lector de texto del dispositivo (OCR).", what: "picture" });
   assert.deepEqual(checked, [R1, R2]);
   assert.deepEqual([reads, s.runs()], [0, 0]);
-  assert.deepEqual(pageReadView({ textless: true, avail: "available", status: { state: "too-large", message: "This picture is too large for the on-device text reader (OCR).", what: "picture" } }),
-    { kind: "unreadable", text: "This picture is too large for the on-device text reader (OCR)." });
+  assert.deepEqual(pageReadView({ textless: true, avail: "available", status: { state: "too-large", message: "Esta imagen es demasiado grande para el lector de texto del dispositivo (OCR).", what: "picture" } }),
+    { kind: "unreadable", text: "Esta imagen es demasiado grande para el lector de texto del dispositivo (OCR)." });
 });
 
 test("too-large with no message: the fallback names what the read covers", () => {
   const v = (status: PageReadStatus) => pageReadView({ textless: true, avail: "available", status });
-  assert.deepEqual(v({ state: "too-large", what: "picture" }), { kind: "unreadable", text: "This picture is too large for the on-device text reader (OCR)." });
-  assert.deepEqual(v({ state: "too-large" }), { kind: "unreadable", text: "This page is too large for the on-device text reader (OCR)." });
+  assert.deepEqual(v({ state: "too-large", what: "picture" }), { kind: "unreadable", text: "Esta imagen es demasiado grande para el lector de texto del dispositivo (OCR)." });
+  assert.deepEqual(v({ state: "too-large" }), { kind: "unreadable", text: "Esta página es demasiado grande para el lector de texto del dispositivo (OCR)." });
 });
 
 test("a pictures read's failures say picture: the region reader's own refusal, a failed read; a scan's still say page", async () => {
@@ -1334,12 +1334,12 @@ test("a pictures read's failures say picture: the region reader's own refusal, a
   const big: ReadRegion = async () => { throw Object.assign(new Error("more than 64 tiles"), { name: "PageTooLargeError" }); };
   const boom: ReadRegion = async () => { throw new Error("render failed"); };
   const run = (readRegion: ReadRegion, p: ReadPlan) => readPageText({ page: 1, rs: RS, getPage: page().getPage, pdfHash: async () => HASH, session: s.session, cache: createPageCache(metaMap().deps), readRegion, tooLarge: () => false, plan: p });
-  assert.deepEqual(await run(big, PICTURES), { ok: false, status: "too-large", message: "This picture is too large for the on-device text reader (OCR).", what: "picture" });
+  assert.deepEqual(await run(big, PICTURES), { ok: false, status: "too-large", message: "Esta imagen es demasiado grande para el lector de texto del dispositivo (OCR).", what: "picture" });
   assert.deepEqual(await run(boom, PICTURES), { ok: false, status: "failed", message: "render failed", what: "picture" });
   assert.deepEqual(await run(boom, { kind: "scan" }), { ok: false, status: "failed", message: "render failed" });
   const v = (status: PageReadStatus) => pageReadView({ textless: true, avail: "available", status });
-  assert.deepEqual(v({ state: "failed", message: "render failed", what: "picture" }), { kind: "read", note: "Couldn't read this picture: render failed" });
-  assert.deepEqual(v({ state: "failed", message: "render failed" }), { kind: "read", note: "Couldn't read this page: render failed" });
+  assert.deepEqual(v({ state: "failed", message: "render failed", what: "picture" }), { kind: "read", note: "No se pudo leer esta imagen: render failed" });
+  assert.deepEqual(v({ state: "failed", message: "render failed" }), { kind: "read", note: "No se pudo leer esta página: render failed" });
 });
 
 test("the second picture fails after the first is read: the read fails as a picture's, and nothing is stored", async () => {
@@ -1380,7 +1380,7 @@ test("a pictures read's failure reaches the controller's status, still saying pi
   assert.deepEqual(reader.status("A.pdf"), { state: "failed", message: "boom", what: "picture" });
   const none = createPageReader({ session: s.session, cache: createPageCache(metaMap().deps), readRegion: instantRegion(), onLines: () => {} });
   await none.read({ key: "A.pdf", file: "A.pdf", page: 1, rs: RS, getPage: page().getPage, pdfHash: async () => HASH, plan: { kind: "none" } });
-  assert.deepEqual(none.status("A.pdf"), { state: "no-picture", message: "No picture on this sheet to read." });
+  assert.deepEqual(none.status("A.pdf"), { state: "no-picture", message: "No hay imagen en esta hoja para leer." });
 });
 
 const P = (phase: "tiles" | "seams", done: number, total: number, rastersDone: number, rastersPlanned: number) => ({ phase, done, total, rastersDone, rastersPlanned });

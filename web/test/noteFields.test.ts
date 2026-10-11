@@ -21,7 +21,7 @@ const labels = qtyLabels(conditionTotals(conds, shapes));
 
 test("{{qty}} is the linked condition's measured count", () => {
   assert.deepEqual(resolveNote("Provide and install x{{qty}} emergency lights", "em", labels),
-    { text: "Provide and install x5 EA emergency lights", unresolved: [] });
+    { text: "Provide and install x5 UND emergency lights", unresolved: [] });
 });
 
 test("measured, not ordered: multiplier applies, waste does not; every unit listed SF → LF", () => {
@@ -31,11 +31,11 @@ test("measured, not ordered: multiplier applies, waste does not; every unit list
 
 test("the number moves with the takeoff", () => {
   const more = [...shapes, { id: "e6", sheet_id: "p#1", condition_id: "em", measure_role: "count", computed: { count: 1 } }];
-  assert.equal(resolveNote("x{{qty}}", "em", qtyLabels(conditionTotals(conds, more))).text, "x6 EA");
+  assert.equal(resolveNote("x{{qty}}", "em", qtyLabels(conditionTotals(conds, more))).text, "x6 UND");
 });
 
 test("case and inner whitespace don't matter", () => {
-  assert.equal(resolveNote("{{ QTY }}", "em", labels).text, "5 EA");
+  assert.equal(resolveNote("{{ QTY }}", "em", labels).text, "5 UND");
 });
 
 test("unresolvable fields stay literal and are reported, never blank, never 0", () => {
@@ -43,7 +43,7 @@ test("unresolvable fields stay literal and are reported, never blank, never 0", 
   assert.deepEqual(resolveNote("x{{qty}}", "none", labels), { text: "x{{qty}}", unresolved: ["{{qty}}"] });   // nothing measured yet
   assert.deepEqual(resolveNote("x{{qty}}", "gone", labels), { text: "x{{qty}}", unresolved: ["{{qty}}"] });   // deleted condition
   assert.deepEqual(resolveNote("{{qty}} of {{Emergency light}}", "em", labels),
-    { text: "5 EA of {{Emergency light}}", unresolved: ["{{Emergency light}}"] });
+    { text: "5 UND of {{Emergency light}}", unresolved: ["{{Emergency light}}"] });
 });
 
 test("text without fields passes through untouched", () => {
@@ -57,7 +57,7 @@ test("text without fields passes through untouched", () => {
 test("metric display converts area and length, not counts", () => {
   const m = qtyLabels(conditionTotals(conds, shapes), "metric");
   assert.equal(m.get("ct"), "111.48 m² · 25.68 m");
-  assert.equal(m.get("em"), "5 EA");
+  assert.equal(m.get("em"), "5 UND");
 });
 
 test("resolveMarkup returns the same object when there's nothing to resolve", () => {
@@ -65,7 +65,7 @@ test("resolveMarkup returns the same object when there's nothing to resolve", ()
   assert.equal(resolveMarkup(plain, labels).m, plain);
   const live = { id: "b", text: "x{{qty}}", condition_id: "em" };
   const r = resolveMarkup(live, labels);
-  assert.equal(r.m.text, "x5 EA");
+  assert.equal(r.m.text, "x5 UND");
   assert.equal(live.text, "x{{qty}}");   // the stored template is never rewritten
   assert.equal((r.m as any).field_warn, undefined);
   const broken = resolveMarkup({ id: "c", text: "x{{qty}}", condition_id: "" }, labels);
@@ -79,6 +79,6 @@ test("report JSON: text keeps the template, text_resolved appears only on a note
     { id: "m2", type: "text", sheet_id: "p#1", text: "plain", condition_id: "em" },
   ] });
   assert.equal(j.markups[0].text, "x{{qty}} lights");
-  assert.equal(j.markups[0].text_resolved, "x5 EA lights");
+  assert.equal(j.markups[0].text_resolved, "x5 UND lights");
   assert.equal("text_resolved" in j.markups[1], false);
 });

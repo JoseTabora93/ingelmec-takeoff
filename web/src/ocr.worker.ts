@@ -43,7 +43,7 @@ const core = createOcrCore({
     return splitRecognizer(svc as unknown as PpuServiceInternals, (source, box) => {
       const crop = new OffscreenCanvas(Math.max(1, Math.ceil(box.width * 2)), Math.max(1, Math.ceil(box.height)));
       const ctx = crop.getContext("2d");
-      if (!ctx) throw new Error("no 2d context for code check");
+      if (!ctx) throw new Error("sin contexto 2d para la verificación de código");
       ctx.drawImage(source as OffscreenCanvas, box.x, box.y, box.width, box.height, 0, 0, crop.width, crop.height);
       return crop;
     });
@@ -51,7 +51,7 @@ const core = createOcrCore({
   makeCanvas: (rgba, width, height) => {
     const canvas = new OffscreenCanvas(width, height);
     const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("no 2d context in the OCR worker");
+    if (!ctx) throw new Error("sin contexto 2d en el trabajador de OCR");
     const img = ctx.createImageData(width, height);
     img.data.set(rgba);
     ctx.putImageData(img, 0, 0);

@@ -149,5 +149,5 @@ test("scope review ignores machine-precision edge remnants but retains small rea
   const real = scopeCollisions([a, shape("small", "lvt", sq(99.996, 0, 100))], conds, frame, { minFraction: 0 });
   assert.equal(real.collisions.length, 1, "0.004 SF is real, even when rounded to zero");
   assert.equal(real.collisions[0].shared_sf, 0);
-  assert.match(real.collisions[0].note, /below 0.01 SF/);
+  assert.match(real.collisions[0].note, /menor a 0.01 SF/);
 });

@@ -30,6 +30,6 @@ test("a stitch is skipped when any member PDF is closed", () => {
 
 test("the status note is empty when nothing was skipped, and names the files when something was", () => {
   assert.equal(skippedPdfsNote([]), "");
-  assert.equal(skippedPdfsNote(["gone.pdf"]), "skipped takeoffs on 1 closed PDF (gone.pdf). Re-open it to include it.");
-  assert.match(skippedPdfsNote(["a.pdf", "b.pdf"]), /^skipped takeoffs on 2 closed PDFs \(a\.pdf, b\.pdf\)\. Re-open them/);
+  assert.equal(skippedPdfsNote(["gone.pdf"]), "se omitieron takeoffs de 1 PDF cerrado (gone.pdf). Vuelva a abrirlo para incluirlo.");
+  assert.match(skippedPdfsNote(["a.pdf", "b.pdf"]), /^se omitieron takeoffs de 2 PDF cerrados \(a\.pdf, b\.pdf\)\. Vuelva a abrirlos/);
 });

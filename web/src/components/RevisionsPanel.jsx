@@ -35,7 +35,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
   // snapshot metadata → the panel's row shape (label/ts → name/created_at);
   // listSnapshots already sorts newest-first and scopes to this project
   const refresh = () => store.listSnapshots()
-    .then((list) => setRevs(list.map((s) => ({ id: s.id, name: s.label || "Untitled", created_at: s.ts, conditions: s.conditions ?? 0, shapes: s.shapes ?? 0 }))))
+    .then((list) => setRevs(list.map((s) => ({ id: s.id, name: s.label || "Sin título", created_at: s.ts, conditions: s.conditions ?? 0, shapes: s.shapes ?? 0 }))))
     .catch((e) => setErr(errText(e)));
   useEffect(() => { refresh(); }, []);
   // default the baseline to the newest revision once the list is in
@@ -53,7 +53,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
       if (!id || id === "current" || payloads[id]) continue;
       store.getSnapshot(id)
         .then((rec) => {
-          if (!rec) { setErr("Revision not found, it may have been deleted in another tab."); return; }
+          if (!rec) { setErr("No se encontró la revisión: puede haberse eliminado en otra pestaña."); return; }
           setPayloads((p) => ({ ...p, [id]: rec.payload || {} }));
         })
         .catch((e) => setErr(errText(e)));
@@ -64,7 +64,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
   const sideB = compareId === "current" ? current : payloads[compareId];
   const diff = useMemo(() => (sideA && sideB ? diffTakeoffs(sideA, sideB) : null), [sideA, sideB]);
 
-  const nameOf = (id) => (id === "current" ? "Current takeoff" : revs?.find((r) => r.id === id)?.name || "Revision");
+  const nameOf = (id) => (id === "current" ? "Takeoff actual" : revs?.find((r) => r.id === id)?.name || "Revisión");
   const defaultName = () => `Rev ${(revs?.length || 0) + 1}, ${new Date().toLocaleDateString()}`;
 
   const save = async (name) => {
@@ -87,9 +87,9 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
     setBusy(true); setErr("");
     try {
       // bank the live takeoff first — restore must never be a one-way door
-      await store.saveSnapshot(`Auto-backup before restore, ${new Date().toLocaleString()}`, current);
+      await store.saveSnapshot(`Respaldo automático antes de restaurar, ${new Date().toLocaleString()}`, current);
       const rec = await store.getSnapshot(id);
-      if (!rec) { setErr("Revision not found, it may have been deleted in another tab."); setBusy(false); setConfirmId(""); return; }
+      if (!rec) { setErr("No se encontró la revisión: puede haberse eliminado en otra pestaña."); setBusy(false); setConfirmId(""); return; }
       onRestore(rec.payload || {});
       await refresh();
     } catch (e) { setErr(errText(e)); }
@@ -129,19 +129,19 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
     <div style={{ position: "absolute", inset: 0, zIndex: 50, display: "flex", flexDirection: "column", background: "var(--paper-cream)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 18px", borderBottom: "1px solid var(--ink)", background: "var(--paper-bright)" }}>
         <Icon name="revisions" size={18} />
-        <strong style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)" }}>Revisions</strong>
-        <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>save the takeoff at each bid revision, then compare what moved</span>
+        <strong style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)" }}>Revisiones</strong>
+        <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>guarde el takeoff en cada revisión de oferta y compare qué cambió</span>
         <div style={{ flex: 1 }} />
         <input value={saveName} onChange={(e) => setSaveName(e.target.value)} placeholder={defaultName()}
           className="field-input" style={{ width: 220, padding: "5px 9px", fontSize: 13 }}
           onKeyDown={(e) => { if (e.key === "Enter") save(saveName); }} name="revision-name" />
         <button className="btn-primary" onClick={() => save(saveName)} disabled={busy}
-          title="Snapshot the current takeoff (conditions, shapes, markups) as a named revision">
-          <Icon name="revisions" size={13} />Save revision
+          title="Guardar una copia del takeoff actual (condiciones, figuras, anotaciones) como revisión con nombre">
+          <Icon name="revisions" size={13} />Guardar revisión
         </button>
         <button onClick={onClose} title="Volver al lienzo"
           style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12.5 }}>
-          <Icon name="close" size={12} />Close
+          <Icon name="close" size={12} />Cerrar
         </button>
       </div>
 
@@ -151,19 +151,19 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
         {/* saved revisions */}
         <div style={{ maxWidth: 980, margin: "0 auto" }}>
           {revs === null ? (
-            <div style={{ padding: 24, textAlign: "center", color: "var(--ink-muted)" }}>Loading revisions…</div>
+            <div style={{ padding: 24, textAlign: "center", color: "var(--ink-muted)" }}>Cargando revisiones…</div>
           ) : revs.length === 0 ? (
             <div style={{ padding: "28px 24px", textAlign: "center", color: "var(--ink-muted)", border: "1px dashed var(--ink-faint)", background: "var(--paper-bright)" }}>
-              No revisions yet. Save one now, and after the next addendum lands you can compare exactly which quantities moved.
+              Aún no hay revisiones. Guarde una ahora y, cuando llegue la próxima adenda, podrá comparar exactamente qué cantidades cambiaron.
             </div>
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
               <thead><tr>
-                <th style={{ ...th, textAlign: "left" }}>Revision</th>
-                <th style={th}>Saved</th>
-                <th style={th}>Conditions</th>
-                <th style={th}>Shapes</th>
-                <th style={{ ...th, textAlign: "left", paddingLeft: 18 }}>Actions</th>
+                <th style={{ ...th, textAlign: "left" }}>Revisión</th>
+                <th style={th}>Guardado</th>
+                <th style={th}>Condiciones</th>
+                <th style={th}>Figuras</th>
+                <th style={{ ...th, textAlign: "left", paddingLeft: 18 }}>Acciones</th>
               </tr></thead>
               <tbody>
                 {revs.map((r) => (
@@ -175,14 +175,14 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
                     <td style={{ ...td, textAlign: "left", paddingLeft: 18 }}>
                       <button className="btn-ghost" style={{ fontSize: 11.5, padding: "3px 8px" }}
                         onClick={() => { setBaseId(r.id); setCompareId("current"); }}
-                        title="Diff this revision against the live takeoff">Compare with current</button>{" "}
+                        title="Comparar esta revisión con el takeoff en vivo">Comparar con el actual</button>{" "}
                       <button className="btn-ghost" style={{ fontSize: 11.5, padding: "3px 8px", color: confirmId === `restore:${r.id}` ? "var(--c-warning)" : undefined }}
                         onClick={() => (confirmId === `restore:${r.id}` ? restore(r.id) : setConfirmId(`restore:${r.id}`))} disabled={busy}
-                        title="Replace the live takeoff with this revision, the live takeoff is auto-backed-up first">
-                        {confirmId === `restore:${r.id}` ? "Really restore? (auto-backup saved)" : "Restore"}</button>{" "}
+                        title="Reemplazar el takeoff en vivo con esta revisión; antes se respalda automáticamente el takeoff en vivo">
+                        {confirmId === `restore:${r.id}` ? "¿Restaurar de verdad? (se guardó un respaldo automático)" : "Restaurar"}</button>{" "}
                       <button className="btn-ghost" style={{ fontSize: 11.5, padding: "3px 8px", color: confirmId === `del:${r.id}` ? "var(--c-danger)" : undefined }}
                         onClick={() => (confirmId === `del:${r.id}` ? del(r.id) : setConfirmId(`del:${r.id}`))} disabled={busy}>
-                        {confirmId === `del:${r.id}` ? "Really delete?" : "Delete"}</button>
+                        {confirmId === `del:${r.id}` ? "¿Eliminar de verdad?" : "Eliminar"}</button>
                     </td>
                   </tr>
                 ))}
@@ -195,28 +195,28 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
         {revs?.length > 0 && (
           <div style={{ maxWidth: 980, margin: "26px auto 0" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-              <h3 style={{ fontFamily: "var(--f-display)", fontSize: 14, color: "var(--ink)", margin: 0 }}>Compare</h3>
+              <h3 style={{ fontFamily: "var(--f-display)", fontSize: 14, color: "var(--ink)", margin: 0 }}>Comparar</h3>
               <select value={baseId} onChange={(e) => setBaseId(e.target.value)} style={sel} name="compare-baseline">
                 <option value="" disabled>baseline…</option>
                 {revs.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
               <span style={{ color: "var(--ink-muted)" }}>→</span>
               <select value={compareId} onChange={(e) => setCompareId(e.target.value)} style={sel} name="compare-to">
-                <option value="current">Current takeoff</option>
+                <option value="current">Takeoff actual</option>
                 {revs.filter((r) => r.id !== baseId).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
               <div style={{ flex: 1 }} />
               <label style={{ fontSize: 12, color: "var(--ink-muted)", display: "inline-flex", gap: 6, alignItems: "center", cursor: "pointer" }}>
-                <input type="checkbox" checked={showUnchanged} onChange={(e) => setShowUnchanged(e.target.checked)} name="show-unchanged" />show unchanged
+                <input type="checkbox" checked={showUnchanged} onChange={(e) => setShowUnchanged(e.target.checked)} name="show-unchanged" />mostrar sin cambios
               </label>
-              <button className="btn-ghost" onClick={exportCsv} disabled={!diff}><Icon name="document" size={13} />Export compare CSV</button>
+              <button className="btn-ghost" onClick={exportCsv} disabled={!diff}><Icon name="document" size={13} />Exportar CSV de comparación</button>
             </div>
 
             {!diff ? (
-              <p style={{ marginTop: 14, color: "var(--ink-muted)", fontSize: 12.5 }}>Pick a baseline revision to diff.</p>
+              <p style={{ marginTop: 14, color: "var(--ink-muted)", fontSize: 12.5 }}>Elija una revisión base para comparar.</p>
             ) : identical ? (
               <p style={{ marginTop: 14, color: "var(--c-positive)", fontSize: 13, fontWeight: 600 }}>
-                Identical takeoffs, no visible quantity change between “{nameOf(baseId)}” and “{nameOf(compareId)}”.
+                Takeoffs idénticos: ningún cambio visible de cantidades entre «{nameOf(baseId)}» y «{nameOf(compareId)}».
               </p>
             ) : (
               <>
@@ -228,13 +228,13 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
                 </p>
                 <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
                   <thead><tr>
-                    <th style={{ ...th, textAlign: "left" }}>Finish</th>
-                    <th style={{ ...th, textAlign: "left" }}>Status</th>
-                    <th style={th}>Δ Floor {AU}</th>
-                    <th style={th}>Δ Wall {AU}</th>
-                    <th style={th}>Δ Border {AU}</th>
+                    <th style={{ ...th, textAlign: "left" }}>Acabado</th>
+                    <th style={{ ...th, textAlign: "left" }}>Estado</th>
+                    <th style={th}>Δ Piso {AU}</th>
+                    <th style={th}>Δ Muro {AU}</th>
+                    <th style={th}>Δ Borde {AU}</th>
                     <th style={th}>Δ {LU}</th>
-                    <th style={th}>Δ EA</th>
+                    <th style={th}>Δ UND</th>
                     <th style={{ ...th, color: "var(--cobalt)" }}>{AU} ordered</th>
                   </tr></thead>
                   <tbody>
@@ -257,22 +257,22 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
                         </td>
                       </tr>
                     ))}
-                    {!condRows.length && <tr><td colSpan={8} style={{ ...td, textAlign: "center", color: "var(--ink-muted)" }}>Only unchanged conditions, tick “show unchanged” to list them.</td></tr>}
+                    {!condRows.length && <tr><td colSpan={8} style={{ ...td, textAlign: "center", color: "var(--ink-muted)" }}>Solo condiciones sin cambios: marque «mostrar sin cambios» para listarlas.</td></tr>}
                   </tbody>
                 </table>
 
                 {sheetRows.length > 0 && (
                   <>
-                    <h3 style={{ fontFamily: "var(--f-display)", fontSize: 14, color: "var(--ink)", margin: "22px 0 8px" }}>By sheet</h3>
+                    <h3 style={{ fontFamily: "var(--f-display)", fontSize: 14, color: "var(--ink)", margin: "22px 0 8px" }}>Por hoja</h3>
                     <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
                       <thead><tr>
-                        <th style={{ ...th, textAlign: "left" }}>Sheet</th>
-                        <th style={{ ...th, textAlign: "left" }}>Status</th>
-                        <th style={th}>Δ Floor {AU}</th>
-                        <th style={th}>Δ Wall {AU}</th>
-                        <th style={th}>Δ Border {AU}</th>
+                        <th style={{ ...th, textAlign: "left" }}>Hoja</th>
+                        <th style={{ ...th, textAlign: "left" }}>Estado</th>
+                        <th style={th}>Δ Piso {AU}</th>
+                        <th style={th}>Δ Muro {AU}</th>
+                        <th style={th}>Δ Borde {AU}</th>
                         <th style={th}>Δ {LU}</th>
-                        <th style={th}>Δ EA</th>
+                        <th style={th}>Δ UND</th>
                       </tr></thead>
                       <tbody>
                         {sheetRows.map((s) => (
@@ -288,21 +288,21 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
                         ))}
                       </tbody>
                     </table>
-                    <p style={{ margin: "8px 0 0", fontSize: 11.5, color: "var(--ink-muted)" }}>Base measured quantities per sheet, multiplier and waste apply at condition level.</p>
+                    <p style={{ margin: "8px 0 0", fontSize: 11.5, color: "var(--ink-muted)" }}>Cantidades base medidas por hoja; el multiplicador y el desperdicio se aplican a nivel de condición.</p>
                   </>
                 )}
 
                 {matRows.length > 0 && (
                   <>
-                    <h3 style={{ fontFamily: "var(--f-display)", fontSize: 14, color: "var(--ink)", margin: "22px 0 8px" }}>Buy list</h3>
+                    <h3 style={{ fontFamily: "var(--f-display)", fontSize: 14, color: "var(--ink)", margin: "22px 0 8px" }}>Lista de compras</h3>
                     <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
                       <thead><tr>
                         <th style={{ ...th, textAlign: "left" }}>Material</th>
-                        <th style={{ ...th, textAlign: "left" }}>Status</th>
+                        <th style={{ ...th, textAlign: "left" }}>Estado</th>
                         <th style={th}>Qty ({nameOf(baseId)})</th>
                         <th style={th}>Qty ({nameOf(compareId)})</th>
                         <th style={th}>Δ</th>
-                        <th style={{ ...th, textAlign: "left", paddingLeft: 16 }}>Unit</th>
+                        <th style={{ ...th, textAlign: "left", paddingLeft: 16 }}>Unidad</th>
                       </tr></thead>
                       <tbody>
                         {matRows.map((m, i) => (

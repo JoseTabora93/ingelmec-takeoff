@@ -139,7 +139,7 @@ test("combining: the text layer outside the picture, OCR inside it, synchronousl
   const h = hybrid({ lines: READ });
   const o = sync(readCopyText([h.reader], BOX));
   assert.equal(o.kind === "text" && o.reader, TEXT_LAYER_OCR);
-  assert.equal(TEXT_LAYER_OCR, "Text layer + OCR");
+  assert.equal(TEXT_LAYER_OCR, "Capa de texto + OCR");
   // OVER once (the text layer's; OCR's read of it overlaps it), FAR not (outside the box)
   assert.equal(textOf(o), "VCT-1\nSIDE\tOVER\nBELOW");
   assert.deepEqual(h.boxCalls, []);
@@ -252,7 +252,7 @@ test("combining: a box over two pictures whose second read is declined, offline 
     assert.equal(textOf(o), "ONE\tPAPER", status);
     assert.equal(o.kind === "text" && o.reader, TEXT_LAYER_OCR, status);
     assert.equal(o.kind === "text" && o.imageUnread, true, status);
-    if (o.kind === "text") assert.equal(makeReceipt(o, { failed: false, scope: "box", key: "k", hybrid: true }).reader, "Text layer + OCR · the picture wasn't read", status);
+    if (o.kind === "text") assert.equal(makeReceipt(o, { failed: false, scope: "box", key: "k", hybrid: true }).reader, "Capa de texto + OCR · no se leyó la imagen", status);
     assert.deepEqual(h.boxCalls, [r1, r2], status);
   }
   // a second read that was stopped, failed or lost its page still ends the copy
@@ -292,13 +292,13 @@ test("OCR found nothing, off or not installed: every text-layer run in the box, 
 });
 
 test("declined, offline or too large: every text-layer run in the box, and the receipt says the picture wasn't read", async () => {
-  assert.equal(PICTURE_UNREAD_NOTE, "the picture wasn't read");
+  assert.equal(PICTURE_UNREAD_NOTE, "no se leyó la imagen");
   for (const status of ["declined", "error", "too-large"] as const) {
     const o = await readCopyText([missRead(status).reader], BOX);
     assert.equal(textOf(o), "SIDE\tOVER\nBELOW", status);
     assert.equal(o.kind === "text" && o.reader, TEXT_LAYER, status);
     assert.equal(o.kind === "text" && o.imageUnread, true, status);
-    if (o.kind === "text") assert.equal(makeReceipt(o, { failed: false, scope: "box", key: "k", hybrid: true }).reader, "Text layer · the picture wasn't read", status);
+    if (o.kind === "text") assert.equal(makeReceipt(o, { failed: false, scope: "box", key: "k", hybrid: true }).reader, "Capa de texto · no se leyó la imagen", status);
     // and with nothing on the text layer either: empty, with the reason
     const e = await readCopyText([missRead(status, tcOf()).reader], BOX);
     assert.equal(e.kind === "empty" && e.miss?.status, status, status);
@@ -363,25 +363,25 @@ test("a hybrid's messages never call the sheet a scan, whatever scanLike says", 
   }
   // an empty hybrid box the read found nothing in names OCR once, not the combined label
   const m = outcomeMessage(outs[0], "box", false, true);
-  assert.equal(m, "No text found in that box: no text-layer text there, and OCR read none.");
+  assert.equal(m, "No se encontró texto en ese recuadro: no hay texto de capa de texto ahí, y OCR no leyó nada.");
 });
 
 test("an empty hybrid box with OCR off says the picture can't be read here, and why", () => {
   const off = (status: "disabled" | "uninstalled") => sync(readCopyText([hybrid({ startMiss: { status }, tc: tcOf() }).reader], BOX));
-  assert.equal(outcomeMessage(off("disabled"), "box", false, true), "No text layer in that box, and the picture can't be read here: on-device reading is turned off on this site.");
-  assert.equal(outcomeMessage(off("uninstalled"), "box", false, true), "No text layer in that box, and the picture can't be read here: this site doesn't have the on-device reader installed.");
+  assert.equal(outcomeMessage(off("disabled"), "box", false, true), "No hay capa de texto en ese recuadro, y la imagen no se puede leer aquí: la lectura en el dispositivo está apagada en este sitio.");
+  assert.equal(outcomeMessage(off("uninstalled"), "box", false, true), "No hay capa de texto en ese recuadro, y la imagen no se puede leer aquí: este sitio no tiene instalado el lector del dispositivo.");
   // a scan's and a plain vector sheet's wording is unchanged
-  assert.match(outcomeMessage(off("disabled"), "box", true), /little or no text layer/);
-  assert.equal(outcomeMessage(off("disabled"), "box", false), "No text in that box.");
+  assert.match(outcomeMessage(off("disabled"), "box", true), /poca o ninguna capa de texto/);
+  assert.equal(outcomeMessage(off("disabled"), "box", false), "No hay texto en ese recuadro.");
 });
 
 test("the receipt names a combined copy, and keeps the scan's note off a hybrid", () => {
   const o = sync(readCopyText([hybrid({ lines: READ }).reader], BOX));
   if (o.kind !== "text") return assert.fail(o.kind);
-  assert.equal(makeReceipt(o, { failed: false, scope: "box", key: "k", hybrid: true }).reader, "Text layer + OCR");
+  assert.equal(makeReceipt(o, { failed: false, scope: "box", key: "k", hybrid: true }).reader, "Capa de texto + OCR");
   const unread = { ...o, reader: TEXT_LAYER, imageUnread: true as const };
-  assert.equal(makeReceipt(unread, { failed: false, scope: "box", key: "k", hybrid: true }).reader, "Text layer · the picture wasn't read");
-  assert.equal(makeReceipt(unread, { failed: false, scope: "box", key: "k" }).reader, "Text layer · the scanned image wasn't read", "a scan's note unchanged");
+  assert.equal(makeReceipt(unread, { failed: false, scope: "box", key: "k", hybrid: true }).reader, "Capa de texto · no se leyó la imagen");
+  assert.equal(makeReceipt(unread, { failed: false, scope: "box", key: "k" }).reader, "Capa de texto · no se leyó la imagen escaneada", "a scan's note unchanged");
 });
 
 // ── the real synthetic hybrid and its captured read ─────────────────────────

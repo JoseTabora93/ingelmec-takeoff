@@ -9,10 +9,10 @@ import { parseSheetKey } from "../lib/sheets";
 
 function ago(ms) {
   const m = Math.round(ms / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m} min ago`;
+  if (m < 1) return "ahora mismo";
+  if (m < 60) return `hace ${m} min`;
   const h = Math.round(m / 60);
-  return `${h} h ago`;
+  return `hace ${h} h`;
 }
 
 function sheetLabel(sheet) {
@@ -49,9 +49,9 @@ export default function PresenceChip({ bridge }) {
   if (!peers.length) return null;
   const first = peers[0];
   const firstSheet = sheetLabel(first.sheet);
-  const line = `${first.name} has this project open, last seen ${ago(first.ageMs)}${firstSheet ? `, on ${firstSheet}` : ""}`;
+  const line = `${first.name} tiene este proyecto abierto, visto por última vez ${ago(first.ageMs)}${firstSheet ? `, on ${firstSheet}` : ""}`;
   const title = peers
-    .map((p) => `${p.name}, last seen ${ago(p.ageMs)}${sheetLabel(p.sheet) ? `, on ${sheetLabel(p.sheet)}` : ""}`)
+    .map((p) => `${p.name}, visto ${ago(p.ageMs)}${sheetLabel(p.sheet) ? `, en ${sheetLabel(p.sheet)}` : ""}`)
     .join("\n");
 
   return (
@@ -62,7 +62,7 @@ export default function PresenceChip({ bridge }) {
       overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
     }}>
       <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: "var(--c-positive)", flex: "none" }} />
-      {peers.length === 1 ? line : `${peers.length} teammates in this project`}
+      {peers.length === 1 ? line : `${peers.length} compañeros en este proyecto`}
     </span>
   );
 }

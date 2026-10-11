@@ -36,7 +36,7 @@ const row: ScheduleRow = {
   manufacturer: "VENDOR-A", style: "", spec_color: "", size: "", remarks: "", suggested: true,
 };
 const NO_TABLE = { rows: [] as [], refused: "no-table" as const };
-const WHERE = "(its CODE / TAG / MARK / SYMBOL column and MATERIAL / MANUFACTURER / COLOR headers)";
+const WHERE = "(con su columna CÓDIGO / ETIQUETA / MARCA / SÍMBOLO y encabezados MATERIAL / FABRICANTE / COLOR)";
 
 test("finish table rows open the dialog", () => {
   for (const pageHasText of [true, false]) {
@@ -99,13 +99,13 @@ test("countTextRuns counts only runs with a letter or digit", () => {
 test("a title refusal names the title", () => {
   assert.equal(
     refusalMessage("title", "DOOR SCHEDULE"),
-    `That's the "DOOR SCHEDULE", not a finish/material schedule, drag around the finish schedule instead.`,
+    `Eso es «DOOR SCHEDULE», no un cuadro de acabados o materiales: arrastre alrededor del cuadro de acabados.`,
   );
 });
 
 test("a title refusal without a title, and every other refusal, use the generic wording", () => {
-  const generic = "That table doesn't look like a finish/material schedule, drag around the finish schedule "
-    + "(its CODE / TAG / MARK / SYMBOL column and MATERIAL / MANUFACTURER / COLOR headers).";
+  const generic = "Esa tabla no parece un cuadro de acabados o materiales: arrastre alrededor del cuadro de acabados "
+    + "(con su columna CÓDIGO / ETIQUETA / MARCA / SÍMBOLO y encabezados MATERIAL / FABRICANTE / COLOR).";
   assert.equal(refusalMessage("title"), generic);
   for (const refused of ["equipment", "foreign-header", "no-color-style-pattern"] as RefusalReason[]) {
     // a title that passed the finish reader's title check (it may even say
@@ -116,20 +116,20 @@ test("a title refusal without a title, and every other refusal, use the generic 
 });
 
 test("refusalWhy is the reason clause the agent's note shares", () => {
-  assert.equal(refusalWhy("title", "DOOR SCHEDULE"), `That's the "DOOR SCHEDULE", not a finish/material schedule`);
-  assert.equal(refusalWhy("foreign-header", "X"), "That table doesn't look like a finish/material schedule");
+  assert.equal(refusalWhy("title", "DOOR SCHEDULE"), `Eso es «DOOR SCHEDULE», no un cuadro de acabados o materiales`);
+  assert.equal(refusalWhy("foreign-header", "X"), "Esa tabla no parece un cuadro de acabados o materiales");
 });
 
 test("the hints name every key column, not CODE alone", () => {
   for (const s of [NO_SCHEDULE_HINT, refusalMessage("equipment"), EMPTY_BOX_MESSAGE, OCR_NO_ROWS_MESSAGE]) {
-    for (const k of ["CODE", "TAG", "MARK", "SYMBOL"]) assert.match(s, new RegExp(`\\b${k}\\b`), s);
+    for (const k of ["CÓDIGO", "ETIQUETA", "MARCA", "SÍMBOLO"]) assert.match(s, new RegExp(`\\b${k}\\b`), s);
   }
 });
 
 // The box too small to read (the canvas's size gate) is a mis-drag, never a
 // claim about the page.
 test("the empty-box message aims the next drag and never claims a raster page", () => {
-  assert.equal(EMPTY_BOX_MESSAGE, `No text in that box, drag around the finish/material schedule ${WHERE}.`);
+  assert.equal(EMPTY_BOX_MESSAGE, `No hay texto en ese recuadro: arrastre alrededor del cuadro de acabados o materiales ${WHERE}.`);
   assert.doesNotMatch(EMPTY_BOX_MESSAGE, /scann|raster/i);
 });
 
@@ -141,21 +141,21 @@ test("the reader unavailable: two reasons by two box kinds", () => {
   const raster = { textRuns: 0, pageHasText: false };
   assert.equal(
     ocrUnavailableMessage("disabled", raster),
-    "No schedule text here, this page looks like a raster image (no text layer), and on-device reading is turned off on this site.",
+    "No hay texto de cuadro aquí: esta página parece una imagen ráster (sin capa de texto), y la lectura en el dispositivo está apagada en este sitio.",
   );
   assert.equal(
     ocrUnavailableMessage("uninstalled", raster),
-    "No schedule text here, this page looks like a raster image (no text layer), and this site doesn't have the on-device reader installed.",
+    "No hay texto de cuadro aquí: esta página parece una imagen ráster (sin capa de texto), y este sitio no tiene instalado el lector del dispositivo.",
   );
   for (const box of [{ textRuns: 0, pageHasText: true }, { textRuns: 3, pageHasText: true }, { textRuns: 3, pageHasText: false }]) {
     assert.equal(
       ocrUnavailableMessage("disabled", box),
-      "No schedule found in that box. If it's a raster image, on-device reading is turned off on this site.",
+      "No se encontró un cuadro en ese recuadro. Si es una imagen ráster, la lectura en el dispositivo está apagada en este sitio.",
       JSON.stringify(box),
     );
     assert.equal(
       ocrUnavailableMessage("uninstalled", box),
-      "No schedule found in that box. If it's a raster image, this site doesn't have the on-device reader installed.",
+      "No se encontró un cuadro en ese recuadro. Si es una imagen ráster, este sitio no tiene instalado el lector del dispositivo.",
       JSON.stringify(box),
     );
   }
@@ -174,7 +174,7 @@ test("the reader's own result: rows, a refusal, or the no-rows hint naming WHERE
   assert.deepEqual(routeOcrRead(NO_TABLE), { kind: "message", text: OCR_NO_ROWS_MESSAGE });
   assert.equal(
     OCR_NO_ROWS_MESSAGE,
-    `No schedule found in that box, the on-device reader found no finish/material rows. Drag around the schedule ${WHERE}.`,
+    `No se encontró un cuadro en ese recuadro: el lector del dispositivo no halló filas de acabados o materiales. Arrastre alrededor del cuadro ${WHERE}.`,
   );
 });
 
@@ -188,7 +188,7 @@ const span = (str: string, x: number, y: number) => ({ str, x, y, w: 40, h: 12 }
 test("the no-header hint is worded as decided", () => {
   assert.equal(
     OCR_NO_HEADER_MESSAGE,
-    "Found finish codes in a column but no header row the reader could read. The headers may be rotated (which can't be read yet) or outside the box, box the schedule with a header row that reads left to right.",
+    "Se encontraron códigos de acabado en una columna, pero ninguna fila de encabezado que el lector pudiera leer. Los encabezados pueden estar rotados (aún no se pueden leer) o fuera del recuadro: encierre el cuadro con una fila de encabezado que se lea de izquierda a derecha.",
   );
 });
 
@@ -233,13 +233,13 @@ test("the hint is only for no table: rows and other refusals are unchanged", () 
 });
 
 test("declined, failed, and the status lines are worded as decided", () => {
-  assert.equal(OCR_DECLINED_MESSAGE, "Not read, reading a raster schedule needs the on-device reader, which wasn't downloaded.");
-  assert.equal(ocrFailedMessage("OCR engine not ready"), "Couldn't read that box on this device (OCR engine not ready), try again.");
-  assert.equal(OCR_BUSY_MESSAGE, "Still reading the last box.");
-  assert.equal(OCR_STARTING_MESSAGE, "Starting the on-device reader…");
-  assert.equal(OCR_READING_MESSAGE, "Reading the schedule on this device…");
-  assert.equal(OCR_WAITING_MESSAGE, "Waiting for another read…", "Copy text's waiting line, word for word");
-  assert.equal(OCR_TOO_LARGE_MESSAGE, "That box is too large to read, draw it around the schedule only.");
+  assert.equal(OCR_DECLINED_MESSAGE, "Sin leer: leer un cuadro ráster requiere el lector del dispositivo, que no se descargó.");
+  assert.equal(ocrFailedMessage("OCR engine not ready"), "No se pudo leer ese recuadro en este dispositivo (OCR engine not ready): intente de nuevo.");
+  assert.equal(OCR_BUSY_MESSAGE, "Aún se lee el último recuadro.");
+  assert.equal(OCR_STARTING_MESSAGE, "Iniciando el lector del dispositivo…");
+  assert.equal(OCR_READING_MESSAGE, "Leyendo el cuadro en este dispositivo…");
+  assert.equal(OCR_WAITING_MESSAGE, "Esperando otra lectura…", "Copy text's waiting line, word for word");
+  assert.equal(OCR_TOO_LARGE_MESSAGE, "Ese recuadro es demasiado grande para leerlo: dibújelo solo alrededor del cuadro.");
 });
 
 test("the reading line counts rasters read only when the box takes several, never as n/N", () => {
@@ -252,9 +252,9 @@ test("the reading line counts rasters read only when the box takes several, neve
   // several planned, none read yet: still the plain line, not "0 rasters"
   assert.equal(ocrReadingMessage(p(0, 4)), OCR_READING_MESSAGE);
   // several: how many are read (the total grows when patches join the plan)
-  assert.equal(ocrReadingMessage(p(1, 4)), "Reading the schedule on this device… (1 raster read)");
-  assert.equal(ocrReadingMessage(p(3, 4)), "Reading the schedule on this device… (3 rasters read)");
-  assert.equal(ocrReadingMessage(p(5, 6)), "Reading the schedule on this device… (5 rasters read)");
+  assert.equal(ocrReadingMessage(p(1, 4)), "Leyendo el cuadro en este dispositivo… (1 raster read)");
+  assert.equal(ocrReadingMessage(p(3, 4)), "Leyendo el cuadro en este dispositivo… (3 rasters read)");
+  assert.equal(ocrReadingMessage(p(5, 6)), "Leyendo el cuadro en este dispositivo… (5 rasters read)");
 });
 
 /** A fake element: a tag, its attributes and a parent. closest() matches a

@@ -270,7 +270,7 @@ export function createCloudStore(folderId, drive, { local = localStore, maxPdfBy
     // a findChild-by-name in the project folder wouldn't find them.
     await ensureManifest();
     const entry = manifestFiles.find((f) => f.name === name);
-    if (!entry) throw new Error(`PDF not in project sheet set: ${name}`);
+    if (!entry) throw new Error(`El PDF no está en el juego de hojas del proyecto: ${name}`);
     const bytes = await drive.getFileBytes(entry.id);
     // a fresh view; pdfBytes hands each caller its own copy of it (pdf.js
     // getDocument({data}) may detach what it's given)
@@ -433,7 +433,7 @@ export function createCloudStore(folderId, drive, { local = localStore, maxPdfBy
         // Tagged so the canvas load can leave autosave DISARMED (like a stale tab)
         // instead of overwriting Drive. See TakeoffCanvas mount-load catch.
         throw Object.assign(
-          new Error(`Couldn't read this project's saved takeoff from Drive, reload to retry. (${e?.message || e})`),
+          new Error(`No se pudo leer el takeoff guardado de este proyecto desde Drive: recargue para reintentar. (${e?.message || e})`),
           { name: "CloudLoadError" },
         );
       }

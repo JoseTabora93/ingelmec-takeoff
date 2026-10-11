@@ -175,10 +175,10 @@ function CoveragePresetSelect({ material: m, onPick }) {
   return (
     <select name="coverage-preset" value={presets.some((t) => t.label === m.note) ? m.note : ""}
       onChange={(e) => { const t = presets.find((x) => x.label === e.target.value); if (t) onPick({ note: t.label, per: t.per }); }}
-      title="Coverage preset, trowel notch / spread rate. Generic industry-typical values; verify against the product data sheet."
+      title="Preajuste de cobertura: muesca de llana y rendimiento. Valores genéricos típicos de la industria; verifíquelos con la ficha técnica del producto."
       style={{ ...ip, background: "var(--paper-bright)" }}>
-      <option value="">preset…</option>
-      {presets.map((t) => <option key={t.label} value={t.label}>{t.label} · {t.per} SF/{m.unit || "unit"}</option>)}
+      <option value="">preajuste…</option>
+      {presets.map((t) => <option key={t.label} value={t.label}>{t.label} · {t.per} SF/{m.unit || "unidad"}</option>)}
     </select>
   );
 }
@@ -192,7 +192,7 @@ function MaterialsEditor({ materials, onAdd, onUpdate, onRemove, library, libByI
   // and grows a per-field ↺ revert; unlinked lines can be promoted to the library
   const OV = "1px solid var(--c-warning)";
   const rv = (m, f) => (
-    <button onClick={() => onRevert(m, f)} title="Revert this field to the library value"
+    <button onClick={() => onRevert(m, f)} title="Revertir este campo al valor de la biblioteca"
       style={{ padding: "0 3px", border: "none", background: "transparent", color: "var(--c-warning)", cursor: "pointer", fontSize: 11, lineHeight: 1 }}>↺</button>
   );
   return (
@@ -223,44 +223,44 @@ function MaterialsEditor({ materials, onAdd, onUpdate, onRemove, library, libByI
             {/* family state: this row still follows the original, or it is this condition's own */}
             {twin && (
               <span title={m.inherited
-                ? `Following ${parentTag || "the family"}, edit any field here and this row stops following (the others keep following)`
-                : `This row is this condition's own${m.origin_id ? `, it no longer follows ${parentTag || "the family"}` : ""}`}
+                ? `Sigue a ${parentTag || "la familia"}: edite cualquier campo aquí y esta fila deja de seguirla (las demás siguen)`
+                : `Esta fila es propia de esta condición${m.origin_id ? `: ya no sigue a ${parentTag || "la familia"}` : ""}`}
                 style={{ fontSize: 10, lineHeight: 1, cursor: "default", padding: "2px 3px",
                   color: m.inherited ? "var(--ink-faint)" : "var(--cobalt)",
                   border: `1px solid ${m.inherited ? "var(--ink-faint)" : "var(--cobalt)"}` }}>{m.inherited ? "↳" : "✎"}</span>
             )}
             {twin && !m.inherited && m.origin_id && onFollowFamilyRow && (
-              <button onClick={() => onFollowFamilyRow(m.id)} title={`Follow the family again, take this row's values back from ${parentTag || "the original"}`}
-                style={{ padding: "1px 4px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 10, lineHeight: 1.4 }}>↺ follow</button>
+              <button onClick={() => onFollowFamilyRow(m.id)} title={`Volver a seguir a la familia: recupera los valores de esta fila desde ${parentTag || "el original"}`}
+                style={{ padding: "1px 4px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 10, lineHeight: 1.4 }}>↺ seguir</button>
             )}
-            {lm && <span title={`Linked to “${lm.name}” in the material library, amber fields differ from the library values`} style={{ color: "var(--ink-muted)", fontSize: 11, cursor: "default" }}>⛓</span>}
-            <input name="material-name" value={m.name} onChange={(e) => onUpdate(m.id, { name: e.target.value })} placeholder="Material (e.g. Adhesive)" style={{ ...ip, width: 160, ...(ov("name") ? { border: OV } : {}) }} />
+            {lm && <span title={`Vinculado a «${lm.name}» en la biblioteca de materiales: los campos en ámbar difieren de los valores de la biblioteca`} style={{ color: "var(--ink-muted)", fontSize: 11, cursor: "default" }}>⛓</span>}
+            <input name="material-name" value={m.name} onChange={(e) => onUpdate(m.id, { name: e.target.value })} placeholder="Material (p. ej. Adhesivo)" style={{ ...ip, width: 160, ...(ov("name") ? { border: OV } : {}) }} />
             {ov("name") && rv(m, "name")}
             <span style={{ color: "var(--ink-muted)" }}>1</span>
-            <input name="material-unit" value={m.unit} onChange={(e) => onUpdate(m.id, { unit: e.target.value })} placeholder="unit" style={{ ...ip, width: 60, ...(ov("unit") ? { border: OV } : {}) }} />
+            <input name="material-unit" value={m.unit} onChange={(e) => onUpdate(m.id, { unit: e.target.value })} placeholder="unidad" style={{ ...ip, width: 60, ...(ov("unit") ? { border: OV } : {}) }} />
             {ov("unit") && rv(m, "unit")}
             <span style={{ color: "var(--ink-muted)" }}>per</span>
             <input name="material-per" type="number" min="0" step="any" value={m.per || ""} onChange={(e) => onUpdate(m.id, { per: Math.max(0, parseFloat(e.target.value) || 0) })} placeholder="0" style={{ ...ip, width: 66, ...(ov("per") ? { border: OV } : {}) }} />
             {ov("per") && rv(m, "per")}
             <select name="material-basis" value={m.basis || "area"} onChange={(e) => onUpdate(m.id, { basis: e.target.value })} style={{ ...ip, background: "var(--paper-bright)", ...(ov("basis") ? { border: OV } : {}) }}>
-              <option value="area">floor SF</option>
-              <option value="linear">linear LF</option>
-              <option value="count">each</option>
-              <option value="seam_lf" title="Figured seam length from the roll layout, 0 until this condition carries a roll setup">seam LF</option>
+              <option value="area">SF de piso</option>
+              <option value="linear">lineal LF</option>
+              <option value="count">unidad (UND)</option>
+              <option value="seam_lf" title="Longitud de traslape calculada del diseño del rollo; 0 hasta que esta condición tenga una configuración de rollo">LF de traslape</option>
             </select>
             {ov("basis") && rv(m, "basis")}
-            <label style={{ display: "inline-flex", alignItems: "center", gap: 4, color: ov("round") ? "var(--c-warning)" : "var(--ink-muted)" }} title="Round up to whole units (you buy whole buckets/bags)">
-              <input name="material-round" type="checkbox" checked={m.round !== false} onChange={(e) => onUpdate(m.id, { round: e.target.checked })} />round up
+            <label style={{ display: "inline-flex", alignItems: "center", gap: 4, color: ov("round") ? "var(--c-warning)" : "var(--ink-muted)" }} title="Redondear hacia arriba a unidades enteras (se compran cubetas o bolsas completas)">
+              <input name="material-round" type="checkbox" checked={m.round !== false} onChange={(e) => onUpdate(m.id, { round: e.target.checked })} />redondear hacia arriba
             </label>
             {ov("round") && rv(m, "round")}
             <CoveragePresetSelect material={m} onPick={(patch) => onUpdate(m.id, patch)} />
-            <input name="material-note" value={m.note || ""} onChange={(e) => onUpdate(m.id, { note: e.target.value })} placeholder="note (coats, trowel…)" style={{ ...ip, width: 150, ...(ov("note") ? { border: OV } : {}) }} />
+            <input name="material-note" value={m.note || ""} onChange={(e) => onUpdate(m.id, { note: e.target.value })} placeholder="nota (manos, llana…)" style={{ ...ip, width: 150, ...(ov("note") ? { border: OV } : {}) }} />
             {ov("note") && rv(m, "note")}
             {!lm && onPromote && (
-              <button onClick={() => onPromote(m)} title="Save this material to the library (this line becomes linked)"
+              <button onClick={() => onPromote(m)} title="Guardar este material en la biblioteca (esta línea queda vinculada)"
                 style={{ padding: "2px 7px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 11 }}>→ lib</button>
             )}
-            <button onClick={() => onRemove(m.id)} title="Remove this material"
+            <button onClick={() => onRemove(m.id)} title="Quitar este material"
               style={{ padding: "2px 7px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 12 }}>✕</button>
             {/* the calculator renders ONLY when the line HAS geometry; a grout
                 line without it keeps its rate untouched behind an explicit
@@ -273,44 +273,44 @@ function MaterialsEditor({ materials, onAdd, onUpdate, onRemove, library, libByI
                     {/* read-only: the height belongs to the CONDITION, and an editable copy
                         here would be a second owner of one number. No height = not figurable,
                         which says so rather than deriving off a default. */}
-                    <span title="Base height, set on the condition, not here"
+                    <span title="Altura de rodapié: se fija en la condición, no aquí"
                       style={{ fontFamily: "var(--f-mono, monospace)", padding: "2px 5px", border: "1px dashed var(--ink-faint)",
                         color: Number(heightFt) > 0 ? "var(--ink)" : "var(--c-warning)" }}>
-                      {Number(heightFt) > 0 ? `${inFrac(Number(heightFt) * 12)}″ H` : "set height on condition"}
+                      {Number(heightFt) > 0 ? `${inFrac(Number(heightFt) * 12)}″ H` : "fije la altura en la condición"}
                     </span>
                     {/* piece height defaults to the base height (one course); a SHORTER one
                         is multi-course base, where the interior horizontal joints are real */}
                     <span>· pc</span>
-                    {gi("tileL", "Piece height (in), defaults to the base height (one course). Enter a SHORTER piece for multi-course base (a 6″ band of 2×2 mosaic is three courses)", { width: 52 })}
+                    {gi("tileL", "Altura de pieza (in): por omisión es la altura del rodapié (una hilada). Escriba una pieza MÁS BAJA para rodapié de varias hiladas (una franja de 6″ de mosaico 2×2 son tres hiladas)", { width: 52 })}
                     <span>×</span>
-                    {gi("tileW", "Piece width (in), for field-cut base, the parent tile dimension you did NOT rip")}
+                    {gi("tileW", "Ancho de pieza (in): para rodapié cortado en obra, la dimensión de la loseta madre que NO se corta a lo largo")}
                     {baseCourses(g, heightFt) > 1 && (
-                      <span title="Courses of base, a fractional last course is a CUT (waste), not more grout">
+                      <span title="Hiladas de rodapié: una última hilada fraccionaria es un CORTE (desperdicio), no más boquilla">
                         ({Math.round(baseCourses(g, heightFt) * 100) / 100} crs)
                       </span>
                     )}
                   </>
                 ) : (
                   <>
-                    <span>tile</span>
-                    {gi("tileL", "Tile length (in)")}
+                    <span>loseta</span>
+                    {gi("tileL", "Largo de loseta (in)")}
                     <span>×</span>
-                    {gi("tileW", "Tile width (in)")}
+                    {gi("tileW", "Ancho de loseta (in)")}
                   </>
                 )}
-                <span>× thick</span>
-                {gi("tileT", "Tile thickness (in)")}
-                <span>″ · joint</span>
-                {gi("joint", "Joint width (in), 1/32″ to 1/2″", { min: 0.03125, max: 0.5, width: 62 })}
-                <span>″ · bag</span>
-                {gi("bagLbs", "Bag size (lbs)")}
+                <span>× espesor</span>
+                {gi("tileT", "Espesor de loseta (in)")}
+                <span>″ · junta</span>
+                {gi("joint", "Ancho de junta (in), de 1/32″ a 1/2″", { min: 0.03125, max: 0.5, width: 62 })}
+                <span>″ · bolsa</span>
+                {gi("bagLbs", "Tamaño de bolsa (lb)")}
                 <span>lb</span>
                 {ov("grout") && rv(m, "grout")}
                 {groutRateStale(m, heightFt) && (
                   <button onClick={() => setGrout({})}
-                    title={`This line's rate (${m.per} per LF-basis unit) is not what its geometry and this condition's base height derive. A rate figured for a different base height, from a library entry or a hand edit, does not follow the height here. Click to re-derive.`}
+                    title={`El rendimiento de esta línea (${m.per} por unidad de base LF) no es el que dan su geometría y la altura de rodapié de esta condición. Un rendimiento calculado para otra altura, tomado de la biblioteca o editado a mano, no sigue la altura de aquí. Clic para recalcular.`}
                     style={{ padding: "1px 6px", borderRadius: 0, border: "1px solid var(--c-warning)", background: "transparent", color: "var(--c-warning)", cursor: "pointer", fontSize: 11 }}>
-                    ⚠ rate ≠ geometry · re-derive
+                    ⚠ rendimiento ≠ geometría · recalcular
                   </button>
                 )}
               </div>
@@ -319,10 +319,10 @@ function MaterialsEditor({ materials, onAdd, onUpdate, onRemove, library, libByI
               <div style={{ flexBasis: "100%", display: "flex", alignItems: "center", gap: 6, paddingLeft: 14 }}>
                 <button onClick={() => setGrout({})}
                   title={isLinearGrout(m)
-                    ? "Start the base-grout calculator with standard geometry (3/8″ thick @ 1/8″ joint, 25 lb bag), the piece height comes from the condition. REPLACES this line's coverage rate and note"
-                    : "Start the grout calculator with standard tile geometry (12×24×3/8″ @ 1/8″, 25 lb bag), REPLACES this line's coverage rate and note with the derived values"}
+                    ? "Iniciar la calculadora de boquilla de rodapié con geometría estándar (3/8″ de espesor, junta de 1/8″, bolsa de 25 lb): la altura de la pieza viene de la condición. REEMPLAZA el rendimiento y la nota de esta línea"
+                    : "Iniciar la calculadora de boquilla con geometría de loseta estándar (12×24×3/8″, junta de 1/8″, bolsa de 25 lb): REEMPLAZA el rendimiento y la nota de esta línea con los valores calculados"}
                   style={{ padding: "2px 7px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 11 }}>
-                  {isLinearGrout(m) ? "derive from base geometry…" : "derive from tile geometry…"}
+                  {isLinearGrout(m) ? "calcular desde la geometría del rodapié…" : "calcular desde la geometría de la loseta…"}
                 </button>
                 {ov("grout") && rv(m, "grout")}
               </div>
@@ -331,7 +331,7 @@ function MaterialsEditor({ materials, onAdd, onUpdate, onRemove, library, libByI
         );
       })}
       {/* Rows this twin threw away. They stay visible (struck through) rather than silently
-          vanishing, because "this area has no moisture barrier" is a DECISION, and it is also
+          vanishing, because "esta área no tiene barrera de humedad" is a DECISION, and it is also
           what stops a later family edit from quietly putting it back. */}
       {twin && dropped.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 2, paddingTop: 4, borderTop: "1px dashed var(--ink-faint)" }}>
@@ -340,11 +340,11 @@ function MaterialsEditor({ materials, onAdd, onUpdate, onRemove, library, libByI
             return (
               <div key={k} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--ink-muted)" }}>
                 <span style={{ color: "var(--c-danger)" }}>✕</span>
-                <span style={{ textDecoration: "line-through" }}>{src?.name || "(removed material)"}</span>
-                <span style={{ fontSize: 10 }}>removed here</span>
+                <span style={{ textDecoration: "line-through" }}>{src?.name || "(material quitado)"}</span>
+                <span style={{ fontSize: 10 }}>quitado aquí</span>
                 {src && onRestoreDroppedRow && (
-                  <button onClick={() => onRestoreDroppedRow(k)} title={`Put it back, takes the row from ${parentTag || "the family"} again`}
-                    style={{ padding: "1px 4px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 10, lineHeight: 1.4 }}>↺ restore</button>
+                  <button onClick={() => onRestoreDroppedRow(k)} title={`Devolverla: toma de nuevo la fila desde ${parentTag || "la familia"}`}
+                    style={{ padding: "1px 4px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 10, lineHeight: 1.4 }}>↺ restaurar</button>
                 )}
               </div>
             );
@@ -352,13 +352,13 @@ function MaterialsEditor({ materials, onAdd, onUpdate, onRemove, library, libByI
         </div>
       )}
       <button onClick={onAdd}
-        style={{ marginTop: 2, padding: "4px 10px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>+ add material</button>
+        style={{ marginTop: 2, padding: "4px 10px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>+ agregar material</button>
       {onAttach && (library || []).length > 0 && (
         <select name="attach-material" value="" onChange={(e) => { if (e.target.value) onAttach(e.target.value); }}
-          title="Attach a material from the library, the line copies the library values and stays linked"
+          title="Adjuntar un material de la biblioteca: la línea copia los valores de la biblioteca y queda vinculada"
           style={{ ...ip, marginLeft: 6, background: "var(--paper-bright)", color: "var(--ink-muted)" }}>
-          <option value="">+ from library…</option>
-          {library.map((lm) => <option key={lm.id} value={lm.id}>{lm.name || "(unnamed)"}{lm.per ? ` · ${lm.per}/${lm.unit || "?"}` : ""}</option>)}
+          <option value="">+ de la biblioteca…</option>
+          {library.map((lm) => <option key={lm.id} value={lm.id}>{lm.name || "(sin nombre)"}{lm.per ? ` · ${lm.per}/${lm.unit || "?"}` : ""}</option>)}
         </select>
       )}
     </>
@@ -377,9 +377,9 @@ function ColumnSelects({ columns, cond, onAssign }) {
           <label key={cc.id} style={{ display: "inline-flex", alignItems: "center", gap: 5, marginRight: 12, marginBottom: 6 }}>
             <span style={{ color: "var(--ink-muted)" }}>{columnLabel(cc)}</span>
             <select name="assign-column-value" value={v} onChange={(e) => onAssign(cc.id, e.target.value)} style={{ ...ip, background: "var(--paper-bright)" }}>
-              <option value="">Unassigned</option>
+              <option value="">Sin asignar</option>
               {cc.values.map((val) => <option key={val} value={val}>{val}</option>)}
-              {v && !cc.values.includes(v) && <option value={v}>{v} (removed)</option>}
+              {v && !cc.values.includes(v) && <option value={v}>{v} (quitado)</option>}
             </select>
           </label>
         );
@@ -394,8 +394,8 @@ function AddValueInput({ onAdd }) {
   const commit = () => { const t = v.trim(); if (t) onAdd(t); setV(""); };
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-      <input name="column-add-value" value={v} onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && commit()} placeholder="add value" style={{ ...ip, width: 90 }} />
-      <button onClick={commit} title="Add this value to the list"
+      <input name="column-add-value" value={v} onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && commit()} placeholder="agregar valor" style={{ ...ip, width: 90 }} />
+      <button onClick={commit} title="Agregar este valor a la lista"
         style={{ padding: "2px 7px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>+</button>
     </span>
   );
@@ -448,25 +448,25 @@ export function ConditionAppearanceEditor({ cond: c, onUpdateCond, onSetCondPara
       {isRow && rule()}
       {isRow ? (
         <div ref={paletteRef} style={{ display: "flex", alignItems: "center", gap: 6, position: "relative" }}>
-          <button data-testid="line-swatch" title={`Line color, ${c.color || "default"}`} aria-expanded={paletteOpen === "line"}
+          <button data-testid="line-swatch" title={`Color de línea, ${c.color || "predeterminado"}`} aria-expanded={paletteOpen === "line"}
             onClick={() => setPaletteOpen((v) => (v === "line" ? null : "line"))}
             style={{ display: "flex", alignItems: "center", gap: 5, padding: "2px 7px 2px 4px", borderRadius: 0, border: `1px solid ${paletteOpen === "line" ? "var(--ink)" : "var(--ink-faint)"}`, background: "var(--paper-bright)", cursor: "pointer", fontSize: 10.5, color: "var(--ink-muted)" }}>
             <span aria-hidden style={{ width: 16, height: 16, display: "block", borderRadius: 4, border: "1px solid var(--ink-faint)", background: `linear-gradient(to top right, transparent calc(50% - 1.5px), ${activeColor} calc(50% - 1.5px), ${activeColor} calc(50% + 1.5px), transparent calc(50% + 1.5px))` }} />
-            Line
+            Línea
           </button>
-          <button data-testid="fill-swatch" title={`Fill color, ${c.fill === NO_FILL || !c.fill ? "none" : c.fill}`} aria-expanded={paletteOpen === "fill"}
+          <button data-testid="fill-swatch" title={`Color de relleno, ${c.fill === NO_FILL || !c.fill ? "none" : c.fill}`} aria-expanded={paletteOpen === "fill"}
             onClick={() => setPaletteOpen((v) => (v === "fill" ? null : "fill"))}
             style={{ display: "flex", alignItems: "center", gap: 5, padding: "2px 7px 2px 4px", borderRadius: 0, border: `1px solid ${paletteOpen === "fill" ? "var(--ink)" : "var(--ink-faint)"}`, background: "var(--paper-bright)", cursor: "pointer", fontSize: 10.5, color: "var(--ink-muted)" }}>
             {c.fill && c.fill !== NO_FILL
               ? <span aria-hidden style={{ width: 16, height: 16, display: "block", borderRadius: 4, background: c.fill, opacity: 0.55, border: "1px solid var(--ink-faint)" }} />
               : <span aria-hidden style={{ width: 16, height: 16, display: "block", borderRadius: 4, border: "1px solid var(--ink-faint)", fontSize: 9, lineHeight: "14px", textAlign: "center", color: "var(--c-danger)" }}>⦸</span>}
-            Fill
+            Relleno
           </button>
           {paletteOpen && (
-            <div role="dialog" aria-label={paletteOpen === "line" ? "Line color" : "Fill color"}
+            <div role="dialog" aria-label={paletteOpen === "line" ? "Color de línea" : "Color de relleno"}
               style={{ position: "absolute", top: 26, left: paletteOpen === "line" ? 0 : 62, zIndex: 30, display: "grid", gridTemplateColumns: "repeat(6, 16px)", gap: 4, padding: 8, background: "var(--paper-bright)", border: "1px solid var(--ink-faint)", borderRadius: 0, boxShadow: "var(--shadow-pop)" }}>
               {paletteOpen === "fill" && (
-                <button title="No fill" onClick={() => { onUpdateCond({ fill: NO_FILL }); setPaletteOpen(null); }} style={{ width: 16, height: 16, borderRadius: 4, padding: 0, background: "var(--paper-bright)", border: c.fill === NO_FILL ? "2px solid var(--ink)" : "1px solid var(--ink-faint)", cursor: "pointer", fontSize: 9, lineHeight: "12px", color: "var(--c-danger)" }}>⦸</button>
+                <button title="Sin relleno" onClick={() => { onUpdateCond({ fill: NO_FILL }); setPaletteOpen(null); }} style={{ width: 16, height: 16, borderRadius: 4, padding: 0, background: "var(--paper-bright)", border: c.fill === NO_FILL ? "2px solid var(--ink)" : "1px solid var(--ink-faint)", cursor: "pointer", fontSize: 9, lineHeight: "12px", color: "var(--c-danger)" }}>⦸</button>
               )}
               {PALETTE.map((p) => {
                 const on = paletteOpen === "line" ? c.color === p : c.fill === p;
@@ -479,12 +479,12 @@ export function ConditionAppearanceEditor({ cond: c, onUpdateCond, onSetCondPara
       ) : (
         <>
           <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-            <span style={{ color: "var(--ink-muted)", width: 26 }}>Line</span>
+            <span style={{ color: "var(--ink-muted)", width: 26 }}>Línea</span>
             {PALETTE.map((p) => <button key={p} title={p} onClick={() => onUpdateCond({ color: p })} style={{ width: 16, height: 16, borderRadius: 4, background: p, border: c.color === p ? "2px solid var(--ink)" : "1px solid var(--ink-faint)", cursor: "pointer" }} />)}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-            <span style={{ color: "var(--ink-muted)", width: 26 }}>Fill</span>
-            <button title="No fill" onClick={() => onUpdateCond({ fill: NO_FILL })} style={{ width: 16, height: 16, borderRadius: 4, background: "var(--paper-bright)", border: c.fill === NO_FILL ? "2px solid var(--ink)" : "1px solid var(--ink-faint)", cursor: "pointer", fontSize: 9, lineHeight: "12px", color: "var(--c-danger)" }}>⦸</button>
+            <span style={{ color: "var(--ink-muted)", width: 26 }}>Relleno</span>
+            <button title="Sin relleno" onClick={() => onUpdateCond({ fill: NO_FILL })} style={{ width: 16, height: 16, borderRadius: 4, background: "var(--paper-bright)", border: c.fill === NO_FILL ? "2px solid var(--ink)" : "1px solid var(--ink-faint)", cursor: "pointer", fontSize: 9, lineHeight: "12px", color: "var(--c-danger)" }}>⦸</button>
             {PALETTE.map((p) => <button key={p} title={p} onClick={() => onUpdateCond({ fill: p })} style={{ width: 16, height: 16, borderRadius: 4, background: p, opacity: 0.55, border: c.fill === p ? "2px solid var(--ink)" : "1px solid var(--ink-faint)", cursor: "pointer" }} />)}
           </div>
         </>
@@ -507,29 +507,29 @@ export function ConditionAppearanceEditor({ cond: c, onUpdateCond, onSetCondPara
           )}
         </span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }} title="Estilo de línea: el trazo del contorno de las mediciones de área y lineales de este acabado (lienzo + PDF del juego marcado). Los muros y las deducciones conservan su propio trazo.">
-          <span style={{ color: "var(--ink-muted)" }}>Style</span>
+          <span style={{ color: "var(--ink-muted)" }}>Estilo</span>
           <select name="condition-line-style" value={c.line_style || "solid"} onChange={(e) => onUpdateCond({ line_style: e.target.value })}
             style={{ fontSize: 11, border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", padding: "1px 3px" }}>
             {LINE_STYLE_IDS.map((id) => <option key={id} value={id}>{LINE_STYLES[id].label}</option>)}
           </select>
         </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }} title={`Height (${heightUnit(units)}), the default for NEW wall traces (SF = LF × H) and the vertical-SF display on floor areas. Walls keep the height they were drawn at, select a wall to change just that one.`}>
+        <span style={{ display: "flex", alignItems: "center", gap: 4 }} title={`Altura (${heightUnit(units)}): valor por omisión de los trazos de muro NUEVOS (SF = LF × H) y de la visualización de SF vertical en áreas de piso. Los muros conservan la altura con que se dibujaron; seleccione un muro para cambiar solo ese.`}>
           <Icon name="height" size={13} /><span style={{ color: "var(--ink-muted)" }}>H</span>
           <DimParamInput name="condition-height-ft" internal={c.height_ft} units={units} kind="height" width={54}
             onCommit={(v) => onSetCondParam("height_ft", v)} />
         </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }} title={`Thickness (${thickUnit(units)}), a Linear run with thickness also computes border/feature-strip SF = LF × T/12. Changing it re-flows existing linear runs.`}>
+        <span style={{ display: "flex", alignItems: "center", gap: 4 }} title={`Espesor (${thickUnit(units)}): un trazo lineal con espesor también calcula SF de borde o franja = LF × T/12. Cambiarlo recalcula los trazos lineales existentes.`}>
           <Icon name="thickness" size={13} /><span style={{ color: "var(--ink-muted)" }}>T</span>
           <DimParamInput name="condition-thickness-in" internal={c.thickness_in} units={units} kind="thickness" width={50}
             onCommit={(v) => onSetCondParam("thickness_in", v)} />
         </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }} title={`Rise (${heightUnit(units)}), the vertical leg UP every Linear run of this condition adds to its plan length (a home run rising to a box, a riser to the ceiling). LF = plan + rise + drop. Changing it re-flows existing runs; select a run to give it its own rise.`}>
-          <span style={{ color: "var(--ink-muted)" }}>↑ Rise</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 4 }} title={`Subida (${heightUnit(units)}): el tramo vertical hacia ARRIBA que cada tramo lineal de esta condición suma a su longitud en planta (un retorno que sube a una caja, una subida al cielo). LF = planta + subida + bajada. Cambiarlo recalcula los tramos existentes; seleccione un tramo para darle su propia subida.`}>
+          <span style={{ color: "var(--ink-muted)" }}>↑ Subida</span>
           <DimParamInput name="condition-rise-ft" internal={c.rise_ft} units={units} kind="height" width={48}
             onCommit={(v) => onSetCondParam("rise_ft", v)} />
         </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }} title={`Drop (${heightUnit(units)}), the vertical leg DOWN every Linear run of this condition adds to its plan length (a drop from the ceiling to a panel or device). LF = plan + rise + drop. Changing it re-flows existing runs; select a run to give it its own drop.`}>
-          <span style={{ color: "var(--ink-muted)" }}>↓ Drop</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 4 }} title={`Bajada (${heightUnit(units)}): el tramo vertical hacia ABAJO que cada tramo lineal de esta condición suma a su longitud en planta (una bajada del cielo a un tablero o dispositivo). LF = planta + subida + bajada. Cambiarlo recalcula los tramos existentes; seleccione un tramo para darle su propia bajada.`}>
+          <span style={{ color: "var(--ink-muted)" }}>↓ Bajada</span>
           <DimParamInput name="condition-drop-ft" internal={c.drop_ft} units={units} kind="height" width={48}
             onCommit={(v) => onSetCondParam("drop_ft", v)} />
         </span>
@@ -560,13 +560,13 @@ export function ConditionAppearanceEditor({ cond: c, onUpdateCond, onSetCondPara
       {!isRow && !hasRollSetup(c) && (
         <div style={{ display: "flex", alignItems: "center", gap: 6, paddingTop: 6, marginTop: 1, borderTop: "1px solid var(--ink-faint)" }}>
           <select name="condition-roll-optin" value=""
-            title="Make this condition a roll-goods material, its floor areas get figured into roll cuts (seams, order footage, a cut diagram)"
+            title="Hacer de esta condición un material en rollo: sus áreas de piso se calculan en cortes de rollo (traslapes, metraje de pedido, diagrama de cortes)"
             onChange={(e) => { if (e.target.value) onUpdateCond({ roll_setup: mintRollSetup(e.target.value) }); }}
             style={{ padding: "3px 6px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", fontSize: 11.5, cursor: "pointer" }}>
-            <option value="">+ roll goods…</option>
-            <option value="carpet">Broadloom carpet</option>
-            <option value="sheet_vinyl">Sheet vinyl</option>
-            <option value="rubber">Sheet rubber</option>
+            <option value="">+ material en rollo…</option>
+            <option value="carpet">Alfombra en rollo ancho</option>
+            <option value="sheet_vinyl">Vinilo en rollo</option>
+            <option value="rubber">Hule en rollo</option>
           </select>
         </div>
       )}
@@ -582,49 +582,49 @@ export function ConditionAppearanceEditor({ cond: c, onUpdateCond, onSetCondPara
           <div style={{ display: "flex", flexDirection: "column", gap: 5, paddingTop: 6, marginTop: 1, borderTop: "1px solid var(--ink-faint)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: "var(--ink-muted)", fontSize: 10, letterSpacing: 0.4, textTransform: "uppercase" }}
-                title="Roll-goods setup, the engine figures seams, cuts, and order footage from this condition's floor areas">Roll goods</span>
+                title="Configuración de rollo: el motor calcula traslapes, cortes y metraje de pedido a partir de las áreas de piso de esta condición">Material en rollo</span>
               <select name="condition-roll-material" value={rs.material || "carpet"} onChange={(e) => patch({ material: e.target.value })} style={sel}
-                title="Material class, sets the cut overlay's material-true color">
-                {ROLL_FLOORING_TYPES.map((ft) => <option key={ft} value={ft}>{ft === "carpet" ? "carpet" : ft === "sheet_vinyl" ? "sheet vinyl" : "rubber"}</option>)}
+                title="Clase de material: fija el color real del material en la capa de cortes">
+                {ROLL_FLOORING_TYPES.map((ft) => <option key={ft} value={ft}>{ft === "carpet" ? "alfombra" : ft === "sheet_vinyl" ? "vinilo en rollo" : "hule"}</option>)}
               </select>
-              <button onClick={() => onUpdateCond({ roll_setup: undefined })} title="Remove the roll-goods setup (cuts and order footage stop being figured; manual cut edits on shapes are kept but inert)"
+              <button onClick={() => onUpdateCond({ roll_setup: undefined })} title="Quitar la configuración de rollo (se dejan de calcular cortes y metraje de pedido; las ediciones manuales de corte en las figuras se conservan pero inertes)"
                 style={{ marginLeft: "auto", padding: "1px 6px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 11 }}>✕</button>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-              <span style={{ color: "var(--ink-muted)" }}>Roll</span>
+              <span style={{ color: "var(--ink-muted)" }}>Rollo</span>
               {rs.material === "carpet" ? (
                 <select name="condition-roll-width" value={String(rs.roll_width_ft)} onChange={(e) => patch({ roll_width_ft: parseFloat(e.target.value) || 12 })} style={sel}
-                  title="Roll width, broadloom comes 12′ or 15′">
+                  title="Ancho de rollo: la alfombra en rollo ancho viene de 12′ o 15′">
                   <option value="12">12′</option>
                   <option value="15">15′</option>
                 </select>
               ) : (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }} title="Roll width, resilient sheet widths vary by product (6′, 6′6″, 12′…)">
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }} title="Ancho de rollo: los anchos del material resiliente en rollo varían por producto (6′, 6′6″, 12′…)">
                   <input name="condition-roll-width-ft" type="number" min="0" step="1" value={wFt} onChange={(e) => setW(e.target.value, wIn)} style={numIp} /><span style={{ color: "var(--ink-muted)" }}>′</span>
                   <input name="condition-roll-width-in" type="number" min="0" max="11" step="1" value={wIn} onChange={(e) => setW(wFt, e.target.value)} style={numIp} /><span style={{ color: "var(--ink-muted)" }}>″</span>
                 </span>
               )}
-              <span style={{ color: "var(--ink-muted)" }} title="Max usable length of one physical roll, 0 = continuous (cut off one roll). When set, cuts pack across rolls and the diagram marks the roll breaks.">max</span>
+              <span style={{ color: "var(--ink-muted)" }} title="Largo útil máximo de un rollo físico; 0 = continuo (se corta de un solo rollo). Con valor, los cortes se reparten entre rollos y el diagrama marca los cambios de rollo.">max</span>
               <input name="condition-roll-length" type="number" min="0" step="5" value={rs.roll_length_ft || 0}
                 onChange={(e) => patch({ roll_length_ft: Math.max(0, parseFloat(e.target.value) || 0) })} style={numIp} />
               <span style={{ color: "var(--ink-muted)" }}>′</span>
               <select name="condition-roll-direction" value={rs.direction || "auto"} onChange={(e) => patch({ direction: e.target.value })} style={sel}
-                title="Run direction, auto picks whichever needs less footage; force it when the pattern or the light dictates">
+                title="Dirección de corrida: auto elige la que necesite menos metraje; fórcela cuando el patrón o la luz lo exijan">
                 <option value="auto">auto</option>
                 <option value="ns">N-S</option>
-                <option value="ew">E-W</option>
+                <option value="ew">E-O</option>
               </select>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-              <span style={{ color: "var(--ink-muted)" }} title="Seam allowance, extra width where two cuts meet, per seamed edge">Seam</span>
+              <span style={{ color: "var(--ink-muted)" }} title="Margen de traslape: ancho extra donde se juntan dos cortes, por borde con traslape">Traslape</span>
               <input name="condition-roll-seam" type="number" min="0" step="0.5" value={rs.seam_allowance_in ?? 2}
                 onChange={(e) => patch({ seam_allowance_in: Math.max(0, parseFloat(e.target.value) || 0) })} style={numIp} />
-              <span style={{ color: "var(--ink-muted)" }}>″ · wall</span>
+              <span style={{ color: "var(--ink-muted)" }}>″ · muro</span>
               <input name="condition-roll-wall" type="number" min="0" step="0.5" value={rs.wall_overage_in ?? 3}
                 onChange={(e) => patch({ wall_overage_in: Math.max(0, parseFloat(e.target.value) || 0) })} style={numIp} />
               <span style={{ color: "var(--ink-muted)" }}>″ · sells by</span>
               <select name="condition-roll-unit" value={rs.price_unit || "sf"} onChange={(e) => patch({ price_unit: e.target.value })} style={sel}
-                title="The unit this material sells in, a unit, never a dollar (the takeoff stays quantities-only)">
+                title="La unidad en que se vende este material: una unidad, nunca un monto (el takeoff queda solo en cantidades)">
                 <option value="sy">SY</option>
                 <option value="sf">SF</option>
                 <option value="lf">LF</option>
@@ -632,10 +632,10 @@ export function ConditionAppearanceEditor({ cond: c, onUpdateCond, onSetCondPara
             </div>
             {rollInfo && (
               <div style={{ fontFamily: "var(--f-mono,monospace)", fontSize: 11, color: "var(--ink)" }}
-                title="The figured order, how far down the roll the cuts reach (side-by-side cuts share length), rounded up to the inch. The Roll panel has the cut diagram.">
-                Figured: order {ftIn(rollInfo.orderFt)} · {rollInfo.qty} {rollInfo.unit.toUpperCase()}
+                title="El pedido calculado: hasta dónde llegan los cortes a lo largo del rollo (los cortes lado a lado comparten largo), redondeado hacia arriba a la pulgada. El panel Rollo tiene el diagrama de cortes.">
+                Calculado: pedido {ftIn(rollInfo.orderFt)} · {rollInfo.qty} {rollInfo.unit.toUpperCase()}
                 {rollInfo.config.rollLengthFt > 0 ? ` · ${rollInfo.rollCount} roll${rollInfo.rollCount === 1 ? "" : "s"}` : ""}
-                {rollInfo.oversize && <span style={{ color: "var(--c-danger)" }}> · a cut exceeds one roll</span>}
+                {rollInfo.oversize && <span style={{ color: "var(--c-danger)" }}> · un corte excede un rollo</span>}
               </div>
             )}
           </div>
@@ -644,7 +644,7 @@ export function ConditionAppearanceEditor({ cond: c, onUpdateCond, onSetCondPara
       {!isRow && c.spec && typeof c.spec === "object" && !Array.isArray(c.spec) && (
         <div style={{ display: "flex", flexDirection: "column", gap: 4, paddingTop: 6, marginTop: 1, borderTop: "1px solid var(--ink-faint)" }}>
           <span style={{ color: "var(--ink-muted)", fontSize: 10, letterSpacing: 0.4, textTransform: "uppercase" }}
-            title="Product spec imported from the finish schedule, editable; shown as read-only columns in the Report / CSV / XLSX">Spec</span>
+            title="Especificación del producto importada del cuadro de acabados, editable; se muestra como columnas de solo lectura en el Reporte / CSV / XLSX">Especificación</span>
           {SPEC_FIELDS.map(({ field, header }) => (
             <label key={field} style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: "var(--ink-muted)", width: 104, flexShrink: 0 }}>{header}</span>
@@ -687,8 +687,8 @@ function TransitionsAction({ cond: c, sources, draft, setDraft, result, setResul
         <button onClick={() => { setDraft({ id: c.id, a: opts[0]?.id || "", b: opts[1]?.id || "" }); setResult(null); }}
           disabled={opts.length < 2}
           title={opts.length < 2
-            ? "Two finishes with measured rooms on the open sheets are needed before anything can meet."
-            : `Derive where two finishes meet onto ${c.finish_tag}. Runs where the rooms butt inside one open space commit dashed, pending Accept; runs across a wall are reported and never counted, that transition is a threshold in a doorway no trace can locate.`}
+            ? "Se necesitan dos acabados con recintos medidos en las hojas abiertas antes de que algo pueda encontrarse."
+            : `Derivar dónde se encuentran dos acabados sobre ${c.finish_tag}. Los tramos donde los recintos se juntan a tope dentro de un mismo espacio abierto se confirman punteados, pendientes de aceptar; los tramos a través de un muro se reportan y nunca se cuentan: esa transición es un umbral en un vano que ningún trazo puede ubicar.`}
           style={{ padding: "3px 9px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent",
             color: opts.length < 2 ? "var(--ink-faint)" : "var(--ink)", cursor: opts.length < 2 ? "default" : "pointer", fontSize: 11.5 }}>
           ⟂ Transitions…
@@ -696,7 +696,7 @@ function TransitionsAction({ cond: c, sources, draft, setDraft, result, setResul
       ) : (
         <div>
           <div style={{ color: "var(--ink-muted)", marginBottom: 5 }}>
-            Derive onto <b style={{ color: "var(--ink)" }}>{c.finish_tag}</b>, where these two meet.
+            Derivar sobre <b style={{ color: "var(--ink)" }}>{c.finish_tag}</b>, donde se encuentran estos dos.
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
             <select name="transition-a" value={draft.a} onChange={(e) => setDraft({ ...draft, a: e.target.value })} style={selStyle}>
@@ -708,8 +708,8 @@ function TransitionsAction({ cond: c, sources, draft, setDraft, result, setResul
             </select>
             <button name="transition-derive" onClick={run} disabled={!ready}
               style={{ padding: "2px 9px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent",
-                color: ready ? "var(--ink)" : "var(--ink-faint)", cursor: ready ? "pointer" : "default", fontSize: 11 }}>Derive</button>
-            <button onClick={close} style={{ padding: "2px 6px", border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 11 }}>Cancel</button>
+                color: ready ? "var(--ink)" : "var(--ink-faint)", cursor: ready ? "pointer" : "default", fontSize: 11 }}>Derivar</button>
+            <button onClick={close} style={{ padding: "2px 6px", border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 11 }}>Cancelar</button>
           </div>
           {result?.error && (
             <div style={{ marginTop: 6, padding: "4px 6px", border: "1px solid var(--c-warning)", color: "var(--ink)", background: "var(--paper-bright)" }}>{result.error}</div>
@@ -718,28 +718,28 @@ function TransitionsAction({ cond: c, sources, draft, setDraft, result, setResul
             <div style={{ marginTop: 6 }}>
               <div style={{ color: result.committed ? "var(--c-positive)" : "var(--ink-muted)" }}>
                 {result.committed
-                  ? `${result.committed} run${result.committed === 1 ? "" : "s"} · ${result.total_lf} LF proposed on ${result.onto}, dashed until you Accept.`
-                  : "No butt joints between these two on the open sheets."}
+                  ? `${result.committed} tramo${result.committed === 1 ? "" : "s"} · ${result.total_lf} LF propuestos en ${result.onto}, punteados hasta que acepte.`
+                  : "No hay juntas a tope entre estos dos en las hojas abiertas."}
               </div>
               {result.withheld?.length > 0 && (
                 <div style={{ marginTop: 5, paddingTop: 5, borderTop: "1px solid var(--ink-faint)" }}>
                   <div style={{ color: "var(--ink-muted)", fontSize: 10.5, letterSpacing: 0.4, textTransform: "uppercase" }}
-                    title="These rooms are adjacent across a partition. The transition is a threshold in the doorway, and nothing in the trace record says where the doorway is, so it is reported, never counted. Measure it at the door.">
-                    Reported, never counted
+                    title="Estos recintos son contiguos a través de un tabique. La transición es un umbral en el vano de la puerta y nada en el registro de trazos dice dónde está el vano, así que se reporta y nunca se cuenta. Mídala en la puerta.">
+                    Reportado, nunca contado
                   </div>
                   <ul style={{ margin: "3px 0 0", paddingLeft: 14, color: "var(--ink)" }}>
                     {result.withheld.map((w, i) => (
                       <li key={`${w.between_shape_ids.join("-")}-${i}`} style={{ marginBottom: 1 }}>
-                        {w.length_lf} LF across {w.gap_in}″ of wall
+                        {w.length_lf} LF a través de {w.gap_in}″ de muro
                         <span style={{ color: "var(--ink-muted)" }}>, {w.between.join(" / ")}</span>
                         {onLocate2 && (
-                          <button onClick={() => onLocate2(w.sheet_id, w.at)} title="Center the sheet on this run, find the door and measure the threshold there"
-                            style={{ marginLeft: 5, padding: 0, border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11, textDecoration: "underline" }}>look</button>
+                          <button onClick={() => onLocate2(w.sheet_id, w.at)} title="Centrar la hoja en este tramo: busque la puerta y mida ahí el umbral"
+                            style={{ marginLeft: 5, padding: 0, border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11, textDecoration: "underline" }}>ver</button>
                         )}
                       </li>
                     ))}
                   </ul>
-                  <div style={{ marginTop: 3, color: "var(--ink-muted)" }}>Adjacent, not joined, measure the threshold at the door.</div>
+                  <div style={{ marginTop: 3, color: "var(--ink-muted)" }}>Contiguos, no unidos: mida el umbral en la puerta.</div>
                 </div>
               )}
             </div>
@@ -760,7 +760,7 @@ export const ROW_TAG_MIN_W = 104;
 export function MultiplierChip({ mult }) {
   if (!(mult > 1)) return null;
   return (
-    <span data-multiplier-chip title={`Every quantity on this condition is multiplied by ${mult}, measure one unit, count it ${mult} times`}
+    <span data-multiplier-chip title={`Toda cantidad de esta condición se multiplica por ${mult}: mida una unidad, se cuenta ${mult} veces`}
       style={{ marginLeft: 6, padding: "0 4px", fontFamily: "var(--f-mono,monospace)", fontSize: 10.5, fontWeight: 700, color: "var(--cobalt)", border: "1px solid var(--cobalt)", borderRadius: 3 }}>×{mult}</span>
   );
 }
@@ -777,7 +777,7 @@ export function MultiplierField({ value, onChange }) {
       <input name="condition-multiplier" type="number" min="1" step="1" value={value}
         onChange={(e) => onChange(Math.max(1, parseInt(e.target.value, 10) || 1))}
         style={{ width: 46, padding: "3px 5px", borderRadius: 0, border: `1px solid ${live ? "var(--cobalt)" : "var(--ink-faint)"}`, fontSize: 12, fontWeight: live ? 700 : 400 }} />
-      <span style={{ color: live ? "var(--cobalt)" : "var(--ink-muted)" }}>{value === 1 ? "unit" : "units"}</span>
+      <span style={{ color: live ? "var(--cobalt)" : "var(--ink-muted)" }}>{value === 1 ? "unidad" : "unidades"}</span>
     </label>
   );
 }
@@ -789,10 +789,10 @@ export function MultiplierField({ value, onChange }) {
 // click contract are testable without mounting the whole panel.
 export function ConditionEye({ tag, hidden, onToggle }) {
   return (
-    <button type="button" aria-pressed={!hidden} aria-label={`${hidden ? "Show" : "Hide"} ${tag} on the plan`}
+    <button type="button" aria-pressed={!hidden} aria-label={`${hidden ? "Mostrar" : "Ocultar"} ${tag} en el plano`}
       onClick={(e) => { e.stopPropagation(); onToggle(!!e.altKey); }}
       onDoubleClick={(e) => e.stopPropagation()}
-      title={keyText(hidden ? "Hidden on the plan, click to show (⌥-click shows only this one). Still counted in totals, report and exports." : "Hide on the plan (⌥-click shows only this one). Hiding never changes a quantity.")}
+      title={keyText(hidden ? "Oculta en el plano; clic para mostrar (⌥+clic muestra solo esta). Sigue contando en totales, reporte y exportaciones." : "Ocultar en el plano (⌥+clic muestra solo esta). Ocultar nunca cambia una cantidad.")}
       style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 24, height: 22, padding: 0, borderRadius: 0, border: `1px solid ${hidden ? "var(--c-danger)" : "var(--ink-faint)"}`, background: hidden ? "var(--c-danger)" : "transparent", color: hidden ? "var(--paper-bright)" : "var(--ink)", cursor: "pointer", lineHeight: 0 }}>
       <Icon name={hidden ? "eyeOff" : "eye"} size={15} />
     </button>
@@ -807,9 +807,9 @@ export function HiddenConditionsBar({ hidden, total, onShowAll }) {
   return (
     <div role="status" style={{ display: "flex", alignItems: "center", gap: 7, padding: "6px 10px", borderBottom: "1px solid var(--ink-faint)", background: "var(--c-danger)", color: "var(--paper-bright)", flexShrink: 0, fontSize: 11, fontWeight: 600 }}>
       <Icon name="eyeOff" size={14} />
-      <span style={{ flex: 1, minWidth: 0 }}>{hidden} of {total} hidden on the plan, totals unchanged</span>
+      <span style={{ flex: 1, minWidth: 0 }}>{hidden} de {total} ocultas en el plano; los totales no cambian</span>
       <button type="button" onClick={onShowAll} title="Mostrar de nuevo todas las condiciones ocultas"
-        style={{ flexShrink: 0, padding: "2px 8px", borderRadius: 0, border: "1px solid var(--paper-bright)", background: "transparent", color: "var(--paper-bright)", cursor: "pointer", fontSize: 11, fontWeight: 700 }}>Show all</button>
+        style={{ flexShrink: 0, padding: "2px 8px", borderRadius: 0, border: "1px solid var(--paper-bright)", background: "transparent", color: "var(--paper-bright)", cursor: "pointer", fontSize: 11, fontWeight: 700 }}>Mostrar todo</button>
     </div>
   );
 }
@@ -1002,7 +1002,7 @@ function TakeoffsPanel({
     // than the open sheets, so the common everything-on-this-sheet case stays
     // one number. A condition entirely on closed sheets reads "Σ 412 SF"
     // instead of a dead "—".
-    const qtys = (o) => [o.sf ? fa(o.sf) : "", o.wsf ? `${fa(o.wsf)} wall` : "", o.lf ? fl(o.lf) : "", o.ea ? `${num(o.ea, 0)} EA` : ""].filter(Boolean).join(" · ");
+    const qtys = (o) => [o.sf ? fa(o.sf) : "", o.wsf ? `${fa(o.wsf)} muro` : "", o.lf ? fl(o.lf) : "", o.ea ? `${num(o.ea, 0)} UND` : ""].filter(Boolean).join(" · ");
     const pr = projRowById.get(c.id);
     const prQ = pr ? { sf: pr.floor_sf || 0, wsf: pr.wall_sf || 0, lf: pr.lf || 0, ea: pr.ea || 0 } : null;
     const projDiff = prQ && (Math.abs(prQ.sf - sf) > 0.005 || Math.abs(prQ.wsf - wsf) > 0.005 || Math.abs(prQ.lf - lf) > 0.005 || Math.abs(prQ.ea - ea) > 0.005);
@@ -1027,9 +1027,9 @@ function TakeoffsPanel({
             onActivate(c.id);
           }}
           onDoubleClick={() => onLocate(c.id)}
-          title={reassigning ? "Reassign selected shape to this condition" : keyText("Make this the active condition (double-click zooms to its takeoffs · ⌘-click / ⇧-click selects for bulk edit · drag to the top-bar palette for one-click access)")}
+          title={reassigning ? "Reasignar la figura seleccionada a esta condición" : keyText("Hacer de esta la condición activa (doble clic acerca a sus takeoffs · ⌘+clic / ⇧+clic selecciona para edición en bloque · arrástrela a la paleta de la barra superior para acceso con un clic)")}
           style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 8, rowGap: 5, padding: "9px 12px", cursor: "pointer", outline: reassigning ? "1px dashed var(--cobalt)" : "none", outlineOffset: -3, userSelect: "none" }}>
-          {hot && <span title={pinned ? `Palette shortcut, press ${hIdx + 1} to activate` : `Press ${hIdx + 1} to activate (pin to lock this number)`} style={{ fontSize: 9, fontFamily: "var(--f-mono,monospace)", color: pinned ? "var(--cobalt)" : "var(--ink-muted)", border: `1px solid ${pinned ? "var(--cobalt)" : "var(--ink-faint)"}`, borderRadius: 3, padding: "0 3px", flexShrink: 0 }}>{hIdx + 1}</span>}
+          {hot && <span title={pinned ? `Atajo de la paleta: presione ${hIdx + 1} para activar` : `Presione ${hIdx + 1} para activar (fije para bloquear este número)`} style={{ fontSize: 9, fontFamily: "var(--f-mono,monospace)", color: pinned ? "var(--cobalt)" : "var(--ink-muted)", border: `1px solid ${pinned ? "var(--cobalt)" : "var(--ink-faint)"}`, borderRadius: 3, padding: "0 3px", flexShrink: 0 }}>{hIdx + 1}</span>}
           <ConditionEye tag={c.finish_tag} hidden={hidden} onToggle={(isolate) => onToggleHidden(c.id, isolate)} />
           <span style={{ borderRadius: 4, overflow: "hidden", lineHeight: 0, flexShrink: 0, opacity: hidden ? 0.35 : 1 }}><HatchSwatch type={c.hatch || "solid"} line={c.color} fill={c.fill} /></span>
           {/* the tag is the row's identity: it holds a floor (ROW_TAG_MIN_W) and
@@ -1038,17 +1038,17 @@ function TakeoffsPanel({
           <div style={{ minWidth: 0, flex: `1 1 ${ROW_TAG_MIN_W}px`, opacity: hidden ? 0.55 : 1 }}>
             <div style={{ fontWeight: on ? 700 : 600, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {/* a twin reads as one: whose it is, and how many of its rows have gone their own way */}
-              {c.variant_of ? <span aria-hidden title="A twin, its materials follow another condition" style={{ color: "var(--ink-faint)", fontWeight: 400 }}>↳ </span> : null}
+              {c.variant_of ? <span aria-hidden title="Un gemelo: sus materiales siguen a otra condición" style={{ color: "var(--ink-faint)", fontWeight: 400 }}>↳ </span> : null}
               {c.finish_tag}<MultiplierChip mult={mult} />
               {c.variant_of && localCount(c) > 0 ? (
-                <span title={`${localCount(c)} material row${localCount(c) === 1 ? "" : "s"} no longer follow${localCount(c) === 1 ? "s" : ""} the family`}
+                <span title={`${localCount(c)} fila${localCount(c) === 1 ? "" : "s"} de material ya no sigue${localCount(c) === 1 ? "" : "n"} a la familia`}
                   style={{ marginLeft: 5, fontFamily: "var(--f-mono,monospace)", fontSize: 9, fontWeight: 500, color: "var(--cobalt)", border: "1px solid var(--cobalt)", borderRadius: 3, padding: "0 3px" }}>{localCount(c)}</span>
               ) : null}
             </div>
             <div style={{ fontFamily: "var(--f-mono,monospace)", fontSize: 11, color: "var(--ink-muted)" }}>
               {qtys({ sf, wsf, lf, ea })}{!sf && !wsf && !lf && !ea && !projDiff ? "" : ""}
               {projDiff ? (
-                <span title="Σ = whole project, every sheet. The leading numbers count the open sheets only." style={{ color: "var(--ink-faint)" }}>
+                <span title="Σ = todo el proyecto, todas las hojas. Los números iniciales cuentan solo las hojas abiertas." style={{ color: "var(--ink-faint)" }}>
                   {(sf || wsf || lf || ea) ? " · " : ""}Σ {qtys(prQ) || "0"}
                 </span>
               ) : null}
@@ -1060,7 +1060,7 @@ function TakeoffsPanel({
               (or with itself, a double trace). The badge is the count; the
               list under the ACTIVE row names each pair with a Look link. */}
           {collisionsByCond?.get(c.id)?.length ? (
-            <span data-collision-badge={c.id} title={`${collisionsByCond.get(c.id).length} shared-floor pair${collisionsByCond.get(c.id).length === 1 ? "" : "s"}, another condition claims the same floor, or a room is traced twice. Activate the row to see each pair.`}
+            <span data-collision-badge={c.id} title={`${collisionsByCond.get(c.id).length} par${collisionsByCond.get(c.id).length === 1 ? "" : "es"} de piso compartido: otra condición reclama el mismo piso, o un recinto está trazado dos veces. Active la fila para ver cada par.`}
               style={{ flexShrink: 0, fontFamily: "var(--f-mono,monospace)", fontSize: 10, fontWeight: 700, color: "var(--c-danger)", border: "1px solid var(--c-danger)", borderRadius: 3, padding: "0 4px" }}>⚠ {collisionsByCond.get(c.id).length}</span>
           ) : null}
           <button onClick={(e) => { e.stopPropagation(); onLocate(c.id); }} title="Centrar el lienzo en las mediciones de esta condición"
@@ -1071,7 +1071,7 @@ function TakeoffsPanel({
             <Icon name="product" size={11} />Materials{c.materials?.length ? ` (${c.materials.length})` : ""}
           </button>
           <button onClick={(e) => { e.stopPropagation(); onTogglePin(c.id); }}
-            title={pinned ? "Unpin from the top-bar palette" : (palette.length >= 9 ? "Palette is full (9)" : "Pin to the top-bar palette for one-click access")}
+            title={pinned ? "Quitar de la paleta de la barra superior" : (palette.length >= 9 ? "La paleta está llena (9)" : "Fijar en la paleta de la barra superior para acceso con un clic")}
             style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", padding: "2px 5px", borderRadius: 0, border: `1px solid ${pinned ? "var(--cobalt)" : "var(--ink-faint)"}`, background: "transparent", color: pinned ? "var(--cobalt)" : (!pinned && palette.length >= 9 ? "var(--ink-faint)" : "var(--ink-muted)"), cursor: "pointer", lineHeight: 0 }}>
             <Icon name="pin" size={12} />
           </button>
@@ -1085,7 +1085,7 @@ function TakeoffsPanel({
             render the same editor from one source of truth. */}
         {on && collisionsByCond?.get(c.id)?.length ? (
           <div data-collision-list={c.id} onClick={(e) => e.stopPropagation()} style={{ margin: "0 12px 8px", padding: "6px 8px", border: "1px solid var(--c-danger)", background: "var(--paper-bright)", fontSize: 11 }}>
-            <div style={{ fontFamily: "var(--f-mono,monospace)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-danger)", fontWeight: 700, marginBottom: 4 }}>Shared floor · counted twice in the totals</div>
+            <div style={{ fontFamily: "var(--f-mono,monospace)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-danger)", fontWeight: 700, marginBottom: 4 }}>Piso compartido · contado dos veces en los totales</div>
             {collisionsByCond.get(c.id).map((p) => {
               const other = p.a.condition_id === c.id ? p.b : p.a;
               const mine = p.a.condition_id === c.id ? p.a : p.b;
@@ -1093,11 +1093,11 @@ function TakeoffsPanel({
                 <div key={`${p.a.shape_id}-${p.b.shape_id}`} style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--f-mono,monospace)", fontSize: 11, color: "var(--ink)", padding: "1px 0" }}>
                   <span style={{ color: "var(--ink-muted)" }}>{p.same_condition ? "⧉" : "↔"}</span>
                   <span style={{ flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {p.same_condition ? `double trace${mine.label ? ` · ${mine.label}` : ""}` : `${other.condition}${other.label ? ` · ${other.label}` : ""}`}
-                    <span style={{ color: "var(--ink-muted)" }}> · {p.shared_sf === 0 ? "<0.01" : p.shared_sf} SF shared · {Math.round(p.fraction_of_smaller * 100)}%{p.a.reviewed && p.b.reviewed ? " · both accepted" : ""}</span>
+                    {p.same_condition ? `trazo doble${mine.label ? ` · ${mine.label}` : ""}` : `${other.condition}${other.label ? ` · ${other.label}` : ""}`}
+                    <span style={{ color: "var(--ink-muted)" }}> · {p.shared_sf === 0 ? "<0.01" : p.shared_sf} SF compartidos · {Math.round(p.fraction_of_smaller * 100)}%{p.a.reviewed && p.b.reviewed ? " · ambos aceptados" : ""}</span>
                   </span>
-                  <button onClick={() => onLookAtCollision?.(p)} title="Frame both shapes on the plan"
-                    style={{ flexShrink: 0, padding: "1px 6px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 10.5, fontWeight: 600 }}>Look</button>
+                  <button onClick={() => onLookAtCollision?.(p)} title="Encuadrar ambas figuras en el plano"
+                    style={{ flexShrink: 0, padding: "1px 6px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 10.5, fontWeight: 600 }}>Aspecto</button>
                 </div>
               );
             })}
@@ -1115,12 +1115,12 @@ function TakeoffsPanel({
             <div data-condition-proposal={p.id} onClick={(e) => e.stopPropagation()}
               style={{ margin: "0 12px 8px", padding: "6px 8px", border: "1px dashed var(--cobalt)", background: "var(--paper-bright)", fontSize: 11.5 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                <span style={{ fontFamily: "var(--f-mono,monospace)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--cobalt)", fontWeight: 700 }}>Proposed change</span>
+                <span style={{ fontFamily: "var(--f-mono,monospace)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--cobalt)", fontWeight: 700 }}>Cambio propuesto</span>
                 <span style={{ flex: 1 }} />
-                <button onClick={() => onAcceptConditionEdit?.(p.id)} title="Apply the proposed values to this condition, the same edit typing them here would make"
-                  style={{ padding: "2px 8px", borderRadius: 0, border: "1px solid var(--c-positive)", background: "var(--c-positive)", color: "var(--paper-bright)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}>Accept</button>
-                <button onClick={() => onRejectConditionEdit?.(p.id)} title="Drop the proposal, the condition stays as it is"
-                  style={{ padding: "2px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 11 }}>Reject</button>
+                <button onClick={() => onAcceptConditionEdit?.(p.id)} title="Aplicar los valores propuestos a esta condición: la misma edición que haría al escribirlos aquí"
+                  style={{ padding: "2px 8px", borderRadius: 0, border: "1px solid var(--c-positive)", background: "var(--c-positive)", color: "var(--paper-bright)", cursor: "pointer", fontSize: 11, fontWeight: 600 }}>Aceptar</button>
+                <button onClick={() => onRejectConditionEdit?.(p.id)} title="Descartar la propuesta: la condición queda como está"
+                  style={{ padding: "2px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 11 }}>Rechazar</button>
               </div>
               {rows.map((r) => (
                 <div key={r.field} style={{ display: "flex", gap: 6, fontFamily: "var(--f-mono,monospace)", fontSize: 11, color: "var(--ink)" }}>
@@ -1139,17 +1139,17 @@ function TakeoffsPanel({
           result={transResult} setResult={setTransResult} onDerive={onDeriveTransitions} onLocate2={onLocateTransition} />}
         {matOn && (
           <div style={{ padding: "8px 12px 10px", background: "var(--paper-cream)", borderTop: "1px solid var(--ink-faint)", fontSize: 11.5 }}>
-            <div style={{ marginBottom: 6, color: "var(--ink-muted)" }}>Supporting Materials, order qty = measured ÷ coverage, rounded up.</div>
+            <div style={{ marginBottom: 6, color: "var(--ink-muted)" }}>Materiales de apoyo: cantidad a pedir = medido ÷ cobertura, redondeado hacia arriba.</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 8 }}>
               <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ color: "var(--ink-muted)", width: 56, flexShrink: 0 }}>Labor</span>
-                <input name="condition-labor-type" value={c.laborType || ""} placeholder="e.g. Glue-down, Float, Nail-down"
+                <span style={{ color: "var(--ink-muted)", width: 56, flexShrink: 0 }}>Mano de obra</span>
+                <input name="condition-labor-type" value={c.laborType || ""} placeholder="p. ej. Pegado, Flotante, Clavado"
                   onChange={(e) => onUpdateCond({ laborType: e.target.value })}
                   style={{ ...ip, flex: 1, minWidth: 0 }} />
               </label>
               <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ color: "var(--ink-muted)", width: 56, flexShrink: 0 }}>Subfloor</span>
-                <input name="condition-subfloor-type" value={c.subfloorType || ""} placeholder="e.g. Ply, Concrete slab, OSB"
+                <span style={{ color: "var(--ink-muted)", width: 56, flexShrink: 0 }}>Contrapiso</span>
+                <input name="condition-subfloor-type" value={c.subfloorType || ""} placeholder="p. ej. Contrachapado, Losa de concreto, OSB"
                   onChange={(e) => onUpdateCond({ subfloorType: e.target.value })}
                   style={{ ...ip, flex: 1, minWidth: 0 }} />
               </label>
@@ -1161,14 +1161,14 @@ function TakeoffsPanel({
               return (
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6, padding: "3px 6px", border: "1px solid var(--ink-faint)", background: "var(--paper-cream)", fontSize: 11 }}>
                   <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--ink-muted)" }}
-                    title={`These materials follow “${par?.finish_tag || "the original"}”. Edit a row and only that row stops following.`}>
-                    ↳ twin of <b style={{ color: "var(--ink)" }}>{par?.finish_tag || ""}</b>
+                    title={`Estos materiales siguen a «${par?.finish_tag || "el original"}». Edite una fila y solo esa fila deja de seguirlo.`}>
+                    ↳ gemelo de <b style={{ color: "var(--ink)" }}>{par?.finish_tag || ""}</b>
                     {n ? <span style={{ color: "var(--cobalt)" }}> · {n} local</span> : null}
                   </span>
                   {onSplitCondition && (
                     <button onClick={() => onSplitCondition(c.id)}
-                      title={`Split out, freeze the following rows where they stand and stop following “${par?.finish_tag || "the original"}”. Keeps its name and still groups with the family.`}
-                      style={{ padding: "1px 6px", border: "1px solid var(--ink-faint)", background: "transparent", cursor: "pointer", fontSize: 10.5, color: "var(--ink)", flexShrink: 0 }}>⤴ Split out</button>
+                      title={`Separar: congela las filas que siguen donde están y deja de seguir a «${par?.finish_tag || "el original"}». Conserva su nombre y sigue agrupándose con la familia.`}
+                      style={{ padding: "1px 6px", border: "1px solid var(--ink-faint)", background: "transparent", cursor: "pointer", fontSize: 10.5, color: "var(--ink)", flexShrink: 0 }}>⤴ Separar</button>
                   )}
                 </div>
               );
@@ -1184,27 +1184,27 @@ function TakeoffsPanel({
                 CDP/automation-driven session dead, and this panel is scripted in demos. */}
             {onDuplicateCondition && (twinDraft.id === c.id ? (
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
-                <span style={{ color: "var(--ink-muted)", fontSize: 11 }}>Duplicate for</span>
+                <span style={{ color: "var(--ink-muted)", fontSize: 11 }}>Duplicar para</span>
                 <input name="twin-label" autoFocus value={twinDraft.label}
                   onChange={(e) => setTwinDraft({ id: c.id, label: e.target.value })}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && twinDraft.label.trim()) { onDuplicateCondition(c.id, twinDraft.label.trim()); setTwinDraft({ id: "", label: "" }); }
                     if (e.key === "Escape") setTwinDraft({ id: "", label: "" });
                   }}
-                  placeholder="e.g. Level 2" style={{ ...ip, width: 120 }} />
+                  placeholder="p. ej. Nivel 2" style={{ ...ip, width: 120 }} />
                 <span style={{ color: "var(--ink-muted)", fontSize: 11 }}>
                   → <b style={{ color: "var(--ink)" }}>{twinDraft.label.trim() ? `${baseTagOf(c.finish_tag)}, ${twinDraft.label.trim()}` : "…"}</b>
                 </span>
                 <button onClick={() => { if (twinDraft.label.trim()) { onDuplicateCondition(c.id, twinDraft.label.trim()); setTwinDraft({ id: "", label: "" }); } }}
                   disabled={!twinDraft.label.trim()}
-                  style={{ padding: "2px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: twinDraft.label.trim() ? "var(--ink)" : "var(--ink-faint)", cursor: twinDraft.label.trim() ? "pointer" : "default", fontSize: 11 }}>Duplicate</button>
+                  style={{ padding: "2px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: twinDraft.label.trim() ? "var(--ink)" : "var(--ink-faint)", cursor: twinDraft.label.trim() ? "pointer" : "default", fontSize: 11 }}>Duplicar</button>
                 <button onClick={() => setTwinDraft({ id: "", label: "" })}
-                  style={{ padding: "2px 6px", border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 11 }}>Cancel</button>
+                  style={{ padding: "2px 6px", border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 11 }}>Cancelar</button>
               </div>
             ) : (
               <button onClick={() => setTwinDraft({ id: c.id, label: "" })}
                 title="Duplicar esta condición: el mismo acabado medido en otro lado, con sus propios materiales. Nombre el área (p. ej. Nivel 2); no trae mediciones: usted mide dentro de ella, y sus materiales siguen a esta condición hasta que los cambie allá."
-                style={{ marginTop: 6, padding: "3px 9px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 11.5 }}>⎘ Duplicate for another area…</button>
+                style={{ marginTop: 6, padding: "3px 9px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 11.5 }}>⎘ Duplicar para otra área…</button>
             ))}
           </div>
         )}
@@ -1247,7 +1247,7 @@ function TakeoffsPanel({
         <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 10px", borderBottom: "1px solid var(--ink-faint)", flexShrink: 0 }}>
           <input name="condition-filter" value={condQuery} onChange={(e) => setCondQuery(e.target.value)} placeholder="filtrar condiciones…"
             style={{ flex: 1, minWidth: 0, padding: "4px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", fontSize: 12 }} />
-          {condQuery && <button onClick={() => setCondQuery("")} title="Clear the filter" style={btnClearX}>×</button>}
+          {condQuery && <button onClick={() => setCondQuery("")} title="Borrar el filtro" style={btnClearX}>×</button>}
           <button onClick={() => onPanelPrefs((p) => ({ ...p, az: !p.az }))}
             title="Orden natural por etiqueta (CT-2 antes que CT-10), solo vista; las teclas 1 a 9 conservan su numeración original"
             style={{ padding: "3px 7px", borderRadius: 0, border: `1px solid ${panelPrefs.az ? "var(--cobalt)" : "var(--ink-faint)"}`, background: panelPrefs.az ? "var(--cobalt)" : "transparent", color: panelPrefs.az ? "var(--paper-bright)" : "var(--ink-muted)", cursor: "pointer", fontSize: 10.5, fontFamily: "var(--f-mono)", lineHeight: 1.4 }}>A→Z</button>
@@ -1348,11 +1348,11 @@ function TakeoffsPanel({
               Materiales reutilizables en todo el navegador. Al vincular uno a una condición se copian sus valores y queda un enlace; las ediciones aquí solo llegan a las líneas vinculadas cuando usted las empuja.
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px 8px" }}>
-              <input name="material-library-filter" value={matLibQuery} onChange={(e) => setMatLibQuery(e.target.value)} placeholder="filter materials…"
+              <input name="material-library-filter" value={matLibQuery} onChange={(e) => setMatLibQuery(e.target.value)} placeholder="filtrar materiales…"
                 style={{ flex: 1, minWidth: 0, padding: "4px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", fontSize: 12 }} />
-              {matLibQuery && <button onClick={() => setMatLibQuery("")} title="Clear the filter" style={btnClearX}>×</button>}
+              {matLibQuery && <button onClick={() => setMatLibQuery("")} title="Borrar el filtro" style={btnClearX}>×</button>}
             </div>
-            {matLib.length === 0 && <div style={{ padding: "2px 12px 12px", color: "var(--ink-muted)" }}>No library materials yet, add one below, or use “→ lib” on a condition's material line.</div>}
+            {matLib.length === 0 && <div style={{ padding: "2px 12px 12px", color: "var(--ink-muted)" }}>Aún no hay materiales en la biblioteca: agregue uno abajo, o use «→ biblioteca» en la línea de material de una condición.</div>}
             {matLib.filter((lm) => !matQ || (lm.name || "").toLowerCase().includes(matQ)).map((lm) => {
               const n = linkedCountById[lm.id] || 0;
               return (
@@ -1362,41 +1362,41 @@ function TakeoffsPanel({
                         commit routes every transient value through libEntryPatch's rename
                         re-classification, where a select-all-retype walks the entry's kind
                         through arbitrary intermediate classifications */}
-                    <LibDraftInput name="library-material-name" value={lm.name} placeholder="Material (e.g. Adhesive)" width={150}
+                    <LibDraftInput name="library-material-name" value={lm.name} placeholder="Material (p. ej. Adhesivo)" width={150}
                       onCommitText={(t) => onUpdateLibMaterial(lm.id, { name: t })} />
                     <span style={{ color: "var(--ink-muted)" }}>1</span>
-                    <input name="library-material-unit" value={lm.unit} onChange={(e) => onUpdateLibMaterial(lm.id, { unit: e.target.value })} placeholder="unit" style={{ ...ip, width: 54 }} />
+                    <input name="library-material-unit" value={lm.unit} onChange={(e) => onUpdateLibMaterial(lm.id, { unit: e.target.value })} placeholder="unidad" style={{ ...ip, width: 54 }} />
                     <span style={{ color: "var(--ink-muted)" }}>per</span>
                     <LibDraftInput name="library-material-per" number value={lm.per || ""} placeholder="0" width={62}
                       onCommitText={(t) => onUpdateLibMaterial(lm.id, { per: Math.max(0, parseFloat(t) || 0) })} />
                     <select name="library-material-basis" value={lm.basis || "area"} onChange={(e) => onUpdateLibMaterial(lm.id, { basis: e.target.value })} style={{ ...ip, background: "var(--paper-bright)" }}>
-                      <option value="area">floor SF</option>
-                      <option value="linear">linear LF</option>
-                      <option value="count">each</option>
-                      <option value="seam_lf" title="Figured seam length from the roll layout, 0 until the condition carries a roll setup">seam LF</option>
+                      <option value="area">SF de piso</option>
+                      <option value="linear">lineal LF</option>
+                      <option value="count">unidad (UND)</option>
+                      <option value="seam_lf" title="Longitud de traslape calculada del diseño del rollo; 0 hasta que la condición tenga una configuración de rollo">LF de traslape</option>
                     </select>
-                    <label style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--ink-muted)" }} title="Round up to whole units">
-                      <input name="library-material-round" type="checkbox" checked={lm.round !== false} onChange={(e) => onUpdateLibMaterial(lm.id, { round: e.target.checked })} />round up
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--ink-muted)" }} title="Redondear hacia arriba a unidades enteras">
+                      <input name="library-material-round" type="checkbox" checked={lm.round !== false} onChange={(e) => onUpdateLibMaterial(lm.id, { round: e.target.checked })} />redondear hacia arriba
                     </label>
                     <CoveragePresetSelect material={lm} onPick={(patch) => onUpdateLibMaterial(lm.id, patch)} />
                     <LibDraftInput name="library-material-note" value={lm.note || ""} placeholder="note" width={120}
                       onCommitText={(t) => onUpdateLibMaterial(lm.id, { note: t })} />
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 5 }}>
-                    <span style={{ fontFamily: "var(--f-mono,monospace)", fontSize: 10.5, color: "var(--ink-muted)" }}>{n ? `⛓ ${n} linked line${n === 1 ? "" : "s"}` : "not linked yet"}</span>
+                    <span style={{ fontFamily: "var(--f-mono,monospace)", fontSize: 10.5, color: "var(--ink-muted)" }}>{n ? `⛓ ${n} línea${n === 1 ? "" : "s"} vinculada${n === 1 ? "" : "s"}` : "aún sin vínculo"}</span>
                     <div style={{ flex: 1 }} />
                     {n > 0 && (
-                      <button onClick={() => onPushLibUpdate(lm.id)} title="Replace the values on every linked condition line with these library values (overrides included)"
-                        style={{ padding: "2px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 11 }}>update linked ({n})</button>
+                      <button onClick={() => onPushLibUpdate(lm.id)} title="Reemplazar los valores de cada línea de condición vinculada con estos valores de la biblioteca (incluye las modificaciones)"
+                        style={{ padding: "2px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 11 }}>actualizar vinculadas ({n})</button>
                     )}
-                    <button onClick={() => onDeleteLibMaterial(lm.id)} title="Remove from the library, linked lines keep their values, only the link is removed"
+                    <button onClick={() => onDeleteLibMaterial(lm.id)} title="Quitar de la biblioteca: las líneas vinculadas conservan sus valores, solo se quita el vínculo"
                       style={{ padding: "2px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 11 }}>✕</button>
                   </div>
                 </div>
               );
             })}
             <div style={{ padding: "6px 12px", borderTop: matLib.length ? "1px solid var(--ink-faint)" : "none" }}>
-              <button onClick={onAddLibMaterial} style={btnAddFull}>+ add library material</button>
+              <button onClick={onAddLibMaterial} style={btnAddFull}>+ agregar material a la biblioteca</button>
             </div>
           </div>
         )}
@@ -1405,23 +1405,23 @@ function TakeoffsPanel({
             properties on the Takeoffs tab */}
         {panelTab === "columns" && (
           <div style={{ flex: 1, overflow: "auto", fontSize: 11.5 }}>
-            {/* Shape labels (#110), a flat project-level vocabulary; each shape
+            {/* Etiquetas de figuras (#110), a flat project-level vocabulary; each shape
                 carries at most one label. Lives here rather than a 5th panel tab:
                 it's the degenerate single-column case. */}
             <details open style={{ borderBottom: "2px solid var(--ink-faint)" }}>
               <summary style={{ padding: "8px 12px 4px", cursor: "pointer", fontWeight: 600, fontSize: 11.5 }}>
-                Shape labels{shapeLabels.length ? ` (${shapeLabels.length})` : ""}
+                Etiquetas de figuras{shapeLabels.length ? ` (${shapeLabels.length})` : ""}
               </summary>
               <div style={{ padding: "0 12px 4px", color: "var(--ink-muted)", fontSize: 11 }}>
-                Phase / area labels (e.g. Phase 1, East Wing) for grouping the Report by shape.
+                Etiquetas de fase o área (p. ej. Fase 1, Ala este) para agrupar el Reporte por figura.
               </div>
               <div style={{ padding: "2px 12px 10px", display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                 {shapeLabels.map((v) => (
                   <span key={v} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "2px 3px 2px 8px", border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", fontSize: 11.5, color: "var(--ink)" }}>
                     {v}
-                    <button onClick={() => onRenameLabel(v)} title="Rename this label, labeled shapes follow"
+                    <button onClick={() => onRenameLabel(v)} title="Renombrar esta etiqueta: las figuras con ella la siguen"
                       style={{ padding: "0 3px", border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 11 }}>✎</button>
-                    <button onClick={() => onRemoveLabel(v)} title="Remove from the list, labeled shapes keep the value (shown ungrouped in the Report)"
+                    <button onClick={() => onRemoveLabel(v)} title="Quitar de la lista: las figuras con esta etiqueta conservan el valor (se muestra sin agrupar en el Reporte)"
                       style={{ padding: "0 3px", border: "none", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 11 }}>✕</button>
                   </span>
                 ))}
@@ -1429,24 +1429,24 @@ function TakeoffsPanel({
               </div>
             </details>
             <div style={{ padding: "8px 12px 4px", color: "var(--ink-muted)", fontSize: 11 }}>
-              Custom columns (e.g. CSI Division) classify conditions for report grouping and exports. Columns and values apply to the whole project; assign values on a condition in the Takeoffs tab.
+              Las columnas personalizadas (p. ej. División CSI) clasifican las condiciones para agrupar el reporte y las exportaciones. Las columnas y sus valores aplican a todo el proyecto; asigne valores a una condición en la pestaña Cantidades.
             </div>
-            {conditionColumns.length === 0 && <div style={{ padding: "2px 12px 8px", color: "var(--ink-muted)" }}>Add a column, e.g. CSI Division.</div>}
+            {conditionColumns.length === 0 && <div style={{ padding: "2px 12px 8px", color: "var(--ink-muted)" }}>Agregar una columna, p. ej. División CSI.</div>}
             {conditionColumns.map((cc) => (
               <div key={cc.id} style={{ padding: "8px 12px", borderTop: "1px solid var(--ink-faint)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                  <input name="column-name" value={cc.name} onChange={(e) => onRenameColumn(cc.id, e.target.value)} placeholder="Column name (e.g. CSI Division)"
+                  <input name="column-name" value={cc.name} onChange={(e) => onRenameColumn(cc.id, e.target.value)} placeholder="Nombre de columna (p. ej. División CSI)"
                     style={{ padding: "3px 6px", borderRadius: 0, border: "1px solid var(--ink-faint)", fontSize: 12, flex: 1, minWidth: 0 }} />
-                  <button onClick={() => onDeleteColumn(cc.id)} title="Delete this column (whole project)"
-                    style={{ flexShrink: 0, padding: "2px 7px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 12 }}>✕ column</button>
+                  <button onClick={() => onDeleteColumn(cc.id)} title="Eliminar esta columna (todo el proyecto)"
+                    style={{ flexShrink: 0, padding: "2px 7px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 12 }}>✕ columna</button>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                   {cc.values.map((v) => (
                     <span key={v} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "2px 3px 2px 8px", border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", fontSize: 11.5, color: "var(--ink)" }}>
                       {v}
-                      <button onClick={() => onRenameColumnValue(cc.id, v)} title="Rename this value, assigned conditions follow"
+                      <button onClick={() => onRenameColumnValue(cc.id, v)} title="Renombrar este valor: las condiciones asignadas lo siguen"
                         style={{ padding: "0 3px", border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 11 }}>✎</button>
-                      <button onClick={() => onRemoveColumnValue(cc.id, v)} title="Remove from the list, conditions keep the value, shown as (removed)"
+                      <button onClick={() => onRemoveColumnValue(cc.id, v)} title="Quitar de la lista: las condiciones conservan el valor, se muestra como (quitado)"
                         style={{ padding: "0 3px", border: "none", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 11 }}>✕</button>
                     </span>
                   ))}
@@ -1455,7 +1455,7 @@ function TakeoffsPanel({
               </div>
             ))}
             <div style={{ padding: "6px 12px", borderTop: conditionColumns.length ? "1px solid var(--ink-faint)" : "none" }}>
-              <button onClick={onAddColumn} style={btnAddFull}>+ add column</button>
+              <button onClick={onAddColumn} style={btnAddFull}>+ agregar columna</button>
             </div>
           </div>
         )}

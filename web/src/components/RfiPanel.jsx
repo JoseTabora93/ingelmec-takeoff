@@ -51,17 +51,17 @@ export default function RfiPanel({ docked = false, rfis: rfisIn = [], markups = 
       )}
 
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap", padding: "8px 10px", borderBottom: "1px solid var(--ink-faint)" }}>
-        {chip("all", `All ${rfis.length}`)}
+        {chip("all", `Todos ${rfis.length}`)}
         {RFI_STATUSES.map((s) => chip(s.id, `${s.label} ${rfis.filter((r) => rfiStatus(r.status).id === s.id).length}`))}
       </div>
 
       {rfis.length === 0 && (
         <div style={{ padding: "14px 12px", color: "var(--ink-muted)" }}>
-          No RFIs yet, select a cloud, callout, or note in the markup panel and press <b>Raise RFI</b>.
+          Aún no hay RFI: seleccione una nube, llamada o nota en el panel de anotaciones y presione <b>Levantar RFI</b>.
         </div>
       )}
       {rfis.length > 0 && shown.length === 0 && (
-        <div style={{ padding: "14px 12px", color: "var(--ink-muted)" }}>No RFIs with this status.</div>
+        <div style={{ padding: "14px 12px", color: "var(--ink-muted)" }}>No hay RFI con este estado.</div>
       )}
 
       {shown.map((r) => {
@@ -79,37 +79,37 @@ export default function RfiPanel({ docked = false, rfis: rfisIn = [], markups = 
               <span style={{ fontFamily: "var(--f-mono)", fontWeight: 700, color: "var(--cobalt)" }}>{String(r.number ?? "")}</span>
               <span style={{ padding: "1px 7px", background: st.color, color: "#fff", fontSize: 10, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" }}>{st.label}</span>
               {agent && (
-                <span title={pending ? "Raised by an agent over MCP, pending until you accept it" : "Raised by an agent over MCP, accepted"}
+                <span title={pending ? "Levantado por un agente por MCP, pendiente hasta que usted lo acepte" : "Levantado por un agente por MCP, aceptado"}
                   style={{ padding: "1px 6px", border: "1px dashed var(--ink-muted)", color: "var(--ink-muted)", fontSize: 9.5, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-                  agent{pending ? " · pending" : ""}
+                  agente{pending ? " · pendiente" : ""}
                 </span>
               )}
               {pending && (
                 <button onClick={() => up(r, { origin: { ...r.origin, reviewed: true } })}
-                  title="Accept this agent-raised RFI as your own question (turns it from pencil to ink)"
-                  style={{ padding: "1px 8px", border: "1px solid var(--cobalt)", background: "var(--cobalt)", color: "var(--accent-contrast)", cursor: "pointer", fontSize: 10, fontWeight: 700 }}>Accept</button>
+                  title="Aceptar este RFI levantado por el agente como pregunta suya (pasa de lápiz a tinta)"
+                  style={{ padding: "1px 8px", border: "1px solid var(--cobalt)", background: "var(--cobalt)", color: "var(--accent-contrast)", cursor: "pointer", fontSize: 10, fontWeight: 700 }}>Aceptar</button>
               )}
               <span style={{ flex: 1 }} />
               <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>{linked.length} linked</span>
-              <button onClick={() => { if (window.confirm(`Delete ${r.number}? Linked markups keep their annotation but lose the RFI link.`)) onDeleteRfi && onDeleteRfi(r.id); }}
-                title="Delete this RFI (hard remove; clears links)" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--c-danger)" }}>🗑</button>
+              <button onClick={() => { if (window.confirm(`¿Eliminar ${r.number}? Las anotaciones vinculadas conservan su anotación pero pierden el vínculo con el RFI.`)) onDeleteRfi && onDeleteRfi(r.id); }}
+                title="Eliminar este RFI (borrado definitivo; limpia los vínculos)" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--c-danger)" }}>🗑</button>
             </div>
 
-            <label style={lbl}>Subject</label>
-            <input name="rfi-subject" value={r.subject || ""} onChange={(e) => up(r, { subject: e.target.value })} placeholder="Short subject" style={{ ...field, marginBottom: 6 }} />
+            <label style={lbl}>Asunto</label>
+            <input name="rfi-subject" value={r.subject || ""} onChange={(e) => up(r, { subject: e.target.value })} placeholder="Asunto breve" style={{ ...field, marginBottom: 6 }} />
 
-            <label style={lbl}>Question</label>
-            <textarea name="rfi-question" value={r.question || ""} onChange={(e) => up(r, { question: e.target.value })} rows={2} placeholder="What are you asking?" style={{ ...field, marginBottom: 6, resize: "vertical" }} />
+            <label style={lbl}>Pregunta</label>
+            <textarea name="rfi-question" value={r.question || ""} onChange={(e) => up(r, { question: e.target.value })} rows={2} placeholder="¿Qué pregunta?" style={{ ...field, marginBottom: 6, resize: "vertical" }} />
 
             <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
               <div style={{ flex: 1 }}>
-                <label style={lbl}>Status</label>
+                <label style={lbl}>Estado</label>
                 <select name="rfi-status" value={st.id} onChange={(e) => up(r, { status: e.target.value })} style={field}>
                   {RFI_STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
                 </select>
               </div>
               <div style={{ flex: 1 }}>
-                <label style={lbl}>Priority</label>
+                <label style={lbl}>Prioridad</label>
                 <select name="rfi-priority" value={r.priority || "normal"} onChange={(e) => up(r, { priority: e.target.value })} style={field}>
                   {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
                 </select>
@@ -118,39 +118,39 @@ export default function RfiPanel({ docked = false, rfis: rfisIn = [], markups = 
 
             <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
               <div style={{ flex: 1 }}>
-                <label style={lbl}>Ball in court</label>
-                <input name="rfi-to" value={r.to || ""} onChange={(e) => up(r, { to: e.target.value })} placeholder="Architect / GC…" style={field} />
+                <label style={lbl}>Pendiente de respuesta de</label>
+                <input name="rfi-to" value={r.to || ""} onChange={(e) => up(r, { to: e.target.value })} placeholder="Arquitecto / contratista…" style={field} />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={lbl}>Opened</label>
+                <label style={lbl}>Abierto</label>
                 <input name="rfi-date" value={r.date || ""} onChange={(e) => up(r, { date: e.target.value })} placeholder="YYYY-MM-DD" style={field} />
               </div>
             </div>
 
             <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 6 }}>
               <label style={{ display: "inline-flex", alignItems: "center", gap: 5, cursor: "pointer", fontSize: 11.5 }}>
-                <input name="rfi-cost-impact" type="checkbox" checked={!!r.cost_impact} onChange={(e) => up(r, { cost_impact: e.target.checked })} />cost impact
+                <input name="rfi-cost-impact" type="checkbox" checked={!!r.cost_impact} onChange={(e) => up(r, { cost_impact: e.target.checked })} />impacto en costo
               </label>
               <label style={{ display: "inline-flex", alignItems: "center", gap: 5, cursor: "pointer", fontSize: 11.5 }}>
-                <input name="rfi-schedule-impact" type="checkbox" checked={!!r.schedule_impact} onChange={(e) => up(r, { schedule_impact: e.target.checked })} />schedule impact
+                <input name="rfi-schedule-impact" type="checkbox" checked={!!r.schedule_impact} onChange={(e) => up(r, { schedule_impact: e.target.checked })} />impacto en plazo
               </label>
             </div>
 
-            <label style={lbl}>Response</label>
-            <textarea name="rfi-response" value={r.response || ""} onChange={(e) => up(r, { response: e.target.value })} rows={2} placeholder="The answer, once received" style={{ ...field, marginBottom: 6, resize: "vertical" }} />
-            <label style={lbl}>Response date</label>
-            <input name="rfi-response-date" value={r.response_date || ""} onChange={(e) => up(r, { response_date: e.target.value })} placeholder="auto-stamps when set to Answered" style={{ ...field, marginBottom: 6 }} />
+            <label style={lbl}>Respuesta</label>
+            <textarea name="rfi-response" value={r.response || ""} onChange={(e) => up(r, { response: e.target.value })} rows={2} placeholder="La respuesta, una vez recibida" style={{ ...field, marginBottom: 6, resize: "vertical" }} />
+            <label style={lbl}>Fecha de respuesta</label>
+            <input name="rfi-response-date" value={r.response_date || ""} onChange={(e) => up(r, { response_date: e.target.value })} placeholder="se fecha sola al marcar Respondido" style={{ ...field, marginBottom: 6 }} />
 
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
               <button onClick={() => up(r, { status: "closed" })} disabled={st.id === "closed"}
-                style={{ padding: "3px 9px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: st.id === "closed" ? "default" : "pointer", fontSize: 11, opacity: st.id === "closed" ? 0.5 : 1 }}>Close</button>
+                style={{ padding: "3px 9px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: st.id === "closed" ? "default" : "pointer", fontSize: 11, opacity: st.id === "closed" ? 0.5 : 1 }}>Cerrar</button>
               <button onClick={() => up(r, { status: "void" })} disabled={st.id === "void"}
-                style={{ padding: "3px 9px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: st.id === "void" ? "default" : "pointer", fontSize: 11, opacity: st.id === "void" ? 0.5 : 1 }}>Void</button>
+                style={{ padding: "3px 9px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: st.id === "void" ? "default" : "pointer", fontSize: 11, opacity: st.id === "void" ? 0.5 : 1 }}>Anular</button>
               <span style={{ flex: 1 }} />
               {linked.length === 0
-                ? <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>no linked markups</span>
+                ? <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>sin anotaciones vinculadas</span>
                 : linked.map((m) => (
-                  <button key={m.id} onClick={() => onFlyTo && onFlyTo(m)} title={`Fly to this ${m.type} on ${sheetLabel ? sheetLabel(m.sheet_id) : m.sheet_id}`}
+                  <button key={m.id} onClick={() => onFlyTo && onFlyTo(m)} title={`Ir a ${m.type} en ${sheetLabel ? sheetLabel(m.sheet_id) : m.sheet_id}`}
                     style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 8px", border: "1px solid var(--cobalt)", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11 }}>
                     <Icon name="target" size={11} />{sheetLabel ? sheetLabel(m.sheet_id) : m.sheet_id}
                   </button>

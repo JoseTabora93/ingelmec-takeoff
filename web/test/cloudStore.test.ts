@@ -199,7 +199,7 @@ test("loadPdfData resolves by manifest id; throws when not in the working set", 
   const store = createCloudStore("folder1", drive as any, { local: fakeLocal() as any });
   await store.addPdf(fakeFile("plan.pdf", new Uint8Array([37, 80, 68, 70])) as any);
   assert.deepEqual(await store.loadPdfData("plan.pdf"), new Uint8Array([37, 80, 68, 70]));
-  await assert.rejects(store.loadPdfData("missing.pdf"), /PDF not in project sheet set: missing\.pdf/);
+  await assert.rejects(store.loadPdfData("missing.pdf"), /El PDF no está en el juego de hojas del proyecto: missing\.pdf/);
 });
 
 test("loadPdfData resolves a file living in a SUBFOLDER purely via the manifest id", async () => {

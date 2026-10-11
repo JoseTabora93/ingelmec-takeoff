@@ -173,7 +173,7 @@ export function buildContribution({ conditions, shapes, scaleInfo = [], counters
 
 export async function sendContribution(payload, contributor = "") {
   const endpoint = contributeEndpoint();
-  if (!endpoint) throw new Error("No contribution endpoint is configured for this build.");
+  if (!endpoint) throw new Error("No hay un endpoint de contribución configurado para esta compilación.");
   const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

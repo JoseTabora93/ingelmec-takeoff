@@ -29,10 +29,10 @@ export function parseTakeoffImport(text) {
   try {
     doc = JSON.parse(text);
   } catch {
-    throw new Error("Couldn't import takeoff: that file is not valid JSON.");
+    throw new Error("No se pudo importar el takeoff: ese archivo no es un JSON válido.");
   }
   if (!doc || typeof doc !== "object" || Array.isArray(doc) || doc.schema !== ANN_SCHEMA) {
-    throw new Error(`Couldn't import takeoff: not a takeoff export (expected schema "${ANN_SCHEMA}", the file export_takeoff or the app writes).`);
+    throw new Error(`No se pudo importar el takeoff: no es una exportación de takeoff (se esperaba el esquema «${ANN_SCHEMA}», el archivo que escribe export_takeoff o la app).`);
   }
   return doc;
 }
@@ -73,7 +73,7 @@ export function mergeTakeoffImport(current, imported, knownFiles = null) {
   const badMult = impConds.filter((c) => !isValidMultiplier(c.multiplier));
   if (badMult.length) {
     const list = badMult.map((c) => `${c.finish_tag ?? c.id} (${JSON.stringify(c.multiplier)})`).join(", ");
-    throw new Error(`Couldn't import takeoff: condition multiplier must be a positive number, ${list}. Fix the file and re-import. Nothing was imported.`);
+    throw new Error(`No se pudo importar el takeoff: el multiplicador de la condición debe ser un número positivo, ${list}. Corrija el archivo y vuelva a importar. No se importó nada.`);
   }
   const localScales = new Map(arr(cur.sheets).filter((s) => typeof s?.sheet_id === "string").map((s) => [s.sheet_id, s.units_per_px]));
   const incomingScales = new Map(arr(imported.sheets).filter((s) => typeof s?.sheet_id === "string").map((s) => [s.sheet_id, s.units_per_px]));
@@ -84,7 +84,7 @@ export function mergeTakeoffImport(current, imported, knownFiles = null) {
     if (existingIds.has(s.id) || s.measure_role === "count") continue;
     const local = localScales.get(s.sheet_id), incoming = incomingScales.get(s.sheet_id);
     if (local > 0 && (!(incoming > 0) || !Number.isFinite(incoming) || Math.abs(local - incoming) > Math.max(local, incoming) * 1e-9)) {
-      throw new Error(`Couldn't import takeoff: scale conflict on ${s.sheet_id} (current ${local} ft/px; imported ${incoming ?? "missing"}). Align the sheet calibration and re-export before importing measurements. Nothing was imported.`);
+      throw new Error(`No se pudo importar el takeoff: conflicto de escala en ${s.sheet_id} (actual ${local} ft/px; importada ${incoming ?? "falta"}). Alinee la calibración de la hoja y vuelva a exportar antes de importar mediciones. No se importó nada.`);
     }
   }
 

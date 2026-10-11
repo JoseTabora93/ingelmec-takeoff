@@ -24,9 +24,9 @@ test("otprofile: a well-formed v1 profile parses through", () => {
 });
 
 test("otprofile: refuses non-JSON, non-objects, and unknown schemas loudly", () => {
-  assert.throws(() => parseProfile("not json {"), /isn't valid JSON/);
-  assert.throws(() => parseProfile('"a string"'), /not a profile file/);
-  assert.throws(() => parseProfile("[1,2]"), /not a profile file/);
-  assert.throws(() => parseProfile(JSON.stringify({ schema: "opentakeoff.profile.v9" })), /version/);
-  assert.throws(() => parseProfile(JSON.stringify({ conditions: [] })), /version/);
+  assert.throws(() => parseProfile("not json {"), /no es un JSON válido/);
+  assert.throws(() => parseProfile('"a string"'), /no es un archivo de perfil/);
+  assert.throws(() => parseProfile("[1,2]"), /no es un archivo de perfil/);
+  assert.throws(() => parseProfile(JSON.stringify({ schema: "opentakeoff.profile.v9" })), /versión/);
+  assert.throws(() => parseProfile(JSON.stringify({ conditions: [] })), /versión/);
 });

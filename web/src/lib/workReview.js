@@ -2,21 +2,21 @@
 // verification or authentication; missing attribution stays unknown.
 export function workActor(shape) {
   const origin = shape.origin || {};
-  if (origin.actor === "agent" || origin.method === "agent_v1") return "Agent";
-  if (origin.actor === "rule" || origin.method === "rule_v1") return "Rule";
-  if (origin.actor === "canvas" || origin.actor === "human") return "Canvas";
-  return shape.author ? "Named author" : "Not recorded";
+  if (origin.actor === "agent" || origin.method === "agent_v1") return "Agente";
+  if (origin.actor === "rule" || origin.method === "rule_v1") return "Regla";
+  if (origin.actor === "canvas" || origin.actor === "human") return "Lienzo";
+  return shape.author ? "Autor con nombre" : "Sin registrar";
 }
 
 export function workReviewState(shape) {
-  if (shape.origin?.reviewed === false) return "Needs review";
-  if (shape.origin?.reviewed === true) return "Reviewed";
-  return "Recorded";
+  if (shape.origin?.reviewed === false) return "Por revisar";
+  if (shape.origin?.reviewed === true) return "Revisado";
+  return "Registrado";
 }
 
 export function workMethod(shape) {
-  const names = { manual: "Explicit geometry", agent_v1: "Agent proposal", rule_v1: "Correction rule", one_click_v1: "Room detection", net_v1: "Room detection", derived: "Derived measurement" };
-  return names[shape.origin?.method] || shape.origin?.method || "Not recorded";
+  const names = { manual: "Geometría explícita", agent_v1: "Propuesta del agente", rule_v1: "Regla de corrección", one_click_v1: "Detección de recintos", net_v1: "Detección de recintos", derived: "Medición derivada" };
+  return names[shape.origin?.method] || shape.origin?.method || "Sin registrar";
 }
 
 export function workQuantity(shape) {
@@ -29,8 +29,8 @@ export function workQuantity(shape) {
 export function filterWork(shapes, { filter = "all", query = "", conditionLabel = () => "", sheetLabel = () => "" } = {}) {
   const term = query.trim().toLocaleLowerCase();
   return shapes.filter((shape) => {
-    if (filter === "pending" && workReviewState(shape) !== "Needs review") return false;
-    if (filter === "agent" && workActor(shape) !== "Agent") return false;
+    if (filter === "pending" && workReviewState(shape) !== "Por revisar") return false;
+    if (filter === "agent" && workActor(shape) !== "Agente") return false;
     return !term || [shape.id, shape.label, shape.author, conditionLabel(shape.condition_id), sheetLabel(shape.sheet_id)]
       .some((value) => String(value || "").toLocaleLowerCase().includes(term));
   });

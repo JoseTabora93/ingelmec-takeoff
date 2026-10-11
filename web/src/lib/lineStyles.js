@@ -7,10 +7,10 @@
 // stage scale for the screen-relative SVG convention (`${n/z}` everywhere).
 // `solid` carries no pattern.
 export const LINE_STYLES = {
-  solid: { label: "Solid", dash: null },
-  dashed: { label: "Dashed", dash: [6, 4] },
-  dotted: { label: "Dotted", dash: [1, 3] },
-  dashdot: { label: "Dash-dot", dash: [8, 3, 1, 3] },
+  solid: { label: "Sólido", dash: null },
+  dashed: { label: "Discontinua", dash: [6, 4] },
+  dotted: { label: "Punteada", dash: [1, 3] },
+  dashdot: { label: "Raya y punto", dash: [8, 3, 1, 3] },
 };
 
 export const LINE_STYLE_IDS = Object.keys(LINE_STYLES);

@@ -39,7 +39,7 @@ const describedBy = (html: string) => {
 
 test("ImportSchedulePanel: text-sourced rows are flagged 'from description'; heading/none rows are not", () => {
   const html = render();
-  const flags = [...html.matchAll(/<span[^>]*id="([^"]+)"[^>]*>from description<\/span>/g)].map((m) => m[1]);
+  const flags = [...html.matchAll(/<span[^>]*id="([^"]+)"[^>]*>por la descripción<\/span>/g)].map((m) => m[1]);
   assert.equal(flags.length, 2);
   const by = describedBy(html);
   assert.equal(by.size, 5);
@@ -52,23 +52,23 @@ test("ImportSchedulePanel: text-sourced rows are flagged 'from description'; hea
 
 test("ImportSchedulePanel: the flag is a sibling of the row's <label>, not inside it", () => {
   const html = render();
-  for (const m of html.matchAll(/<label[^>]*>(.*?)<\/label>/gs)) assert.doesNotMatch(m[1], /from description/);
-  assert.match(html, /<\/label><span[^>]*id="[^"]+"[^>]*>from description<\/span>/);
+  for (const m of html.matchAll(/<label[^>]*>(.*?)<\/label>/gs)) assert.doesNotMatch(m[1], /por la descripción/);
+  assert.match(html, /<\/label><span[^>]*id="[^"]+"[^>]*>por la descripción<\/span>/);
   // warning colour + a tooltip saying why
-  assert.match(html, /<span[^>]*color:var\(--c-warning\)[^>]*>from description</);
+  assert.match(html, /<span[^>]*color:var\(--c-warning\)[^>]*>por la descripción</);
   // accurate: a row under a printed MISC / ACCESSORIES heading is "text" too —
   // there IS a heading, it just names no category
-  assert.match(html, /title="Category guessed from the row(&#x27;|')s own words, no printed heading names one"/);
+  assert.match(html, /title="Categoría deducida de las propias palabras de la fila; ningún encabezado impreso la nombra"/);
   assert.doesNotMatch(html, /no printed section heading/);
 });
 
 test("ImportSchedulePanel: Select All / Deselect All render; the tag is an inline-edit button", () => {
   const html = render();
-  assert.match(html, /<button[^>]*>Select all<\/button>/);
-  assert.match(html, /<button[^>]*>Deselect all<\/button>/);
-  assert.match(html, /<button[^>]*title="Click to fix the code"[^>]*>TS-1<\/button>/);
+  assert.match(html, /<button[^>]*>Seleccionar todo<\/button>/);
+  assert.match(html, /<button[^>]*>Deseleccionar todo<\/button>/);
+  assert.match(html, /<button[^>]*title="Clic para corregir el código"[^>]*>TS-1<\/button>/);
   // every suggested creatable row starts ticked → Create 5
-  assert.match(html, /Create 5 conditions/);
+  assert.match(html, /Crear 5 condiciones/);
 });
 
 test("ImportSchedulePanel: the dialog fits a phone-width viewport and its footer wraps", () => {
@@ -77,13 +77,13 @@ test("ImportSchedulePanel: the dialog fits a phone-width viewport and its footer
   assert.match(html, /width:min\(560px, calc\(100vw - 32px\)\)/);
   assert.doesNotMatch(html, /width:560px/);
   // the footer (Select all … Create) wraps instead of pushing Create off-screen
-  const footer = html.slice(html.lastIndexOf("<div", html.indexOf(">Select all<")));
+  const footer = html.slice(html.lastIndexOf("<div", html.indexOf(">Seleccionar todo<")));
   assert.match(footer, /^<div[^>]*flex-wrap:wrap/);
 });
 
 test("ImportSchedulePanel: 'No section' is the first group", () => {
   const html = render();
-  const order = ["No section", "Floor", "Wall Protection", "Transition", "Ceiling"].map((l) => html.indexOf(`>${l}<`));
+  const order = ["Sin sección", "Piso", "Protección de muro", "Transición", "Cielo"].map((l) => html.indexOf(`>${l}<`));
   assert.ok(order.every((i) => i >= 0));
   assert.deepEqual([...order].sort((a, b) => a - b), order);
 });
@@ -96,7 +96,7 @@ test("ImportSchedulePanel: the dialog is a labelled modal", () => {
   const labelId = dlg!.match(/aria-labelledby="([^"]+)"/)?.[1];
   assert.ok(labelId, "has aria-labelledby");
   const esc = labelId!.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  assert.match(html, new RegExp(`<span[^>]*id="${esc}"[^>]*>Import from schedule`));
+  assert.match(html, new RegExp(`<span[^>]*id="${esc}"[^>]*>Importar desde el cuadro`));
 });
 
 // ── #483: NOT USED rows, mixed group checkbox, duplicates, skipped codes ─────
@@ -128,7 +128,7 @@ const HIDDEN = "position:absolute;width:1px;height:1px;padding:0;margin:-1px;ove
 test("NOT USED row: the marker as printed, a hidden note, a title; unchecked, not disabled", () => {
   const html = renderWith({ rows: [row("CPT-1", "floor", "heading"), nu("CPT-2", "floor", "(NOT USED)")] });
   const r = rowOf(html, "CPT-2");
-  const note = " The schedule marks this row not used. Select it to create a condition anyway.";
+  const note = " El cuadro marca esta fila como no usada. Selecciónela para crear una condición de todos modos.";
   const m = r.match(/<span id="([^"]+)" title="([^"]+)" style="([^"]*)">\(NOT USED\)<span style="([^"]*)">([^<]*)<\/span><\/span>/);
   assert.ok(m, `NOT USED label in: ${r}`);
   assert.equal(m![2], note.trimStart());
@@ -146,21 +146,21 @@ test("NOT USED row: the marker as printed, a hidden note, a title; unchecked, no
   assert.doesNotMatch(cb, /checked|disabled/);
   for (const l of r.matchAll(/<label[^>]*>(.*?)<\/label>/gs)) assert.doesNotMatch(l[1], /NOT USED/);
   // the ticked row next to it still counts; the NOT USED row doesn't
-  assert.match(html, /Create 1 condition</);
+  assert.match(html, /Crear 1 condición</);
 });
 
 test("N.I.C. row: the not-in-contract note", () => {
   const html = renderWith({ rows: [nu("CPT-3", "floor", "N.I.C.")] });
-  assert.match(rowOf(html, "CPT-3"), /title="The schedule marks this row N\.I\.C\. \(not in contract\)\. Select it to create a condition anyway\."/);
+  assert.match(rowOf(html, "CPT-3"), /title="El cuadro marca esta fila como N\.I\.C\. \(fuera de contrato\)\. Selecciónela para crear una condición de todos modos\."/);
 });
 
 test("from description, then NOT USED: both describe the checkbox, in that order", () => {
   const html = renderWith({ rows: [nu("HR-1", "wall_protection", "NOT USED", { category_source: "text" })] });
   const r = rowOf(html, "HR-1");
-  const guess = r.match(/<span id="([^"]+)"[^>]*>from description<\/span>/)?.[1];
+  const guess = r.match(/<span id="([^"]+)"[^>]*>por la descripción<\/span>/)?.[1];
   const notUsed = r.match(/<span id="([^"]+)"[^>]*>NOT USED<span/)?.[1];
   assert.ok(guess && notUsed && guess !== notUsed);
-  assert.ok(r.indexOf(">from description<") < r.indexOf(">NOT USED<"));
+  assert.ok(r.indexOf(">por la descripción<") < r.indexOf(">NOT USED<"));
   assert.equal(checkboxOf(r).match(/aria-describedby="([^"]+)"/)?.[1], `${guess} ${notUsed}`);
 });
 
@@ -170,11 +170,11 @@ test("a NOT USED CPT-2 before a real CPT-2: the real one is checked and counted;
   assert.doesNotMatch(first, /checked/);
   assert.match(first, /disabled/);
   assert.match(second, /checked/);
-  assert.match(html, /Create 1 condition</);
+  assert.match(html, /Crear 1 condición</);
   // the duplicate flag says how to fix it, and stays out of aria-describedby
-  assert.match(html, /<span title="Click the code to rename it\."[^>]*>duplicate<\/span>/);
+  assert.match(html, /<span title="Haga clic en el código para renombrarlo\."[^>]*>duplicado<\/span>/);
   // the locked row's hidden note: no "Select it" (it can't be selected)
-  assert.match(html, /<span style="[^"]*">\s?The schedule marks this row not used\.<\/span>/);
+  assert.match(html, /<span style="[^"]*">\s?El cuadro marca esta fila como no usada\.<\/span>/);
   assert.doesNotMatch(html, /Select it to create a condition anyway/);
 });
 
@@ -185,7 +185,7 @@ test("in-use flag: inside the label, never in aria-describedby; aria-describedby
   const ids = cb.match(/aria-describedby="([^"]+)"/)![1].split(" ");
   assert.equal(ids.length, 1);
   assert.match(r, new RegExp(`<span id="${ids[0]}"[^>]*>NOT USED<span`));
-  assert.match(r.match(/<label[^>]*>(.*?)<\/label>/s)![1], />in use</);
+  assert.match(r.match(/<label[^>]*>(.*?)<\/label>/s)![1], />en uso</);
   assert.doesNotMatch(checkboxOf(rowOf(html, "CPT-1")), /aria-describedby/);
 });
 
@@ -207,7 +207,7 @@ test("row layout: wraps; label flex 1 1 160px; descriptors pushed right; locked 
   assert.doesNotMatch(rowOf(html, "CPT-1").match(/<label style="([^"]*)"/)![1], /opacity/);
   // two descriptors: one group pushed right, flex, gap as the row's
   const two = rowOf(html, "HR-1");
-  assert.match(two, /<\/label><div style="margin-left:auto;display:flex;gap:10px[^"]*"><span[^>]*>from description<\/span><span[^>]*>NOT USED<span/);
+  assert.match(two, /<\/label><div style="margin-left:auto;display:flex;gap:10px[^"]*"><span[^>]*>por la descripción<\/span><span[^>]*>NOT USED<span/);
 });
 
 test("group checkbox: a partly picked group is data-state=some and unchecked; all → checked; none → unchecked", () => {
@@ -217,29 +217,29 @@ test("group checkbox: a partly picked group is data-state=some and unchecked; al
   };
   const html = renderWith({ rows: [row("CPT-1", "floor", "heading"), nu("CPT-2", "floor", "NOT USED"),
     row("RB-1", "base", "heading"), nu("ACT-9", "ceiling", "NOT USED")] });
-  const floor = groupBox(html, "Floor");
+  const floor = groupBox(html, "Piso");
   assert.match(floor, /data-state="some"/);
   assert.doesNotMatch(floor, /checked/);
   const base = groupBox(html, "Base");
   assert.match(base, /data-state="all"/);
   assert.match(base, /checked/);
-  const ceiling = groupBox(html, "Ceiling");
+  const ceiling = groupBox(html, "Cielo");
   assert.match(ceiling, /data-state="none"/);
   assert.doesNotMatch(ceiling, /checked|disabled/);
 });
 
-const BANNER_TAIL = "A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it, ";
+const BANNER_TAIL = "Un código de cuatro o cinco letras sin número se lee solo cuando arriba hay el encabezado o una fila ya leída, llena dos o más columnas más, y después le sigue una fila con un código numerado, como CPT-1";
 const bannerOf = (html: string) => html.match(/<div role="note" id="([^"]+)" style="([^"]*)">([^<]*)<\/div>/);
 const unesc = (s: string) => s.replace(/&#x27;/g, "'").replace(/&quot;/g, "\"").replace(/&amp;/g, "&");
 
 test("skipped notice: exact text one / several / repeated / > 8; a note the dialog is described by", () => {
   const rs = [row("CPT-1", "floor", "heading")];
   const cases: [string[], string][] = [
-    [["EPOX"], `1 code wasn't read: EPOX. ${BANNER_TAIL}if it's a finish, add it as a condition yourself.`],
-    [["EPOX", "SEAL"], `2 codes weren't read: EPOX, SEAL. ${BANNER_TAIL}if they're finishes, add them as conditions yourself.`],
-    [["EPOX", "EPOX"], `1 code wasn't read: EPOX (2 lines). ${BANNER_TAIL}if it's a finish, add it as a condition yourself.`],
+    [["EPOX"], `1 código no se leyó: EPOX. ${BANNER_TAIL}; si es un acabado, agréguelo usted mismo como condición.`],
+    [["EPOX", "SEAL"], `2 códigos no se leyeron: EPOX, SEAL. ${BANNER_TAIL}; si son acabados, agréguelos usted mismo como condiciones.`],
+    [["EPOX", "EPOX"], `1 código no se leyó: EPOX (2 líneas). ${BANNER_TAIL}; si es un acabado, agréguelo usted mismo como condición.`],
     [["AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ"],
-      `10 codes weren't read: AAAA, BBBB, CCCC, DDDD, EEEE, FFFF, GGGG, HHHH, and 2 more. ${BANNER_TAIL}if they're finishes, add them as conditions yourself.`],
+      `10 códigos no se leyeron: AAAA, BBBB, CCCC, DDDD, EEEE, FFFF, GGGG, HHHH y 2 más. ${BANNER_TAIL}; si son acabados, agréguelos usted mismo como condiciones.`],
   ];
   for (const [skipped, text] of cases) {
     const html = renderWith({ rows: rs, skipped });
@@ -259,9 +259,9 @@ test("skipped notice: exact text one / several / repeated / > 8; a note the dial
 
 test("zero rows: its own title, Close (autofocus) only, no Select all, Deselect all or Create", () => {
   const html = renderWith({ rows: [], skipped: ["EPOX"] });
-  assert.match(html, />Import from schedule, no rows read</);
-  assert.doesNotMatch(html, /Select all|Deselect all|Create \d/);
-  assert.match(html, /<button autofocus=""[^>]*>Close<\/button>/);
+  assert.match(html, />Importar desde el cuadro: no se leyeron filas</);
+  assert.doesNotMatch(html, /Seleccionar todo|Deseleccionar todo|Crear \d/);
+  assert.match(html, /<button autofocus=""[^>]*>Cerrar<\/button>/);
   assert.doesNotMatch(html, />Cancel</);
   assert.ok(bannerOf(html));
 });
@@ -277,7 +277,7 @@ const ctRows = (html: string) => {
   const out: Record<string, string> = {};
   for (const m of html.matchAll(/<label[^>]*>(<input type="checkbox"[^>]*>)(.*?)<\/label>/gs)) {
     const desc = m[2].match(/<\/button><span[^>]*>([^<]*)/)?.[1];
-    if (m[2].includes(">CT-1</button>") && desc) out[desc] = `${/checked/.test(m[1]) ? "on" : "off"}|${/>duplicate</.test(m[2]) ? "duplicate" : ""}`;
+    if (m[2].includes(">CT-1</button>") && desc) out[desc] = `${/checked/.test(m[1]) ? "on" : "off"}|${/>duplicado</.test(m[2]) ? "duplicado" : ""}`;
   }
   return out;
 };
@@ -287,8 +287,8 @@ test("a key_rule CT-1 before a plain CT-1: the plain one is checked and counted;
     { ...row("CT-1", "base", "heading"), description: "COVE BASE", key_rule: "extended" },
     { ...row("CT-1", "floor", "heading"), description: "CERAMIC TILE" },
   ] });
-  assert.deepEqual(ctRows(html), { "COVE BASE": "off|duplicate", "CERAMIC TILE": "on|" });
-  assert.match(html, /Create 1 condition</);
+  assert.deepEqual(ctRows(html), { "COVE BASE": "off|duplicado", "CERAMIC TILE": "on|" });
+  assert.match(html, /Crear 1 condición</);
 });
 
 test("end to end: the reader's CT-1 COVE line above a floor CT-1 → two items, CT-1COVE and CT-1, both picked (the collision rule)", () => {
@@ -304,7 +304,7 @@ test("end to end: the reader's CT-1 COVE line above a floor CT-1 → two items, 
 
 // ── #482: a code repaired from an OCR misread ──────────────────────────────────
 // A row whose code the reader repaired (read_as: PT-O1 imported as PT-01) shows
-// "read as PT-O1" after the row's label, built like the NOT USED label: the
+// "leída como PT-O1" after the row's label, built like the NOT USED label: the
 // code in the edit button's mono at 12.5px so O and 0 can be told apart, a
 // title and a hidden sentence saying what to check, and the checkbox described
 // by it. With more than one descriptor they wrap as one group: from
@@ -315,7 +315,7 @@ const tagRows = (html: string, tag: string) => {
   const out: Record<string, string> = {};
   for (const m of html.matchAll(/<label[^>]*>(<input type="checkbox"[^>]*>)(.*?)<\/label>/gs)) {
     const desc = m[2].match(/<\/button><span[^>]*>([^<]*)/)?.[1];
-    if (m[2].includes(`>${tag}</button>`) && desc) out[desc] = `${/checked/.test(m[1]) ? "on" : "off"}|${/>duplicate</.test(m[2]) ? "duplicate" : ""}`;
+    if (m[2].includes(`>${tag}</button>`) && desc) out[desc] = `${/checked/.test(m[1]) ? "on" : "off"}|${/>duplicado</.test(m[2]) ? "duplicado" : ""}`;
   }
   return out;
 };
@@ -323,9 +323,9 @@ const tagRows = (html: string, tag: string) => {
 test("read as: the code as read, mono 12.5px, warning color, a title and hidden sentence; it describes the checkbox", () => {
   const html = renderWith({ rows: [ra("PT-01", "PT-O1")] });
   const r = rowOf(html, "PT-01");
-  const sentence = "Repaired from PT-O1; check the code against the schedule.";
-  const m = r.match(/<span id="([^"]+)" title="([^"]+)" style="([^"]*)">read as <span style="([^"]*)">PT-O1<\/span><span style="([^"]*)">([^<]*)<\/span><\/span>/);
-  assert.ok(m, `read as flag in: ${r}`);
+  const sentence = "Reparado desde PT-O1; revise el código contra el cuadro.";
+  const m = r.match(/<span id="([^"]+)" title="([^"]+)" style="([^"]*)">leída como <span style="([^"]*)">PT-O1<\/span><span style="([^"]*)">([^<]*)<\/span><\/span>/);
+  assert.ok(m, `leída como flag in: ${r}`);
   assert.equal(m![2], sentence);
   assert.match(m![3], /text-transform:none/);
   assert.match(m![3], /color:var\(--c-warning\)/);
@@ -334,10 +334,10 @@ test("read as: the code as read, mono 12.5px, warning color, a title and hidden 
   assert.match(m![4], /font-size:12\.5px/);
   assert.equal(m![5], HIDDEN);
   // the hidden text doesn't repeat the code the visible text just read out
-  assert.equal(m![6], ", check the code against the schedule.");
+  assert.equal(m![6], ", revise el código contra el cuadro.");
   // outside the label, pushed right on its own; the checkbox points at it
   for (const l of r.matchAll(/<label[^>]*>(.*?)<\/label>/gs)) assert.doesNotMatch(l[1], /read as/);
-  assert.match(r, /<\/label><span[^>]*margin-left:auto[^>]*>read as /);
+  assert.match(r, /<\/label><span[^>]*margin-left:auto[^>]*>leída como /);
   assert.equal(checkboxOf(r).match(/aria-describedby="([^"]+)"/)?.[1], m![1]);
   // a row with no read_as has none
   assert.doesNotMatch(renderWith({ rows: [row("PT-01", "floor", "heading")] }), /read as/);
@@ -346,9 +346,9 @@ test("read as: the code as read, mono 12.5px, warning color, a title and hidden 
 test("three descriptors: one group pushed right, in the order from description, read as, NOT USED", () => {
   const html = renderWith({ rows: [nu("HR-01", "wall_protection", "NOT USED", { category_source: "text", read_as: "HR-O1" })] });
   const r = rowOf(html, "HR-01");
-  assert.match(r, /<\/label><div style="margin-left:auto;display:flex;gap:10px"><span[^>]*>from description<\/span><span[^>]*>read as <span[^>]*>HR-O1<\/span><span[^>]*>[^<]*<\/span><\/span><span[^>]*>NOT USED<span/);
-  const guess = r.match(/<span id="([^"]+)"[^>]*>from description<\/span>/)?.[1];
-  const readAs = r.match(/<span id="([^"]+)"[^>]*>read as /)?.[1];
+  assert.match(r, /<\/label><div style="margin-left:auto;display:flex;gap:10px"><span[^>]*>por la descripción<\/span><span[^>]*>leída como <span[^>]*>HR-O1<\/span><span[^>]*>[^<]*<\/span><\/span><span[^>]*>NOT USED<span/);
+  const guess = r.match(/<span id="([^"]+)"[^>]*>por la descripción<\/span>/)?.[1];
+  const readAs = r.match(/<span id="([^"]+)"[^>]*>leída como /)?.[1];
   const notUsed = r.match(/<span id="([^"]+)"[^>]*>NOT USED<span/)?.[1];
   assert.equal(checkboxOf(r).match(/aria-describedby="([^"]+)"/)?.[1], `${guess} ${readAs} ${notUsed}`);
   // the group's descriptors aren't each pushed right
@@ -361,40 +361,40 @@ test("a PT-01 read right claims the code over a repaired PT-01, in either order"
     [{ ...row("PT-01", "floor", "heading"), description: "PLAIN" }, { ...ra("PT-01", "PT-O1"), description: "REPAIRED" }],
   ]) {
     const html = renderWith({ rows });
-    assert.deepEqual(tagRows(html, "PT-01"), { REPAIRED: "off|duplicate", PLAIN: "on|" });
+    assert.deepEqual(tagRows(html, "PT-01"), { REPAIRED: "off|duplicado", PLAIN: "on|" });
   }
 });
 
 test("a key_rule row that was also repaired ranks with key_rule rows: under a repaired row, over a NOT USED one", () => {
   const krRa = { ...ra("PT-01", "PT-O1", { key_rule: "extended" }), description: "BOTH" };
   // under a repaired row read the usual way
-  assert.deepEqual(tagRows(renderWith({ rows: [krRa, { ...ra("PT-01", "PT-O1"), description: "REPAIRED" }] }), "PT-01"), { BOTH: "off|duplicate", REPAIRED: "on|" });
+  assert.deepEqual(tagRows(renderWith({ rows: [krRa, { ...ra("PT-01", "PT-O1"), description: "REPAIRED" }] }), "PT-01"), { BOTH: "off|duplicado", REPAIRED: "on|" });
   // level with a key_rule row: the first one claims it
-  assert.deepEqual(tagRows(renderWith({ rows: [krRa, { ...row("PT-01", "floor", "heading"), key_rule: "extended", description: "RULE" }] }), "PT-01"), { BOTH: "on|", RULE: "off|duplicate" });
+  assert.deepEqual(tagRows(renderWith({ rows: [krRa, { ...row("PT-01", "floor", "heading"), key_rule: "extended", description: "RULE" }] }), "PT-01"), { BOTH: "on|", RULE: "off|duplicado" });
   // over a NOT USED row
   const notUsed = { ...nu("PT-01", "floor", "NOT USED"), description: "UNUSED" };
-  assert.deepEqual(tagRows(renderWith({ rows: [notUsed, krRa] }), "PT-01"), { UNUSED: "off|duplicate", BOTH: "on|" });
+  assert.deepEqual(tagRows(renderWith({ rows: [notUsed, krRa] }), "PT-01"), { UNUSED: "off|duplicado", BOTH: "on|" });
 });
 
 test("a historical flat code is visibly held, unchecked and disabled while a distinct suffix stays creatable", () => {
   const html = renderWith({ rows: [row("G-01(C)", "floor", "heading"), row("G-01(W)", "floor", "heading")], existing: new Set(["G-01C"]) });
   const held = rowOf(html, "G-01(C)");
-  assert.match(held, /check existing G-01C/);
+  assert.match(held, /revise la existente G-01C/);
   assert.match(checkboxOf(held), /disabled/);
   assert.doesNotMatch(checkboxOf(held), /checked/);
   assert.match(checkboxOf(rowOf(html, "G-01(W)")), /checked/);
-  assert.match(html, /Create 1 condition</);
+  assert.match(html, /Crear 1 condición</);
   const dialog = html.match(/<div[^>]*role="dialog"[^>]*>/)![0];
   const id = dialog.match(/aria-describedby="([^"]+)"/)![1];
   assert.ok(html.includes(`role="note" id="${id}"`));
-  assert.match(html, /if it is the same finish, rename it before importing again/);
+  assert.match(html, /si es el mismo acabado, renómbrela antes de importar de nuevo/);
 });
 
 test("after the existing condition is renamed to its printed suffix, re-import is in use with no historical hold", () => {
   const html = renderWith({ rows: [row("G-01(C)", "floor", "heading")], existing: new Set(["G-01 (C)"]) });
-  assert.match(rowOf(html, "G-01(C)"), />in use</);
-  assert.doesNotMatch(html, /check existing|Some codes may already exist without parentheses/);
-  assert.match(html, /Create 0 conditions/);
+  assert.match(rowOf(html, "G-01(C)"), />en uso</);
+  assert.doesNotMatch(html, /revise la existente|Algunos códigos pueden ya existir sin paréntesis/);
+  assert.match(html, /Crear 0 condiciones/);
 });
 
 test("OCR disagreement and historical identity holds coexist without hiding either notice or enabling duplicate creation", () => {
@@ -404,8 +404,8 @@ test("OCR disagreement and historical identity holds coexist without hiding eith
     row("PT-1", "floor", "heading"),
   ], existing: new Set(["G-01C"]), skipped: ["EPOX"] });
   const held = rowOf(html, "G-01(C)");
-  assert.match(held, /check existing G-01C/);
-  assert.match(held, /Check code: G-01\(C\) \/ G-01C/);
+  assert.match(held, /revise la existente G-01C/);
+  assert.match(held, /Revise el código: G-01\(C\) \/ G-01C/);
   assert.match(checkboxOf(held), /disabled/);
   assert.doesNotMatch(checkboxOf(held), /checked/);
   const uncertain = rowOf(html, "S-2");
@@ -413,7 +413,7 @@ test("OCR disagreement and historical identity holds coexist without hiding eith
   const warningId = checkboxOf(uncertain).match(/aria-describedby="([^"]+)"/)![1];
   assert.ok(html.includes(`id="${warningId}"`));
   assert.match(checkboxOf(rowOf(html, "PT-1")), /checked/);
-  assert.match(html, /Create 1 condition</);
+  assert.match(html, /Crear 1 condición</);
   const ids = html.match(/role="dialog"[^>]*aria-describedby="([^"]+)"/)![1].split(" ");
   assert.equal(new Set(ids).size, 3);
   for (const id of ids) assert.ok(html.includes(`role="note" id="${id}"`));
@@ -421,7 +421,7 @@ test("OCR disagreement and historical identity holds coexist without hiding eith
 
 test("an unconfirmed second read remains visible and unchecked even when every row was suggested", () => {
   const html = renderWith({ rows: [{ ...row("P1", "floor", "heading"), code_checks: [{ first: "P1", second: "" }] }] });
-  assert.match(html, /Check code: P1 \/ second read did not confirm/);
+  assert.match(html, /Revise el código: P1 \/ la segunda lectura no lo confirmó/);
   assert.doesNotMatch(checkboxOf(rowOf(html, "P1")), /checked|disabled/);
-  assert.match(html, /Create 0 conditions/);
+  assert.match(html, /Crear 0 condiciones/);
 });

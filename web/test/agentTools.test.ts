@@ -183,12 +183,12 @@ test("read_schedule: a refused table says why, naming the title when that is the
   const { ctx } = makeCtx({ readSchedule: async () => ({ rows: [], refused: "title", title: "DOOR SCHEDULE" }) });
   const out = await executeAgentTool(ctx, "read_schedule", { sheet: "plan.pdf", region: { x0: 0, y0: 0, x1: 0.5, y1: 0.5 } });
   assert.deepEqual(out.rows, []);
-  assert.match(out.note, /^That's the "DOOR SCHEDULE", not a finish\/material schedule, /);
+  assert.match(out.note, /^Eso es «DOOR SCHEDULE», no un cuadro de acabados o materiales, /);
   assert.equal(Object.keys(out).sort().join(), "note,rows");
 
   const { ctx: ctx2 } = makeCtx({ readSchedule: async () => ({ rows: [], refused: "foreign-header" }) });
   const out2 = await executeAgentTool(ctx2, "read_schedule", { sheet: "plan.pdf", region: { x0: 0, y0: 0, x1: 0.5, y1: 0.5 } });
-  assert.match(out2.note, /^That table doesn't look like a finish\/material schedule, /);
+  assert.match(out2.note, /^Esa tabla no parece un cuadro de acabados o materiales, /);
 });
 
 test("read_schedule: no table → the re-draw note names every key column", async () => {
@@ -224,11 +224,11 @@ test("read_schedule: { rows: [], skipped } → skipped and the exact note", asyn
     return executeAgentTool(ctx, "read_schedule", R);
   };
   assert.deepEqual(await run(["EPOX"]), { rows: [], skipped: ["EPOX"],
-    note: "No rows read. A four- or five-letter code with no number wasn't read: EPOX. Find its line with read_sheet_text, check it with view_region, then create it with create_condition if it's a finish." });
+    note: "No se leyeron filas. Un código de cuatro o cinco letras sin número no se leyó: EPOX. Ubique su línea con read_sheet_text, verifíquela con view_region y, si es un acabado, créela con create_condition." });
   assert.deepEqual(await run(["EPOX", "SEAL"]), { rows: [], skipped: ["EPOX", "SEAL"],
-    note: "No rows read. Four- or five-letter codes with no number weren't read: EPOX, SEAL. Find their lines with read_sheet_text, check them with view_region, then create them with create_condition if they're finishes." });
+    note: "No se leyeron filas. Los códigos de cuatro o cinco letras sin número no se leyeron: EPOX, SEAL. Ubique sus líneas con read_sheet_text, verifíquelas con view_region y, si son acabados, créelas con create_condition." });
   assert.deepEqual(await run(["EPOX", "EPOX"]), { rows: [], skipped: ["EPOX", "EPOX"],
-    note: "No rows read. A four- or five-letter code with no number wasn't read: EPOX (2 lines). Find its lines with read_sheet_text, check it with view_region, then create it with create_condition if it's a finish." });
+    note: "No se leyeron filas. Un código de cuatro o cinco letras sin número no se leyó: EPOX (2 líneas). Ubique sus líneas con read_sheet_text, verifíquela con view_region y, si es un acabado, créela con create_condition." });
 });
 
 test("read_schedule: rows keep key_rule where the reader set it; other rows have no key_rule key", async () => {

@@ -412,7 +412,7 @@ export interface DetectionReport {
  *  tag produced a room) that the readout is most likely to be misread as
  *  "sheet complete". */
 export const NO_TAG_CAVEAT =
-  "Only rooms carrying a room-number tag are found, corridors, elevators and vestibules usually carry none and are NOT detected. One-Click those.";
+  "Solo se encuentran los recintos con una etiqueta de número de recinto: pasillos, ascensores y vestíbulos suelen no llevarla y NO se detectan. Trácelos con One-Click.";
 
 const plural = (n: number) => (n === 1 ? "" : "s");
 
@@ -429,28 +429,28 @@ export function detectionReport(t: DetectionTally, tinySf = 4): DetectionReport 
   const headline =
     t.seeds === 0
       ? t.patternHits === 0
-        ? "No room-number tags on this sheet, detection has nothing to seed from."
-        : `No room-number tags on this sheet, all ${t.patternHits} matching numeral${plural(t.patternHits)} were rejected as something else.`
+        ? "No hay etiquetas de número de recinto en esta hoja: la detección no tiene de dónde partir."
+        : `No hay etiquetas de número de recinto en esta hoja: los ${t.patternHits} numerales coincidentes se descartaron por ser otra cosa.`
       : n === 0
-        ? `No rooms detected: ${t.seeds} room tag${plural(t.seeds)} found, ${tried === 0 ? "none was tried" : "none produced a usable region"}.`
-        : `${n} of ${tried} room tag${plural(tried)} produced a room${t.cancelled ? ` (${t.seeds} on the sheet)` : ""}.`;
+        ? `No se detectaron recintos: ${t.seeds} etiqueta${plural(t.seeds)} de recinto encontrada${plural(t.seeds)}, ${tried === 0 ? "ninguna se probó" : "ninguna produjo una región utilizable"}.`
+        : `${n} de ${tried} etiqueta${plural(tried)} de recinto ${n === 1 ? "produjo" : "produjeron"} un recinto${t.cancelled ? ` (${t.seeds} en la hoja)` : ""}.`;
   const limits: string[] = [];
   if (t.cancelled) {
     const untried = Math.max(0, t.seeds - tried);
     limits.push(untried > 0
-      ? `Stopped early, ${untried} room tag${plural(untried)} ${untried === 1 ? "was" : "were"} never tried.`
-      : "Stopped early.");
+      ? `Se detuvo antes de tiempo: ${untried} etiqueta${plural(untried)} de recinto nunca se ${untried === 1 ? "probó" : "probaron"}.`
+      : "Se detuvo antes de tiempo.");
   }
   if (t.seeds > 0 && t.patternHits > t.seeds) {
     const k = t.patternHits - t.seeds;
-    limits.push(`${k} other numeral${plural(k)} rejected as not a room tag (printed areas, dimensions, drawing numbers, title-block text).`);
+    limits.push(`${k} numeral${k === 1 ? "" : "es"} más ${k === 1 ? "se descartó" : "se descartaron"} por no ser etiqueta de recinto (áreas impresas, cotas, números de dibujo, texto del cajetín).`);
   }
   if (tried > n) {
     const k = tried - n;
-    limits.push(`${k} tag${plural(k)} produced nothing, the fill leaked past the room, or landed in dense linework.`);
+    limits.push(`${k} etiqueta${plural(k)} ${k === 1 ? "no produjo" : "no produjeron"} nada: el relleno se salió del recinto o cayó en líneas densas.`);
   }
   if (t.tiny > 0) {
-    limits.push(`${t.tiny} proposal${plural(t.tiny)} under ${tinySf} SF, usually the box drawn around a room tag, not a room. Reject ${t.tiny === 1 ? "it" : "them"}.`);
+    limits.push(`${t.tiny} propuesta${plural(t.tiny)} de menos de ${tinySf} SF, normalmente el recuadro dibujado alrededor de una etiqueta de recinto y no un recinto. Rechácela${t.tiny === 1 ? "" : "s"}.`);
   }
   limits.push(NO_TAG_CAVEAT);
   return { headline, limits, message: [headline, ...limits].join(" "), empty: n === 0 };

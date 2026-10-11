@@ -57,5 +57,5 @@ test("authorTallyLine: null when no shape carries an author (export stays byte-i
 
 test("authorTallyLine: named authors sorted with counts, unattributed counted last", () => {
   const line = authorTallyLine([{ author: "Michael" }, { author: "Aaron" }, { author: "Michael" }, {}]);
-  assert.equal(line, "Marks by: Aaron (1) · Michael (2) · unattributed (1)");
+  assert.equal(line, "Marcas por: Aaron (1) · Michael (2) · sin atribuir (1)");
 });

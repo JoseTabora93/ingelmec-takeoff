@@ -196,16 +196,16 @@ const tally = (o: Partial<DetectionTally> = {}): DetectionTally => ({
 
 test("detectionReport: the headline always states the denominator", () => {
   const r = detectionReport(tally({ proposals: 9, seeds: 12 }));
-  assert.equal(r.headline, "9 of 12 room tags produced a room.");
+  assert.equal(r.headline, "9 de 12 etiquetas de recinto produjeron un recinto.");
   assert.equal(r.empty, false);
 });
 
 test("detectionReport: the no-tag ceiling rides EVERY report, including a perfect one", () => {
   // the case that most invites "sheet done": every tag produced a room
   const perfect = detectionReport(tally({ patternHits: 4, seeds: 4, regions: 4, proposals: 4 }));
-  assert.equal(perfect.headline, "4 of 4 room tags produced a room.");
+  assert.equal(perfect.headline, "4 de 4 etiquetas de recinto produjeron un recinto.");
   assert.equal(perfect.limits.at(-1), NO_TAG_CAVEAT);
-  assert.match(perfect.message, /NOT detected/);
+  assert.match(perfect.message, /NO se detectan/);
   // and on the other extreme
   for (const t of [tally({ seeds: 0, patternHits: 0, regions: 0, proposals: 0 }),
                    tally({ proposals: 0, regions: 0 }),
@@ -218,18 +218,18 @@ test("detectionReport: limits are never empty, and the caveat is always last", (
   const r = detectionReport(tally({ patternHits: 56, seeds: 41, regions: 40, proposals: 40, tiny: 11 }));
   assert.ok(r.limits.length >= 1);
   assert.equal(r.limits.at(-1), NO_TAG_CAVEAT);
-  assert.match(r.limits[0], /^15 other numerals rejected as not a room tag/);
-  assert.match(r.limits[1], /^1 tag produced nothing/);
-  assert.match(r.limits[2], /^11 proposals under 4 SF/);
+  assert.match(r.limits[0], /^15 numerales más se descartaron por no ser etiqueta de recinto/);
+  assert.match(r.limits[1], /^1 etiqueta no produjo nada/);
+  assert.match(r.limits[2], /^11 propuestas de menos de 4 SF/);
 });
 
 test("detectionReport: no tags at all is a stated outcome, not an empty screen", () => {
   const none = detectionReport(tally({ patternHits: 0, seeds: 0, regions: 0, proposals: 0 }));
-  assert.equal(none.headline, "No room-number tags on this sheet, detection has nothing to seed from.");
+  assert.equal(none.headline, "No hay etiquetas de número de recinto en esta hoja: la detección no tiene de dónde partir.");
   assert.equal(none.empty, true);
   // numerals present but all rejected reads differently — the reason matters
   const filtered = detectionReport(tally({ patternHits: 7, seeds: 0, regions: 0, proposals: 0 }));
-  assert.equal(filtered.headline, "No room-number tags on this sheet, all 7 matching numerals were rejected as something else.");
+  assert.equal(filtered.headline, "No hay etiquetas de número de recinto en esta hoja: los 7 numerales coincidentes se descartaron por ser otra cosa.");
   assert.equal(filtered.empty, true);
   // …and with zero seeds there is no "N of the seeds were junk" line to add
   assert.equal(filtered.limits.length, 1);
@@ -237,23 +237,23 @@ test("detectionReport: no tags at all is a stated outcome, not an empty screen",
 
 test("detectionReport: tags found but nothing floodable says both halves", () => {
   const r = detectionReport(tally({ patternHits: 12, seeds: 12, regions: 0, proposals: 0 }));
-  assert.equal(r.headline, "No rooms detected: 12 room tags found, none produced a usable region.");
+  assert.equal(r.headline, "No se detectaron recintos: 12 etiquetas de recinto encontradas, ninguna produjo una región utilizable.");
   assert.equal(r.empty, true);
-  assert.match(r.message, /12 tags produced nothing/);
+  assert.match(r.message, /12 etiquetas no produjeron nada/);
 });
 
 test("detectionReport: a cancelled pass says the rest were never tried", () => {
   const r = detectionReport(tally({ cancelled: true, seeds: 41, regions: 6, proposals: 6 }));
-  assert.match(r.limits[0], /Stopped early/);
+  assert.match(r.limits[0], /Se detuvo antes de tiempo/);
   assert.equal(r.empty, false);
 });
 
 test("detectionReport: singular/plural, and the tiny threshold is the caller's", () => {
   const one = detectionReport(tally({ patternHits: 2, seeds: 1, regions: 1, proposals: 0, tiny: 0 }));
-  assert.match(one.headline, /1 room tag found/);
-  assert.match(one.message, /1 tag produced nothing/);
+  assert.match(one.headline, /1 etiqueta de recinto encontrada/);
+  assert.match(one.message, /1 etiqueta no produjo nada/);
   const t = detectionReport(tally({ proposals: 9, tiny: 1 }), 6);
-  assert.match(t.message, /1 proposal under 6 SF.* Reject it\./);
+  assert.match(t.message, /1 propuesta de menos de 6 SF.* Rechácela\./);
 });
 
 test("detectionReport: message is the headline plus every limit, in order", () => {
@@ -273,10 +273,10 @@ const cancelTally = (over: Partial<DetectionTally> = {}): DetectionTally => ({
 test("detectionReport: a cancelled pass counts failures against what was TRIED", () => {
   // 10 tags on the sheet, stopped after 4, of which 3 produced a room
   const r = detectionReport(cancelTally({ tried: 4, regions: 3, proposals: 3, cancelled: true }));
-  assert.match(r.headline, /3 of 4 room tags produced a room \(10 on the sheet\)/);
-  assert.ok(r.limits.some((l) => /Stopped early, 6 room tags were never tried/.test(l)),
+  assert.match(r.headline, /3 de 4 etiquetas de recinto produjeron un recinto \(10 en la hoja\)/);
+  assert.ok(r.limits.some((l) => /Se detuvo antes de tiempo: 6 etiquetas de recinto nunca se probaron/.test(l)),
     `must say what was skipped, got ${JSON.stringify(r.limits)}`);
-  assert.ok(r.limits.some((l) => /^1 tag produced nothing/.test(l)),
+  assert.ok(r.limits.some((l) => /^1 etiqueta no produjo nada/.test(l)),
     `only the ONE tried-and-failed tag is a failure, got ${JSON.stringify(r.limits)}`);
   assert.ok(!r.limits.some((l) => /^7 tags produced nothing/.test(l)),
     "the 6 untried tags must never be reported as fill failures");
@@ -284,17 +284,17 @@ test("detectionReport: a cancelled pass counts failures against what was TRIED",
 
 test("detectionReport: cancelling before the first flood claims nothing", () => {
   const r = detectionReport(cancelTally({ tried: 0, regions: 0, proposals: 0, cancelled: true }));
-  assert.match(r.headline, /none was tried/);
-  assert.ok(r.limits.some((l) => /never tried/.test(l)));
+  assert.match(r.headline, /ninguna se probó/);
+  assert.ok(r.limits.some((l) => /nunca se probó|nunca se probaron/.test(l)));
   assert.ok(!r.limits.some((l) => /produced nothing/.test(l)), "nothing was tried, so nothing failed");
   assert.equal(r.empty, true);
 });
 
 test("detectionReport: a completed pass is unchanged, and a caller with no `tried` still reads right", () => {
   const complete = detectionReport(cancelTally({ regions: 8, proposals: 8 }));
-  assert.match(complete.headline, /8 of 10 room tags produced a room\./);
+  assert.match(complete.headline, /8 de 10 etiquetas de recinto produjeron un recinto\./);
   assert.ok(!complete.headline.includes("on the sheet"), "no cancellation aside on a full pass");
-  assert.ok(complete.limits.some((l) => /^2 tags produced nothing/.test(l)));
+  assert.ok(complete.limits.some((l) => /^2 etiquetas no produjeron nada/.test(l)));
 
   const legacy = detectionReport({ ...cancelTally({ proposals: 8, regions: 8 }), tried: undefined });
   assert.deepEqual(legacy.limits, complete.limits, "absent `tried` means everything was tried");

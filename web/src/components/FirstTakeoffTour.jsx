@@ -49,7 +49,8 @@ function Spotlight({ selector }) {
   );
 }
 
-const fmtSf = (n) => `${Math.round(n).toLocaleString()} SF`;
+// INGELMEC: la app es métrica por omisión; el takeoff guiado mide en pies cuadrados internamente
+const fmtSf = (n) => `${(n * 0.092903).toLocaleString("es", { maximumFractionDigits: 1 })} m²`;
 
 export default function FirstTakeoffTour({ done, step, sheetOpen, sampleBusy, onLoadSample, onClose, onConnect, result }) {
   const doneSet = new Set(done);
@@ -64,7 +65,7 @@ export default function FirstTakeoffTour({ done, step, sheetOpen, sampleBusy, on
       `}</style>
       {!finished && <Spotlight selector={step.target} />}
       <section
-        role="region" aria-label="Guided first takeoff" aria-live="polite"
+        role="region" aria-label="Primer takeoff guiado" aria-live="polite"
         style={{
           position: "fixed", left: "calc(var(--rail-w, 52px) + 14px)", bottom: 38,
           // in progress it sits under every menu and dialog; the done card rises
@@ -77,29 +78,29 @@ export default function FirstTakeoffTour({ done, step, sheetOpen, sampleBusy, on
         }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
           <span className="t-label" style={{ color: "var(--cobalt)" }}>
-            {finished ? "First takeoff, done" : `First takeoff · step ${n + 1} of ${TOUR_STEPS.length}`}
+            {finished ? "Primer takeoff, listo" : `Primer takeoff · paso ${n + 1} de ${TOUR_STEPS.length}`}
           </span>
-          <button type="button" onClick={onClose} title="End the guided takeoff" aria-label="End the guided takeoff"
+          <button type="button" onClick={onClose} title="Terminar el takeoff guiado" aria-label="Terminar el takeoff guiado"
             style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: 17, cursor: "pointer", lineHeight: 1, padding: 2 }}>×</button>
         </div>
 
         {finished ? (
           <div style={{ marginTop: 8 }}>
             <strong style={{ fontFamily: "var(--f-display)", fontSize: 16 }}>
-              {result?.sf ? `You measured ${fmtSf(result.sf)}${result.tag ? ` of ${result.tag}` : ""}.` : "That's a takeoff."}
+              {result?.sf ? `Usted midió ${fmtSf(result.sf)}${result.tag ? ` de ${result.tag}` : ""}.` : "Eso es un takeoff."}
             </strong>
             <p style={{ fontSize: 12.5, lineHeight: 1.55, color: "var(--ink-soft)", margin: "6px 0 12px" }}>
-              Same loop for every finish: pick a condition, trace, read the Report. Press <kbd>?</kbd> any time for the shortcuts.
-              {onConnect ? "Next, hand the same engine to an AI agent." : null}
+              El ciclo es igual para cada acabado: elija una condición, trace y lea el Reporte. Presione <kbd>?</kbd> en cualquier momento para ver los atajos.
+              {onConnect ? "" : null}
             </p>
             <div style={{ display: "flex", gap: 8 }}>
               {onConnect && <button type="button" onClick={onConnect}
                 style={{ padding: "8px 13px", border: "none", background: "var(--cobalt)", color: "var(--accent-contrast)", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>
-                Connect your AI
+                Conectar su IA
               </button>}
               <button type="button" onClick={onClose}
                 style={{ padding: "8px 13px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", fontSize: 12.5, cursor: "pointer" }}>
-                Close
+                Cerrar
               </button>
             </div>
           </div>
@@ -110,13 +111,13 @@ export default function FirstTakeoffTour({ done, step, sheetOpen, sampleBusy, on
             {step.id === "open" && !sheetOpen && (
               <button type="button" onClick={onLoadSample} disabled={sampleBusy}
                 style={{ marginTop: 11, padding: "8px 13px", border: "none", background: "var(--cobalt)", color: "var(--accent-contrast)", fontWeight: 700, fontSize: 12.5, cursor: sampleBusy ? "default" : "pointer", opacity: sampleBusy ? 0.65 : 1 }}>
-                {sampleBusy ? "Loading sample…" : "Load the sample plan"}
+                {sampleBusy ? "Cargando ejemplo…" : "Cargar el plano de ejemplo"}
               </button>
             )}
           </>
         )}
 
-        <ol aria-label="Steps" style={{ listStyle: "none", margin: "13px 0 0", padding: "10px 0 0", borderTop: "1px solid var(--ink-faint)", display: "flex", gap: 6 }}>
+        <ol aria-label="Pasos" style={{ listStyle: "none", margin: "13px 0 0", padding: "10px 0 0", borderTop: "1px solid var(--ink-faint)", display: "flex", gap: 6 }}>
           {TOUR_STEPS.map((s, i) => {
             const isDone = doneSet.has(s.id);
             const isNow = s.id === step?.id;

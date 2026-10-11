@@ -89,8 +89,8 @@ test("shapesDetail: surface_area carries wall SF and run LF (reference)", () => 
 test("shapesToCsv: empty project, semantics line + header only", () => {
   const csv = shapesToCsv(shapesDetail(conds, []));
   const lines = csv.split("\n");
-  assert.ok(lines[0].startsWith("# Per-shape measured quantities"));
-  assert.equal(lines[1], "Shape,Sheet,Sheet ID,Finish,Role,Area SF,LF,EA,Height ft,Height override,Rise ft,Drop ft,Origin");
+  assert.ok(lines[0].startsWith("# Cantidades medidas por figura"));
+  assert.equal(lines[1], "Figura,Hoja,ID de hoja,Acabado,Rol,Área SF,LF,UND,Altura ft,Altura propia,Subida ft,Bajada ft,Origen");
   assert.equal(lines[2], "");
   assert.equal(lines.length, 3);
 });
@@ -109,9 +109,9 @@ test("shapesToCsv: title, semantics line, exact header, quoting, negative deduct
   ];
   const csv = shapesToCsv(shapesDetail(conds2, shapes), "Job 42");
   const lines = csv.split("\n");
-  assert.equal(lines[0], "# Job 42, OpenTakeoff shapes");
-  assert.equal(lines[1], "# Per-shape measured quantities, no multiplier or waste; deducts negative; LF on floor/deduct/surface rows is trace reference only (incl. openings), linear rows alone sum to condition LF; a linear row's LF includes its Rise + Drop");
-  assert.equal(lines[2], "Shape,Sheet,Sheet ID,Finish,Role,Area SF,LF,EA,Height ft,Height override,Rise ft,Drop ft,Origin");
+  assert.equal(lines[0], "# Job 42, Ingelmec Takeoff: figuras");
+  assert.equal(lines[1], "# Cantidades medidas por figura: sin multiplicador ni desperdicio; las deducciones son negativas; LF en filas de piso, deducción y superficie es solo referencia del trazo (incluye vanos); solo las filas lineales suman al LF de la condición; el LF de una fila lineal incluye su Subida + Bajada");
+  assert.equal(lines[2], "Figura,Hoja,ID de hoja,Acabado,Rol,Área SF,LF,UND,Altura ft,Altura propia,Subida ft,Bajada ft,Origen");
   assert.ok(lines[3].includes('"CT-1, honed"'));
   // full-line equality: the -12.5 deduct is a NUMBER cell — a type-blind
   // formula guard would emit '-12.5 and includes("-12.5") would still pass
@@ -121,7 +121,7 @@ test("shapesToCsv: title, semantics line, exact header, quoting, negative deduct
 
 test("shapesToCsv: no title line without a project name", () => {
   const csv = shapesToCsv(shapesDetail(conds, [floor("a", 10)]));
-  assert.ok(csv.startsWith("# Per-shape measured quantities"));
+  assert.ok(csv.startsWith("# Cantidades medidas por figura"));
 });
 
 test("shapesToCsv: metric export converts per-shape area and length columns", () => {
@@ -135,7 +135,7 @@ test("shapesToCsv: metric export converts per-shape area and length columns", ()
   }]);
   const csv = shapesToCsv(rows, "", "OpenTakeoff", "metric");
   const lines = csv.split("\n");
-  assert.equal(lines[1], "Shape,Sheet,Sheet ID,Finish,Role,Area m2,m,EA,Height m,Height override,Rise m,Drop m,Origin");
+  assert.equal(lines[1], "Figura,Hoja,ID de hoja,Acabado,Rol,Área m2,m,UND,Altura m,Altura propia,Subida m,Bajada m,Origen");
   assert.equal(lines[2], "a,sh1,sh1,CT-1,floor_area,9.29,12.19,0,2.74,,0,0,untracked");
 });
 

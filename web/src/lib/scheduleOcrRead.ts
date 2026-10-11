@@ -72,7 +72,7 @@ export interface BoxReadSteps {
 }
 
 /** Thrown inside the task when the read is no longer wanted. */
-const STALE = new Error("The box read is no longer wanted.");
+const STALE = new Error("Ya no se requiere la lectura del recuadro.");
 
 const CANCELLED: OcrReadResult = { kind: "cancelled" };
 

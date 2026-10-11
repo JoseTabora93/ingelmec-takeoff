@@ -26,7 +26,7 @@ export function commandBoxEnabled() {
 
 /** The one sentence every surface uses when something reaches for the tool. */
 export const ONE_CLICK_GATE_MESSAGE =
-  "One-Click Area is temporarily gated while the flood engine is re-validated against a wider plan corpus. Trace the room with Area (A) meanwhile.";
+  "One-Click Área está temporalmente deshabilitado mientras el motor de relleno se revalida con un corpus de planos más amplio. Mientras tanto, trace el recinto con Área (A).";
 
 // On-device OCR (#469) — on by default. VITE_OCR=off at build time disables
 // it for a deployment: the client reports "disabled" and makes no request,

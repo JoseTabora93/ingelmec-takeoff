@@ -13,9 +13,9 @@ import { Icon } from "../brand/icons.jsx";
 const evidenceText = (ev) => {
   if (!ev) return "";
   const bits = [];
-  if (ev.schedule_row_tag) bits.push(`schedule ${ev.schedule_row_tag}`);
+  if (ev.schedule_row_tag) bits.push(`cuadro ${ev.schedule_row_tag}`);
   if (ev.matched_text && ev.matched_text !== ev.schedule_row_tag) bits.push(`“${ev.matched_text}”`);
-  if (Array.isArray(ev.seed_norm)) bits.push(`seed (${(+ev.seed_norm[0]).toFixed(2)}, ${(+ev.seed_norm[1]).toFixed(2)})`);
+  if (Array.isArray(ev.seed_norm)) bits.push(`semilla (${(+ev.seed_norm[0]).toFixed(2)}, ${(+ev.seed_norm[1]).toFixed(2)})`);
   return bits.join(" · ");
 };
 
@@ -40,22 +40,22 @@ export default function AgentPanel({
       {/* header strip, matches the docked-panel chrome */}
       {!embedded && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", background: "var(--cobalt)", color: "var(--accent-contrast)" }}>
         <Icon name="target" size={15} />
-        <strong style={{ flex: 1, fontSize: 12.5 }}>Agent{proposals.length ? ` · ${proposals.length} pending` : ""}</strong>
-        <button onClick={onClose} title="Close panel" style={{ border: "none", background: "transparent", color: "var(--accent-contrast)", fontSize: 16, cursor: "pointer", padding: "0 2px" }}>×</button>
+        <strong style={{ flex: 1, fontSize: 12.5 }}>Agente{proposals.length ? ` · ${proposals.length} pendiente${proposals.length === 1 ? "" : "s"}` : ""}</strong>
+        <button onClick={onClose} title="Cerrar panel" style={{ border: "none", background: "transparent", color: "var(--accent-contrast)", fontSize: 16, cursor: "pointer", padding: "0 2px" }}>×</button>
       </div>}
 
       {!configured ? (
         // honest empty state — the Contribute-modal pattern: nothing configured,
         // nothing runs, no pretense. Zero network calls until the user brings a key.
         <div style={{ padding: 14, fontSize: 13, lineHeight: 1.6, color: "var(--ink)" }}>
+          {/* INGELMEC: agente cerrado en el lienzo; se usa desde OpenCode por el MCP */}
           <p style={{ marginTop: 0 }}>
-            Connect your model to run an agent in this workspace.
+            En Ingelmec el agente se usa desde OpenCode por el MCP; este lienzo no lo configura.
           </p>
           <p style={{ color: "var(--ink-muted)" }}>
-            Describe the work, inspect the resulting proposals, and accept or reject them on the plan.
-            Imported agent takeoffs are available in Measurements without a model connection.
+            El trabajo que el agente entrega llega aquí como un takeoff importado (Archivo, Importar mediciones).
+            Revíselo en Trabajo, pestaña Mediciones, y apruébelo sobre el plano.
           </p>
-          <button className="btn-primary" onClick={onOpenSettings} style={{ marginTop: 4 }}>AI settings…</button>
         </div>
       ) : (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
@@ -63,25 +63,25 @@ export default function AgentPanel({
           <div style={{ padding: "10px 12px", borderBottom: "1px solid var(--ink-faint)" }}>
             <textarea
               name="agent-goal" value={goal} onChange={(e) => setGoal(e.target.value)} rows={3}
-              placeholder={'e.g. "Take off the carpet per the finish schedule on this sheet."'}
+              placeholder={'p. ej. «Cuantifique la alfombra según el cuadro de acabados de esta hoja.»'}
               onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); run(); } }}
               style={{ width: "100%", boxSizing: "border-box", resize: "vertical", fontSize: 12.5, fontFamily: "inherit", padding: "6px 8px", border: "1px solid var(--ink-faint)", background: "var(--paper-bright)", color: "var(--ink)", outline: "none" }}
             />
             <div style={{ display: "flex", gap: 8, marginTop: 6, alignItems: "center" }}>
               {running ? (
-                <button onClick={onStop} style={{ ...ctl, color: "var(--c-danger)", fontWeight: 600 }}>■ Stop</button>
+                <button onClick={onStop} style={{ ...ctl, color: "var(--c-danger)", fontWeight: 600 }}>■ Detener</button>
               ) : (
-                <button onClick={run} disabled={!goal.trim()} className="btn-primary" style={{ padding: "5px 14px", fontSize: 12, cursor: goal.trim() ? "pointer" : "default", opacity: goal.trim() ? 1 : 0.5 }}>Run</button>
+                <button onClick={run} disabled={!goal.trim()} className="btn-primary" style={{ padding: "5px 14px", fontSize: 12, cursor: goal.trim() ? "pointer" : "default", opacity: goal.trim() ? 1 : 0.5 }}>Ejecutar</button>
               )}
-              <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>{running ? "Working, proposals land as dashed outlines." : keyText("⌘⏎ runs. Your key, your endpoint.")}</span>
+              <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>{running ? "Trabajando: las propuestas llegan como contornos punteados." : keyText("⌘⏎ ejecuta. Su clave, su endpoint.")}</span>
               <span style={{ flex: 1 }} />
-              <button onClick={onOpenSettings} title="AI settings (endpoint / model / key)" style={{ border: "none", background: "transparent", cursor: "pointer", color: "var(--ink-muted)" }}><Icon name="sliders" size={13} /></button>
+              <button onClick={onOpenSettings} title="Ajustes del agente" style={{ border: "none", background: "transparent", cursor: "pointer", color: "var(--ink-muted)" }}><Icon name="sliders" size={13} /></button>
             </div>
           </div>
 
           {/* streaming status log */}
           <div ref={logRef} style={{ flex: 1, minHeight: 60, overflow: "auto", padding: "8px 12px", fontFamily: "var(--f-mono)", fontSize: 11, lineHeight: 1.55 }}>
-            {log.length === 0 && <div style={{ color: "var(--ink-muted)", fontFamily: "inherit" }}>No run yet.</div>}
+            {log.length === 0 && <div style={{ color: "var(--ink-muted)", fontFamily: "inherit" }}>Aún no hay ejecuciones.</div>}
             {log.map((e, i) => (
               <div key={i} style={{ color: LOG_STYLE[e.kind] || "var(--ink)", whiteSpace: "pre-wrap", overflowWrap: "anywhere", marginBottom: 3 }}>{e.text}</div>
             ))}
@@ -90,11 +90,11 @@ export default function AgentPanel({
           {/* pending proposals, the accept gate */}
           <div style={{ borderTop: "1px solid var(--ink-faint)", maxHeight: "45%", display: "flex", flexDirection: "column", minHeight: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 12px" }}>
-              <strong style={{ flex: 1, fontSize: 11.5 }}>Proposals · {proposals.length}</strong>
+              <strong style={{ flex: 1, fontSize: 11.5 }}>Propuestas · {proposals.length}</strong>
               {proposals.length > 0 && (
                 <>
-                  <button onClick={onAcceptAll} style={{ ...ctl, color: "var(--c-positive)", fontWeight: 600 }} title={keyText("Accept every visible proposal (⏎ on the canvas does the same)")}>Accept all</button>
-                  <button onClick={onRejectAll} style={{ ...ctl, color: "var(--c-danger)" }} title="Discard every pending proposal (local only, nothing is recorded)">Reject all</button>
+                  <button onClick={onAcceptAll} style={{ ...ctl, color: "var(--c-positive)", fontWeight: 600 }} title={keyText("Aceptar todas las propuestas visibles (⏎ en el lienzo hace lo mismo)")}>Aceptar todas</button>
+                  <button onClick={onRejectAll} style={{ ...ctl, color: "var(--c-danger)" }} title="Descartar todas las propuestas pendientes (solo local, no se registra nada)">Rechazar todas</button>
                 </>
               )}
             </div>
@@ -106,14 +106,14 @@ export default function AgentPanel({
                     <span style={{ width: 10, height: 10, flexShrink: 0, background: cond?.color || "var(--cobalt)", border: "1px solid var(--ink-faint)" }} />
                     <span style={{ flex: 1, minWidth: 0 }}>
                       <span style={{ fontWeight: 600 }}>{cond?.finish_tag || "?"}</span>
-                      {p.measure_role === "deduct" ? " (deduct)" : ""} · {sheetLabel(p.sheet_id)}
+                      {p.measure_role === "deduct" ? " (deducción)" : ""} · {sheetLabel(p.sheet_id)}
                       {p.area_sf != null ? ` · ${fmtArea(p.area_sf)}` : ""}
                       <span style={{ display: "block", color: "var(--ink-muted)", fontSize: 10.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={evidenceText(p.evidence)}>
-                        {evidenceText(p.evidence) || "no evidence"}
+                        {evidenceText(p.evidence) || "sin evidencia"}
                       </span>
                     </span>
-                    <button onClick={() => onAccept(p.id)} style={{ ...ctl, color: "var(--c-positive)", fontWeight: 600 }} title="Accept, commits as a takeoff (origin: agent, human-reviewed)">✓</button>
-                    <button onClick={() => onReject(p.id)} style={{ ...ctl, color: "var(--c-danger)" }} title="Reject, discard this proposal (local only)">✕</button>
+                    <button onClick={() => onAccept(p.id)} style={{ ...ctl, color: "var(--c-positive)", fontWeight: 600 }} title="Aceptar: se confirma como takeoff (origen: agente, revisado por una persona)">✓</button>
+                    <button onClick={() => onReject(p.id)} style={{ ...ctl, color: "var(--c-danger)" }} title="Rechazar: descarta esta propuesta (solo local)">✕</button>
                   </div>
                 );
               })}

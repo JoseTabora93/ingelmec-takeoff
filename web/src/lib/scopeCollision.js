@@ -134,7 +134,7 @@ export function scopeCollisions(shapes, conditions, frameFor, opts = {}) {
         const pair = {
           sheet_id: sheetId, a: side(A), b: side(B),
           shared_sf: round2(shared * sfPer),
-          ...(round2(shared * sfPer) === 0 ? { note: "Positive overlap below 0.01 SF; the displayed area rounds to zero. Inspect the boundary before changing geometry." } : {}),
+          ...(round2(shared * sfPer) === 0 ? { note: "Traslape positivo menor a 0.01 SF; el área mostrada se redondea a cero. Inspeccione el límite antes de cambiar la geometría." } : {}),
           fraction_of_smaller: round2(fraction * 100) / 100,
           iou: round2(iou * 100) / 100,
           same_condition: same,

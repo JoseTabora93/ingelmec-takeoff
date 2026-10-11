@@ -448,18 +448,18 @@ export function transitionRefusal(gate: {
   unscaled?: string[];
 }): string | null {
   const { activeTag, a, b, sheets, unscaled = [] } = gate;
-  if (!a.tag || !b.tag) return "Pick the two finishes that meet.";
-  if (a.tag === b.tag) return "Pick two DIFFERENT finishes, a tag does not transition to itself.";
+  if (!a.tag || !b.tag) return "Elija los dos acabados que se encuentran.";
+  if (a.tag === b.tag) return "Elija dos acabados DISTINTOS: una etiqueta no hace transición consigo misma.";
   if (activeTag === a.tag || activeTag === b.tag) {
-    return `The transition has to land on its own condition (e.g. T-1), committing onto ${activeTag} would add its LF to one of the finishes it separates.`;
+    return `La transición debe caer en su propia condición (p. ej. T-1): confirmarla sobre ${activeTag} sumaría sus LF a uno de los acabados que separa.`;
   }
   for (const side of [a, b]) {
-    if (!side.shapes.length) return `${side.tag} has no rooms on the open sheets, measure them first (One-Click or Area).`;
+    if (!side.shapes.length) return `${side.tag} no tiene recintos en las hojas abiertas: mídalos primero (One-Click o Área).`;
   }
   if (unscaled.length) {
-    return `${unscaled.join(", ")} ${unscaled.length === 1 ? "has" : "have"} no scale, a transition is a real length, so calibrate before deriving.`;
+    return `${unscaled.join(", ")} ${unscaled.length === 1 ? "no tiene" : "no tienen"} escala: una transición es una longitud real, así que calibre antes de derivar.`;
   }
   const shared = [...sheets.keys()].filter((k) => a.shapes.some((s) => s.sheet_id === k) && b.shapes.some((s) => s.sheet_id === k));
-  if (!shared.length) return `${a.tag} and ${b.tag} have no rooms on the same open sheet, nothing can meet.`;
+  if (!shared.length) return `${a.tag} y ${b.tag} no tienen recintos en la misma hoja abierta: nada se puede encontrar.`;
   return null;
 }

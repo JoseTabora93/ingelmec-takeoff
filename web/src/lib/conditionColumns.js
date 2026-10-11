@@ -61,7 +61,7 @@ export function sanitizeConditionAttrs(conditions) {
 // empty one (blank table/CSV headers, a blank Group option, "Grouped by ⟨⟩"
 // in print), so both fall back. The stored name is never mutated.
 export function columnLabel(cc) {
-  return typeof cc?.name === "string" && cc.name.trim() ? cc.name : "Untitled";
+  return typeof cc?.name === "string" && cc.name.trim() ? cc.name : "Sin título";
 }
 
 // Rewrite assignments when a vocabulary value is renamed — typo-fixing is the

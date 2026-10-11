@@ -42,7 +42,7 @@ export function parseThemeFile(json) {
     if (raw == null) return;
     const h = normalizeHex(raw);
     if (h) color[role] = h;
-    else warnings.push(`color.${role}: "${raw}" is not a hex color, skipped`);
+    else warnings.push(`color.${role}: «${raw}» no es un color hexadecimal, se omitió`);
   };
   setColor("ink", neutral.ink?.value);
   // the neutral paper scale: base / raised / pressed — maps to bright/cream/shadow

@@ -94,7 +94,7 @@ function openDB() {
     req.onblocked = () => {
       settled = true;
       reject(Object.assign(
-        new Error("OpenTakeoff is open in another tab with older data, close it or reload."),
+        new Error("La aplicación está abierta en otra pestaña con datos más viejos: ciérrela o recargue."),
         { name: "BlockedError" },
       ));
     };
@@ -115,7 +115,7 @@ function openDB() {
       if (req.error?.name === "VersionError") {
         // This build is OLDER than the database — a stale tab after a future bump.
         reject(Object.assign(
-          new Error("This tab is running an older OpenTakeoff, reload to update."),
+          new Error("Esta pestaña ejecuta una versión más vieja de la aplicación: recargue para actualizar."),
           { name: "VersionError" },
         ));
       } else {
@@ -135,13 +135,13 @@ export function isStaleTabError(e) {
 // The one UI copy for stale-tab failures. TakeoffCanvas routes its message
 // tint on exact equality with this string, so every surface must use the
 // constant — a local paraphrase would silently render in the success color.
-export const STALE_TAB_MESSAGE = "OpenTakeoff was updated in another tab, reload this tab to continue.";
+export const STALE_TAB_MESSAGE = "La aplicación se actualizó en otra pestaña: recargue esta pestaña para continuar.";
 
 // Map raw store errors to copy the user can act on; falls back to the
 // error's own message for everything unrecognized.
 export function friendlyStoreError(e) {
   if (e?.name === "QuotaExceededError") {
-    return "Not enough storage space for this snapshot, delete old snapshots or unused PDFs and try again.";
+    return "No hay suficiente espacio de almacenamiento para esta copia: elimine copias viejas o PDF sin uso e intente de nuevo.";
   }
   return e?.message || String(e);
 }
@@ -198,7 +198,7 @@ async function txDecide(db, stores, fn) {
       try { holder.out = cb(); } catch (e) { holder.err = e; t.abort(); }
     }));
   } catch (e) {
-    throw holder.err ?? e ?? new Error("The browser's database stopped the save.");
+    throw holder.err ?? e ?? new Error("La base de datos del navegador detuvo el guardado.");
   }
   return holder.out;
 }
@@ -302,7 +302,7 @@ export const localStore = {
 
   async loadPdfData(name) {
     const rec = await withDb((db) => tx(db, PDF_STORE, "readonly", (os) => os.get(name)));
-    if (!rec) throw new Error(`PDF not found in local store: ${name}`);
+    if (!rec) throw new Error(`No se encontró el PDF en el almacén local: ${name}`);
     // hand pdf.js a fresh view each call — getDocument({data}) may detach it
     return new Uint8Array(rec.bytes);
   },
@@ -344,7 +344,7 @@ export const localStore = {
         const prevHash = existing.hash || peekHash;
         // a legacy record the peek didn't see: only a build older than v3
         // could write one, and it can't open this database
-        if (!prevHash) throw new Error(`${file.name} changed while it was being added, try again.`);
+        if (!prevHash) throw new Error(`${file.name} cambió mientras se agregaba: intente de nuevo.`);
         if (prevHash === hash) {
           if (!existing.hash || !existing.rev) {
             // backfill the legacy record's identity so the next compare is cheap
@@ -459,7 +459,7 @@ export const localStore = {
     const cur = await withDb((db) => tx(db, PDF_STORE, "readonly", (os) => os.get(name)));
     if (cur && (cur.rev || 1) === rev) return new Uint8Array(cur.bytes);
     const rec = await withDb((db) => tx(db, REV_STORE, "readonly", (os) => os.get(revKey(name, rev))));
-    if (!rec) throw new Error(`Revision ${rev} of ${name} not found in local store`);
+    if (!rec) throw new Error(`No se encontró la revisión ${rev} de ${name} en el almacén local`);
     return new Uint8Array(rec.bytes);
   },
 

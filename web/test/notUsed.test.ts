@@ -53,12 +53,12 @@ test("notUsedKind: NOT USED → not-used; NOT IN CONTRACT / N.I.C. → not-in-co
 });
 
 test("notUsedNote: the label's note per kind and state", () => {
-  assert.equal(notUsedNote("not-used", { pickable: true, picked: false }), " The schedule marks this row not used. Select it to create a condition anyway.");
-  assert.equal(notUsedNote("not-used", { pickable: true, picked: true }), " The schedule marks this row not used.");
-  assert.equal(notUsedNote("not-used", { pickable: false, picked: false }), " The schedule marks this row not used.");
-  assert.equal(notUsedNote("not-in-contract", { pickable: true, picked: false }), " The schedule marks this row N.I.C. (not in contract). Select it to create a condition anyway.");
-  assert.equal(notUsedNote("not-in-contract", { pickable: true, picked: true }), " The schedule marks this row N.I.C. (not in contract).");
-  assert.equal(notUsedNote("not-in-contract", { pickable: false, picked: true }), " The schedule marks this row N.I.C. (not in contract).");
+  assert.equal(notUsedNote("not-used", { pickable: true, picked: false }), " El cuadro marca esta fila como no usada. Selecciónela para crear una condición de todos modos.");
+  assert.equal(notUsedNote("not-used", { pickable: true, picked: true }), " El cuadro marca esta fila como no usada.");
+  assert.equal(notUsedNote("not-used", { pickable: false, picked: false }), " El cuadro marca esta fila como no usada.");
+  assert.equal(notUsedNote("not-in-contract", { pickable: true, picked: false }), " El cuadro marca esta fila como N.I.C. (fuera de contrato). Selecciónela para crear una condición de todos modos.");
+  assert.equal(notUsedNote("not-in-contract", { pickable: true, picked: true }), " El cuadro marca esta fila como N.I.C. (fuera de contrato).");
+  assert.equal(notUsedNote("not-in-contract", { pickable: false, picked: true }), " El cuadro marca esta fila como N.I.C. (fuera de contrato).");
 });
 
 // ── the reader ──────────────────────────────────────────────────────────────

@@ -49,7 +49,7 @@ const centered = {
 };
 const brand = (
   <strong style={{ fontFamily: "var(--f-display)", fontSize: 20, letterSpacing: "-0.02em" }}>
-    open<span style={{ fontStyle: "italic", color: "var(--cobalt)" }}>takeoff</span>
+    ingelmec<span style={{ fontStyle: "italic", color: "var(--cobalt)" }}>takeoff</span>
   </strong>
 );
 
@@ -154,8 +154,8 @@ function ProjectGate({ projectId }) {
   useEffect(() => () => { setActiveStore(); }, []);
 
   if (!user) return <SignInScreen ready={ready} signIn={signIn} />;
-  if (error) return <Centered title="Couldn't open this project" body={error} />;
-  if (!storeReady) return <Centered title="Opening project…" />;
+  if (error) return <Centered title="No se pudo abrir este proyecto" body={error} />;
+  if (!storeReady) return <Centered title="Abriendo proyecto…" />;
   // key on projectId so switching projects (or sign-in) remounts a fresh canvas
   return <TakeoffCanvas key={projectId} />;
 }

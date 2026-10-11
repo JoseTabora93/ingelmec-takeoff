@@ -14,13 +14,7 @@ test('interest payload contains only the required contact fields and ignores rem
 test('interest input validation rejects incomplete or unsupported required fields',()=>{
   for(const patch of [{email:'bad'}, {name:''}, {company:'  '}, {role:''}, {role:'unsupported'}]) assert.throws(()=>premiumPayload({...fields,...patch},'test-id'));
 });
-test('static detection includes every posted field',()=>{
-  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-  for(const key of premiumPayload(fields,'test-id').keys()) {
-    if(key!=='form-name') assert.ok(html.includes(`name="${key}"`),key);
-  }
-  assert.ok(html.includes('name="premium-interest" method="POST" data-netlify="true"'));
-});
+// INGELMEC: se retiró la prueba «static detection»: el formulario de Netlify ya no está en index.html (premium apagado y sin externos)
 test('submission rejects service errors and an accidental SPA fallback instead of claiming success',async()=>{
   const body=premiumPayload(fields,'test-id');
   await assert.rejects(sendPremiumInterest(body,async()=>new Response('failed',{status:503})));

@@ -172,7 +172,7 @@ export function galleryReadView(ix: SheetIndex | undefined, avail: string | null
 export function unreadLine(count: number, avail: string | null | undefined): string | null {
   if (count > 0 && avail === "error") return UNREACHABLE;
   if (count <= 0 || avail !== "available") return null;
-  return count === 1 ? "1 sheet with a scan or a picture that hasn't been read" : `${count} sheets with scans or pictures that haven't been read`;
+  return count === 1 ? "1 hoja con un escaneo o una imagen que no se ha leído" : `${count} hojas con escaneos o imágenes que no se han leído`;
 }
 
 /** A gallery thumbnail record's text-layer flag (thumbs.js): false for a
@@ -279,8 +279,8 @@ export function createWalkFailures() {
 /** The gallery's line for a search that missed sheets: how many couldn't be
  *  read, or that the walk stopped early (the gallery adds Retry). */
 export function searchFailedLine(s: { sheets: number; incomplete: boolean }): string | null {
-  if (s.sheets > 0) return `${s.sheets} sheet${s.sheets === 1 ? "" : "s"} couldn't be read for search`;
-  return s.incomplete ? "Search couldn't read every sheet" : null;
+  if (s.sheets > 0) return `${s.sheets} hoja${s.sheets === 1 ? "" : "s"} no se pudo${s.sheets === 1 ? "" : "ieron"} leer para la búsqueda`;
+  return s.incomplete ? "La búsqueda no pudo leer todas las hojas" : null;
 }
 
 /** Whether a new query should walk again for what the last walk missed. */

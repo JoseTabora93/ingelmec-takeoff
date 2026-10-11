@@ -141,8 +141,8 @@ export function buildSheetDxf(sheet: DxfSheetInput, opts: DxfOptions = {}): DxfB
   const textH = opts.text_height ?? (units === "m" ? 0.3 : 1);
   const { w, h } = sheet.dims;
   const upp = sheet.upp;
-  if (!(w > 0) || !(h > 0)) throw new Error(`DXF: sheet ${sheet.sheet_id} has no image dimensions`);
-  if (!(upp > 0)) throw new Error(`DXF: sheet ${sheet.sheet_id} has no scale, set the scale before exporting to CAD`);
+  if (!(w > 0) || !(h > 0)) throw new Error(`DXF: la hoja ${sheet.sheet_id} no tiene dimensiones de imagen`);
+  if (!(upp > 0)) throw new Error(`DXF: la hoja ${sheet.sheet_id} no tiene escala: fije la escala antes de exportar a CAD`);
 
   const toXY = ([nx, ny]: [number, number]): [number, number] => [nx * w * upp * k, (1 - ny) * h * upp * k];
   const toPx = ([nx, ny]: [number, number]): [number, number] => [nx * w, ny * h];

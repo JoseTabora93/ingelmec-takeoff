@@ -16,7 +16,7 @@ const shape = (id: string, label: string | null, area: number) => ({
 test("a condition split across labels sums per bucket and reconciles to the ungrouped total", () => {
   const shapes = [shape("s1", "Phase 1", 100), shape("s2", "Phase 2", 50), shape("s3", null, 25)];
   const g = labelGroupedRows(conditions(), shapes, ["Phase 1", "Phase 2"]);
-  assert.deepEqual(g.map((x) => x.label), ["Phase 1", "Phase 2", "Unlabeled"]);
+  assert.deepEqual(g.map((x) => x.label), ["Phase 1", "Phase 2", "Sin etiqueta"]);
   assert.equal(g[0].rows[0].floor_sf, 100);
   assert.equal(g[1].rows[0].floor_sf, 50);
   assert.equal(g[2].rows[0].floor_sf, 25);
@@ -28,7 +28,7 @@ test("a condition split across labels sums per bucket and reconciles to the ungr
 test("the Unlabeled bucket carries value null (renders italic like Unassigned) and comes last", () => {
   const shapes = [shape("s1", null, 10), shape("s2", "Phase 1", 10)];
   const g = labelGroupedRows(conditions(), shapes, ["Phase 1"]);
-  assert.deepEqual(g.map((x) => x.label), ["Phase 1", "Unlabeled"]);
+  assert.deepEqual(g.map((x) => x.label), ["Phase 1", "Sin etiqueta"]);
   assert.equal(g[1].value, null);
   assert.equal(g[0].value, "Phase 1");
 });
@@ -36,7 +36,7 @@ test("the Unlabeled bucket carries value null (renders italic like Unassigned) a
 test("ordering: vocabulary order first, then ad-hoc values sorted, then Unlabeled last", () => {
   const shapes = [shape("s1", "Zeta", 1), shape("s2", "Phase 1", 1), shape("s3", "Alpha", 1), shape("s4", null, 1)];
   const g = labelGroupedRows(conditions(), shapes, ["Phase 1"]);   // only Phase 1 is in the vocab
-  assert.deepEqual(g.map((x) => x.label), ["Phase 1", "Alpha", "Zeta", "Unlabeled"]);
+  assert.deepEqual(g.map((x) => x.label), ["Phase 1", "Alpha", "Zeta", "Sin etiqueta"]);
 });
 
 test("empty buckets are dropped, a vocab label with no shapes doesn't render", () => {
@@ -47,7 +47,7 @@ test("empty buckets are dropped, a vocab label with no shapes doesn't render", (
 test("perimByCond is per-bucket, not whole-project", () => {
   // perimeter rides along per bucket; empty vocab arg still works (all Unlabeled)
   const g = labelGroupedRows(conditions(), [shape("s1", null, 5)], []);
-  assert.deepEqual(g.map((x) => x.label), ["Unlabeled"]);
+  assert.deepEqual(g.map((x) => x.label), ["Sin etiqueta"]);
   assert.ok(g[0].perimByCond instanceof Map);
 });
 
@@ -100,7 +100,7 @@ test("sheetLabelGroupedRows: an unlabeled floor still rolls up, so floors reconc
     sheetShape("s3", "p.pdf#2", null, 10),
   ];
   const g = sheetLabelGroupedRows(conditions(), shapes, ["101"]);
-  assert.deepEqual(g.map((x: any) => x.groups.map((y: any) => y.label)), [["101"], ["Unlabeled"]]);
+  assert.deepEqual(g.map((x: any) => x.groups.map((y: any) => y.label)), [["101"], ["Sin etiqueta"]]);
   assert.equal(g[1].groups[0].rows[0].floor_sf, 50, "the whole floor, in one row, nothing dropped for want of a label");
   // every cell of every floor adds back to the ungrouped condition row
   const cells = g.flatMap((x: any) => x.groups.flatMap((y: any) => y.rows.map((r: any) => r.floor_sf)));

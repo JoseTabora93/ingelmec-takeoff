@@ -47,7 +47,7 @@ export function colLetter(i) {
 // added to it.
 export function sanitizeSheetName(name, used = new Set()) {
   let s = String(name ?? "").replace(/[[\]:*?/\\]/g, "_").replace(/^'+|'+$/g, "").trim();
-  if (!s) s = "Sheet";
+  if (!s) s = "Hoja";
   s = s.slice(0, 31).trim();
   let candidate = s;
   for (let n = 2; used.has(candidate.toLowerCase()); n++) {
@@ -194,7 +194,7 @@ export function reportWorkbook({ rows = [], bySheet = [], shapeRows = [], cols =
   }));
 
   // By sheet — base (unmultiplied) quantities, rounded at serialization only
-  const bySheetRows = [["Sheet", "Sheet ID", "Finish", `Floor ${AU}`, `Wall ${AU}`, `Border ${AU}`, LU, "EA"]];
+  const bySheetRows = [["Hoja", "ID de hoja", "Acabado", `Piso ${AU}`, `Muro ${AU}`, `Borde ${AU}`, LU, "UND"]];
   for (const gp of bySheet) {
     for (const row of gp.rows) {
       const mult = row.multiplier || 1;
@@ -206,14 +206,14 @@ export function reportWorkbook({ rows = [], bySheet = [], shapeRows = [], cols =
   if (hasMultipliers(bySheet)) bySheetRows.push([], [BY_SHEET_BASE_NOTE]);
 
   // Materials — per condition, then the combined buy list (mirrors the CSV)
-  const basisLabel = (b) => (b === "linear" ? "LF" : b === "count" ? "EA" : b === "seam_lf" ? "seam LF" : "SF");
-  const materials = [["Finish", "Material", "Qty", "Unit", "Coverage", "Note"]];
+  const basisLabel = (b) => (b === "linear" ? "LF" : b === "count" ? "UND" : b === "seam_lf" ? "traslape LF" : "SF");
+  const materials = [["Acabado", "Material", "Cant.", "Unidad", "Cobertura", "Nota"]];
   for (const r of rows) for (const m of (r.materials || [])) {
     materials.push([r.finish_tag, m.name, m.qty, m.unit, `1 ${m.unit || "unit"} / ${m.per} ${basisLabel(m.basis)}`, m.note || ""]);
   }
   const combined = materialsSummary(rows);
   if (combined.length) {
-    materials.push([], ["Material (combined)", "Qty", "Unit"]);
+    materials.push([], ["Material (combinado)", "Cant.", "Unidad"]);
     for (const s of combined) materials.push([s.name, s.qty, s.unit]);
   }
 
@@ -221,8 +221,8 @@ export function reportWorkbook({ rows = [], bySheet = [], shapeRows = [], cols =
   // Metric display mode mirrors the standalone shapes CSV. The JSON keeps the
   // machine-readable raw-foot field names.
   const shapesTab = [
-    ["Per-shape measured quantities, no multiplier or waste; deducts negative; LF on floor/deduct/surface rows is trace reference only (incl. openings), linear rows alone sum to condition LF"],
-    ["Shape", "Sheet", "Sheet ID", "Finish", "Role", `Area ${AU}`, LU, "EA", `Height ${M ? "m" : "ft"}`, "Height override", `Rise ${M ? "m" : "ft"}`, `Drop ${M ? "m" : "ft"}`, "Origin"],
+    ["Cantidades medidas por figura: sin multiplicador ni desperdicio; las deducciones son negativas; LF en filas de piso, deducción y superficie es solo referencia del trazo (incluye vanos); solo las filas lineales suman al LF de la condición"],
+    ["Figura", "Hoja", "ID de hoja", "Acabado", "Rol", `Área ${AU}`, LU, "UND", `Altura ${M ? "m" : "ft"}`, "Altura propia", `Subida ${M ? "m" : "ft"}`, `Bajada ${M ? "m" : "ft"}`, "Origen"],
   ];
   for (const r of shapeRows) {
     shapesTab.push([String(r.shape_id), String(r.sheet), String(r.sheet_id), r.finish, r.role,
@@ -239,8 +239,8 @@ export function reportWorkbook({ rows = [], bySheet = [], shapeRows = [], cols =
   // to the floor. Cells are one row per (floor, room, finish); the Sheet ID
   // rides along because display labels are session-volatile.
   const floorRoom = [
-    ["Ordered quantities per floor × room, waste % and xN applied per slice; each floor's rooms reconcile to that floor's shapes. Coverage ceils are per-cell display, not a buy list"],
-    ["Sheet", "Sheet ID", "Room", "Finish", `Floor ${AU}`, `Wall ${AU}`, `Border ${AU}`, LU, "EA", `Total ${AU}`, `Total ${AU} w/Waste`],
+    ["Cantidades pedidas por nivel × recinto: el % de desperdicio y el xN se aplican por tramo; los recintos de cada nivel concilian con las figuras de ese nivel. Los techos de cobertura son visualización por celda, no una lista de compras"],
+    ["Hoja", "ID de hoja", "Recinto", "Acabado", `Piso ${AU}`, `Muro ${AU}`, `Borde ${AU}`, LU, "UND", `Total ${AU}`, `Total ${AU} c/desp`],
   ];
   for (const gp of byFloorRoom) {
     for (const grp of gp.groups) {
@@ -253,10 +253,10 @@ export function reportWorkbook({ rows = [], bySheet = [], shapeRows = [], cols =
   }
 
   return [
-    { name: "Conditions", rows: conditions },
-    { name: "By sheet", rows: bySheetRows },
-    { name: "Materials", rows: materials },
-    { name: "Shapes", rows: shapesTab },
-    { name: "By floor × room", rows: floorRoom },
+    { name: "Condiciones", rows: conditions },
+    { name: "Por hoja", rows: bySheetRows },
+    { name: "Materiales", rows: materials },
+    { name: "Figuras", rows: shapesTab },
+    { name: "Por nivel × recinto", rows: floorRoom },
   ];
 }

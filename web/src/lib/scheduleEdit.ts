@@ -133,28 +133,28 @@ export function groupClickable(picked: Set<string>, keys: string[], canPick: (ke
 export function skippedSummary(skipped: readonly string[]): { count: number; list: string; lines: number } {
   const n = new Map<string, number>();
   for (const w of skipped) n.set(w, (n.get(w) ?? 0) + 1);
-  const words = [...n].map(([w, c]) => (c > 1 ? `${w} (${c} lines)` : w));
+  const words = [...n].map(([w, c]) => (c > 1 ? `${w} (${c} líneas)` : w));
   const shown = words.slice(0, 8);
-  const list = words.length > 8 ? `${shown.join(", ")}, and ${words.length - 8} more` : shown.join(", ");
+  const list = words.length > 8 ? `${shown.join(", ")} y ${words.length - 8} más` : shown.join(", ");
   return { count: n.size, list, lines: skipped.length };
 }
 
-const SKIPPED_RULE = "A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it";
+const SKIPPED_RULE = "Un código de cuatro o cinco letras sin número se lee solo cuando arriba hay el encabezado o una fila ya leída, llena dos o más columnas más, y después le sigue una fila con un código numerado, como CPT-1";
 
 // The Import from schedule dialog's notice for skipped codes.
 export function skippedBanner(skipped: readonly string[]): string {
   const { count, list } = skippedSummary(skipped);
   return count === 1
-    ? `1 code wasn't read: ${list}. ${SKIPPED_RULE}, if it's a finish, add it as a condition yourself.`
-    : `${count} codes weren't read: ${list}. ${SKIPPED_RULE}, if they're finishes, add them as conditions yourself.`;
+    ? `1 código no se leyó: ${list}. ${SKIPPED_RULE}; si es un acabado, agréguelo usted mismo como condición.`
+    : `${count} códigos no se leyeron: ${list}. ${SKIPPED_RULE}; si son acabados, agréguelos usted mismo como condiciones.`;
 }
 
 // The agent's read_schedule note when skipped codes are all a box held.
 export function skippedNote(skipped: readonly string[]): string {
   const { count, list, lines } = skippedSummary(skipped);
   return count === 1
-    ? `No rows read. A four- or five-letter code with no number wasn't read: ${list}. Find its ${lines > 1 ? "lines" : "line"} with read_sheet_text, check it with view_region, then create it with create_condition if it's a finish.`
-    : `No rows read. Four- or five-letter codes with no number weren't read: ${list}. Find their lines with read_sheet_text, check them with view_region, then create them with create_condition if they're finishes.`;
+    ? `No se leyeron filas. Un código de cuatro o cinco letras sin número no se leyó: ${list}. Ubique su${lines > 1 ? "s líneas" : " línea"} con read_sheet_text, verifíquela con view_region y, si es un acabado, créela con create_condition.`
+    : `No se leyeron filas. Los códigos de cuatro o cinco letras sin número no se leyeron: ${list}. Ubique sus líneas con read_sheet_text, verifíquelas con view_region y, si son acabados, créelas con create_condition.`;
 }
 
 // The line colour each row's condition will get, for the dialog's swatch. The

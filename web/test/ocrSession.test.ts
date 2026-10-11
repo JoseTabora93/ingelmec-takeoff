@@ -388,14 +388,14 @@ test("a read that arrives while the notice is up joins it without asking the cli
 test("a task's AbortError with the caller's signal not aborted is `failed`, message intact (the page was closed)", async () => {
   const c = fakeClient(available(true)), host = fakeHost();
   const s = createOcrSession({ client: c.client, requestConsent: host.requestConsent });
-  const closed = new DOMException("The page was closed during the read.", "AbortError");
+  const closed = new DOMException("La página se cerró durante la lectura.", "AbortError");
   const p = s.run(async () => { throw closed; }, { signal: new AbortController().signal });
   await flush();
   c.ensure[0].settle({ ok: true });
   const r = await p;
   assert.equal(!r.ok && r.reason, "failed");
   assert.equal(!r.ok && r.reason === "failed" && r.error, closed);
-  assert.equal(closed.message, "The page was closed during the read.");
+  assert.equal(closed.message, "La página se cerró durante la lectura.");
 });
 
 test("a task's AbortError after the caller aborted is aborted", async () => {

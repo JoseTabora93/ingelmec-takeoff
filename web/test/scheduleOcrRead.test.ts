@@ -267,7 +267,7 @@ test("the read fails while it is no longer wanted (another sheet, the signal not
 });
 
 test("an AbortError nobody asked for (the page closed during the read): cancelled", async () => {
-  const h = harness({ readWords: async () => { throw new DOMException("The page was closed during the read.", "AbortError"); } });
+  const h = harness({ readWords: async () => { throw new DOMException("La página se cerró durante la lectura.", "AbortError"); } });
   await flush();
   h.c.ensure[0].settle({ ok: true });
   assert.deepEqual(await h.p, CANCELLED);
@@ -328,7 +328,7 @@ test("the reader stopped responding (the client's OcrTimeoutError): its own mess
   await flush();
   h.c.ensure[0].settle({ ok: true });
   assert.deepEqual(await h.p, { kind: "message", text: OCR_TIMEOUT_MESSAGE });
-  assert.equal(OCR_TIMEOUT_MESSAGE, "The on-device reader stopped responding, try again.");
+  assert.equal(OCR_TIMEOUT_MESSAGE, "El lector del dispositivo dejó de responder: intente de nuevo.");
 });
 
 test("the read rejects with a non-Error: String(error)", async () => {

@@ -72,8 +72,8 @@ export type TooLarge = (rect: Rect, rs: number) => boolean | Promise<boolean>;
 const defaultTooLarge: TooLarge = async (rect, rs) => (await import("./regionRead")).readTooLarge(rect, rs);
 /** What a read reads: a scan's page, or a vector sheet's pictures. */
 type Noun = "page" | "picture";
-const tooLargeText = (what: Noun) => `This ${what} is too large for the on-device text reader (OCR).`;
-const NO_PICTURE = "No picture on this sheet to read.";
+const tooLargeText = (what: Noun) => `${what === "picture" ? "Esta imagen" : "Esta página"} es demasiado grande para el lector de texto del dispositivo (OCR).`;
+const NO_PICTURE = "No hay imagen en esta hoja para leer.";
 
 /** What to read on a page (#489), rects in px at rs: a scan's whole page, a
  * vector sheet's unread pictures, or nothing (a vector sheet with none; a
@@ -299,7 +299,7 @@ export async function readPageText(a: ReadPageArgs): Promise<PageReadResult> {
   if (putHash && rev) {
     try { await cache.put(putHash, page, pictures ? { rev, rs, lines, ms, rasters, pictures } : { rev, rs, lines, ms, rasters }); } catch (e) {
       // the read still stands; it just won't be there after a reload
-      console.warn("OCR cache: couldn't save page read", e);
+      console.warn("Caché de OCR: no se pudo guardar la lectura de la página", e);
       out.saved = false;
     }
   }
@@ -394,7 +394,7 @@ export interface PageReader {
 
 interface Running { file: string; ac: AbortController; promise: Promise<PageReadResult> }
 
-const abortError = () => new DOMException("The OCR read was cancelled.", "AbortError");
+const abortError = () => new DOMException("Se canceló la lectura de OCR.", "AbortError");
 /** `p`, or a rejection as soon as `signal` aborts. */
 function orAbort(p: Promise<unknown>, signal?: AbortSignal): Promise<void> {
   if (signal?.aborted) return Promise.reject(abortError());
@@ -580,7 +580,7 @@ export function createPageReader(deps: PageReaderDeps): PageReader {
       if (!r.ok) {
         const f = failureOf(r);
         // the file went away (dropFile) rather than the caller cancelling
-        return f.status === "aborted" && !req.signal?.aborted ? { ok: false, status: "page-closed", message: "The page was closed during the read." } : f;
+        return f.status === "aborted" && !req.signal?.aborted ? { ok: false, status: "page-closed", message: "La página se cerró durante la lectura." } : f;
       }
       // cleaned as a page read is (#482): Copy text carries no ruling either
       const lines = r.value.lines.flatMap((l) => { const str = cleanOcrText(l.str); return str ? [{ ...l, str }] : []; });
@@ -650,7 +650,7 @@ export function progressText(p: SeamProgress | null | undefined): string {
 }
 
 /** What a probe error says, where Read would be offered. */
-export const UNREACHABLE = "The on-device text reader (OCR) couldn't be reached";
+export const UNREACHABLE = "No se pudo conectar con el lector de texto del dispositivo (OCR)";
 
 export type PageReadView =
   | { kind: "hidden" }
@@ -698,13 +698,13 @@ export function pageReadView(s: { textless: boolean | undefined; avail: string |
     case "aborted":
       return offer();
     case "page-closed":
-      return offer(st.message || "The page was closed during the read.");
+      return offer(st.message || "La página se cerró durante la lectura.");
     case "failed":
-      return offer(`Couldn't read this ${st.what ?? "page"}: ${st.message ?? "unknown error"}`);
+      return offer(`No se pudo leer ${st.what === "picture" ? "esta imagen" : "esta página"}: ${st.message ?? "error desconocido"}`);
     case "no-picture":
       return offer(st.message ?? NO_PICTURE);
     case "error":
-      return offer(`The on-device text reader (OCR) didn't start: ${st.message ?? "unknown error"}`);
+      return offer(`El lector de texto del dispositivo (OCR) no arrancó: ${st.message ?? "error desconocido"}`);
     case "too-large":
       return { kind: "unreadable", text: st.message ?? tooLargeText(st.what ?? "page") };
   }

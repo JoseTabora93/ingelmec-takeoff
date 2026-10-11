@@ -10,30 +10,30 @@
 export const TOUR_STEPS = [
   {
     id: "open",
-    title: "Open a plan",
-    body: "Start on the bundled sample: a real VA medical-center floor finish plan. Your own PDFs work the same way, drag them onto the canvas.",
+    title: "Abrir un plano",
+    body: "Empiece con el ejemplo incluido: un plano real de acabados de piso de un centro médico. Sus propios PDF funcionan igual: arrástrelos al lienzo.",
   },
   {
     id: "scale",
-    title: "Set the scale",
-    body: "Every quantity stands on it. Open the Set scale menu and pick “Plan says …, use it”: that's the scale printed on the sheet.",
+    title: "Fijar la escala",
+    body: "Toda cantidad se apoya en ella. Abra el menú Fijar escala y elija «El plano dice …, usarla»: es la escala impresa en la hoja.",
     target: '[data-tour="scale"]',
   },
   {
     id: "tool",
-    title: "Arm the Area tool",
-    body: "Press A, or click the Area tile in the tool rail on the left.",
+    title: "Armar la herramienta Área",
+    body: "Presione A, o haga clic en el icono Área de la barra de herramientas a la izquierda.",
     target: 'button[aria-label="Área"]',
   },
   {
     id: "trace",
-    title: "Trace one room",
-    body: "Scroll to zoom into a room. Click each corner on the inside face of the wall, then press ⏎ or double-click to close it. Space-drag pans while you trace.",
+    title: "Trazar un recinto",
+    body: "Use la rueda para acercar a un recinto. Haga clic en cada esquina sobre la cara interior del muro y presione ⏎ o doble clic para cerrar. Espacio+arrastrar desplaza mientras traza.",
   },
   {
     id: "report",
-    title: "Open the Report",
-    body: "The Report totals every condition, adds waste, and exports to CSV or Excel.",
+    title: "Abrir el Reporte",
+    body: "El Reporte totaliza cada condición, suma el desperdicio y exporta a CSV o Excel.",
     target: '[data-tour="report"]',
   },
 ];

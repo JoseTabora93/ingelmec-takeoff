@@ -120,7 +120,7 @@ export function buildRuleFromSeed(
     seed_shape_id: deduct.id,
     seed_condition_id: deduct.condition_id,
     predicate: { kind: "enclosed_subpolygon_deduct", max_area_sf: seed.max_area_sf },
-    label: `Exclude enclosed regions under ${seed.max_area_sf} SF in ${conditionTag} rooms`,
+    label: `Excluir regiones cerradas de menos de ${seed.max_area_sf} SF en recintos ${conditionTag}`,
     applied_to: [],
     active: true,
   };

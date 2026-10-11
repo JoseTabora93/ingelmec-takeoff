@@ -1,7 +1,7 @@
 // ReportPanel — the takeoff deliverable. A STACK-style breakdown by condition
 // (finish): measured quantity, waste %, and waste-adjusted order quantity, with
 // a grand total. Exports to CSV / JSON, prints, and hosts the opt-in
-// "Contribute to the open flooring model" flow.
+// "Contribuir al modelo abierto de pisos" flow.
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../brand/icons.jsx";
 import ToolMenu from "./ToolMenu.jsx";
@@ -37,8 +37,8 @@ const DISCLAIMER = "Cantidades derivadas de planos a las escalas indicadas; veri
 // one-line hints for the opt-in columns in the picker (waste hint sits under
 // the second waste checkbox so it reads once for the pair)
 const COL_HINTS = {
-  waste_lf: "Waste SF/LF = (w/Waste) − measured",
-  perimeter_ref: "Perimeter is reference only, includes openings; not totaled",
+  waste_lf: "Desperdicio SF/LF = (c/desp.) − medido",
+  perimeter_ref: "El perímetro es solo referencia, incluye vanos; no se totaliza",
 };
 
 const sheetNum = (v, d = 1) => {
@@ -76,7 +76,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
         saveActiveThemeFile(raw);
         setTheme(activeTheme());
       } catch {
-        setTheme((t) => ({ ...t, warnings: ["That file isn't valid JSON, expected a design-token file."] }));
+        setTheme((t) => ({ ...t, warnings: ["Ese archivo no es un JSON válido: se esperaba un archivo de tokens de diseño."] }));
       }
     };
     reader.readAsText(f);
@@ -275,7 +275,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
     setTplName("");
   };
   const renameTpl = (t) => {
-    const nm = (window.prompt("Rename template:", t.name) || "").trim();
+    const nm = (window.prompt("Renombrar plantilla:", t.name) || "").trim();
     if (!nm || nm === t.name) return;
     setTemplates(renameTemplate(t.id, nm));
   };
@@ -285,18 +285,18 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
   // getAccessToken is safe to import statically (auth.js already ships).
   const pushToDrive = async () => {
     if (!canSync || syncBusy) return;
-    setSyncBusy(true); setSyncMsg("Pushing…");
+    setSyncBusy(true); setSyncMsg("Enviando…");
     try {
       const { createDrive } = await import("../lib/google/drive.js");
       const { count } = await pushTemplatesToDrive(createDrive({ getToken: getAccessToken }), driveRoot, googleUser.email, templates);
-      setSyncMsg(`Pushed ${count} to Drive.`);
+      setSyncMsg(`Se enviaron ${count} a Drive.`);
     } catch (e) {
-      setSyncMsg(`Push failed: ${String(e?.message || e)}`);
+      setSyncMsg(`Falló el envío: ${String(e?.message || e)}`);
     } finally { setSyncBusy(false); }
   };
   const loadFromDrive = async () => {
     if (!canSync || syncBusy) return;
-    setSyncBusy(true); setSyncMsg("Loading…");
+    setSyncBusy(true); setSyncMsg("Cargando…");
     try {
       const { createDrive } = await import("../lib/google/drive.js");
       const remote = await loadTemplatesFromDrive(createDrive({ getToken: getAccessToken }), driveRoot, googleUser.email);
@@ -309,9 +309,9 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
       const added = merged.length - before;
       // Disambiguate a zero result: an empty Drive file reads differently to a
       // user than "you already have everything on Drive."
-      setSyncMsg(added > 0 ? `Loaded ${added} from Drive.` : remote.length === 0 ? "Nothing saved on Drive yet." : "Already up to date, no new templates.");
+      setSyncMsg(added > 0 ? `Se cargaron ${added} desde Drive.` : remote.length === 0 ? "Aún no hay nada guardado en Drive." : "Ya está al día: no hay plantillas nuevas.");
     } catch (e) {
-      setSyncMsg(`Load failed: ${String(e?.message || e)}`);
+      setSyncMsg(`Falló la carga: ${String(e?.message || e)}`);
     } finally { setSyncBusy(false); }
   };
 
@@ -408,7 +408,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             {/* proposals (#365): the pending diff beside the current values,
                 the numbers in this row are what the takeoff stands on today */}
             {editProposalByCond.get(r.id) && (
-              <span data-proposed-edit={editProposalByCond.get(r.id).id} title={`Proposed by the agent, pending your acceptance in the Takeoffs panel${editProposalByCond.get(r.id).rationale ? `, ${editProposalByCond.get(r.id).rationale}` : ""}. This row shows the current values.`}
+              <span data-proposed-edit={editProposalByCond.get(r.id).id} title={`Propuesto por el agente, pendiente de su aceptación en el panel de Cantidades${editProposalByCond.get(r.id).rationale ? `, ${editProposalByCond.get(r.id).rationale}` : ""}. Esta fila muestra los valores actuales.`}
                 style={{ display: "block", marginTop: 3, fontFamily: "var(--f-mono)", fontSize: 10.5, color: "var(--cobalt)", whiteSpace: "nowrap" }}>
                 proposed: {describeConditionEdit(conditions.find((c) => c.id === r.id), editProposalByCond.get(r.id)).map((d) => `${d.field} ${d.from} → ${d.to}`).join(" · ")}
               </span>
@@ -478,25 +478,25 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
                 <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Columnas</strong>
                 <div style={{ flex: 1 }} />
-                <button onClick={applyLaborPreset} title="No-waste actuals per condition, hides SF/SY w/Waste, shows Total SF"
-                  style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11.5, padding: "0 10px 0 0" }}>Labor view</button>
-                <button onClick={() => { setColPrefs({}); saveColPrefs({}); }} title="Back to the default column set"
-                  style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11.5, padding: "0 10px 0 0" }}>Reset</button>
-                <button onClick={() => setShowCols(false)} title="Close"
+                <button onClick={applyLaborPreset} title="Valores reales sin desperdicio por condición: oculta SF/SY con desperdicio y muestra el total"
+                  style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11.5, padding: "0 10px 0 0" }}>Vista de mano de obra</button>
+                <button onClick={() => { setColPrefs({}); saveColPrefs({}); }} title="Volver al conjunto de columnas por omisión"
+                  style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11.5, padding: "0 10px 0 0" }}>Restablecer</button>
+                <button onClick={() => setShowCols(false)} title="Cerrar"
                   style={{ border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>✕</button>
               </div>
               {TABLE_PROFILE.filter((c) => !c.locked && c.defaultVisible).map(colCheckbox)}
-              <div style={{ borderTop: "1px solid var(--ink-faint)", margin: "8px 0 4px", paddingTop: 6, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Optional</div>
+              <div style={{ borderTop: "1px solid var(--ink-faint)", margin: "8px 0 4px", paddingTop: 6, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Opcional</div>
               {TABLE_PROFILE.filter((c) => !c.locked && !c.defaultVisible).map(colCheckbox)}
-              <div style={{ borderTop: "1px solid var(--ink-faint)", margin: "8px 0 4px", paddingTop: 6, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Custom columns</div>
+              <div style={{ borderTop: "1px solid var(--ink-faint)", margin: "8px 0 4px", paddingTop: 6, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Columnas personalizadas</div>
               {customCols.length ? customCols.map(colCheckbox) : (
-                <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.5 }}>No custom columns yet, define them from the condition bar in the canvas.</div>
+                <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.5 }}>Aún no hay columnas personalizadas: defínalas desde la barra de condición en el lienzo.</div>
               )}
               {/* read-only product-spec columns, only shown when a schedule
                   import attached spec data to at least one condition */}
               {specCols.length > 0 && (
                 <>
-                  <div style={{ borderTop: "1px solid var(--ink-faint)", margin: "8px 0 4px", paddingTop: 6, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Product spec (imported)</div>
+                  <div style={{ borderTop: "1px solid var(--ink-faint)", margin: "8px 0 4px", paddingTop: 6, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Especificación del producto (importada)</div>
                   {specCols.map(colCheckbox)}
                 </>
               )}
@@ -504,11 +504,11 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   a value typed in from the Supporting Materials panel */}
               {laborCols.length > 0 && (
                 <>
-                  <div style={{ borderTop: "1px solid var(--ink-faint)", margin: "8px 0 4px", paddingTop: 6, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Labor & subfloor</div>
+                  <div style={{ borderTop: "1px solid var(--ink-faint)", margin: "8px 0 4px", paddingTop: 6, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Mano de obra y contrapiso</div>
                   {laborCols.map(colCheckbox)}
                 </>
               )}
-              <p style={{ margin: "8px 0 0", fontSize: 11, color: "var(--ink-muted)" }}>Also applies to the CSV export. Grouping by a custom column always exports that column.</p>
+              <p style={{ margin: "8px 0 0", fontSize: 11, color: "var(--ink-muted)" }}>También se aplica a la exportación CSV. Agrupar por una columna personalizada siempre la exporta.</p>
             </div>
           )}
         </div>
@@ -519,27 +519,27 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
                 <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Plantillas</strong>
                 <div style={{ flex: 1 }} />
-                <button onClick={() => setShowTemplates(false)} title="Close"
+                <button onClick={() => setShowTemplates(false)} title="Cerrar"
                   style={{ border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>✕</button>
               </div>
               <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.4, marginBottom: 6 }}>Disposiciones de columnas + agrupación guardadas (en este equipo). Haga clic para aplicar.</div>
               {templates.length === 0 && <div style={{ fontSize: 10.5, color: "var(--ink-muted)", marginBottom: 6 }}>Aún no hay plantillas guardadas.</div>}
               {templates.map((t) => (
                 <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 0" }}>
-                  <button onClick={() => applyTemplate(t)} title="Apply this layout"
+                  <button onClick={() => applyTemplate(t)} title="Aplicar esta disposición"
                     style={{ flex: 1, minWidth: 0, textAlign: "left", border: "none", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12, padding: "3px 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name}</button>
-                  <button onClick={() => renameTpl(t)} title="Rename"
+                  <button onClick={() => renameTpl(t)} title="Renombrar"
                     style={{ padding: "0 3px", border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 11 }}>✎</button>
-                  <button onClick={() => setTemplates(deleteTemplate(t.id))} title="Delete this template"
+                  <button onClick={() => setTemplates(deleteTemplate(t.id))} title="Eliminar esta plantilla"
                     style={{ padding: "0 3px", border: "none", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 11 }}>✕</button>
                 </div>
               ))}
               <div style={{ display: "flex", alignItems: "center", gap: 6, borderTop: "1px solid var(--ink-faint)", marginTop: 6, paddingTop: 8 }}>
                 <input name="template-name" value={tplName} onChange={(e) => setTplName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && saveAsTemplate()}
-                  placeholder="Name this layout" style={{ flex: 1, minWidth: 0, padding: "3px 6px", borderRadius: 0, border: "1px solid var(--ink-faint)", fontSize: 12 }} />
-                <button onClick={saveAsTemplate} disabled={!tplName.trim()} title="Save the current columns + grouping under this name"
-                  style={{ padding: "3px 8px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>Save</button>
+                  placeholder="Poner nombre a esta disposición" style={{ flex: 1, minWidth: 0, padding: "3px 6px", borderRadius: 0, border: "1px solid var(--ink-faint)", fontSize: 12 }} />
+                <button onClick={saveAsTemplate} disabled={!tplName.trim()} title="Guardar las columnas y la agrupación actuales con este nombre"
+                  style={{ padding: "3px 8px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>Guardar</button>
               </div>
               {/* Optional Drive sync, only when signed in and a Projects root is
                   configured. Load MERGES (this device wins on a name clash); it
@@ -547,12 +547,12 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   "Sync," to avoid over-promising two-way behavior. */}
               {canSync && (
                 <div style={{ borderTop: "1px solid var(--ink-faint)", marginTop: 8, paddingTop: 8 }}>
-                  <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.4, marginBottom: 6 }}>Carry these across your own devices via Drive. Load only adds templates this device doesn't have, a same-name template is never overwritten (rename or delete it here first to pull a newer copy).</div>
+                  <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.4, marginBottom: 6 }}>Llévelas a sus otros dispositivos por Drive. Cargar solo agrega las plantillas que este dispositivo no tiene; una plantilla con el mismo nombre nunca se sobrescribe (renómbrela o elimínela aquí primero para traer una copia más nueva).</div>
                   <div style={{ display: "flex", gap: 6 }}>
-                    <button onClick={pushToDrive} disabled={syncBusy} title="Write your saved templates to your private Drive file"
-                      style={{ flex: 1, padding: "4px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: syncBusy ? "default" : "pointer", fontSize: 12 }}>Push to Drive</button>
-                    <button onClick={loadFromDrive} disabled={syncBusy} title="Merge templates from your Drive file into this device"
-                      style={{ flex: 1, padding: "4px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: syncBusy ? "default" : "pointer", fontSize: 12 }}>Load from Drive</button>
+                    <button onClick={pushToDrive} disabled={syncBusy} title="Escribir sus plantillas guardadas en su archivo privado de Drive"
+                      style={{ flex: 1, padding: "4px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: syncBusy ? "default" : "pointer", fontSize: 12 }}>Enviar a Drive</button>
+                    <button onClick={loadFromDrive} disabled={syncBusy} title="Combinar las plantillas de su archivo de Drive en este dispositivo"
+                      style={{ flex: 1, padding: "4px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: syncBusy ? "default" : "pointer", fontSize: 12 }}>Cargar desde Drive</button>
                   </div>
                   {syncMsg && <div style={{ fontSize: 10.5, color: "var(--ink-muted)", marginTop: 6 }}>{syncMsg}</div>}
                 </div>
@@ -567,11 +567,11 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
                 <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Tema del reporte</strong>
                 <div style={{ flex: 1 }} />
-                <button onClick={() => setShowTheme(false)} title="Close"
+                <button onClick={() => setShowTheme(false)} title="Cerrar"
                   style={{ border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>✕</button>
               </div>
               <div style={{ fontSize: 11, color: "var(--ink-muted)", lineHeight: 1.5, marginBottom: 8 }}>
-                Import a design-token file (e.g. a Claude Design <code>tokens.json</code>) to reskin this report, palette and fonts only. Your company identity stays where it is.
+                Importe un archivo de tokens de diseño (p. ej. un <code>tokens.json</code>) para cambiar el aspecto de este reporte: solo paleta y tipografías. La identidad de su empresa se queda donde está.
               </div>
               {theme.name ? (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -579,14 +579,14 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   <div style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 600 }} title={theme.name}>{theme.name}</div>
                 </div>
               ) : (
-                <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginBottom: 8 }}>Using the default house style.</div>
+                <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginBottom: 8 }}>Usando el estilo por omisión.</div>
               )}
               <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => themeFileRef.current?.click()} title="Choose a design-token file to import"
-                  style={{ flex: 1, padding: "5px 8px", border: "1px solid var(--ink)", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>Import theme…</button>
+                <button onClick={() => themeFileRef.current?.click()} title="Elija un archivo de tokens de diseño para importar"
+                  style={{ flex: 1, padding: "5px 8px", border: "1px solid var(--ink)", background: "var(--ink)", color: "var(--paper-bright)", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>Importar tema…</button>
                 {theme.name && (
-                  <button onClick={resetTheme} title="Remove the imported theme and return to the default"
-                    style={{ padding: "5px 10px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 12 }}>Reset</button>
+                  <button onClick={resetTheme} title="Quitar el tema importado y volver al predeterminado"
+                    style={{ padding: "5px 10px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 12 }}>Restablecer</button>
                 )}
               </div>
               {theme.warnings.length > 0 && (
@@ -611,7 +611,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
           {preventa ? "Preventa: sin compras" : "Preventa: con compras"}
         </button>
         <ToolMenu
-          title="Download the report and shape data"
+          title="Descargar el reporte y los datos de figuras"
           disabled={!rows.length && !shapes.length && !markups.length && !rfis.length}
           face={<><Icon name="document" size={13} />Exportar</>}
           items={[
@@ -623,14 +623,14 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             { id: "shapes-csv", icon: "document", label: "CSV de figuras", disabled: !shapes.length, title: "Cantidades medidas por figura: sin multiplicador ni desperdicio", onSelect: exportShapesCsv },
             { id: "shapes-json", icon: "document", label: "JSON de figuras", disabled: !shapes.length, title: "Cantidades medidas por figura: sin multiplicador ni desperdicio", onSelect: exportShapesJson },
             { id: "dxf", icon: "document", label: dxfSheets.length > 1 ? `DXF (CAD) · ${dxfSheets.length} sheets` : "DXF (CAD)", disabled: !dxfSheets.length,
-              title: !shapes.length ? "Nothing measured yet"
-                : !dxfSheets.length ? "Set the scale on a sheet with shapes first, a CAD file in pixels is worse than none"
-                : `AutoCAD-ready geometry: closed polylines per finish on OT-<TAG> layers, ${units === "metric" ? "metres" : "feet"}, one drawing per sheet${dxfSkipped.length ? `, ${dxfSkipped.length} unscaled sheet${dxfSkipped.length > 1 ? "s" : ""} left out` : ""}`,
+              title: !shapes.length ? "Aún no hay nada medido"
+                : !dxfSheets.length ? "Fije primero la escala en una hoja con figuras: un archivo CAD en píxeles es peor que ninguno"
+                : `Geometría lista para AutoCAD: polilíneas cerradas por acabado en capas OT-<TAG>, ${units === "metric" ? "metros" : "pies"}, un dibujo por hoja${dxfSkipped.length ? `; ${dxfSkipped.length} hoja${dxfSkipped.length > 1 ? "s" : ""} sin escala excluida${dxfSkipped.length > 1 ? "s" : ""}` : ""}`,
               onSelect: exportDxf },
           ]}
         />
         <ToolMenu
-          title="Print the report, or generate the marked-set PDF"
+          title="Imprimir el reporte, o generar el PDF del juego marcado"
           disabled={!rows.length && !markups.length && !rfis.length /* both items are disabled exactly here: with no rows/rfis, the marked-set condition also collapses to true */}
           face={<span>Imprimir</span>}
           items={[
@@ -639,7 +639,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               "divider",
               { section: "Juego marcado" },
               ...(markups.length > 0 ? [{ id: "inc-markups", label: "Incluir anotaciones", checked: includeMarkups, stayOpen: true, title: "Incluye sus anotaciones (nubes, llamadas, notas, resaltados) en el PDF del juego marcado. Es independiente del interruptor de la capa del lienzo.", onSelect: () => setIncludeMarkups((v) => !v) }] : []),
-              { id: "marked-set", icon: "document", label: `Download marked set${markedSetDark ? " ☾" : ""}`, disabled: !rows.length && (!includeMarkups || !markups.length) && !rfis.length, title: `PDF de distribución: hojas marcadas con el takeoff quemado, más una portada con leyenda${markedSetDark ? " (oscuro, según su vista)" : ""}`, onSelect: () => onMarkedSet(includeMarkups) },
+              { id: "marked-set", icon: "document", label: `Descargar juego marcado${markedSetDark ? " ☾" : ""}`, disabled: !rows.length && (!includeMarkups || !markups.length) && !rfis.length, title: `PDF de distribución: hojas marcadas con el takeoff quemado, más una portada con leyenda${markedSetDark ? " (oscuro, según su vista)" : ""}`, onSelect: () => onMarkedSet(includeMarkups) },
             ] : []),
           ]}
         />
@@ -740,7 +740,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
           </div>
         </div>
         {/* the empty-state hides once markups exist, "Revisions noted" below
-            renders from markups alone, and "Nothing measured yet" reading as a
+            renders from markups alone, and "Aún no hay nada medido" reading as a
             headline above a populated table was a lie */}
         {!rows.length ? (
           markups.length ? null : (
@@ -858,11 +858,11 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   <thead>
                     <tr>
                       <th style={{ ...th, textAlign: "left" }}>Acabado</th>
-                      <th style={th}>Floor {AU}</th>
-                      <th style={th}>Wall {AU}</th>
-                      <th style={th}>Border {AU}</th>
+                      <th style={th}>Piso {AU}</th>
+                      <th style={th}>Muro {AU}</th>
+                      <th style={th}>Borde {AU}</th>
                       <th style={th}>{LU}</th>
-                      <th style={th}>EA</th>
+                      <th style={th}>UND</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -887,10 +887,10 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               </div>
             ))}
             <p style={{ margin: "10px auto 0", fontSize: 11.5, color: "var(--ink-muted)", lineHeight: 1.6 }}>
-              Base quantities as measured per sheet, waste not applied.
+              Cantidades base medidas por hoja, sin desperdicio.
               {hasMultipliers(bySheet) && (
                 // the shared note + a screen-only reconcile clause (CSV/PDF omit it)
-                <> {BY_SHEET_BASE_NOTE}, sheet subtotals × multiplier reconcile to the condition table.</>
+                <> {BY_SHEET_BASE_NOTE}: los subtotales por hoja × el multiplicador concilian con la tabla de condiciones.</>
               )}
             </p>
           </div>
@@ -898,7 +898,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
         {markups.some((m) => m.type !== "svg" && m.type !== "image") && (
           <div style={{ maxWidth: 980, margin: "26px auto 0" }}>
             {/* svg symbols and image markups aren't revision notes, excluded */}
-            <h3 style={{ fontFamily: "var(--f-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink)", margin: "0 0 10px", paddingBottom: 5, borderBottom: "1.25px solid var(--ink)" }}>Revisions noted</h3>
+            <h3 style={{ fontFamily: "var(--f-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink)", margin: "0 0 10px", paddingBottom: 5, borderBottom: "1.25px solid var(--ink)" }}>Revisiones anotadas</h3>
             <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
               <thead>
                 <tr>
@@ -912,7 +912,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   <tr key={m.id}>
                     <td style={{ ...td, textAlign: "left" }}>
                       <span style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, fontWeight: 700, letterSpacing: "0.08em", border: "1px solid var(--ink-faint)", padding: "1px 6px", color: "var(--ink-soft)" }}>
-                        {m.type === "cloud" ? "CLOUD" : m.type === "callout" ? "CALLOUT" : "NOTE"}
+                        {m.type === "cloud" ? "NUBE" : m.type === "callout" ? "LLAMADA" : "NOTA"}
                       </span>
                     </td>
                     <td style={{ ...td, textAlign: "left", fontFamily: "var(--f-mono)", fontSize: 11.5 }}>{sheetLabel ? sheetLabel(m.sheet_id) : m.sheet_id}</td>
@@ -933,8 +933,8 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               <thead>
                 <tr>
                   <th style={{ ...th, textAlign: "left" }}>Material</th>
-                  <th style={th}>Quantity</th>
-                  <th style={{ ...th, textAlign: "left", paddingLeft: 16 }}>Unit</th>
+                  <th style={th}>Cantidad</th>
+                  <th style={{ ...th, textAlign: "left", paddingLeft: 16 }}>Unidad</th>
                 </tr>
               </thead>
               <tbody>
@@ -1079,57 +1079,57 @@ function ProjectInfoModal({ clientInfo = {}, onClientInfo, onSaved, onClose }) {
           <strong style={{ fontFamily: "var(--f-display)", fontSize: 15 }}>Datos del proyecto</strong>
         </div>
         <div style={{ padding: 16, fontSize: 13, lineHeight: 1.6, color: "var(--ink)" }}>
-          <div style={section}>Company, your trade names, saved on this device</div>
+          <div style={section}>Empresa: sus nombres comerciales, guardados en este dispositivo</div>
           {/* trade-name picker: choose which identity prints on the report + marked-set */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "8px 0" }}>
-            <select name="trade-name" aria-label="Active trade name" value={profs.activeId || ""} onChange={(e) => switchProfile(e.target.value)}
+            <select name="trade-name" aria-label="Nombre comercial activo" value={profs.activeId || ""} onChange={(e) => switchProfile(e.target.value)}
               className="field-input" style={{ flex: 1, minWidth: 0 }} disabled={!profs.profiles.length}>
-              {profs.profiles.length === 0 && <option value="">No trade name yet, add one</option>}
-              {profs.profiles.map((p) => <option key={p.id} value={p.id}>{p.name || "Untitled trade name"}</option>)}
+              {profs.profiles.length === 0 && <option value="">Aún no hay nombre comercial: agregue uno</option>}
+              {profs.profiles.map((p) => <option key={p.id} value={p.id}>{p.name || "Nombre comercial sin título"}</option>)}
             </select>
-            <button onClick={addTradeName} className="btn-ghost" title="Add another trade name (e.g. a second brand)"
-              style={{ padding: "5px 10px", whiteSpace: "nowrap" }}>+ Add</button>
+            <button onClick={addTradeName} className="btn-ghost" title="Agregar otro nombre comercial (p. ej. una segunda marca)"
+              style={{ padding: "5px 10px", whiteSpace: "nowrap" }}>+ Agregar</button>
             {profs.profiles.length > 1 && (
-              <button onClick={deleteActive} title="Delete the selected trade name"
-                style={{ padding: "5px 10px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 12, whiteSpace: "nowrap" }}>Delete</button>
+              <button onClick={deleteActive} title="Eliminar el nombre comercial seleccionado"
+                style={{ padding: "5px 10px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--c-danger)", cursor: "pointer", fontSize: 12, whiteSpace: "nowrap" }}>Eliminar</button>
             )}
           </div>
           <label style={row}>
-            <span className="field-label">Name</span>
+            <span className="field-label">Nombre</span>
             <input name="company-name" autoComplete="organization" value={active.name || ""} onChange={(e) => editActive({ name: e.target.value })}
-              placeholder="Your trade name" className="field-input" style={{ marginTop: 4 }} />
+              placeholder="Su nombre comercial" className="field-input" style={{ marginTop: 4 }} />
           </label>
           <label style={row}>
-            <span className="field-label">Address</span>
+            <span className="field-label">Dirección</span>
             <textarea name="company-address" autoComplete="street-address" value={active.address || ""} onChange={(e) => editActive({ address: e.target.value })}
-              rows={2} placeholder={"Street\nCity, ST"} className="field-input" style={{ marginTop: 4, resize: "vertical" }} />
+              rows={2} placeholder={"Calle\nCiudad, país"} className="field-input" style={{ marginTop: 4, resize: "vertical" }} />
           </label>
           <div style={row}>
-            <span className="field-label">Logo</span>
+            <span className="field-label">Logotipo</span>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
               <input name="company-logo" type="file" accept="image/*" onChange={onLogoFile} style={{ fontSize: 12, minWidth: 0 }} />
               {active.logo && (
                 <>
-                  <img src={active.logo} alt="Company logo" style={{ width: 120, height: "auto", flex: "none", border: "1px solid var(--ink-faint)", background: "var(--well)" }} />
+                  <img src={active.logo} alt="Logotipo de la empresa" style={{ width: 120, height: "auto", flex: "none", border: "1px solid var(--ink-faint)", background: "var(--well)" }} />
                   <button onClick={removeLogo}
-                    style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11.5, padding: 0, whiteSpace: "nowrap" }}>Remove logo</button>
+                    style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11.5, padding: 0, whiteSpace: "nowrap" }}>Quitar logotipo</button>
                 </>
               )}
             </div>
             {logoErr && <p style={err}>{logoErr}</p>}
           </div>
-          {saveFailed && <p style={err}>Couldn't save on this device</p>}
+          {saveFailed && <p style={err}>No se pudo guardar en este dispositivo</p>}
 
           {/* branding mode, per project. Off = OpenTakeoff (default); on brands
               the report + marked set as the selected trade name, keeping a subtle
               "Measured with OpenTakeoff" credit. Disabled until a trade name exists. */}
-          <div style={{ ...section, borderTop: "1px solid var(--ink-faint)", marginTop: 14, paddingTop: 12 }}>Branding, how this project's documents present</div>
+          <div style={{ ...section, borderTop: "1px solid var(--ink-faint)", marginTop: 14, paddingTop: 12 }}>Marca: cómo se presentan los documentos de este proyecto</div>
           <label style={{ display: "flex", alignItems: "center", gap: 8, margin: "8px 0", cursor: profs.profiles.length ? "pointer" : "not-allowed", opacity: profs.profiles.length ? 1 : 0.6 }}>
             <input type="checkbox" name="trade-name-brand" checked={brandSel.mode === "clearlabel"} disabled={!profs.profiles.length}
               onChange={(e) => setBranding({ mode: e.target.checked ? "clearlabel" : "default" })} />
             <span style={{ fontSize: 12.5 }}>
-              Trade name, brand as your company
-              {!profs.profiles.length && <span style={{ color: "var(--ink-muted)" }}> (add a trade name first)</span>}
+              Nombre comercial: presentar con la marca de su empresa
+              {!profs.profiles.length && <span style={{ color: "var(--ink-muted)" }}> (agregue primero un nombre comercial)</span>}
             </span>
           </label>
           {brandSel.mode === "clearlabel" && profs.profiles.length > 1 && (
@@ -1137,41 +1137,41 @@ function ProjectInfoModal({ clientInfo = {}, onClientInfo, onSaved, onClose }) {
               {profs.profiles.map((p) => {
                 const on = brandProfileId === p.id;
                 return (
-                  <button key={p.id} onClick={() => setBranding({ profileId: p.id })} title="Brand this project as this trade name"
+                  <button key={p.id} onClick={() => setBranding({ profileId: p.id })} title="Presentar este proyecto con este nombre comercial"
                     style={{ padding: "4px 10px", fontSize: 12, cursor: "pointer",
                       border: `1px solid ${on ? "var(--cobalt)" : "var(--ink-faint)"}`,
                       background: on ? "var(--cobalt)" : "transparent", color: on ? "var(--paper-bright)" : "var(--ink)" }}>
-                    {p.name || "Untitled trade name"}
+                    {p.name || "Nombre comercial sin título"}
                   </button>
                 );
               })}
             </div>
           )}
 
-          <div style={{ ...section, borderTop: "1px solid var(--ink-faint)", marginTop: 14, paddingTop: 12 }}>Client / job, saved with this project</div>
+          <div style={{ ...section, borderTop: "1px solid var(--ink-faint)", marginTop: 14, paddingTop: 12 }}>Cliente / trabajo: se guarda con este proyecto</div>
           <label style={row}>
-            <span className="field-label">Client name</span>
+            <span className="field-label">Nombre del cliente</span>
             <input name="client-name" autoComplete="off" value={clientInfo.client_name || ""} onChange={client("client_name")} className="field-input" style={{ marginTop: 4 }} />
           </label>
           <label style={row}>
-            <span className="field-label">Client address</span>
+            <span className="field-label">Dirección del cliente</span>
             <textarea name="client-address" autoComplete="off" value={clientInfo.client_address || ""} onChange={client("client_address")} rows={2}
               className="field-input" style={{ marginTop: 4, resize: "vertical" }} />
           </label>
           <div style={{ display: "flex", gap: 12 }}>
             <label style={{ ...row, flex: 1 }}>
-              <span className="field-label">PO / reference</span>
+              <span className="field-label">OC / referencia</span>
               <input name="client-reference" autoComplete="off" value={clientInfo.reference || ""} onChange={client("reference")} className="field-input" style={{ marginTop: 4 }} />
             </label>
             <label style={{ ...row, flex: 1 }}>
-              <span className="field-label">Date</span>
-              <input name="client-date" autoComplete="off" value={clientInfo.date || ""} onChange={client("date")} placeholder={'e.g. "Bid 7/12"'}
+              <span className="field-label">Fecha</span>
+              <input name="client-date" autoComplete="off" value={clientInfo.date || ""} onChange={client("date")} placeholder={'p. ej. «Oferta 7/12»'}
                 className="field-input" style={{ marginTop: 4 }} />
             </label>
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", padding: "12px 16px", borderTop: "1px solid var(--ink-faint)" }}>
-          <button className="btn-primary" onClick={onClose}>Done</button>
+          <button className="btn-primary" onClick={onClose}>Listo</button>
         </div>
       </div>
     </div>
@@ -1201,14 +1201,14 @@ function ContributeModal({ conditions, shapes, scaleInfo = [], provenanceCounter
       <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: 520, maxWidth: "100%", maxHeight: "90%", overflow: "auto", background: "var(--paper-bright)", boxShadow: "var(--shadow-2)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderBottom: "1px solid var(--ink)" }}>
           <Icon name="oneClick" size={16} />
-          <strong style={{ fontFamily: "var(--f-display)", fontSize: 15 }}>Contribute to the open flooring model</strong>
+          <strong style={{ fontFamily: "var(--f-display)", fontSize: 15 }}>Contribuir al modelo abierto de pisos</strong>
         </div>
         <div style={{ padding: "16px", fontSize: 13, lineHeight: 1.6, color: "var(--ink)" }}>
           <p style={{ marginTop: 0 }}>Help grow a shared, flooring-tuned open model. We send only the <strong>derived takeoff</strong>:</p>
           <ul style={{ margin: "0 0 10px", paddingLeft: 18 }}>
             <li>condition labels, shape types, and quantities (SF / LF / EA)</li>
-            <li>normalized room geometry (shape only, no scale, no location)</li>
-            <li>how each shape was made (hand-traced vs. machine-proposed) and whether you corrected it</li>
+            <li>geometría normalizada de recintos (solo la forma: sin escala ni ubicación)</li>
+            <li>cómo se hizo cada figura (trazada a mano o propuesta por máquina) y si usted la corrigió</li>
           </ul>
           <p style={{ margin: "0 0 10px", color: "var(--c-positive)", fontWeight: 600 }}>
             Never sent: the PDF itself, file names, project or client names, your markups, or any absolute coordinates.
@@ -1220,13 +1220,13 @@ function ContributeModal({ conditions, shapes, scaleInfo = [], provenanceCounter
             </p>
           )}
           <label style={{ display: "block", margin: "6px 0" }}>
-            <span className="field-label">Credit (optional)</span>
-            <input name="contributor" autoComplete="name" value={contributor} onChange={(e) => setContributor(e.target.value)} placeholder="Name or company to credit"
+            <span className="field-label">Crédito (opcional)</span>
+            <input name="contributor" autoComplete="name" value={contributor} onChange={(e) => setContributor(e.target.value)} placeholder="Nombre o empresa a acreditar"
               className="field-input" style={{ marginTop: 4 }} />
           </label>
           <label style={{ display: "flex", gap: 8, alignItems: "flex-start", margin: "12px 0", cursor: "pointer" }}>
             <input name="attest" type="checkbox" checked={attest} onChange={(e) => setAttest(e.target.checked)} style={{ marginTop: 3 }} />
-            <span>I have the right to share this takeoff data and am contributing it to the open flooring model.</span>
+            <span>Tengo derecho a compartir los datos de este takeoff y los aporto al modelo abierto de pisos.</span>
           </label>
           {msg && <p style={{ fontSize: 12.5, color: state === "error" ? "var(--c-danger)" : "var(--c-positive)" }}>{msg}</p>}
         </div>

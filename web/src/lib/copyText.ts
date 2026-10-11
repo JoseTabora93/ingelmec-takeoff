@@ -43,11 +43,11 @@ type TextContent = Parameters<typeof extractRegionText>[0];
 type Viewport = Parameters<typeof extractRegionText>[1];
 
 /** The text layer reader's label, shown on the receipt. */
-export const TEXT_LAYER = "Text layer";
+export const TEXT_LAYER = "Capa de texto";
 /** The OCR readers' label: text read from the page image, never the PDF's own. */
 export const OCR_LABEL = "OCR";
 /** A hybrid copy's label: the text layer, and OCR for the picture's text. */
-export const TEXT_LAYER_OCR = "Text layer + OCR";
+export const TEXT_LAYER_OCR = "Capa de texto + OCR";
 
 /** Why a reader couldn't read (lib/ocr/pageRead's ReadFailure). */
 export type ReaderMissStatus = "declined" | "aborted" | "page-closed" | "failed" | "disabled" | "uninstalled" | "error" | "too-large";
@@ -229,9 +229,9 @@ const OCR_UNAVAILABLE: ReadonlySet<ReaderMissStatus> = new Set(["disabled", "uni
  * receipt says the image wasn't read: declined, offline, too large. */
 const IMAGE_UNREAD: ReadonlySet<ReaderMissStatus> = new Set(["declined", "error", "too-large"]);
 /** The receipt's note on such a copy. */
-export const IMAGE_UNREAD_NOTE = "the scanned image wasn't read";
+export const IMAGE_UNREAD_NOTE = "no se leyó la imagen escaneada";
 /** The same note on a hybrid, whose unread image is a picture on a vector sheet. */
-export const PICTURE_UNREAD_NOTE = "the picture wasn't read";
+export const PICTURE_UNREAD_NOTE = "no se leyó la imagen";
 
 /** The readers for one copy, in the order they're asked.
  *   - A sheet with a text layer: the text layer, then OCR (copyOcrRoute
@@ -441,7 +441,7 @@ export function createReadGate(): { begin(): AbortSignal } {
 }
 
 /** How messages name OCR: one phrase everywhere. */
-export const OCR_READER = "the on-device text reader (OCR)";
+export const OCR_READER = "el lector de texto del dispositivo (OCR)";
 const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 
 /** The status-bar line for an outcome that put nothing on the clipboard.
@@ -451,30 +451,30 @@ export function outcomeMessage(o: CopyOutcome, scope: "box" | "page", isScanLike
   const scanLike = isScanLike && !hybrid;
   if (o.kind === "aborted") return "";
   if (o.kind === "rotated-only") {
-    return `Only rotated text ${scope === "box" ? "in that box" : "on this sheet"} (${o.skipped} rotated run${o.skipped === 1 ? "" : "s"}: dimension strings, vertical headers), nothing reads left to right.`;
+    return `Solo hay texto rotado ${scope === "box" ? "en ese recuadro" : "en esta hoja"} (${o.skipped} fragmento${o.skipped === 1 ? "" : "s"} rotado${o.skipped === 1 ? "" : "s"}: cotas, encabezados verticales): nada se lee de izquierda a derecha.`;
   }
   if (o.kind === "text") return "";
-  const where = scope === "box" ? "in that box" : "on this sheet";
-  const what = scope === "box" ? "that box" : "this sheet";
+  const where = scope === "box" ? "en ese recuadro" : "en esta hoja";
+  const what = scope === "box" ? "ese recuadro" : "esta hoja";
   const miss = o.miss;
   if (miss) {
     switch (miss.status) {
-      case "declined": return `Nothing copied: ${OCR_READER} wasn't downloaded.`;
-      case "aborted": return `${cap(OCR_READER)} was stopped; nothing copied.`;
-      case "too-large": return `${cap(what)} is too large for ${OCR_READER}.`;
+      case "declined": return `No se copió nada: ${OCR_READER} no se descargó.`;
+      case "aborted": return `${cap(OCR_READER)} se detuvo; no se copió nada.`;
+      case "too-large": return `${cap(what)} es demasiado grande para ${OCR_READER}.`;
       case "disabled":
       case "uninstalled":
-        if (hybrid) return `No text layer ${where}, and the picture can't be read here: ${ocrOffReason(miss.status)}.`;
-        if (!scanLike) return scope === "box" ? "No text in that box." : "No text on this sheet.";
-        return `This sheet has little or no text layer, and ${OCR_READER} isn't available here, so there's no text to copy.`;
-      default: return `Couldn't read ${what} with ${OCR_READER}: ${miss.message || "unknown error"}`;
+        if (hybrid) return `No hay capa de texto ${where}, y la imagen no se puede leer aquí: ${ocrOffReason(miss.status)}.`;
+        if (!scanLike) return scope === "box" ? "No hay texto en ese recuadro." : "No hay texto en esta hoja.";
+        return `Esta hoja tiene poca o ninguna capa de texto, y ${OCR_READER} no está disponible aquí, así que no hay texto para copiar.`;
+      default: return `No se pudo leer ${what} con ${OCR_READER}: ${miss.message || "error desconocido"}`;
     }
   }
   // the combining reader asked the text layer too: it reads as OCR here
   const others = [...new Set(o.tried.filter((t) => t !== TEXT_LAYER).map((t) => (t === TEXT_LAYER_OCR ? OCR_LABEL : t)))];
-  if (others.length) return `No text found ${where}: ${!scanLike ? "no text-layer text there" : "the sheet has little or no text layer"}, and ${others.join(", ")} read none.`;
-  if (scanLike) return `This sheet has little or no text layer (a scan or a flattened export), so there's no text to copy.`;
-  return scope === "box" ? "No text in that box." : "No text on this sheet.";
+  if (others.length) return `No se encontró texto ${where}: ${!scanLike ? "no hay texto de capa de texto ahí" : "la hoja tiene poca o ninguna capa de texto"}, y ${others.join(", ")} no ${others.length === 1 ? "leyó" : "leyeron"} nada.`;
+  if (scanLike) return `Esta hoja tiene poca o ninguna capa de texto (un escaneo o una exportación aplanada), así que no hay texto para copiar.`;
+  return scope === "box" ? "No hay texto en ese recuadro." : "No hay texto en esta hoja.";
 }
 
 type PanelLike = { key: string; xOffset: number; img: { w: number; h: number } };
@@ -589,6 +589,6 @@ export function receiptPlacement({ sweepOpen, zoneOpen, narrow }: { sweepOpen: b
 /** Why a copy can't start on this panel, or null. A stitched surface has no
  * page of its own (its members' pages are each their own). */
 export function copyUnavailable(p: { stitch: boolean; hasPage: boolean }): string | null {
-  if (p.stitch) return "Copy text works on single sheets, open the sheet on its own.";
-  return p.hasPage ? null : "Open a sheet first.";
+  if (p.stitch) return "Copiar texto funciona en hojas individuales: abra la hoja sola.";
+  return p.hasPage ? null : "Abra primero una hoja.";
 }

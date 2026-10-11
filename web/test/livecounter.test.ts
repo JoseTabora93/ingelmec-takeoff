@@ -36,7 +36,7 @@ test("counterRows: measured quantities, not order quantities (no waste)", () => 
 
 test("counterRows: LF and EA roles land under their units", () => {
   assert.deepEqual(rows.find((r: any) => r.id === "c2")!.qtys, [{ qty: 84.25, unit: "LF" }]);
-  assert.deepEqual(rows.find((r: any) => r.id === "c3")!.qtys, [{ qty: 2, unit: "EA" }]);
+  assert.deepEqual(rows.find((r: any) => r.id === "c3")!.qtys, [{ qty: 2, unit: "UND" }]);
 });
 
 test("counterRows: the active flag follows the id", () => {

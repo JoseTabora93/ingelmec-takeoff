@@ -125,7 +125,7 @@ test("with the box's own terms, the code elsewhere on the schedule's sheet is fo
   const one = codeUse("CPT-1", { indexes: mapOf(src), keys: [SCHED], sourceKey: SCHED, boxTerms: box });
   assert.equal(one.state, "found");
   assert.deepEqual(one.found, [{ key: SCHED, source: "text", outsideBox: true }]);
-  assert.match(codeUseLine(one).title, /schedule's sheet, outside the box/);
+  assert.match(codeUseLine(one).title, /hoja del cuadro, fuera del recuadro/);
   // LVT-2 is only in the box: the rest of the sheet was checked and hasn't it
   const two = codeUse("LVT-2", { indexes: mapOf(src), keys: [SCHED], sourceKey: SCHED, boxTerms: box });
   assert.equal(two.state, "not-found");
@@ -153,17 +153,17 @@ test("a code the index can't hold (one letter) is uncheckable, never not-found",
   const u = use("C", [sheet(SCHED, "C"), sheet("plan.pdf", "LOBBY")]);
   assert.equal(u.state, "unchecked");
   assert.equal(u.uncheckable, true);
-  assert.match(codeUseLine(u).text, /can't check/);
+  assert.match(codeUseLine(u).text, /no se puede verificar/);
 });
 
 test("codeUseLine: the row's words never say unused", () => {
   const notFound = codeUseLine({ state: "not-found", found: [], similar: ["CPT-12"], checked: 3, unchecked: 0 });
-  assert.match(notFound.text, /not found in checked text/);
+  assert.match(notFound.text, /no se encontró en el texto revisado/);
   assert.match(notFound.title, /CPT-12/);
   const unchecked = codeUseLine({ state: "unchecked", found: [], similar: [], checked: 1, unchecked: 4 });
-  assert.match(unchecked.text, /4 sheets not checked/);
+  assert.match(unchecked.text, /4 hojas sin revisar/);
   const found = codeUseLine({ state: "found", found: [{ key: "a.pdf", source: "text" }, { key: "b.pdf", source: "ocr" }], similar: [], checked: 2, unchecked: 0 }, (k) => k.toUpperCase());
-  assert.match(found.text, /on 2 sheets/);
+  assert.match(found.text, /en 2 hojas/);
   assert.match(found.title, /B\.PDF \(OCR\)/);
   for (const l of [notFound, unchecked, found]) assert.doesNotMatch(`${l.text} ${l.title}`, /unused/i);
 });

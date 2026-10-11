@@ -40,7 +40,7 @@ export function pendingByProposal(shapes, proposals = []) {
   }
   for (const [key, mine] of byId) {
     if (!key || described.has(key)) continue;
-    out.push({ proposal: { id: key, label: "Proposal", rationale: "" }, ids: mine.map((s) => s.id), shapes: mine });
+    out.push({ proposal: { id: key, label: "Propuesta", rationale: "" }, ids: mine.map((s) => s.id), shapes: mine });
   }
   const loose = byId.get("");
   if (loose?.length) out.push({ proposal: null, ids: loose.map((s) => s.id), shapes: loose });
@@ -94,12 +94,12 @@ export function conditionEditPatch(proposal) {
 export function acceptConditionEditProposal(conditions, proposal, nowIso = () => new Date().toISOString()) {
   const list = Array.isArray(conditions) ? conditions : [];
   const c = list.find((x) => x && x.id === proposal?.condition_id);
-  if (!c) return { conditions: list, error: "That condition no longer exists." };
+  if (!c) return { conditions: list, error: "Esa condición ya no existe." };
   const patch = conditionEditPatch(proposal);
-  if (!Object.keys(patch).length) return { conditions: list, error: "The proposal carries nothing to apply." };
+  if (!Object.keys(patch).length) return { conditions: list, error: "La propuesta no trae nada que aplicar." };
   if (patch.finish_tag !== undefined) {
     const clash = list.find((x) => x && x.id !== c.id && tagKey(x.finish_tag) === tagKey(patch.finish_tag));
-    if (clash) return { conditions: list, error: `${clash.finish_tag} already carries that tag, a condition cannot be renamed onto another.` };
+    if (clash) return { conditions: list, error: `${clash.finish_tag} ya lleva esa etiqueta: una condición no se puede renombrar a otra existente.` };
   }
   return { conditions: list.map((x) => (x.id === c.id ? { ...x, ...patch, updated_at: nowIso() } : x)), error: null };
 }

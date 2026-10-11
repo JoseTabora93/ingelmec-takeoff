@@ -44,8 +44,8 @@ test("nothing to show renders nothing", () => {
 
 test("a sheet with no text layer offers Read page text", () => {
   const t = setup([{ key: "a.pdf", label: "A-1", view: { kind: "read" } }]);
-  assert.deepEqual(t.buttons.map(text), ["Read page text"]);
-  t.press("Read page text");
+  assert.deepEqual(t.buttons.map(text), ["Leer texto de la página"]);
+  t.press("Leer texto de la página");
   assert.deepEqual(t.calls, ["read a.pdf"]);
   assert.ok(!t.html.includes("A-1"), "one sheet: no label");
 });
@@ -55,14 +55,14 @@ test("a hybrid's row offers Read picture text; a scan's keeps Read page text (#4
     { key: "h.pdf", label: "A-1", view: { kind: "read" }, what: "picture" },
     { key: "s.pdf", label: "S-1", view: { kind: "read" }, what: "page" },
   ]);
-  assert.deepEqual(t.buttons.map(text), ["Read picture text", "Read page text"]);
-  t.press("Read picture text");
+  assert.deepEqual(t.buttons.map(text), ["Leer texto de la imagen", "Leer texto de la página"]);
+  t.press("Leer texto de la imagen");
   assert.deepEqual(t.calls, ["read h.pdf"]);
 });
 
 test("the group is named for both kinds it reads", () => {
   const t = setup([{ key: "a.pdf", label: "A-1", view: { kind: "read" } }]);
-  assert.match(t.html, /role="group" aria-label="Read text from scans and pictures"/);
+  assert.match(t.html, /role="group" aria-label="Leer texto de escaneos e imágenes"/);
 });
 
 test("a failure note shows beside Read", () => {
@@ -73,8 +73,8 @@ test("a failure note shows beside Read", () => {
 test("reading shows the phase and Cancel", () => {
   const t = setup([{ key: "a.pdf", label: "A-1", view: { kind: "reading", text: "Reading tiles 2/6" } }]);
   assert.ok(t.html.includes("Reading tiles 2/6"));
-  assert.deepEqual(t.buttons.map(text), ["Cancel"]);
-  t.press("Cancel");
+  assert.deepEqual(t.buttons.map(text), ["Cancelar"]);
+  t.press("Cancelar");
   assert.deepEqual(t.calls, ["cancel a.pdf"]);
 });
 
@@ -89,7 +89,7 @@ test("done shows the time and OCR; Read again only when stale", () => {
   assert.ok(fresh.html.includes("Read in 4.2 s · OCR"));
   assert.equal(fresh.buttons.length, 0);
   const stale = setup([{ key: "a.pdf", label: "A-1", view: { kind: "done", text: "Read in 4.2 s · OCR", readAgain: true } }]);
-  stale.press("Read again");
+  stale.press("Leer de nuevo");
   assert.deepEqual(stale.calls, ["again a.pdf"]);
 });
 
@@ -101,8 +101,8 @@ test("a group lists each qualifying sheet by label, and skips the rest", () => {
   ]);
   assert.ok(t.html.includes("A-1") && t.html.includes("B-1"));
   assert.ok(!t.html.includes("A-2"));
-  t.press("Read page text");
-  t.press("Cancel");
+  t.press("Leer texto de la página");
+  t.press("Cancelar");
   assert.deepEqual(t.calls, ["read a.pdf", "cancel b.pdf"]);
 });
 
@@ -126,7 +126,7 @@ test("status text is announced; nothing announced holds a button", () => {
 test("a background row names its sheet in its own text and offers Cancel", () => {
   const t = setup([{ key: "z.pdf", label: "Z-9", view: { kind: "reading", text: "Reading Z-9…" }, background: true } as Row]);
   assert.ok(t.html.includes("Reading Z-9…"));
-  t.press("Cancel");
+  t.press("Cancelar");
   assert.deepEqual(t.calls, ["cancel z.pdf"]);
 });
 
@@ -151,7 +151,7 @@ test("a reader the probe couldn't reach says so, with Retry", () => {
   const html = renderToStaticMarkup(el);
   assert.match(html, /couldn&#x27;t be reached/);
   const buttons = walk(el).filter((e) => e.type === "button");
-  assert.deepEqual(buttons.map(text), ["Retry"]);
+  assert.deepEqual(buttons.map(text), ["Reintentar"]);
   (buttons[0].props.onClick as () => void)();
   assert.equal(retried, 1);
 });

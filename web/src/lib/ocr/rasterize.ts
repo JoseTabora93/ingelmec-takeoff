@@ -56,7 +56,7 @@ interface PdfPageLike {
   render(o: { canvasContext: CanvasRenderingContext2D; viewport: unknown; transform: number[] }): { promise: Promise<unknown>; cancel?: () => void };
 }
 
-const abortError = () => new DOMException("The OCR render was cancelled.", "AbortError");
+const abortError = () => new DOMException("Se canceló el dibujo para OCR.", "AbortError");
 
 /** Render `rect` (rs px, any corner order) of `page` for OCR. `png: true` also
  * encodes the same render as PNG, so a caller that wants the image as well

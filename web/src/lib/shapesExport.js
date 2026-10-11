@@ -50,16 +50,16 @@ export function shapesDetail(conditions, shapes, sheetLabel) {
   });
 }
 
-export function shapesToCsv(rows, projectName = "", brandName = "OpenTakeoff", units = "imperial") {
+export function shapesToCsv(rows, projectName = "", brandName = "Ingelmec Takeoff", units = "imperial") {
   const M = units === "metric";
   const areaUnit = M ? "m2" : "SF";
   const lengthUnit = M ? "m" : "LF";
   const heightUnit = M ? "m" : "ft";
   const A = (v) => (M ? round2((Number(v) || 0) * M2_PER_SF) : v);
   const L = (v) => (M ? round2((Number(v) || 0) * M_PER_FT) : v);
-  const header = ["Shape", "Sheet", "Sheet ID", "Finish", "Role", `Area ${areaUnit}`, lengthUnit, "EA", `Height ${heightUnit}`, "Height override", `Rise ${heightUnit}`, `Drop ${heightUnit}`, "Origin"];
+  const header = ["Figura", "Hoja", "ID de hoja", "Acabado", "Rol", `Área ${areaUnit}`, lengthUnit, "UND", `Altura ${heightUnit}`, "Altura propia", `Subida ${heightUnit}`, `Bajada ${heightUnit}`, "Origen"];
   const lines = [
-    "# Per-shape measured quantities, no multiplier or waste; deducts negative; LF on floor/deduct/surface rows is trace reference only (incl. openings), linear rows alone sum to condition LF; a linear row's LF includes its Rise + Drop",
+    "# Cantidades medidas por figura: sin multiplicador ni desperdicio; las deducciones son negativas; LF en filas de piso, deducción y superficie es solo referencia del trazo (incluye vanos); solo las filas lineales suman al LF de la condición; el LF de una fila lineal incluye su Subida + Bajada",
     header.map(esc).join(","),
   ];
   for (const r of rows) {
@@ -71,7 +71,7 @@ export function shapesToCsv(rows, projectName = "", brandName = "OpenTakeoff", u
       r.origin,
     ].map(esc).join(","));
   }
-  const title = projectName ? `# ${projectName}, ${brandName} shapes\n` : "";
+  const title = projectName ? `# ${projectName}, ${brandName}: figuras\n` : "";
   return title + lines.join("\n") + "\n";
 }
 

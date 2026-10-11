@@ -64,10 +64,10 @@ export async function buildProfile(name) {
 export function parseProfile(text) {
   let p;
   try { p = JSON.parse(text); }
-  catch { throw new Error("Couldn't apply profile: the file isn't valid JSON."); }
-  if (!p || typeof p !== "object" || Array.isArray(p)) throw new Error("Couldn't apply profile: not a profile file.");
+  catch { throw new Error("No se pudo aplicar el perfil: el archivo no es un JSON válido."); }
+  if (!p || typeof p !== "object" || Array.isArray(p)) throw new Error("No se pudo aplicar el perfil: no es un archivo de perfil.");
   if (p.schema !== PROFILE_SCHEMA) {
-    throw new Error(`Couldn't apply profile: version "${p.schema || "unknown"}", this build reads ${PROFILE_SCHEMA}. Update OpenTakeoff and try again.`);
+    throw new Error(`No se pudo aplicar el perfil: versión «${p.schema || "desconocida"}»; esta compilación lee ${PROFILE_SCHEMA}. Actualice la aplicación e intente de nuevo.`);
   }
   return p;
 }

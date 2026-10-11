@@ -22,17 +22,17 @@ const evt = (altKey = false) => {
 
 test("eye on a showing condition: Hide label, pressed, open-eye icon", () => {
   const out = html(React.createElement(ConditionEye as any, { tag: "REC-1", hidden: false, onToggle: () => {} }));
-  assert.match(out, /aria-label="Hide REC-1 on the plan"/);
+  assert.match(out, /aria-label="Ocultar REC-1 en el plano"/);
   assert.match(out, /aria-pressed="true"/);
-  assert.match(out, /Hiding never changes a quantity/);
+  assert.match(out, /Ocultar nunca cambia una cantidad/);
   assert.doesNotMatch(out, /<line /, "open eye carries no strike");
 });
 
 test("eye on a hidden condition: Show label, not pressed, struck icon, danger fill", () => {
   const out = html(React.createElement(ConditionEye as any, { tag: "REC-1", hidden: true, onToggle: () => {} }));
-  assert.match(out, /aria-label="Show REC-1 on the plan"/);
+  assert.match(out, /aria-label="Mostrar REC-1 en el plano"/);
   assert.match(out, /aria-pressed="false"/);
-  assert.match(out, /Still counted in totals, report and exports/);
+  assert.match(out, /Sigue contando en totales, reporte y exportaciones/);
   assert.match(out, /<line /, "struck eye");
   assert.match(out, /background:var\(--c-danger\)/);
 });
@@ -60,8 +60,8 @@ test("hidden bar: N of M, totals-unchanged promise, Show all fires", () => {
   const props = { hidden: 8, total: 9, onShowAll: () => { shown += 1; } };
   const out = html(React.createElement(HiddenConditionsBar as any, props));
   assert.match(out, /role="status"/);
-  assert.match(out, /8<!-- --> of <!-- -->9<!-- --> hidden on the plan, totals unchanged|8 of 9 hidden on the plan, totals unchanged/);
-  assert.match(out, />Show all</);
+  assert.match(out, /8<!-- --> de <!-- -->9<!-- --> ocultas en el plano; los totales no cambian|8 de 9 ocultas en el plano; los totales no cambian/);
+  assert.match(out, />Mostrar todo</);
   const el: any = (HiddenConditionsBar as any)(props);
   const btn = React.Children.toArray(el.props.children).find((c: any) => c?.type === "button") as any;
   btn.props.onClick();

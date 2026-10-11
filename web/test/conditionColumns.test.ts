@@ -104,9 +104,9 @@ test("sanitizeConditionAttrs: strips corrupt values at hydrate; untouched condit
 
 test("columnLabel: whitespace-only names are as unusable as empty ones", () => {
   assert.equal(columnLabel({ name: "CSI Division" }), "CSI Division");
-  assert.equal(columnLabel({ name: "" }), "Untitled");
-  assert.equal(columnLabel({ name: "   " }), "Untitled");
-  assert.equal(columnLabel({}), "Untitled");
+  assert.equal(columnLabel({ name: "" }), "Sin título");
+  assert.equal(columnLabel({ name: "   " }), "Sin título");
+  assert.equal(columnLabel({}), "Sin título");
 });
 
 test("unknown item fields pass through the round-trip", () => {

@@ -3,14 +3,14 @@ import assert from "node:assert/strict";
 import { filterWork, workActor, workQuantity, workReviewState } from "../src/lib/workReview.js";
 
 test("review receipts distinguish missing state, pending work, and reviewed work", () => {
-  assert.equal(workReviewState({}), "Recorded");
-  assert.equal(workReviewState({ origin: { reviewed: false } }), "Needs review");
-  assert.equal(workReviewState({ origin: { reviewed: true } }), "Reviewed");
-  assert.equal(workActor({}), "Not recorded");
-  assert.equal(workActor({ author: "Estimator" }), "Named author");
-  assert.equal(workActor({ origin: { actor: "agent", method: "manual" } }), "Agent");
-  assert.equal(workActor({ origin: { actor: "canvas" } }), "Canvas");
-  assert.equal(workActor({ origin: { method: "rule_v1" } }), "Rule");
+  assert.equal(workReviewState({}), "Registrado");
+  assert.equal(workReviewState({ origin: { reviewed: false } }), "Por revisar");
+  assert.equal(workReviewState({ origin: { reviewed: true } }), "Revisado");
+  assert.equal(workActor({}), "Sin registrar");
+  assert.equal(workActor({ author: "Estimator" }), "Autor con nombre");
+  assert.equal(workActor({ origin: { actor: "agent", method: "manual" } }), "Agente");
+  assert.equal(workActor({ origin: { actor: "canvas" } }), "Lienzo");
+  assert.equal(workActor({ origin: { method: "rule_v1" } }), "Regla");
 });
 
 test("receipts retain zero, missing quantities, measurement units, and deduct roles", () => {

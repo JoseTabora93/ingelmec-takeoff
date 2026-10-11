@@ -68,20 +68,20 @@ test("colLetter: A..Z, AA rollover, ZZ→AAA", () => {
 
 test("sanitizeSheetName: forbidden chars, length cap, empties, uniqueness", () => {
   const used = new Set<string>();
-  assert.equal(sanitizeSheetName("By sheet", used), "By sheet");
+  assert.equal(sanitizeSheetName("Por hoja", used), "Por hoja");
   assert.equal(sanitizeSheetName("a[b]c:d*e?f/g\\h", used), "a_b_c_d_e_f_g_h");
-  assert.equal(sanitizeSheetName("", used), "Sheet");
-  assert.equal(sanitizeSheetName(null, used), "Sheet (2)"); // empty again → deduped
+  assert.equal(sanitizeSheetName("", used), "Hoja");
+  assert.equal(sanitizeSheetName(null, used), "Hoja (2)"); // empty again → deduped
   const long = sanitizeSheetName("x".repeat(40), used);
   assert.equal(long.length, 31);
   const long2 = sanitizeSheetName("x".repeat(40), used); // same 31-char prefix → suffixed within 31
   assert.equal(long2.length, 31);
   assert.ok(long2.endsWith("(2)"));
-  assert.equal(sanitizeSheetName("BY SHEET", used), "BY SHEET (2)"); // case-insensitive dedupe
+  assert.equal(sanitizeSheetName("BY SHEET", used), "BY SHEET"); // case-insensitive dedupe
 });
 
 test("sheetXml: numbers as <v>, strings as inline strings, empty cells skipped, refs correct", () => {
-  const xml = sheetXml([["Finish", "SF"], [NASTY, 42.5], ["", 0]]);
+  const xml = sheetXml([["Acabado", "SF"], [NASTY, 42.5], ["", 0]]);
   assertBalanced(xml);
   assert.ok(xml.includes('<c r="A2" t="inlineStr"><is><t>CPT &amp; &lt;Tile&gt; &quot;A&quot;</t></is></c>'));
   assert.ok(xml.includes('<c r="B2"><v>42.5</v></c>'));
@@ -99,26 +99,26 @@ test("sheetXml: leading/trailing whitespace gets xml:space=preserve", () => {
 
 test("reportWorkbook: five tabs, Conditions mirrors the CSV columns and numbers", () => {
   const tabs = reportWorkbook(workbookArgs());
-  assert.deepEqual(tabs.map((t: any) => t.name), ["Conditions", "By sheet", "Materials", "Shapes", "By floor × room"]);
+  assert.deepEqual(tabs.map((t: any) => t.name), ["Condiciones", "Por hoja", "Materiales", "Figuras", "Por nivel × recinto"]);
 
   const [cTab, sheetTab, matTab, shapeTab] = tabs;
   // header row = the same headers the CSV emits
   assert.deepEqual(cTab.rows[0], cols.map((c: any) => c.header));
   const idx = (h: string) => cols.findIndex((c: any) => c.header === h);
   const r1 = cTab.rows[1]; // c1: 100 SF, 10% waste
-  assert.equal(r1[idx("Finish")], NASTY);
+  assert.equal(r1[idx("Acabado")], NASTY);
   assert.equal(r1[idx("Total SF")], 100);            // measured, no waste
-  assert.equal(r1[idx("Total SF w/Waste")], 110); // waste only on the w/Waste qty
+  assert.equal(r1[idx("Total SF c/desp")], 110); // waste only on the w/Waste qty
   const r2 = cTab.rows[2]; // c2: linear 25 LF ×2 multiplier
   assert.equal(r2[idx("LF")], 50);
-  assert.equal(r2[idx("LF w/Waste")], 50); // 0% waste
+  assert.equal(r2[idx("LF c/desp")], 50); // 0% waste
   // TOTAL row
   const total = cTab.rows[cTab.rows.length - 1];
   assert.equal(total[0], "TOTAL");
-  assert.equal(total[idx("Total SF w/Waste")], 110);
+  assert.equal(total[idx("Total SF c/desp")], 110);
 
   // By sheet: base quantities (no ×2 on the c2 row), label + raw id + ×N tag
-  assert.deepEqual(sheetTab.rows[0], ["Sheet", "Sheet ID", "Finish", "Floor SF", "Wall SF", "Border SF", "LF", "EA"]);
+  assert.deepEqual(sheetTab.rows[0], ["Hoja", "ID de hoja", "Acabado", "Piso SF", "Muro SF", "Borde SF", "LF", "UND"]);
   const vct = sheetTab.rows.find((r: any[]) => r[1] === "plan.pdf#2");
   assert.ok(vct);
   assert.equal(vct![0], "Sheet plan.pdf#2");
@@ -126,14 +126,14 @@ test("reportWorkbook: five tabs, Conditions mirrors the CSV columns and numbers"
   assert.equal(vct![6], 25); // base LF, multiplier NOT applied
 
   // Materials: per-condition row + combined section
-  assert.deepEqual(matTab.rows[0], ["Finish", "Material", "Qty", "Unit", "Coverage", "Note"]);
+  assert.deepEqual(matTab.rows[0], ["Acabado", "Material", "Cant.", "Unidad", "Cobertura", "Nota"]);
   const adhesive = matTab.rows.find((r: any[]) => r[1] === "Adhesive");
   assert.ok(adhesive);
   assert.equal(adhesive![2], 1); // ceil(100 SF measured / 100 per), coverage runs on the MEASURED basis, never waste-adjusted
-  assert.ok(matTab.rows.some((r: any[]) => r[0] === "Material (combined)"));
+  assert.ok(matTab.rows.some((r: any[]) => r[0] === "Material (combinado)"));
 
   // Shapes: note row, header, one row per shape, measured only
-  assert.deepEqual(shapeTab.rows[1].slice(0, 5), ["Shape", "Sheet", "Sheet ID", "Finish", "Role"]);
+  assert.deepEqual(shapeTab.rows[1].slice(0, 5), ["Figura", "Hoja", "ID de hoja", "Acabado", "Rol"]);
   assert.equal(shapeTab.rows.length, 2 + shapes.length);
   const s2 = shapeTab.rows.find((r: any[]) => r[0] === "s2");
   assert.equal(s2![6], 25); // measured LF, no multiplier
@@ -158,7 +158,7 @@ test("reportWorkbook: read-only spec columns in cols, header, per-row value, bla
   const spec = specColProfile([
     { id: "c1", spec: { manufacturer: "Vendor A", color: "Slate 5" } },  // both fields present
   ] as any);
-  assert.deepEqual(spec.map((c: any) => c.header), ["Manufacturer", "Spec Color"]); // only populated fields
+  assert.deepEqual(spec.map((c: any) => c.header), ["Fabricante", "Color (cuadro)"]); // only populated fields
   const tabs = reportWorkbook({
     ...workbookArgs(),
     cols: [...cols, ...spec],
@@ -166,8 +166,8 @@ test("reportWorkbook: read-only spec columns in cols, header, per-row value, bla
   });
   const cTab = tabs[0];
   const mi = cols.length;          // Manufacturer appended after the CSV columns
-  assert.equal(cTab.rows[0][mi], "Manufacturer");
-  assert.equal(cTab.rows[0][mi + 1], "Spec Color");
+  assert.equal(cTab.rows[0][mi], "Fabricante");
+  assert.equal(cTab.rows[0][mi + 1], "Color (cuadro)");
   assert.equal(cTab.rows[1][mi], "Vendor A");         // c1 spec'd
   assert.equal(cTab.rows[1][mi + 1], "Slate 5");
   assert.equal(cTab.rows[2][mi], "");             // c2 has no spec → cell skipped in the XML
@@ -203,7 +203,7 @@ test("reportWorkbook: metric Shapes tab follows the unit toggle", () => {
   });
   const shapeTab = tabs[3];
   assert.equal(shapeTab.rows[0][0].includes("Raw internal SF/LF"), false);
-  assert.deepEqual(shapeTab.rows[1], ["Shape", "Sheet", "Sheet ID", "Finish", "Role", "Area m2", "m", "EA", "Height m", "Height override", "Rise m", "Drop m", "Origin"]);
+  assert.deepEqual(shapeTab.rows[1], ["Figura", "Hoja", "ID de hoja", "Acabado", "Rol", "Área m2", "m", "UND", "Altura m", "Altura propia", "Subida m", "Bajada m", "Origen"]);
   assert.deepEqual(shapeTab.rows[2], ["m1", "Level 1", "L1", "CT-1", "floor_area", 9.29, 12.19, 0, 2.74, "", 0.61, 2.44, "manual"]);
 });
 
@@ -226,12 +226,12 @@ test("reportWorkbook: floor × room tab, one row per (floor, room, finish), orde
     byFloorRoom: sheetLabelGroupedRows(conds as any, labeled as any, ["101", "102"]),
   });
   const tab = tabs[4];
-  assert.deepEqual(tab.rows[1], ["Sheet", "Sheet ID", "Room", "Finish", "Floor SF", "Wall SF", "Border SF", "LF", "EA", "Total SF", "Total SF w/Waste"]);
+  assert.deepEqual(tab.rows[1], ["Hoja", "ID de hoja", "Recinto", "Acabado", "Piso SF", "Muro SF", "Borde SF", "LF", "UND", "Total SF", "Total SF c/desp"]);
   const body = tab.rows.slice(2);
   assert.deepEqual(body.map((r: any[]) => [r[1], r[2], r[3]]), [
     ["plan.pdf#1", "101", NASTY],
     ["plan.pdf#1", "102", NASTY],
-    ["plan.pdf#2", "Unlabeled", "VCT-1"],   // an unlabeled floor still rolls up, so its rooms reconcile
+    ["plan.pdf#2", "Sin etiqueta", "VCT-1"],   // an unlabeled floor still rolls up, so its rooms reconcile
   ]);
   assert.equal(body[0][4], 60);
   assert.equal(body[0][10], 66, "10% waste applied per slice, like the report's grouped views");
@@ -242,7 +242,7 @@ test("reportWorkbook: floor × room tab, one row per (floor, room, finish), orde
 
 test("reportWorkbook: floor × room tab is always present, header-only when nothing is grouped", () => {
   const tab = reportWorkbook(workbookArgs())[4];         // workbookArgs passes no byFloorRoom
-  assert.equal(tab.name, "By floor × room");
+  assert.equal(tab.name, "Por nivel × recinto");
   assert.equal(tab.rows.length, 2, "note + header, no body");
 });
 
@@ -261,7 +261,7 @@ test("buildXlsx: package parts exist, workbook lists five sheets, XML well-forme
 
   const wb = strFromU8(parts["xl/workbook.xml"]);
   assertBalanced(wb);
-  for (const [i, name] of ["Conditions", "By sheet", "Materials", "Shapes", "By floor × room"].entries()) {
+  for (const [i, name] of ["Condiciones", "Por hoja", "Materiales", "Figuras", "Por nivel × recinto"].entries()) {
     assert.ok(wb.includes(`<sheet name="${name}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`), `workbook missing ${name}`);
   }
 

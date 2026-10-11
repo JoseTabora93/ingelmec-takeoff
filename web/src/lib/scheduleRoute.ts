@@ -19,14 +19,14 @@ import { STRAY_TEXT_MAX } from "./strayText.ts";
 
 /** What the reader keys a row by and what says "finish" — the hint names them
  *  all, not CODE alone. */
-const WHERE = "(its CODE / TAG / MARK / SYMBOL column and MATERIAL / MANUFACTURER / COLOR headers)";
+const WHERE = "(con su columna CÓDIGO / ETIQUETA / MARCA / SÍMBOLO y encabezados MATERIAL / FABRICANTE / COLOR)";
 
 /** The re-drag hint when the box held text but no table. */
-export const NO_SCHEDULE_HINT = `No schedule found in that box, drag around the finish/material schedule ${WHERE}.`;
+export const NO_SCHEDULE_HINT = `No se encontró un cuadro en ese recuadro: arrastre alrededor del cuadro de acabados o materiales ${WHERE}.`;
 
 /** A box too small to read (the canvas's size gate): a mis-drag, never a
  *  claim about the page. */
-export const EMPTY_BOX_MESSAGE = `No text in that box, drag around the finish/material schedule ${WHERE}.`;
+export const EMPTY_BOX_MESSAGE = `No hay texto en ese recuadro: arrastre alrededor del cuadro de acabados o materiales ${WHERE}.`;
 
 /** The most text runs a box can hold and still go to the on-device reader:
  *  a raster schedule can carry a few real text labels (a stamp, a title
@@ -51,15 +51,15 @@ export function countTextRuns(spans: readonly { str: string }[]): number {
  *  (it may even say FINISH), so quoting it would contradict the message. */
 export function refusalWhy(refused: RefusalReason, title?: string): string {
   return refused === "title" && title
-    ? `That's the "${title}", not a finish/material schedule`
-    : "That table doesn't look like a finish/material schedule";
+    ? `Eso es «${title}», no un cuadro de acabados o materiales`
+    : "Esa tabla no parece un cuadro de acabados o materiales";
 }
 
 /** The canvas message for a refused table. */
 export function refusalMessage(refused: RefusalReason, title?: string): string {
   return refused === "title" && title
-    ? `${refusalWhy(refused, title)}, drag around the finish schedule instead.`
-    : `${refusalWhy(refused, title)}, drag around the finish schedule ${WHERE}.`;
+    ? `${refusalWhy(refused, title)}: arrastre alrededor del cuadro de acabados.`
+    : `${refusalWhy(refused, title)}: arrastre alrededor del cuadro de acabados ${WHERE}.`;
 }
 
 /** rows → the dialog (with any skipped codes — four- or five-letter codes
@@ -99,8 +99,8 @@ export function routeScheduleRead(read: ScheduleRead, box: BoxText): ImportRoute
 
 /** The footer's status line while the engine starts, then while the box is
  *  rendered and read. Both carry Cancel. */
-export const OCR_STARTING_MESSAGE = "Starting the on-device reader…";
-export const OCR_READING_MESSAGE = "Reading the schedule on this device…";
+export const OCR_STARTING_MESSAGE = "Iniciando el lector del dispositivo…";
+export const OCR_READING_MESSAGE = "Leyendo el cuadro en este dispositivo…";
 
 /** The reading line once the read reports progress. A box read in one
  *  raster keeps the plain line; a box read in several (tiles, then patches
@@ -114,10 +114,10 @@ export function ocrReadingMessage(p: { rastersDone: number; rastersPlanned: numb
 
 /** A box past the on-device reader's tile cap (OCR_MAX_TILES), refused
  *  before the engine starts: no download notice for a read that can't run. */
-export const OCR_TOO_LARGE_MESSAGE = "That box is too large to read, draw it around the schedule only.";
+export const OCR_TOO_LARGE_MESSAGE = "Ese recuadro es demasiado grande para leerlo: dibújelo solo alrededor del cuadro.";
 /** …and while it waits for a page read or copy read (#471) ahead of it: the
  *  same words as Copy text's own waiting line (an inline string there). */
-export const OCR_WAITING_MESSAGE = "Waiting for another read…";
+export const OCR_WAITING_MESSAGE = "Esperando otra lectura…";
 
 /** The status line's attribute: keys inside it (its Cancel) are its own. */
 export const IMPORT_READ_STATUS_ATTR = "data-import-read-status";
@@ -153,18 +153,18 @@ export function heldKeyWouldPress(key: string, target: KeyTarget): boolean {
 }
 
 /** A box drawn while another is still being read. */
-export const OCR_BUSY_MESSAGE = "Still reading the last box.";
+export const OCR_BUSY_MESSAGE = "Aún se lee el último recuadro.";
 
 /** The download notice's Cancel. */
-export const OCR_DECLINED_MESSAGE = "Not read, reading a raster schedule needs the on-device reader, which wasn't downloaded.";
+export const OCR_DECLINED_MESSAGE = "Sin leer: leer un cuadro ráster requiere el lector del dispositivo, que no se descargó.";
 
 /** The on-device reader read the box and found no finish table in it. */
-export const OCR_NO_ROWS_MESSAGE = `No schedule found in that box, the on-device reader found no finish/material rows. Drag around the schedule ${WHERE}.`;
+export const OCR_NO_ROWS_MESSAGE = `No se encontró un cuadro en ese recuadro: el lector del dispositivo no halló filas de acabados o materiales. Arrastre alrededor del cuadro ${WHERE}.`;
 
 /** Why the on-device reader can't run on this site, as a clause: turned off
  *  (VITE_OCR=off) or not installed (no models staged). Copy text says it too. */
 export const ocrOffReason = (reason: "disabled" | "uninstalled"): string =>
-  reason === "disabled" ? "on-device reading is turned off on this site" : "this site doesn't have the on-device reader installed";
+  reason === "disabled" ? "la lectura en el dispositivo está apagada en este sitio" : "este sitio no tiene instalado el lector del dispositivo";
 
 /** The on-device reader can't run on this site (ocrOffReason). Only a box
  *  with no text on a page with no text layer is called a raster page; any
@@ -173,26 +173,26 @@ export const ocrOffReason = (reason: "disabled" | "uninstalled"): string =>
 export function ocrUnavailableMessage(reason: "disabled" | "uninstalled", box: BoxText): string {
   const why = ocrOffReason(reason);
   return box.textRuns === 0 && !box.pageHasText
-    ? `No schedule text here, this page looks like a raster image (no text layer), and ${why}.`
-    : `No schedule found in that box. If it's a raster image, ${why}.`;
+    ? `No hay texto de cuadro aquí: esta página parece una imagen ráster (sin capa de texto), y ${why}.`
+    : `No se encontró un cuadro en ese recuadro. Si es una imagen ráster, ${why}.`;
 }
 
 /** A read the reader never answered (lib/ocr/client.ts OcrTimeoutError):
  *  the reader restarts on its own, so trying again is the next move. Its
  *  own line rather than ocrFailedMessage, which would wrap the error's
  *  sentence in parentheses. */
-export const OCR_TIMEOUT_MESSAGE = "The on-device reader stopped responding, try again.";
+export const OCR_TIMEOUT_MESSAGE = "El lector del dispositivo dejó de responder: intente de nuevo.";
 
 /** A start or a read step that failed, with the reason it gave. */
 export function ocrFailedMessage(reason: string): string {
-  return `Couldn't read that box on this device (${reason}), try again.`;
+  return `No se pudo leer ese recuadro en este dispositivo (${reason}): intente de nuevo.`;
 }
 
 /** No table, but finish codes stacked in a column (#484): the engine found
  *  the codes and no header row, as on a schedule whose header row is rotated
  *  90° (OCR reads left to right only, and gave no detections in a rotated
  *  header band at all) or that the box cut off above. */
-export const OCR_NO_HEADER_MESSAGE = "Found finish codes in a column but no header row the reader could read. The headers may be rotated (which can't be read yet) or outside the box, box the schedule with a header row that reads left to right.";
+export const OCR_NO_HEADER_MESSAGE = "Se encontraron códigos de acabado en una columna, pero ninguna fila de encabezado que el lector pudiera leer. Los encabezados pueden estar rotados (aún no se pueden leer) o fuera del recuadro: encierre el cuadro con una fila de encabezado que se lea de izquierda a derecha.";
 
 /** A span's text as a code: upper case, only letters, digits and hyphens
  *  kept. Close to the reader's rowKeyOf, not the same: rowKeyOf keeps "/"

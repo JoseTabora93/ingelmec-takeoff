@@ -49,7 +49,7 @@ export function qtyLabels(totals: QtyRow[], units: UnitSystem = "imperial"): Map
     const parts: string[] = [];
     if (t.total_sf) parts.push(`${fmtQty(areaVal(t.total_sf, units))} ${areaUnit(units)}`);
     if (t.lf) parts.push(`${fmtQty(lenVal(t.lf, units))} ${lenUnit(units)}`);
-    if (t.ea) parts.push(`${fmtQty(t.ea)} EA`);
+    if (t.ea) parts.push(`${fmtQty(t.ea)} UND`);
     if (parts.length) out.set(t.id, parts.join(" · "));
   }
   return out;

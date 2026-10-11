@@ -201,16 +201,16 @@ test("by-sheet CSV: label fallback to raw id, ×N finish mark, and the x-multipl
   const rows = conditionTotals(conds, shapes);
   const csv = totalsToCsv(rows, "", sheetTotals(conds, shapes), null);
   const lines = csv.trimEnd().split("\n");
-  assert.equal(lines.at(-3), "Sheet,Sheet ID,Finish,Floor SF,Wall SF,Border SF,LF,EA");
+  assert.equal(lines.at(-3), "Hoja,ID de hoja,Acabado,Piso SF,Muro SF,Borde SF,LF,UND");
   assert.equal(lines.at(-2), "plan.pdf,plan.pdf,LVT-2 ×3,10.01,0,0,0,0");  // raw-id label, round2 at serialization
-  assert.equal(lines.at(-1), "# By-sheet rows show measured (base) quantities; xN multipliers apply at condition level");
+  assert.equal(lines.at(-1), "# Las filas por hoja muestran cantidades medidas (base); los multiplicadores xN se aplican a nivel de condición");
 });
 
 test("BY_SHEET_BASE_NOTE is the golden literal; hasMultipliers gates it", () => {
   // the CSV golden embeds "# " + this exact sentence — constant and golden
   // must never drift apart
   assert.equal(BY_SHEET_BASE_NOTE,
-    "By-sheet rows show measured (base) quantities; xN multipliers apply at condition level");
+    "Las filas por hoja muestran cantidades medidas (base); los multiplicadores xN se aplican a nivel de condición");
   const conds = [{ id: "c", finish_tag: "LVT-2", multiplier: 3 }, { id: "d", finish_tag: "CT-1" }];
   const shapes = [
     shape("c", "plan.pdf", "floor_area", { area_sf: 10 }),

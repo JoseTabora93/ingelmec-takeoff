@@ -55,7 +55,7 @@ test("nested zips are refused past the depth cap instead of recursing forever", 
   const outer = zipFile("outer.zip", { "inner.zip": inner });
   const { pdfs, skipped } = await ingestFiles([outer], { maxZipDepth: 1 });
   assert.equal(pdfs.length, 0);
-  assert.ok(skipped.some((s) => s.name === "inner.zip" && s.reason === "nested too deep"));
+  assert.ok(skipped.some((s) => s.name === "inner.zip" && s.reason === "anidado demasiado profundo"));
 });
 
 test("nested zips within the depth cap still extract their contents", async () => {
@@ -71,7 +71,7 @@ test("an entry whose declared size exceeds the byte budget is refused (zip-bomb 
   const zip = zipFile("bomb.zip", { "huge.pdf": pdfBytes(200) });
   const { pdfs, skipped } = await ingestFiles([zip], { maxTotalBytes: 100 });
   assert.equal(pdfs.length, 0);
-  assert.ok(skipped.some((s) => s.name === "huge.pdf" && s.reason === "archive too large"));
+  assert.ok(skipped.some((s) => s.name === "huge.pdf" && s.reason === "archivo demasiado grande"));
 });
 
 test("the entry-count cap bounds a zip of many tiny files", async () => {
@@ -91,7 +91,7 @@ test("the byte budget is shared across sibling entries in one ingest", async () 
   const zip = zipFile("two.zip", { "A1.pdf": pdfBytes(80), "A2.pdf": pdfBytes(80) });
   const { pdfs, skipped } = await ingestFiles([zip], { maxTotalBytes: 120 });
   assert.equal(pdfs.length, 1);
-  assert.ok(skipped.some((s) => s.reason === "archive too large"));
+  assert.ok(skipped.some((s) => s.reason === "archivo demasiado grande"));
 });
 
 test("an ingested image becomes a .pdf sized in pixels-as-points", async () => {

@@ -82,7 +82,7 @@ function RollDiagram({ ri, editable, onReorder }) {
         return (
           <g key={s.id} onPointerDown={(e) => startDrag(e, s)}
             style={editable ? { cursor: "grab" } : undefined}>
-            <title>{`Cut ${n}${s.label ? `, ${s.label}` : ""}: ${ftIn(ln)} × ${ftIn(lw)}${s.overRoll ? ", LONGER THAN ONE ROLL (needs a cross-seam)" : ""}`}</title>
+            <title>{`Corte ${n}${s.label ? `, ${s.label}` : ""}: ${ftIn(ln)} × ${ftIn(lw)}${s.overRoll ? ", MÁS LARGO QUE UN ROLLO (requiere traslape cruzado)" : ""}`}</title>
             <rect x={x} y={y} width={w} height={h}
               fill={rollFill + (isDrag ? "88" : "66")}
               stroke={s.overRoll ? "var(--c-danger)" : "var(--ink)"} strokeWidth={s.overRoll ? 1.6 : 0.8} />
@@ -113,17 +113,17 @@ export default function RollPanel({
     <div style={{ width: 320, flexShrink: 0, display: "flex", flexDirection: "column", borderLeft: "1px solid var(--ink-faint)", background: "var(--paper-bright)", overflow: "hidden", minHeight: 0 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", background: "var(--ink)", color: "var(--paper-cream)" }}>
         <Icon name="roll" size={15} />
-        <strong style={{ flex: 1, fontSize: 12.5 }}>Roll goods</strong>
-        <button onClick={() => onShow(!show)} title="Draw the figured cuts over the plan" style={ctl(show)}>cuts</button>
-        <button onClick={() => onEdit(!edit)} title="Edit cuts on the plan, drag a cut along its lane, pull its ends to resize; double-click resets a cut to the figured layout" style={ctl(edit)}>edit</button>
-        <button onClick={onClose} title="Close panel" style={{ border: "none", background: "transparent", color: "var(--paper-cream)", fontSize: 16, cursor: "pointer", padding: "0 2px" }}>×</button>
+        <strong style={{ flex: 1, fontSize: 12.5 }}>Material en rollo</strong>
+        <button onClick={() => onShow(!show)} title="Dibujar los cortes calculados sobre el plano" style={ctl(show)}>cuts</button>
+        <button onClick={() => onEdit(!edit)} title="Editar los cortes en el plano: arrastre un corte por su carril, tire de sus extremos para cambiar el tamaño; doble clic restablece un corte al diseño calculado" style={ctl(edit)}>editar</button>
+        <button onClick={onClose} title="Cerrar panel" style={{ border: "none", background: "transparent", color: "var(--paper-cream)", fontSize: 16, cursor: "pointer", padding: "0 2px" }}>×</button>
       </div>
       <div style={{ flex: 1, overflow: "auto", fontSize: 12 }}>
         {layouts.length === 0 && (
           <div style={{ padding: 14, color: "var(--ink-muted)", lineHeight: 1.6 }}>
-            No roll-goods conditions yet. Open a condition's properties in the Takeoffs
-            panel and add a roll setup (carpet, sheet vinyl, rubber), its floor areas
-            get figured into cuts here.
+            Aún no hay condiciones de material en rollo. Abra las propiedades de una condición en el panel de
+            Cantidades y agregue una configuración de rollo (alfombra, vinilo en rollo, hule): sus áreas de piso
+            se calculan aquí en cortes.
           </div>
         )}
         {layouts.map(({ condId, tag, color, fill, hatch, multiplier, ri }) => {
@@ -132,8 +132,8 @@ export default function RollPanel({
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 2 }}>
                 <span style={{ borderRadius: 4, overflow: "hidden", lineHeight: 0, flexShrink: 0 }}><HatchSwatch type={hatch || "solid"} line={color} fill={fill} /></span>
                 <b style={{ fontFamily: "var(--f-mono)", fontSize: 12 }}>{tag}</b>
-                {multiplier > 1 && <span style={{ color: "var(--ink-muted)", fontSize: 11 }} title="The condition's ×N applies to the ORDER, the diagram shows one unit's cuts">×{multiplier}</span>}
-                <span style={{ marginLeft: "auto", color: "var(--ink-muted)", fontSize: 10.5, fontFamily: "var(--f-mono)" }}>{ri.direction === "ns" ? "run N-S" : "run E-W"}</span>
+                {multiplier > 1 && <span style={{ color: "var(--ink-muted)", fontSize: 11 }} title="El ×N de la condición se aplica al PEDIDO; el diagrama muestra los cortes de una unidad">×{multiplier}</span>}
+                <span style={{ marginLeft: "auto", color: "var(--ink-muted)", fontSize: 10.5, fontFamily: "var(--f-mono)" }}>{ri.direction === "ns" ? "corrida N-S" : "corrida E-O"}</span>
               </div>
               <div style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink)", marginBottom: 6 }}>
                 order {ftIn(ri.orderFt)} · {Math.round(ri.qty * 100) / 100} {ri.unit.toUpperCase()} · {ri.cutCount} cut{ri.cutCount === 1 ? "" : "s"}
@@ -141,16 +141,16 @@ export default function RollPanel({
               </div>
               {ri.oversize && (
                 <div style={{ margin: "0 0 6px", padding: "5px 8px", border: "1px solid var(--c-danger)", color: "var(--c-danger)", fontSize: 11, lineHeight: 1.45 }}>
-                  A cut is longer than one whole roll, it needs a cross-seam the math can't place. Split the run on the plan (edit mode) or raise the max roll length.
+                  Un corte es más largo que un rollo completo: requiere un traslape cruzado que el cálculo no puede ubicar. Divida el tramo en el plano (modo edición) o aumente el largo máximo del rollo.
                 </div>
               )}
               <div style={{ overflowX: "auto" }}>
                 <RollDiagram ri={ri} editable onReorder={(ids) => onReorder(condId, ids)} />
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
-                <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>Drag a cut on the roll to change the cutting order, the roll re-packs.</span>
-                <button onClick={() => onResetOrder(condId)} title="Clear the manual cutting order, the packer sequences widest-then-longest again"
-                  style={{ marginLeft: "auto", flexShrink: 0, padding: "2px 8px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 10.5 }}>reset order</button>
+                <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>Arrastre un corte en el rollo para cambiar el orden de corte; el rollo se reacomoda.</span>
+                <button onClick={() => onResetOrder(condId)} title="Borrar el orden de corte manual: el empaquetador vuelve a ordenar del más ancho al más largo"
+                  style={{ marginLeft: "auto", flexShrink: 0, padding: "2px 8px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 10.5 }}>restablecer orden</button>
               </div>
               {/* the cut list, numbered in cutting order, with the piece and the room extent */}
               <div style={{ marginTop: 6 }}>
@@ -162,7 +162,7 @@ export default function RollPanel({
                     <div key={s.id} style={{ display: "flex", gap: 7, alignItems: "baseline", fontSize: 10.5, fontFamily: "var(--f-mono)", color: "var(--ink-secondary)", padding: "1px 0" }}>
                       <span style={{ color: s.overRoll ? "var(--c-danger)" : "var(--ink)", fontWeight: 700, width: 18, flexShrink: 0 }}>{n}</span>
                       <span>cut {ftIn(ln)} × {ftIn(lw)}</span>
-                      <span style={{ color: "var(--ink-muted)" }}>· covers {ftIn(cn)} × {ftIn(cw)}{s.label ? ` · ${s.label}` : ""}{s.laneCount > 1 ? ` · lane ${s.laneIndex + 1}/${s.laneCount}` : ""}</span>
+                      <span style={{ color: "var(--ink-muted)" }}>· cubre {ftIn(cn)} × {ftIn(cw)}{s.label ? ` · ${s.label}` : ""}{s.laneCount > 1 ? ` · carril ${s.laneIndex + 1}/${s.laneCount}` : ""}</span>
                     </div>
                   );
                 })}

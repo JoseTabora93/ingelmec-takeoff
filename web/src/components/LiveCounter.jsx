@@ -83,14 +83,14 @@ export default function LiveCounter({ rows, onActivate }) {
         style={{ display: "flex", alignItems: "center", gap: 8, padding: min ? "4px 8px" : "5px 10px", cursor: "grab", touchAction: "none", borderBottom: min ? "none" : "1px solid var(--ink-faint)" }}>
         <span style={{ width: 8, height: 8, background: active.color || "var(--cobalt)", flexShrink: 0 }} />
         <span style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--ink-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-          {min ? active.tag : "Live count"}
+          {min ? active.tag : "Conteo en vivo"}
         </span>
         {min && qtyLine(active, false)}
         <span style={{ marginLeft: "auto", display: "inline-flex", gap: 6, alignItems: "center" }}>
           {pos && (
-            <button type="button" onClick={redock} title="Return to the default corner" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0, display: "inline-flex" }}><Icon name="target" size={11} /></button>
+            <button type="button" onClick={redock} title="Volver a la esquina por omisión" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0, display: "inline-flex" }}><Icon name="target" size={11} /></button>
           )}
-          <button type="button" onClick={toggleMin} title={min ? "Expand the live counter" : "Collapse to a chip"} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0, fontFamily: "var(--f-mono)", fontSize: 12, lineHeight: 1 }}>{min ? "▢" : ""}</button>
+          <button type="button" onClick={toggleMin} title={min ? "Expandir el contador en vivo" : "Contraer a una ficha"} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0, fontFamily: "var(--f-mono)", fontSize: 12, lineHeight: 1 }}>{min ? "▢" : ""}</button>
         </span>
       </div>
       {!min && (
@@ -101,7 +101,7 @@ export default function LiveCounter({ rows, onActivate }) {
             <span style={{ fontSize: 10, color: "var(--ink-muted)" }}>{active.shapes} shape{active.shapes === 1 ? "" : "s"}</span>
           </div>
           {others.map((r) => (
-            <button key={r.id} type="button" onClick={() => onActivate?.(r.id)} title="Make this the active condition"
+            <button key={r.id} type="button" onClick={() => onActivate?.(r.id)} title="Hacer de esta la condición activa"
               style={{ display: "flex", alignItems: "center", gap: 7, border: "none", background: "none", cursor: "pointer", padding: "2px 0", textAlign: "left" }}>
               <span style={{ width: 7, height: 7, background: r.color || "var(--ink-faint)", flexShrink: 0 }} />
               <span style={{ fontSize: 11, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1 }}>{r.tag}</span>

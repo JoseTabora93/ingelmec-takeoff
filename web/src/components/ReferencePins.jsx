@@ -9,7 +9,7 @@ export function PinButton({ armed, disabled, onCapture, count, onShow }) {
       title="Fije cualquier parte de esta hoja: haga clic en dos esquinas para conservar la referencia junto a su takeoff">
       <Icon name="pin" size={16} />Pin
     </button>
-    {count > 0 && <button type="button" aria-label={`Show pins (${count})`} title="Show saved pins" onClick={onShow}>{count}<Icon name="chevronDown" size={12} /></button>}
+    {count > 0 && <button type="button" aria-label={`Mostrar pins (${count})`} title="Mostrar pins guardados" onClick={onShow}>{count}<Icon name="chevronDown" size={12} /></button>}
   </span>;
 }
 
@@ -32,38 +32,38 @@ export default function ReferencePins({ pins, selectedId, onSelect, onClose, onS
     drag.current = { x: e.clientX, y: e.clientY, left: rect.left, top: rect.top };
     e.currentTarget.setPointerCapture(e.pointerId);
   };
-  return <section ref={frame} className={`reference-pin-window${collapsed ? " is-collapsed" : ""}`} aria-label="Pinned reference"
+  return <section ref={frame} className={`reference-pin-window${collapsed ? " is-collapsed" : ""}`} aria-label="Referencia fijada"
     style={{ zIndex: Z.drawer, ...(position ? { left: position.x, top: position.y, right: "auto" } : {}) }}
     onPointerDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()} onDoubleClick={e => e.stopPropagation()}
     onWheel={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}>
     <header>
-      <button className="reference-pin-grip" type="button" aria-label="Move pinned reference" title="Drag to move; arrow keys also move the window"
+      <button className="reference-pin-grip" type="button" aria-label="Mover la referencia fijada" title="Arrastre para mover; las flechas del teclado también mueven la ventana"
         onPointerDown={startDrag} onPointerMove={e => { const d = drag.current; if (d) move(d.left + e.clientX - d.x, d.top + e.clientY - d.y); }}
         onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }}
         onKeyDown={e => { const delta = { ArrowLeft: [-20, 0], ArrowRight: [20, 0], ArrowUp: [0, -20], ArrowDown: [0, 20] }[e.key]; if (delta) { e.preventDefault(); const r = frame.current.getBoundingClientRect(); move(r.left + delta[0], r.top + delta[1]); } }}>
         <Icon name="pin" size={15} /><span>Fijar</span>
       </button>
-      <select aria-label="Pinned reference" value={pin.id} onChange={e => { onSelect(e.target.value); setZoom(1); }}>
-        {pins.map(p => <option key={p.id} value={p.id}>{p.text || p.src_label || "Reference"}</option>)}
+      <select aria-label="Referencia fijada" value={pin.id} onChange={e => { onSelect(e.target.value); setZoom(1); }}>
+        {pins.map(p => <option key={p.id} value={p.id}>{p.text || p.src_label || "Referencia"}</option>)}
       </select>
-      <button type="button" aria-label={collapsed ? "Expand pin" : "Collapse pin"} onClick={() => setCollapsed(v => !v)}>{collapsed ? "+" : "−"}</button>
-      <button type="button" aria-label="Close pin" title="Close window, the pin stays saved" onClick={onClose}>×</button>
+      <button type="button" aria-label={collapsed ? "Expandir pin" : "Contraer pin"} onClick={() => setCollapsed(v => !v)}>{collapsed ? "+" : "−"}</button>
+      <button type="button" aria-label="Cerrar pin" title="Cerrar ventana: el pin queda guardado" onClick={onClose}>×</button>
     </header>
     {!collapsed && <>
       <div className="reference-pin-controls">
-        <input key={pin.id} aria-label="Pin name" defaultValue={pin.text || ""} placeholder="Name this reference"
+        <input key={pin.id} aria-label="Nombre del pin" defaultValue={pin.text || ""} placeholder="Poner nombre a esta referencia"
           onBlur={e => { if (e.target.value.trim() !== pin.text) onRename(pin.id, e.target.value.trim()); }}
           onKeyDown={e => { if (e.key === "Enter") e.currentTarget.blur(); }} />
-        <button type="button" disabled={zoom <= 1} aria-label="Zoom pin out" onClick={() => setZoom(v => Math.max(1, v - .25))}>−</button>
-        <button type="button" aria-label="Fit pin" onClick={() => setZoom(1)}>{Math.round(zoom * 100)}%</button>
-        <button type="button" disabled={zoom >= 4} aria-label="Zoom pin in" onClick={() => setZoom(v => Math.min(4, v + .25))}>+</button>
+        <button type="button" disabled={zoom <= 1} aria-label="Alejar pin" onClick={() => setZoom(v => Math.max(1, v - .25))}>−</button>
+        <button type="button" aria-label="Ajustar pin" onClick={() => setZoom(1)}>{Math.round(zoom * 100)}%</button>
+        <button type="button" disabled={zoom >= 4} aria-label="Acercar pin" onClick={() => setZoom(v => Math.min(4, v + .25))}>+</button>
       </div>
       <div className="reference-pin-image">
         {/^data:image\/(png|jpeg);base64,/i.test(pin.src || "")
-          ? <img draggable="false" src={pin.src} alt={pin.text || "Pinned region of drawing"} style={{ width: `${zoom * 100}%` }} />
-          : <p>This reference image is unavailable.</p>}
+          ? <img draggable="false" src={pin.src} alt={pin.text || "Región fijada del dibujo"} style={{ width: `${zoom * 100}%` }} />
+          : <p>Esta imagen de referencia no está disponible.</p>}
       </div>
-      <footer><button type="button" disabled={!pin.src_sheet_id || !pin.src_rect} onClick={() => onSource(pin)} title="Open the source sheet and highlight the captured region">Source: {pin.src_label || pin.src_sheet_id || "Image"}</button><span>Resize ↘</span></footer>
+      <footer><button type="button" disabled={!pin.src_sheet_id || !pin.src_rect} onClick={() => onSource(pin)} title="Abrir la hoja de origen y resaltar la región capturada">Origen: {pin.src_label || pin.src_sheet_id || "Imagen"}</button><span>Cambiar tamaño ↘</span></footer>
     </>}
   </section>;
 }

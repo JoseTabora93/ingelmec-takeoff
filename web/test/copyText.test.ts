@@ -46,8 +46,8 @@ test("a box of text: lines in reading order, the joined string, the reader label
   assert.equal(o.text, "GENERAL NOTES\nSEE A-101");
   assert.equal(o.lineCount, 2);
   assert.deepEqual(o.lines.map((l) => l.text), ["GENERAL NOTES", "SEE A-101"]);
-  assert.equal(o.reader, "Text layer");
-  assert.equal(TEXT_LAYER, "Text layer");
+  assert.equal(o.reader, "Capa de texto");
+  assert.equal(TEXT_LAYER, "Capa de texto");
   assert.equal(o.skipped, 0);
 });
 
@@ -76,14 +76,14 @@ test("a null rect reads the whole page", () => {
 
 test("an empty box is 'empty', not a zero-line copy", () => {
   const o = asOutcome(readCopyText([textLayerReader(tcOf(flat("ELSEWHERE", 500, 100)), VP)], BOX));
-  assert.deepEqual(o, { kind: "empty", tried: ["Text layer"] });
+  assert.deepEqual(o, { kind: "empty", tried: ["Capa de texto"] });
 });
 
 test("a box of only rotated text stops at the text layer: zero lines, the skipped count", () => {
   let asked = false;
   const next: CopyReader = { label: "OCR", read: () => { asked = true; return [{ str: "X", x: 0, y: 0, h: 1 }]; } };
   const o = asOutcome(readCopyText([textLayerReader(tcOf(vert("12'-0\"", 250, 820)), VP), next], BOX));
-  assert.deepEqual(o, { kind: "rotated-only", reader: "Text layer", skipped: 1 });
+  assert.deepEqual(o, { kind: "rotated-only", reader: "Capa de texto", skipped: 1 });
   assert.equal(asked, false, "the next reader is for boxes with no text-layer text at all");
 });
 
@@ -108,7 +108,7 @@ test("blank runs are not text", () => {
   assert.equal(pageIsScanLike(tcOf(...EIGHT, flat("  ", 110, 880), flat("", 120, 870)), VP), true);
   assert.equal(pageIsScanLike(tcOf(...EIGHT, flat("A", 110, 880)), VP), false);
   const o = asOutcome(readCopyText([textLayerReader(tcOf(flat("   ", 110, 880)), VP)], BOX));
-  assert.deepEqual(o, { kind: "empty", tried: ["Text layer"] });
+  assert.deepEqual(o, { kind: "empty", tried: ["Capa de texto"] });
 });
 
 const EMPTY = { kind: "empty", tried: [TEXT_LAYER] } as const;
@@ -120,8 +120,8 @@ test("messages tell an empty box, an empty page, a text-less sheet and rotated-o
     outcomeMessage({ kind: "rotated-only", reader: TEXT_LAYER, skipped: 3 }, "box", false),
   ]);
   assert.equal(msgs.size, 4);
-  assert.match(outcomeMessage({ ...EMPTY, tried: [TEXT_LAYER] }, "box", true), /no text layer/i);
-  assert.match(outcomeMessage({ kind: "rotated-only", reader: TEXT_LAYER, skipped: 3 }, "box", false), /3 rotated/);
+  assert.match(outcomeMessage({ ...EMPTY, tried: [TEXT_LAYER] }, "box", true), /capa de texto/i);
+  assert.match(outcomeMessage({ kind: "rotated-only", reader: TEXT_LAYER, skipped: 3 }, "box", false), /3 fragmentos rotados/);
 });
 
 test("after another reader has also looked, the message names it and doesn't stop at 'no text layer'", () => {
@@ -148,7 +148,7 @@ test("an async reader that finds nothing hands over to the next, which answers w
 });
 
 test("a reader that returns only blank runs hands over", () => {
-  const blank: CopyReader = { label: "Text layer", read: () => [{ str: " ", x: 0, y: 0, h: 8 }] };
+  const blank: CopyReader = { label: "Capa de texto", read: () => [{ str: " ", x: 0, y: 0, h: 8 }] };
   const hit: CopyReader = { label: "OCR", read: () => [{ str: "READ", x: 0, y: 10, h: 8 }] };
   const o = asOutcome(readCopyText([blank, hit], BOX));
   assert.equal(o.kind === "text" && o.reader, "OCR");
@@ -187,7 +187,7 @@ test("a new box read cancels the one in flight: two quick boxes can't both post"
 });
 
 test("the chain falls through only on no tokens, and the reader supplies the label", async () => {
-  const none: CopyReader = { label: "Text layer", read: () => [] };
+  const none: CopyReader = { label: "Capa de texto", read: () => [] };
   const nul: CopyReader = { label: "Cache", read: () => null };
   const later: CopyReader = { label: "OCR", read: async () => [{ str: "SCANNED", x: 10, y: 20, h: 8 }] };
   const out = readCopyText([none, nul, later], BOX);
@@ -199,10 +199,10 @@ test("the chain falls through only on no tokens, and the reader supplies the lab
 
 test("the first reader with tokens wins; later readers aren't asked", () => {
   let asked = false;
-  const first: CopyReader = { label: "Text layer", read: () => [{ str: "HIT", x: 0, y: 10, h: 8 }] };
+  const first: CopyReader = { label: "Capa de texto", read: () => [{ str: "HIT", x: 0, y: 10, h: 8 }] };
   const second: CopyReader = { label: "OCR", read: () => { asked = true; return null; } };
   const o = asOutcome(readCopyText([first, second], BOX));
-  assert.equal(o.kind === "text" && o.reader, "Text layer");
+  assert.equal(o.kind === "text" && o.reader, "Capa de texto");
   assert.equal(asked, false);
 });
 
@@ -254,7 +254,7 @@ const TEXT_OUT: TextOutcome = { kind: "text", reader: TEXT_LAYER, lines: [], tex
 
 test("the receipt carries the text, line count, reader, skipped count and whether the write failed", () => {
   const r = makeReceipt(TEXT_OUT, { failed: false, scope: "box", key: "a.pdf" });
-  assert.deepEqual(r, { text: "GENERAL NOTES\nSEE A-101", lineCount: 2, preview: "GENERAL NOTES\nSEE A-101", reader: "Text layer", skipped: 1, failed: false, scope: "box", key: "a.pdf" });
+  assert.deepEqual(r, { text: "GENERAL NOTES\nSEE A-101", lineCount: 2, preview: "GENERAL NOTES\nSEE A-101", reader: "Capa de texto", skipped: 1, failed: false, scope: "box", key: "a.pdf" });
   assert.equal(makeReceipt(TEXT_OUT, { failed: true, scope: "page", key: "a.pdf" }).failed, true);
 });
 
@@ -431,7 +431,7 @@ test("a box read that finds nothing: empty, and the message says OCR read none (
   const o = await readCopyText([noText, ...ocr({ lines: null, box: async () => ({ ok: true, lines: [] }) }).readers], BOX);
   assert.deepEqual(o, { kind: "empty", tried: [TEXT_LAYER, "OCR", "OCR"] });
   const m = outcomeMessage(o, "box", true);
-  assert.match(m, /OCR read none/);
+  assert.match(m, /OCR no leyó nada/);
   assert.doesNotMatch(m, /OCR, OCR/);
   assert.match(outcomeMessage(o, "box", false), /OCR/, "on a sheet with a text layer too");
 });
@@ -439,27 +439,27 @@ test("a box read that finds nothing: empty, and the message says OCR read none (
 test("declined: the chain ends empty with the reason, and the message says nothing was downloaded", async () => {
   const o = await readCopyText([noText, ...ocr({ lines: null, box: async () => ({ ok: false, status: "declined" }) }).readers], BOX);
   assert.deepEqual(o, { kind: "empty", tried: [TEXT_LAYER, "OCR", "OCR"], miss: { status: "declined" } });
-  assert.match(outcomeMessage(o, "box", true), /wasn't downloaded/);
+  assert.match(outcomeMessage(o, "box", true), /no se descargó/);
 });
 
 test("disabled or not installed: the sheet has no text layer and OCR isn't available", async () => {
   for (const status of ["disabled", "uninstalled"] as const) {
     const o = await readCopyText([noText, ...ocr({ lines: null, box: async () => ({ ok: false, status }) }).readers], BOX);
     assert.equal(o.kind === "empty" && o.miss?.status, status);
-    assert.match(outcomeMessage(o, "box", true), /no text layer.*isn't available/);
-    assert.equal(outcomeMessage(o, "box", false), "No text in that box.", "a vector sheet's empty box says only that");
+    assert.match(outcomeMessage(o, "box", true), /capa de texto.*no está disponible/);
+    assert.equal(outcomeMessage(o, "box", false), "No hay texto en ese recuadro.", "a vector sheet's empty box says only that");
   }
 });
 
 test("a box or page too large to read says so", async () => {
   const o = await readCopyText([noText, ...ocr({ lines: null, box: async () => ({ ok: false, status: "too-large", message: "x" }) }).readers], BOX);
-  assert.equal(outcomeMessage(o, "box", true), "That box is too large for the on-device text reader (OCR).");
-  assert.equal(outcomeMessage(o, "page", true), "This sheet is too large for the on-device text reader (OCR).");
+  assert.equal(outcomeMessage(o, "box", true), "Ese recuadro es demasiado grande para el lector de texto del dispositivo (OCR).");
+  assert.equal(outcomeMessage(o, "page", true), "Esta hoja es demasiado grande para el lector de texto del dispositivo (OCR).");
 });
 
 test("a failed box read says what went wrong", async () => {
   const o = await readCopyText([noText, ...ocr({ lines: null, box: async () => ({ ok: false, status: "failed", message: "worker died" }) }).readers], BOX);
-  assert.match(outcomeMessage(o, "box", true), /Couldn't read that box.*worker died/);
+  assert.match(outcomeMessage(o, "box", true), /No se pudo leer ese recuadro.*worker died/);
 });
 
 test("aborted while the box is read: the copy reports aborted, not the late answer", async () => {
@@ -475,7 +475,7 @@ test("aborted while the box is read: the copy reports aborted, not the late answ
 
 test("a box read stopped from elsewhere (not this copy) says so", async () => {
   const o = await readCopyText([noText, ...ocr({ lines: null, box: async () => ({ ok: false, status: "aborted" }) }).readers], BOX);
-  assert.match(outcomeMessage(o, "box", true), /stopped/);
+  assert.match(outcomeMessage(o, "box", true), /se detuvo/);
 });
 
 test("lines no raster held whole are counted on the outcome and the receipt", () => {
@@ -520,7 +520,7 @@ test("copyOcrRoute: punctuation-only text is no text layer (the rule the Read co
 test("copyOcrRoute 'none' in ocrCopyReaders' place: the chain stops at the text layer", () => {
   const o = asOutcome(readCopyText([textLayerReader(tcOf(flat("--", 110, 880)), VP)], BOX));
   assert.deepEqual(o, { kind: "empty", tried: [TEXT_LAYER] });
-  assert.equal(outcomeMessage(o, "box", false), "No text in that box.");
+  assert.equal(outcomeMessage(o, "box", false), "No hay texto en ese recuadro.");
 });
 
 test("a synchronous reader's miss reaches the outcome", () => {
@@ -581,7 +581,7 @@ test("a stray-text scan whose image couldn't be read (declined, offline, too lar
     const o = await readCopyText(chainFor(tcOf(...STRAY), ocr({ lines: null, box: async () => ({ ok: false, status, message: "x" }) })), BOX);
     assert.equal(o.kind === "text" && o.reader, TEXT_LAYER, status);
     assert.equal(o.kind === "text" && o.text, "SCANNED\nRECEIVED", status);
-    if (o.kind === "text") assert.equal(makeReceipt(o, { failed: false, scope: "box", key: "k" }).reader, "Text layer · the scanned image wasn't read", status);
+    if (o.kind === "text") assert.equal(makeReceipt(o, { failed: false, scope: "box", key: "k" }).reader, "Capa de texto · no se leyó la imagen escaneada", status);
   }
 });
 
@@ -667,7 +667,7 @@ test("copyStartMiss: OCR known off seeds the miss, so an empty copy keeps the re
   const miss = copyStartMiss({ enabled: false, avail: null, hasRead: false });
   const o = asOutcome(readCopyText(copyReaderChain({ scanLike: true, textLayer: textLayerReader(tc, VP), ocr: [] }), empty, {}, [], miss));
   assert.equal(o.kind === "empty" && o.miss?.status, "disabled");
-  assert.match(outcomeMessage(o, "box", true), /isn't available/);
+  assert.match(outcomeMessage(o, "box", true), /no está disponible/);
   const hit = asOutcome(readCopyText(copyReaderChain({ scanLike: true, textLayer: textLayerReader(tc, VP), ocr: [] }), BOX, {}, [], miss));
   assert.equal(hit.kind === "text" && hit.reader, TEXT_LAYER, "synchronous, from the text layer");
 });
@@ -680,13 +680,13 @@ test("copyOcrRoute: a stray-text scan with no placed image (outlined text, a bla
 test("outcomeMessage on a stray-text scan doesn't claim the sheet has no text at all", async () => {
   const o = await readCopyText(chainFor(tcOf(...STRAY), ocr({ lines: null, box: async () => ({ ok: true, lines: [] }) })), { x0: 900, y0: 1500, x1: 1000, y1: 1600 });
   assert.equal(o.kind, "empty");
-  assert.match(outcomeMessage(o, "box", true), /little or no text layer/);
+  assert.match(outcomeMessage(o, "box", true), /poca o ninguna capa de texto/);
 });
 
 // ── where Copy text can't read ───────────────────────────────────────────────
 
 test("copyUnavailable: a stitch says to open the sheet on its own; no page says open one; a page is fine", () => {
-  assert.equal(copyUnavailable({ stitch: true, hasPage: false }), "Copy text works on single sheets, open the sheet on its own.");
-  assert.equal(copyUnavailable({ stitch: false, hasPage: false }), "Open a sheet first.");
+  assert.equal(copyUnavailable({ stitch: true, hasPage: false }), "Copiar texto funciona en hojas individuales: abra la hoja sola.");
+  assert.equal(copyUnavailable({ stitch: false, hasPage: false }), "Abra primero una hoja.");
   assert.equal(copyUnavailable({ stitch: false, hasPage: true }), null);
 });

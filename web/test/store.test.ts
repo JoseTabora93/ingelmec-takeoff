@@ -306,7 +306,7 @@ test("database newer than this build surfaces as a stale-tab VersionError", asyn
   await assert.rejects(store.listSheets(), (e: any) => {
     assert.equal(e.name, "VersionError");
     assert.equal(isStaleTabError(e), true);
-    assert.match(e.message, /older OpenTakeoff/);
+    assert.match(e.message, /versión más vieja/);
     return true;
   });
   // sanity: garden-variety errors are NOT stale-tab errors
@@ -336,12 +336,12 @@ test("blocked open rejects BlockedError, then closes its late success (no zombie
 test("friendlyStoreError maps quota to actionable copy; other errors pass through", () => {
   assert.equal(
     friendlyStoreError(Object.assign(new Error("raw engine text"), { name: "QuotaExceededError" })),
-    "Not enough storage space for this snapshot, delete old snapshots or unused PDFs and try again.",
+    "No hay suficiente espacio de almacenamiento para esta copia: elimine copias viejas o PDF sin uso e intente de nuevo.",
   );
   assert.equal(friendlyStoreError(new Error("boom")), "boom");
   // TakeoffCanvas routes its message tint on EXACT equality with this string —
   // pin the copy so an edit there can't silently turn the warning green
-  assert.equal(STALE_TAB_MESSAGE, "OpenTakeoff was updated in another tab, reload this tab to continue.");
+  assert.equal(STALE_TAB_MESSAGE, "La aplicación se actualizó en otra pestaña: recargue esta pestaña para continuar.");
 });
 
 test("two cloudStores over one IndexedDB scope snapshots by folderId (end-to-end)", async () => {
@@ -413,7 +413,7 @@ test("addPdf: new file is rev 1; identical re-add is a no-op; changed bytes arch
   // metadata only — a trail entry must never carry the PDF bytes
   assert.ok(revs.every((r: any) => !("bytes" in r)));
 
-  await assert.rejects(store.loadPdfRevisionData("plan.pdf", 7), /not found/);
+  await assert.rejects(store.loadPdfRevisionData("plan.pdf", 7), /No se encontró/);
 });
 
 test("legacy (pre-v3) pdf records version correctly on first re-drop", async () => {

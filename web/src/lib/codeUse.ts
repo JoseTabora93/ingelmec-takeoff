@@ -139,17 +139,17 @@ const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
 /** What the dialog's row shows (`text`) and its tooltip (`title`). Sheet keys
  *  go through `labelOf` (the canvas's tab label) for the tooltip. */
 export function codeUseLine(u: CodeUse, labelOf: (key: string) => string = (k) => k): { text: string; title: string } {
-  if (u.uncheckable) return { text: "can't check", title: "Plan search doesn't keep one- and two-letter words, so this code can't be looked up on the plans." };
-  const like = u.similar.length ? ` Similar codes on the plans: ${u.similar.slice(0, 4).join(", ")}${u.similar.length > 4 ? ", …" : ""}.` : "";
+  if (u.uncheckable) return { text: "no se puede verificar", title: "La búsqueda en planos no conserva palabras de una o dos letras, así que este código no se puede ubicar en los planos." };
+  const like = u.similar.length ? ` Códigos parecidos en los planos: ${u.similar.slice(0, 4).join(", ")}${u.similar.length > 4 ? ", …" : ""}.` : "";
   if (u.state === "found") {
-    const where = u.found.map((f) => `${labelOf(f.key)}${f.outsideBox ? " (the schedule's sheet, outside the box)" : f.source === "ocr" ? " (OCR)" : ""}`).join(", ");
-    return { text: `on ${plural(u.found.length, "sheet")}`, title: `Printed on ${where}.` };
+    const where = u.found.map((f) => `${labelOf(f.key)}${f.outsideBox ? " (hoja del cuadro, fuera del recuadro)" : f.source === "ocr" ? " (OCR)" : ""}`).join(", ");
+    return { text: `en ${plural(u.found.length, "hoja")}`, title: `Impreso en ${where}.` };
   }
   if (u.state === "not-found") {
-    return { text: "not found in checked text", title: `Not in the text of ${plural(u.checked, "sheet")} checked, outside the schedule. Check the code against the schedule.${like}` };
+    return { text: "no se encontró en el texto revisado", title: `No está en el texto de ${plural(u.checked, "hoja")} revisadas, fuera del cuadro. Revise el código contra el cuadro.${like}` };
   }
   return {
-    text: u.unchecked ? `${plural(u.unchecked, "sheet")} not checked` : "nothing to check against",
-    title: `Not found in ${plural(u.checked, "sheet")} checked so far.${u.unchecked ? " Sheets not opened or indexed yet, and scans or pictures not read, aren't checked." : ""}${like}`,
+    text: u.unchecked ? `${plural(u.unchecked, "hoja")} sin revisar` : "nada contra qué verificar",
+    title: `No se encontró en ${plural(u.checked, "hoja")} revisadas hasta ahora.${u.unchecked ? " Las hojas aún no abiertas o indexadas, y los escaneos o imágenes no leídos, no están revisados." : ""}${like}`,
   };
 }

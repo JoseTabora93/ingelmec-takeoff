@@ -120,7 +120,7 @@ export default function PlanNavigator({
     setM365Err("");
     try {
       const auth = m365AuthRef.current;
-      if (!auth) throw new Error("sign-in module didn't load, check the console and report on issue #315");
+      if (!auth) throw new Error("el módulo de inicio de sesión no cargó; revise la consola");
       await auth.signIn(); // popup, needs this click's gesture
       await metaPut(M365_ENABLED_KEY, true);
       window.location.reload(); // the workspace gate installs the 365 store
@@ -512,7 +512,7 @@ export default function PlanNavigator({
   allKeysRef.current = allKeys;
 
   // ── on-device reads (#471): the probe, and each sheet's read status ──
-  // The probe is asked once a scan (little or no text layer) is known (never on
+  // The probe is asked once a scan (poca o ninguna capa de texto) is known (never on
   // open): disabled / uninstalled hide every Read and the unread line, and
   // stop the cache lookups. Status changes (the canvas's reader) repaint the
   // cards at most once a frame.
@@ -725,7 +725,7 @@ export default function PlanNavigator({
   // never through the level grouping/sort above, which would reorder them
   const shownGroups = search ? (search.hits.length ? [{ level: null, keys: search.hits.map((h) => h.key) }] : []) : groups;
   const assignLevel = () => {
-    const label = window.prompt('Level for the selected sheets (e.g. "L1", "Level 2", "Garage"), empty clears:', "");
+    const label = window.prompt('Nivel de las hojas seleccionadas (p. ej. «N1», «Nivel 2», «Sótano»); vacío lo borra:', "");
     if (label === null) return;
     onAssignLevel?.(sel, label.trim());
     setSel([]);
@@ -839,8 +839,7 @@ export default function PlanNavigator({
         <button onClick={() => { setMSel([]); setMode("manage"); }}
           title="Administrar el juego de planos: quitar varios PDF a la vez o limpiar todo el espacio"
           style={ctrlBtn}>
-          <Icon name="sheets" size={13} />Manage
-        </button>
+          <Icon name="sheets" size={13} />Administrar</button>
       )}
       {mode === "plan" && onAddFiles && (
         <div style={{ position: "relative" }}>
@@ -854,7 +853,7 @@ export default function PlanNavigator({
               <div onClick={() => setAddMenu(false)} style={{ position: "fixed", inset: 0, zIndex: 1 }} />
               <div style={{ position: "absolute", top: "calc(100% + 4px)", right: 0, zIndex: 2, minWidth: 210, background: "var(--paper-bright)", border: "1px solid var(--ink)", boxShadow: "var(--shadow-2)" }}>
                 <button onClick={() => { setAddMenu(false); fileRef.current?.click(); }} style={{ ...ctrlBtn, width: "100%", border: "none", borderBottom: "1px solid var(--ink-faint)", justifyContent: "flex-start", padding: "10px 12px" }}>
-                  <Icon name="document" size={14} />From this computer
+                  <Icon name="document" size={14} />Desde este equipo
                 </button>
                 <button onClick={() => { setAddMenu(false); setMode("browse"); }} style={{ ...ctrlBtn, width: "100%", border: "none", justifyContent: "flex-start", padding: "10px 12px" }}>
                   <Icon name="cloud" size={14} />From Google Drive
@@ -874,8 +873,7 @@ export default function PlanNavigator({
       )}
       {canClose && (
         <button onClick={onExit} title="Volver al lienzo (Esc)" style={ctrlBtn}>
-          <Icon name="close" size={12} />Close
-        </button>
+          <Icon name="close" size={12} />Cerrar</button>
       )}
     </div>
   );
@@ -900,7 +898,7 @@ export default function PlanNavigator({
           <div style={{ padding: 40, textAlign: "center", color: "var(--c-danger)", fontSize: 13 }}>No se pudo leer la carpeta: {bErr}</div>
         ) : (folders.length === 0 && pdfs.length === 0) ? (
           <div style={{ padding: 40, textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>
-            {needle ? "Nothing matches that filter." : "This folder has no PDFs or subfolders."}
+            {needle ? "Nada coincide con ese filtro." : "Esta carpeta no tiene PDF ni subcarpetas."}
           </div>
         ) : (
           <>
@@ -908,7 +906,7 @@ export default function PlanNavigator({
               <div key={f.id} onClick={() => drillInto(f)} style={{ ...rowBase, cursor: "pointer" }}>
                 <span style={{ fontSize: 15, width: 20, textAlign: "center", color: "var(--cobalt)" }}><Icon name="chevronRight" size={13} /></span>
                 <strong style={{ fontFamily: "var(--f-body)", fontSize: 13.5, color: "var(--ink)", flex: 1 }}>{f.name}</strong>
-                <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>folder</span>
+                <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>carpeta</span>
               </div>
             ))}
             {pdfs.map((f) => {
@@ -919,14 +917,14 @@ export default function PlanNavigator({
               const tagStyle = { fontFamily: "var(--f-mono)", fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.08em", minWidth: 72, textAlign: "right" };
               return (
                 <label key={f.id} style={{ ...rowBase, cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.6 : 1 }}
-                  title={conflict ? "Another selected PDF already uses this name, a project can't have two sheets with the same name" : undefined}>
+                  title={conflict ? "Otro PDF seleccionado ya usa este nombre: un proyecto no puede tener dos hojas con el mismo nombre" : undefined}>
                   <input name="drive-file-pick" type="checkbox" checked={selPick || inSet} disabled={disabled} onChange={() => togglePick(f)}
                     style={{ width: 16, height: 16, cursor: disabled ? "default" : "pointer" }} />
                   <span style={{ fontFamily: "var(--f-mono)", fontSize: 13, color: "var(--ink)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.name}>{f.name}</span>
                   <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)", minWidth: 64, textAlign: "right" }}>{fmtSize(f.size)}</span>
                   <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)", minWidth: 84, textAlign: "right" }}>{fmtDate(f.modifiedTime)}</span>
-                  {inSet ? <span style={{ ...tagStyle, color: "var(--c-positive)" }}>added</span>
-                    : conflict ? <span style={{ ...tagStyle, color: "var(--c-warning)" }}>name in use</span>
+                  {inSet ? <span style={{ ...tagStyle, color: "var(--c-positive)" }}>agregada</span>
+                    : conflict ? <span style={{ ...tagStyle, color: "var(--c-warning)" }}>nombre en uso</span>
                     : <span style={{ minWidth: 72 }} />}
                 </label>
               );
@@ -936,7 +934,7 @@ export default function PlanNavigator({
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", borderTop: "1px solid var(--ink)", background: "var(--paper-bright)" }}>
         <span style={{ fontFamily: "var(--f-mono)", fontSize: 11.5, color: "var(--ink-muted)" }}>
-          {picked.length ? `${picked.length} selected to open` : "check the PDFs you want to open, nothing downloads until you add them"}
+          {picked.length ? `${picked.length} seleccionado${picked.length === 1 ? "" : "s"} para abrir` : "marque los PDF que desea abrir; nada se descarga hasta que los agregue"}
         </span>
         <div style={{ flex: 1 }} />
         {picked.length > 0 && (
@@ -944,13 +942,13 @@ export default function PlanNavigator({
         )}
         <button onClick={addPicked} disabled={!picked.length || adding}
           style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 16px", border: "1px solid var(--ink)", background: picked.length ? "var(--cobalt)" : "var(--text-faint)", color: "var(--paper-bright)", cursor: picked.length && !adding ? "pointer" : "default", fontWeight: 700, fontSize: 13 }}>
-          <Icon name="plus" size={13} />{adding ? "Adding…" : `Add ${picked.length || ""} sheet${picked.length === 1 ? "" : "s"}`}
+          <Icon name="plus" size={13} />{adding ? "Agregando…" : `Agregar ${picked.length || ""} hoja${picked.length === 1 ? "" : "s"}`}
         </button>
       </div>
     </>
   );
 
-  // ── a card's Read row (#471, #489): a scan (little or no text layer) or a
+  // ── a card's Read row (#471, #489): a scan (poca o ninguna capa de texto) or a
   // hybrid (a picture the text layer can't read) ─
   // Read page text, or Read picture text on a hybrid (the canvas's reader:
   // cache first, the download notice before the first read), then its
@@ -966,12 +964,12 @@ export default function PlanNavigator({
     return (
       <div data-gallery-read={key} data-state={v.kind} data-last-read={key === lastReadKey ? "" : undefined} onClick={(e) => e.stopPropagation()}
         style={{ padding: "0 10px 8px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)", cursor: "default" }}>
-        {v.kind === "read" && <>{btn(v.what === "picture" ? "Read picture text" : "Read page text", () => readCard(key))}<span>{v.what === "picture" ? "text in a picture isn't searchable yet" : "little or no text layer"}</span>{v.note && <span style={{ color: "var(--c-danger)", flexBasis: "100%" }}>{v.note}</span>}</>}
-        {v.kind === "reading" && <><span className="pip" aria-hidden="true" /><span aria-live="polite">{v.text}</span>{btn("Cancel", () => ocr.cancel(key))}</>}
+        {v.kind === "read" && <>{btn(v.what === "picture" ? "Leer texto de la imagen" : "Leer texto de la página", () => readCard(key))}<span>{v.what === "picture" ? "el texto dentro de una imagen aún no se puede buscar" : "poca o ninguna capa de texto"}</span>{v.note && <span style={{ color: "var(--c-danger)", flexBasis: "100%" }}>{v.note}</span>}</>}
+        {v.kind === "reading" && <><span className="pip" aria-hidden="true" /><span aria-live="polite">{v.text}</span>{btn("Cancelar", () => ocr.cancel(key))}</>}
         {v.kind === "stopping" && <span aria-live="polite">{v.text}</span>}
         {v.kind === "unreadable" && <span aria-live="polite" style={{ color: "var(--c-danger)" }}>{v.text}</span>}
-        {v.kind === "unreachable" && <><span aria-live="polite" style={{ color: "var(--c-danger)" }}>{v.text}</span>{btn("Retry", retryProbe)}</>}
-        {v.kind === "done" && <><span aria-live="polite" style={{ color: "var(--c-warning)" }}>{v.text}</span>{v.readAgain && btn("Read again", () => readCard(key, true))}</>}
+        {v.kind === "unreachable" && <><span aria-live="polite" style={{ color: "var(--c-danger)" }}>{v.text}</span>{btn("Reintentar", retryProbe)}</>}
+        {v.kind === "done" && <><span aria-live="polite" style={{ color: "var(--c-warning)" }}>{v.text}</span>{v.readAgain && btn("Leer de nuevo", () => readCard(key, true))}</>}
       </div>
     );
   };
@@ -985,7 +983,7 @@ export default function PlanNavigator({
         {sheets.length > 0 && planIndexRef && (<>
           <span style={{ flex: 1 }} />
           {countLine && <span aria-live="polite" style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)" }}>{countLine}</span>}
-          {search && indexProg && <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)" }}>· Indexing {indexProg.done} / {indexProg.total}</span>}
+          {search && indexProg && <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)" }}>· Indexando {indexProg.done} / {indexProg.total}</span>}
           {failLine && <span data-search-failed="" style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--c-danger)" }}>· {failLine} <button type="button" onClick={() => setWalkTick((t) => t + 1)} style={{ ...ctrlBtn, padding: "1px 6px", fontSize: 11 }}>Reintentar</button></span>}
           <input name="plan-search" type="text" value={query} onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar texto en las hojas…" aria-label="Buscar el texto de todas las hojas"
@@ -999,7 +997,7 @@ export default function PlanNavigator({
         <div key={grp.level ?? "__all"} style={{ marginBottom: grp.level !== null ? 22 : 0 }}>
         {grp.level !== null && (
           <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink-muted)", margin: "0 0 8px 2px" }}>
-            {grp.level || "Unassigned"} · {grp.keys.length}
+            {grp.level || "Sin asignar"} · {grp.keys.length}
           </div>
         )}
         <div className="sheet-preview-grid" data-size={previewSize}>
@@ -1014,13 +1012,13 @@ export default function PlanNavigator({
             return (
               <div key={key} data-sheetkey={key} ref={(el) => { if (el && !thumb) obsRef.current?.observe(el); }}
                 onClick={() => toggleSel(key)}
-                role="group" aria-label={`Sheet ${labelOf(key)}`}
+                role="group" aria-label={`Hoja ${labelOf(key)}`}
                 style={{ border: isSel ? "1.5px solid var(--cobalt)" : "1px solid var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", position: "relative", boxShadow: isSel ? "var(--shadow-2)" : "var(--shadow-1)" }}>
-                <button type="button" aria-label={`Select ${labelOf(key)}`} aria-pressed={isSel} onClick={(e) => { e.stopPropagation(); toggleSel(key); }} style={{ position: "absolute", top: 8, left: 8, zIndex: 2, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", border: isSel ? "none" : "1.5px solid var(--ink-faint)", background: isSel ? "var(--cobalt)" : "var(--paper-bright)", color: "var(--paper-bright)", fontFamily: "var(--f-mono)", fontSize: 12, fontWeight: 700 }}>{isSel ? idx + 1 : ""}</button>
+                <button type="button" aria-label={`Seleccionar ${labelOf(key)}`} aria-pressed={isSel} onClick={(e) => { e.stopPropagation(); toggleSel(key); }} style={{ position: "absolute", top: 8, left: 8, zIndex: 2, width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", border: isSel ? "none" : "1.5px solid var(--ink-faint)", background: isSel ? "var(--cobalt)" : "var(--paper-bright)", color: "var(--paper-bright)", fontFamily: "var(--f-mono)", fontSize: 12, fontWeight: 700 }}>{isSel ? idx + 1 : ""}</button>
                 <div style={{ position: "absolute", top: 8, right: 8, zIndex: 2, display: "flex", gap: 6 }}>
                   <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewSheet(key); }} style={ctrlBtn}>Previa</button>
                   {isFirstPageOfPdf && onClosePdf && (
-                    <button onClick={(e) => { e.stopPropagation(); requestClose(parsed.file); }} title={cloudMode ? "Close this PDF, unload it from the plan set (it stays in Drive)" : "Close this PDF, remove it from the plan set (local plans aren't stored elsewhere)"}
+                    <button onClick={(e) => { e.stopPropagation(); requestClose(parsed.file); }} title={cloudMode ? "Cerrar este PDF: lo descarga del juego de planos (sigue en Drive)" : "Cerrar este PDF: lo quita del juego de planos (los planos locales no se guardan en otro lugar)"}
                       style={{ padding: "5px 8px", border: "none", background: "var(--paper-bright)", color: "var(--ink-muted)", cursor: "pointer", fontFamily: "var(--f-mono)", fontSize: 11, boxShadow: "var(--shadow-1)" }}>✕</button>
                   )}
                   <button onClick={(e) => { e.stopPropagation(); onOpen([key], false); }} title="Abrir solo esta hoja"
@@ -1038,11 +1036,11 @@ export default function PlanNavigator({
                     <span key={`m:${t}`} title="Texto coincidente en esta hoja" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--cobalt)", border: "1px solid var(--cobalt)", padding: "1px 5px", whiteSpace: "nowrap" }}>{t}</span>
                   ))}
                   {search?.ocrKeys.has(key) && <span title="Coincidencia en texto que el lector local (OCR) sacó de la imagen de la página, no del texto propio del PDF, revise la hoja" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--c-warning)", textTransform: "uppercase", letterSpacing: "0.08em" }}>OCR</span>}
-                  {isOpenTab && <span title="Ya está abierta como pestaña" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--cobalt)", textTransform: "uppercase", letterSpacing: "0.08em" }}>open</span>}
+                  {isOpenTab && <span title="Ya está abierta como pestaña" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--cobalt)", textTransform: "uppercase", letterSpacing: "0.08em" }}>abierta</span>}
                   {cnt > 0 && <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, color: "var(--ink-muted)" }}>{cnt}▦</span>}
                   <span style={{ fontSize: 10, fontWeight: 600, whiteSpace: "nowrap", color: scales[key] ? (scaleUnconfirmed[key] === false ? "var(--c-warning)" : "var(--c-positive)") : detectedScales[key] ? "var(--c-warning)" : "var(--c-danger)" }}
-                    title={scales[key] && scaleUnconfirmed[key] === false ? "Scale set by an agent, no person has confirmed it. Open the sheet and confirm from the scale menu." : undefined}>
-                    {scales[key] ? (scaleUnconfirmed[key] === false ? "scale ⚠ confirm" : "scale ✓") : detectedScales[key] ? `plan: ${detectedScales[key].label}` : "no scale"}
+                    title={scales[key] && scaleUnconfirmed[key] === false ? "Escala fijada por un agente: ninguna persona la ha confirmado. Abra la hoja y confírmela desde el menú de escala." : undefined}>
+                    {scales[key] ? (scaleUnconfirmed[key] === false ? "escala ⚠ confirmar" : "escala ✓") : detectedScales[key] ? `plano: ${detectedScales[key].label}` : "sin escala"}
                   </span>
                 </div>
                 {readRow(key)}
@@ -1056,8 +1054,8 @@ export default function PlanNavigator({
           <div style={{ padding: 48, textAlign: "center", color: "var(--ink-muted)", fontSize: 13.5, lineHeight: 1.7 }}>
             <div style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)", marginBottom: 6 }}>Ninguna hoja coincide con «{query.trim()}»</div>
             {indexProg
-              ? `Still reading sheet text, ${indexProg.done} of ${indexProg.total} checked.`
-              : "Search reads each sheet's own text: finish tags, room and sheet numbers, and words of three letters or more."}
+              ? `Aún se lee el texto de las hojas: ${indexProg.done} de ${indexProg.total} revisadas.`
+              : "La búsqueda lee el texto propio de cada hoja: etiquetas de acabado, números de recinto y de hoja, y palabras de tres letras o más."}
           </div>
         )}
         {unread && (
@@ -1112,9 +1110,7 @@ export default function PlanNavigator({
                         sincronizando por su <strong style={{ color: "var(--ink)" }}>librería de Microsoft 365</strong>
                         {" · "}
                         <button type="button" onClick={doStopM365}
-                          style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>
-                          stop
-                        </button>
+                          style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 12, textDecoration: "underline", fontFamily: "var(--f-body)" }}>detener</button>
                       </span>
                     )}
                   </div>
@@ -1188,7 +1184,7 @@ export default function PlanNavigator({
             ) : enumerated ? (
               <>
                 <div style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)", marginBottom: 6 }}>No se pudieron leer esos PDF</div>
-                None of the opened files would render, try opening them again.
+                Ninguno de los archivos abiertos se pudo dibujar: intente abrirlos de nuevo.
               </>
             ) : "Leyendo el juego de planos…"}
           </div>
@@ -1199,7 +1195,7 @@ export default function PlanNavigator({
           <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Superficies empalmadas</span>
           {stitches.map((st) => (
             <span key={st.id} style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "1px solid var(--ink-faint)", padding: "4px 8px", fontSize: 12 }}>
-              <button onClick={() => onOpenStitch && onOpenStitch(st.id)} title={`Open ${st.name}, ${st.members.length} sheets as one working surface`}
+              <button onClick={() => onOpenStitch && onOpenStitch(st.id)} title={`Abrir ${st.name}: ${st.members.length} hojas como una sola superficie de trabajo`}
                 style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontWeight: 600, fontSize: 12, padding: 0 }}>{st.name}</button>
               <button onClick={() => onDeleteStitch && onDeleteStitch(st.id)} title="Eliminar este empalme (se niega mientras tenga mediciones encima)"
                 style={{ border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12, padding: 0 }}>×</button>
@@ -1209,7 +1205,7 @@ export default function PlanNavigator({
       )}
       {sheets.length > 0 && (
         <div style={{ display: "flex", gap: 10, alignItems: "center", padding: "12px 18px", borderTop: "1px solid var(--ink)", background: "var(--paper-bright)" }}>
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)" }}>{sel.length ? `${sel.length} selected` : "select sheets, or hover a card and hit View"}</span>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)" }}>{sel.length ? `${sel.length} selected` : "seleccione hojas, o pase el cursor sobre una tarjeta y presione Ver"}</span>
           <div style={{ flex: 1 }} />
           {sel.length > 0 && (
             <>
@@ -1220,18 +1216,18 @@ export default function PlanNavigator({
           )}
           <button disabled={!sel.length} onClick={() => onOpen(sel, false)}
             style={{ padding: "8px 14px", border: "1px solid var(--ink)", background: "transparent", color: "var(--ink)", cursor: sel.length ? "pointer" : "default", opacity: sel.length ? 1 : 0.4, fontWeight: 700, fontSize: 12.5 }}>
-            Open {sel.length || ""} as tabs
+            Abrir {sel.length || ""} como pestañas
           </button>
           <button disabled={sel.length < 2 || sel.length > MAX_GROUP} onClick={() => onOpen(sel, true)}
-            title={sel.length > MAX_GROUP ? `Side-by-side maxes at ${MAX_GROUP}, open as tabs instead` : "One pan/zoom moves the whole row"}
+            title={sel.length > MAX_GROUP ? `Lado a lado admite hasta ${MAX_GROUP}: abra como pestañas` : "Un desplazamiento o zoom mueve toda la fila"}
             style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 14px", border: "none", background: sel.length >= 2 && sel.length <= MAX_GROUP ? "var(--cobalt)" : "var(--ink-faint)", color: "var(--paper-bright)", cursor: sel.length >= 2 && sel.length <= MAX_GROUP ? "pointer" : "default", fontWeight: 700, fontSize: 12.5 }}>
-            <Icon name="sideBySide" size={14} />Open {sel.length >= 2 ? sel.length : ""} side-by-side
+            <Icon name="sideBySide" size={14} />Abrir {sel.length >= 2 ? sel.length : ""} lado a lado
           </button>
           {onStitch && (
             <button disabled={sel.length < 2 || sel.length > MAX_GROUP} onClick={() => onStitch(sel)}
-              title={sel.length > MAX_GROUP ? `A stitch maxes at ${MAX_GROUP} sheets` : "Stitch, join a floor split at a match line into ONE working surface: the sheets butt edge-to-edge (no gap), you align the match line with two clicks, then a room crossing it traces as one shape"}
+              title={sel.length > MAX_GROUP ? `Un empalme admite hasta ${MAX_GROUP} hojas` : "Empalme: une un nivel cortado en una línea de empalme en UNA sola superficie de trabajo: las hojas se juntan borde a borde (sin hueco), usted alinea la línea de empalme con dos clics y luego un recinto que la cruza se traza como una sola figura"}
               style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 14px", border: "1px solid var(--ink)", background: "transparent", color: sel.length >= 2 && sel.length <= MAX_GROUP ? "var(--ink)" : "var(--ink-faint)", cursor: sel.length >= 2 && sel.length <= MAX_GROUP ? "pointer" : "default", fontWeight: 700, fontSize: 12.5 }}>
-              <Icon name="calibrate" size={14} />Stitch {sel.length >= 2 ? sel.length : ""} into one surface
+              <Icon name="calibrate" size={14} />Empalmar {sel.length >= 2 ? sel.length : ""} en una sola superficie
             </button>
           )}
         </div>
@@ -1262,7 +1258,7 @@ export default function PlanNavigator({
       <div style={{ flex: 1, overflow: "auto" }}>
         <label style={{ ...rowBase, cursor: "pointer", background: "var(--well)" }}>
           <input name="manage-all" type="checkbox" checked={mAll} onChange={() => setMSel(mAll ? [] : sheets.map((s) => s.name))} style={{ width: 16, height: 16, cursor: "pointer" }} />
-          <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>{mAll ? "Clear selection" : "Select all"}</span>
+          <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>{mAll ? "Borrar selección" : "Seleccionar todo"}</span>
         </label>
         {sheets.map((s) => {
           const pg = pageOf(s.name);
@@ -1272,9 +1268,9 @@ export default function PlanNavigator({
             <label key={s.name} style={{ ...rowBase, cursor: "pointer" }}>
               <input name="manage-pick" type="checkbox" checked={mSel.includes(s.name)} onChange={() => mToggle(s.name)} style={{ width: 16, height: 16, cursor: "pointer" }} />
               <span style={{ fontFamily: "var(--f-mono)", fontSize: 13, color: "var(--ink)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={s.name}>{s.name}</span>
-              {tabsOpen > 0 && <span style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, color: "var(--cobalt)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{tabsOpen} open</span>}
+              {tabsOpen > 0 && <span style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, color: "var(--cobalt)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{tabsOpen} abierta{tabsOpen === 1 ? "" : "s"}</span>}
               <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)", minWidth: 74, textAlign: "right" }}>{pg !== undefined ? `${pg || "?"} sheet${pg === 1 ? "" : "s"}` : "…"}</span>
-              <span title={cnt ? "This PDF carries takeoffs, they persist in the project and restore if you re-add the same file" : undefined}
+              <span title={cnt ? "Este PDF tiene takeoffs: persisten en el proyecto y se restauran si vuelve a agregar el mismo archivo" : undefined}
                 style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: cnt ? "var(--c-warning)" : "var(--text-faint)", minWidth: 88, textAlign: "right" }}>
                 {cnt ? `${cnt} takeoff${cnt === 1 ? "" : "s"}` : "no takeoffs"}
               </span>
@@ -1287,42 +1283,38 @@ export default function PlanNavigator({
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", borderTop: "1px solid var(--ink)", background: "var(--paper-bright)", flexWrap: "wrap" }}>
         <span style={{ fontFamily: "var(--f-mono)", fontSize: 11.5, color: "var(--ink-muted)" }}>
-          {working ? "Working…" : mSel.length ? `${mSel.length} PDF${mSel.length === 1 ? "" : "s"} selected${mSelShapes ? ` · ${mSelShapes} takeoff${mSelShapes === 1 ? "" : "s"} on them` : ""}` : "check the PDFs to remove, removing never deletes takeoff data"}
+          {working ? "Trabajando…" : mSel.length ? `${mSel.length} PDF seleccionado${mSel.length === 1 ? "" : "s"}${mSelShapes ? ` · ${mSelShapes} takeoff${mSelShapes === 1 ? "" : "s"} en ${mSel.length === 1 ? "él" : "ellos"}` : ""}` : "marque los PDF que desea quitar; quitar nunca borra datos del takeoff"}
         </span>
         <div style={{ flex: 1 }} />
         {m365Cfg && m365Active && (
           <span title="Annotations sync through the configured Microsoft 365 document library (experimental, issue #315)"
             style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)" }}>
             ⇄ 365 library{" "}
-            <button onClick={doStopM365} title="Stop syncing through the 365 library, local work stays in this browser"
-              style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 11, textDecoration: "underline", fontFamily: "var(--f-mono)" }}>
-              stop
-            </button>
+            <button onClick={doStopM365} title="Dejar de sincronizar por la librería 365: el trabajo local se queda en este navegador"
+              style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 11, textDecoration: "underline", fontFamily: "var(--f-mono)" }}>detener</button>
           </span>
         )}
         {folderUiOn && (folderLink ? (
-          <span title={folderCopies.length ? `The folder's sync client forked the annotations file, someone should reconcile these by hand:\n${folderCopies.join("\n")}` : `Annotations sync through “${folderLink.name}”, the folder's own sync client replicates them`}
+          <span title={folderCopies.length ? `El cliente de sincronización de la carpeta bifurcó el archivo de anotaciones; alguien debe conciliarlos a mano:\n${folderCopies.join("\n")}` : `Las anotaciones se sincronizan por «${folderLink.name}»: las replica el cliente de sincronización de la propia carpeta`}
             style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: folderCopies.length ? "var(--c-warning)" : "var(--ink-muted)" }}>
-            ⇄ “{folderLink.name}”{folderCopies.length ? ` · ${folderCopies.length} conflict cop${folderCopies.length === 1 ? "y" : "ies"}` : ""}
+            ⇄ “{folderLink.name}”{folderCopies.length ? ` · ${folderCopies.length} copia${folderCopies.length === 1 ? "" : "s"} en conflicto` : ""}
             {" "}
-            <button onClick={doForgetFolder} title="Stop syncing through this folder, local work stays in this browser"
-              style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 11, textDecoration: "underline", fontFamily: "var(--f-mono)" }}>
-              stop
-            </button>
+            <button onClick={doForgetFolder} title="Dejar de sincronizar por esta carpeta: el trabajo local se queda en este navegador"
+              style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 11, textDecoration: "underline", fontFamily: "var(--f-mono)" }}>detener</button>
           </span>
         ) : (
           <button onClick={doLinkFolder} disabled={working}
-            title="Pick a folder your team already syncs, the takeoff syncs through it as one JSON file, no credentials involved"
-            style={{ ...ctrlBtn, opacity: working ? 0.5 : 1 }}>Sync through a folder…</button>
+            title="Elija una carpeta que su equipo ya sincroniza: el takeoff se sincroniza por ahí como un solo archivo JSON, sin credenciales"
+            style={{ ...ctrlBtn, opacity: working ? 0.5 : 1 }}>Sincronizar por una carpeta…</button>
         ))}
         {onClearWorkspace && (
           <button onClick={() => setConfirmClear(true)} disabled={working}
-            title="Remove every stored PDF and reset the takeoff, a snapshot of a non-empty takeoff is saved first (Revisions restores it)"
-            style={{ ...ctrlBtn, border: "1px solid var(--c-danger)", color: "var(--c-danger)", opacity: working ? 0.5 : 1 }}>Clear workspace…</button>
+            title="Quitar todos los PDF guardados y reiniciar el takeoff; antes se guarda una copia de un takeoff no vacío (Revisiones lo restaura)"
+            style={{ ...ctrlBtn, border: "1px solid var(--c-danger)", color: "var(--c-danger)", opacity: working ? 0.5 : 1 }}>Limpiar espacio…</button>
         )}
         <button onClick={() => setConfirmBulk(true)} disabled={!mSel.length || working}
           style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 16px", border: "1px solid var(--ink)", background: mSel.length && !working ? "var(--ink)" : "var(--ink-faint)", color: "var(--paper-bright)", cursor: mSel.length && !working ? "pointer" : "default", fontWeight: 700, fontSize: 13 }}>
-          Remove {mSel.length || ""} selected
+          Quitar {mSel.length || ""} seleccionado{mSel.length === 1 ? "" : "s"}
         </button>
       </div>
     </>
@@ -1331,18 +1323,18 @@ export default function PlanNavigator({
   const bulkDialog = confirmBulk && (
     <div onClick={() => setConfirmBulk(false)} style={{ position: "absolute", inset: 0, zIndex: 5, background: "var(--scrim)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: 460, maxWidth: "100%", background: "var(--paper-bright)", boxShadow: "var(--shadow-2)", padding: "18px 20px" }}>
-        <strong style={{ fontFamily: "var(--f-display)", fontSize: 15, color: "var(--ink)" }}>Remove {mSel.length} PDF{mSel.length === 1 ? "" : "s"} from the plan set?</strong>
+        <strong style={{ fontFamily: "var(--f-display)", fontSize: 15, color: "var(--ink)" }}>¿Quitar {mSel.length} PDF del juego de planos?</strong>
         <p style={{ fontSize: 12.5, color: "var(--ink-muted)", lineHeight: 1.6, margin: "10px 0 4px" }}>
           {cloudMode
-            ? "They stop loading in this plan set, the files stay in your Drive project and re-add any time from Browse Drive."
-            : "Their stored bytes are removed from this browser. Local plans aren't stored anywhere else, so you'd re-open the files to get them back."}
+            ? "Dejan de cargarse en este juego de planos; los archivos siguen en su proyecto de Drive y puede volver a agregarlos cuando quiera desde Explorar Drive."
+            : "Sus bytes guardados se quitan de este navegador. Los planos locales no se guardan en ningún otro lugar, así que tendría que volver a abrir los archivos para recuperarlos."}
           {mSelShapes > 0 && (
-            <><br /><span style={{ color: "var(--c-warning)" }}>{mSelShapes} takeoff{mSelShapes === 1 ? "" : "s"} live on these PDFs, they're preserved in the project and restore if you re-add the same files.</span></>
+            <><br /><span style={{ color: "var(--c-warning)" }}>{mSelShapes} takeoff{mSelShapes === 1 ? "" : "s"} {mSelShapes === 1 ? "vive" : "viven"} en estos PDF: se conservan en el proyecto y se restauran si vuelve a agregar los mismos archivos.</span></>
           )}
         </p>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
-          <button onClick={() => setConfirmBulk(false)} style={{ ...ctrlBtn, color: "var(--ink-muted)" }}>Cancel</button>
-          <button onClick={doBulkRemove} style={{ ...ctrlBtn, border: "1px solid var(--ink)", background: "var(--ink)", color: "var(--paper-bright)", fontWeight: 700 }}>Remove {mSel.length}</button>
+          <button onClick={() => setConfirmBulk(false)} style={{ ...ctrlBtn, color: "var(--ink-muted)" }}>Cancelar</button>
+          <button onClick={doBulkRemove} style={{ ...ctrlBtn, border: "1px solid var(--ink)", background: "var(--ink)", color: "var(--paper-bright)", fontWeight: 700 }}>Quitar {mSel.length}</button>
         </div>
       </div>
     </div>
@@ -1351,14 +1343,14 @@ export default function PlanNavigator({
   const clearDialog = confirmClear && (
     <div onClick={() => setConfirmClear(false)} style={{ position: "absolute", inset: 0, zIndex: 5, background: "var(--scrim)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: 460, maxWidth: "100%", background: "var(--paper-bright)", boxShadow: "var(--shadow-2)", padding: "18px 20px" }}>
-        <strong style={{ fontFamily: "var(--f-display)", fontSize: 15, color: "var(--c-danger)" }}>Clear the whole workspace?</strong>
+        <strong style={{ fontFamily: "var(--f-display)", fontSize: 15, color: "var(--c-danger)" }}>¿Limpiar todo el espacio de trabajo?</strong>
         <p style={{ fontSize: 12.5, color: "var(--ink-muted)", lineHeight: 1.6, margin: "10px 0 4px" }}>
-          Every stored PDF ({sheets.length}) is removed and the takeoff resets to empty, a clean start without touching browser storage by hand.
-          <br /><span style={{ color: "var(--ink)" }}>A non-empty takeoff is snapshotted first</span>, Revisions → restore brings it back (you'd re-open the same PDFs to see its shapes). The PDFs themselves aren't stored anywhere else.
+          Se quita cada PDF guardado ({sheets.length}) y el takeoff se reinicia vacío: un arranque limpio sin tocar a mano el almacenamiento del navegador.
+          <br /><span style={{ color: "var(--ink)" }}>Antes se guarda una copia de un takeoff no vacío</span>; Revisiones → restaurar lo devuelve (vuelva a abrir los mismos PDF para ver sus figuras). Los PDF en sí no se guardan en ningún otro lugar.
         </p>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
-          <button onClick={() => setConfirmClear(false)} style={{ ...ctrlBtn, color: "var(--ink-muted)" }}>Cancel</button>
-          <button onClick={doClear} style={{ ...ctrlBtn, border: "1px solid var(--c-danger)", background: "var(--c-danger)", color: "var(--paper-bright)", fontWeight: 700 }}>Clear workspace</button>
+          <button onClick={() => setConfirmClear(false)} style={{ ...ctrlBtn, color: "var(--ink-muted)" }}>Cancelar</button>
+          <button onClick={doClear} style={{ ...ctrlBtn, border: "1px solid var(--c-danger)", background: "var(--c-danger)", color: "var(--paper-bright)", fontWeight: 700 }}>Limpiar espacio</button>
         </div>
       </div>
     </div>
@@ -1368,24 +1360,24 @@ export default function PlanNavigator({
   const confirmDialog = confirmClose && (
     <div onClick={() => setConfirmClose(null)} style={{ position: "absolute", inset: 0, zIndex: 5, background: "var(--scrim)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: 440, maxWidth: "100%", background: "var(--paper-bright)", boxShadow: "var(--shadow-2)", padding: "18px 20px" }}>
-        <strong style={{ fontFamily: "var(--f-display)", fontSize: 15, color: "var(--ink)" }}>Close “{confirmClose.file}”?</strong>
+        <strong style={{ fontFamily: "var(--f-display)", fontSize: 15, color: "var(--ink)" }}>¿Cerrar «{confirmClose.file}»?</strong>
         <p style={{ fontSize: 12.5, color: "var(--ink-muted)", lineHeight: 1.6, margin: "10px 0 4px" }}>
           {cloudMode
-            ? "Closing removes it from this plan set so it stops loading, the file stays in your Drive project and you can re-add it any time from Browse Drive."
-            : "This removes the PDF from the plan set. Local plans aren't stored anywhere else, so you'll have to re-open the file to get it back."}
+            ? "Al cerrarlo se quita de este juego de planos y deja de cargarse; el archivo sigue en su proyecto de Drive y puede volver a agregarlo cuando quiera desde Explorar Drive."
+            : "Esto quita el PDF del juego de planos. Los planos locales no se guardan en ningún otro lugar, así que tendrá que volver a abrir el archivo para recuperarlo."}
           {confirmClose.shapeCount > 0 && (
-            <><br /><span style={{ color: "var(--c-warning)" }}>This PDF has {confirmClose.shapeCount} takeoff{confirmClose.shapeCount === 1 ? "" : "s"}, they're preserved and restore if you re-add the same file.</span></>
+            <><br /><span style={{ color: "var(--c-warning)" }}>Este PDF tiene {confirmClose.shapeCount} takeoff{confirmClose.shapeCount === 1 ? "" : "s"}: se conserva{confirmClose.shapeCount === 1 ? "" : "n"} y se restaura{confirmClose.shapeCount === 1 ? "" : "n"} si vuelve a agregar el mismo archivo.</span></>
           )}
         </p>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16, flexWrap: "wrap" }}>
-          <button onClick={() => setConfirmClose(null)} style={{ ...ctrlBtn, color: "var(--ink-muted)" }}>Cancel</button>
+          <button onClick={() => setConfirmClose(null)} style={{ ...ctrlBtn, color: "var(--ink-muted)" }}>Cancelar</button>
           {cloudMode && onRemoveFromProject && (
-            <button onClick={doRemove} title="Permanently delete the PDF from the Drive project"
-              style={{ ...ctrlBtn, border: "1px solid var(--c-danger)", color: "var(--c-danger)" }}>Delete from Drive</button>
+            <button onClick={doRemove} title="Eliminar el PDF del proyecto de Drive de forma permanente"
+              style={{ ...ctrlBtn, border: "1px solid var(--c-danger)", color: "var(--c-danger)" }}>Eliminar de Drive</button>
           )}
           <button onClick={doClose}
             style={{ ...ctrlBtn, border: "1px solid var(--ink)", background: "var(--ink)", color: "var(--paper-bright)", fontWeight: 700 }}>
-            {cloudMode ? "Close (keep in Drive)" : "Remove"}
+            {cloudMode ? "Cerrar (conservar en Drive)" : "Quitar"}
           </button>
         </div>
       </div>

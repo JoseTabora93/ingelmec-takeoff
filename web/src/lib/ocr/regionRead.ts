@@ -53,9 +53,9 @@ export interface RegionReadResult {
   rasters: number;
 }
 
-const abortError = () => new DOMException("The OCR read was cancelled.", "AbortError");
+const abortError = () => new DOMException("Se canceló la lectura de OCR.", "AbortError");
 /** An AbortError whose own signal wasn't aborted: the page went away. */
-const pageClosed = () => new DOMException("The page was closed during the read.", "AbortError");
+const pageClosed = () => new DOMException("La página se cerró durante la lectura.", "AbortError");
 const checkAbort = (signal?: AbortSignal) => { if (signal?.aborted) throw abortError(); };
 
 /** A read that would take more than OCR_MAX_TILES tiles, or whose size

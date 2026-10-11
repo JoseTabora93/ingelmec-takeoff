@@ -26,7 +26,7 @@ test("pendingByProposal: one group per batch in payload order, undescribed batch
   assert.deepEqual(groups.map((g) => [g.proposal?.id ?? null, g.proposal?.label ?? null, g.ids]), [
     ["prop-a", "Level 1", ["a-1", "a-2"]],
     ["prop-b", "Base", ["b-1"]],
-    ["prop-gone", "Proposal", ["orphan"]],
+    ["prop-gone", "Propuesta", ["orphan"]],
     [null, null, ["loose-1", "loose-2"]],
   ]);
   assert.deepEqual(pendingByProposal([], proposals), []);
@@ -64,10 +64,10 @@ test("acceptConditionEditProposal applies the diff to ONE condition, refuses a r
   assert.deepEqual(ok.conditions, [{ id: "c1", finish_tag: "CPT-1A", waste_pct: 10, multiplier: 1, updated_at: "T" }, conds[1]]);
   assert.deepEqual(conds, before, "pure");
   const clash = acceptConditionEditProposal(conds, { id: "p", condition_id: "c1", proposed: { finish_tag: " lvt-2 " } });
-  assert.match(clash.error!, /LVT-2 already carries that tag/);
+  assert.match(clash.error!, /LVT-2 ya lleva esa etiqueta/);
   assert.equal(clash.conditions, conds);
-  assert.match(acceptConditionEditProposal(conds, { id: "p", condition_id: "nope", proposed: { waste_pct: 1 } }).error!, /no longer exists/);
-  assert.match(acceptConditionEditProposal(conds, { id: "p", condition_id: "c1", proposed: { waste_pct: -4 } }).error!, /nothing to apply/);
+  assert.match(acceptConditionEditProposal(conds, { id: "p", condition_id: "nope", proposed: { waste_pct: 1 } }).error!, /ya no existe/);
+  assert.match(acceptConditionEditProposal(conds, { id: "p", condition_id: "c1", proposed: { waste_pct: -4 } }).error!, /no trae nada que aplicar/);
 });
 
 test("proposedConditionEditRows is the report's beside-the-current-values block; a proposal for a missing condition is dropped", () => {

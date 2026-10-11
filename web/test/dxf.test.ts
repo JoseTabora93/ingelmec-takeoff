@@ -152,8 +152,8 @@ test("metres: $INSUNITS 6 and the frame scales by 0.3048", () => {
 });
 
 test("refuses without a scale or dims, a CAD file in pixels is worse than none", () => {
-  assert.throws(() => buildSheetDxf({ sheet_id: SHEET, dims: DIMS, upp: 0, shapes: [room], conditions: CONDS }), /no scale/);
-  assert.throws(() => buildSheetDxf({ sheet_id: SHEET, dims: { w: 0, h: 0 }, upp: UPP, shapes: [room], conditions: CONDS }), /no image dimensions/);
+  assert.throws(() => buildSheetDxf({ sheet_id: SHEET, dims: DIMS, upp: 0, shapes: [room], conditions: CONDS }), /no tiene escala/);
+  assert.throws(() => buildSheetDxf({ sheet_id: SHEET, dims: { w: 0, h: 0 }, upp: UPP, shapes: [room], conditions: CONDS }), /no tiene dimensiones de imagen/);
 });
 
 test("an empty sheet still writes a valid file with sheet-sized extents and no takeoff layers", () => {

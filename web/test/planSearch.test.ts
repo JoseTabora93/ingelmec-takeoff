@@ -341,7 +341,7 @@ test("canLookUp: the cache is asked unless OCR is off or not installed; offline 
 
 test("galleryReadView: Read on an unread text-less card when OCR is available; never on a vector sheet", () => {
   assert.deepEqual(galleryReadView(textless("a.pdf"), "available", undefined), { kind: "read", what: "page" });
-  assert.deepEqual(galleryReadView(textless("a.pdf"), "error", undefined), { kind: "unreachable", text: "The on-device text reader (OCR) couldn't be reached", what: "page" });
+  assert.deepEqual(galleryReadView(textless("a.pdf"), "error", undefined), { kind: "unreachable", text: "No se pudo conectar con el lector de texto del dispositivo (OCR)", what: "page" });
   assert.deepEqual(galleryReadView(textless("a.pdf"), "disabled", undefined), { kind: "hidden", what: "page" });
   assert.deepEqual(galleryReadView(textless("a.pdf"), null, undefined), { kind: "hidden", what: "page" }, "not probed yet");
   assert.deepEqual(galleryReadView(vector("a.pdf"), "available", undefined), { kind: "hidden", what: "page" });
@@ -358,11 +358,11 @@ test("galleryReadView: progress and Cancel while reading, Stopping… after, the
 });
 
 test("unreadLine: only when OCR is available and a sheet is unread; singular and plural", () => {
-  assert.equal(unreadLine(3, "available"), "3 sheets with scans or pictures that haven't been read");
-  assert.equal(unreadLine(1, "available"), "1 sheet with a scan or a picture that hasn't been read");
+  assert.equal(unreadLine(3, "available"), "3 hojas con escaneos o imágenes que no se han leído");
+  assert.equal(unreadLine(1, "available"), "1 hoja con un escaneo o una imagen que no se ha leído");
   assert.equal(unreadLine(0, "available"), null);
   for (const a of ["disabled", "uninstalled", null]) assert.equal(unreadLine(2, a), null);
-  assert.equal(unreadLine(2, "error"), "The on-device text reader (OCR) couldn't be reached", "a probe error says so (with Retry)");
+  assert.equal(unreadLine(2, "error"), "No se pudo conectar con el lector de texto del dispositivo (OCR)", "a probe error says so (with Retry)");
   assert.equal(unreadLine(0, "error"), null);
 });
 
@@ -412,9 +412,9 @@ test("walk failures: a failed sheet isn't counted as checked; a later success cl
 
 test("searchFailedLine: how many sheets search couldn't read, or that it didn't finish", () => {
   assert.equal(searchFailedLine({ sheets: 0, incomplete: false }), null);
-  assert.equal(searchFailedLine({ sheets: 1, incomplete: false }), "1 sheet couldn't be read for search");
-  assert.equal(searchFailedLine({ sheets: 3, incomplete: true }), "3 sheets couldn't be read for search");
-  assert.equal(searchFailedLine({ sheets: 0, incomplete: true }), "Search couldn't read every sheet");
+  assert.equal(searchFailedLine({ sheets: 1, incomplete: false }), "1 hoja no se pudo leer para la búsqueda");
+  assert.equal(searchFailedLine({ sheets: 3, incomplete: true }), "3 hojas no se pudoieron leer para la búsqueda");
+  assert.equal(searchFailedLine({ sheets: 0, incomplete: true }), "La búsqueda no pudo leer todas las hojas");
 });
 
 test("retryWalk: a new query retries only when something failed", () => {
@@ -905,8 +905,8 @@ test("thumbIndexStep: a measured record puts its pictures on a text entry that h
 });
 
 test("unreadLine: one wording for scans and pictures", () => {
-  assert.equal(unreadLine(3, "available"), "3 sheets with scans or pictures that haven't been read");
-  assert.equal(unreadLine(1, "available"), "1 sheet with a scan or a picture that hasn't been read");
+  assert.equal(unreadLine(3, "available"), "3 hojas con escaneos o imágenes que no se han leído");
+  assert.equal(unreadLine(1, "available"), "1 hoja con un escaneo o una imagen que no se ha leído");
 });
 
 test("pageTextIndex: a text pass records whether the page has a text layer, and the pictures it was handed", () => {

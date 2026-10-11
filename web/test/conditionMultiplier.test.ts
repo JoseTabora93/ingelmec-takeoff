@@ -25,21 +25,21 @@ test("row chip: ×N in cobalt with the consequence spelled out", () => {
   const out = html(MultiplierChip, { mult: 120 });
   assert.match(out, /data-multiplier-chip/);
   assert.match(out, />×<!-- -->120<|>×120</);
-  assert.match(out, /multiplied by 120/);
+  assert.match(out, /se multiplica por 120/);
   assert.match(out, /var\(--cobalt\)/);
 });
 
 test("editor field: labelled, singular at 1 and unlit", () => {
   const out = html(MultiplierField, { value: 1, onChange: () => {} });
   assert.match(out, /name="condition-multiplier"/);
-  assert.match(out, />unit</);
+  assert.match(out, />unidad</);
   assert.doesNotMatch(out, /var\(--cobalt\)/);
-  assert.match(out, /Duplicate for another area/, "points at the ×1-elsewhere answer");
+  assert.match(out, /Duplicar para otra área/, "points at the ×1-elsewhere answer");
 });
 
 test("editor field: plural and lit while multiplying", () => {
   const out = html(MultiplierField, { value: 120, onChange: () => {} });
-  assert.match(out, />units</);
+  assert.match(out, />unidades</);
   assert.match(out, /value="120"/);
   assert.match(out, /border:1px solid var\(--cobalt\)/);
 });
@@ -57,7 +57,7 @@ test("the condition editor renders the labelled field, not a bare ×", () => {
   const noop = () => {};
   const out = html(ConditionAppearanceEditor, { cond, onUpdateCond: noop, onSetCondParam: noop, onAssignAttr: noop, layout: "stack" });
   assert.match(out, /value="120"/);
-  assert.match(out, />units</);
+  assert.match(out, />unidades</);
 });
 
 test("row tag floor fits a real tag with its chip", () => {

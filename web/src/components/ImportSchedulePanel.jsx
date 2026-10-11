@@ -51,14 +51,14 @@ import { S } from "../lib/ui.js";
 // Rows the schedule gives no section (and whose words name no item) come
 // first, so the ones that still need a decision are the first thing read.
 const GROUPS = [
-  { key: "unassigned", label: "No section" },
-  { key: "floor", label: "Floor" },
+  { key: "unassigned", label: "Sin sección" },
+  { key: "floor", label: "Piso" },
   { key: "base", label: "Base" },
-  { key: "wall", label: "Wall" },
-  { key: "wall_protection", label: "Wall Protection" },
-  { key: "transition", label: "Transition" },
-  { key: "ceiling", label: "Ceiling" },
-  { key: "other", label: "Other" },
+  { key: "wall", label: "Muro" },
+  { key: "wall_protection", label: "Protección de muro" },
+  { key: "transition", label: "Transición" },
+  { key: "ceiling", label: "Cielo" },
+  { key: "other", label: "Otro" },
 ];
 
 /** @param {{ rows?: import('../lib/scheduleRows').ScheduleRow[], existing?: Set<string>, palette?: string[], startIndex?: number, skipped?: string[], planSet?: import('../lib/codeUse').CodeUseSet, subscribeIndex?: (fn: () => void) => () => void, labelOf?: (key: string) => string, onCreate: (rows: import('../lib/scheduleRows').ScheduleRow[]) => void, onClose: () => void }} props */
@@ -167,7 +167,7 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
   const create = () => { if (count) onCreate(creatable.map(({ key, row }) => ({ ...row, finish_tag: stateOf(key).tag }))); };
 
   const lbl = { fontFamily: "var(--f-mono)", fontSize: 9, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-muted)" };
-  const flagFor = { "in-use": "in use", duplicate: "duplicate", empty: "needs a code" };
+  const flagFor = { "in-use": "en uso", duplicate: "duplicado", empty: "falta el código" };
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.32)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 40 }} onClick={onClose}>
@@ -175,8 +175,8 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
         style={{ width: "min(560px, calc(100vw - 32px))", maxHeight: "min(82vh, 720px)", display: "flex", flexDirection: "column", background: "var(--paper-bright)", border: "1px solid var(--cobalt)", boxShadow: "var(--shadow-pop)", fontSize: 12.5 }}>
         {/* header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid var(--ink-faint)", background: "var(--cobalt)", color: "var(--accent-contrast)" }}>
-          <span id={titleId} style={{ fontWeight: 700 }}>{empty ? "Import from schedule, no rows read" : `Import from schedule, ${rows.length} finish${rows.length === 1 ? "" : "es"} found`}</span>
-          <button onClick={onClose} title="Close" style={{ background: "transparent", border: "none", color: "var(--accent-contrast)", cursor: "pointer", display: "inline-flex" }}><Icon name="close" size={14} /></button>
+          <span id={titleId} style={{ fontWeight: 700 }}>{empty ? "Importar desde el cuadro: no se leyeron filas" : `Importar desde el cuadro: ${rows.length} acabado${rows.length === 1 ? "" : "s"} encontrado${rows.length === 1 ? "" : "s"}`}</span>
+          <button onClick={onClose} title="Cerrar" style={{ background: "transparent", border: "none", color: "var(--accent-contrast)", cursor: "pointer", display: "inline-flex" }}><Icon name="close" size={14} /></button>
         </div>
 
         {hasSkipped && (
@@ -187,13 +187,13 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
 
         {hasCodeChecks && (
           <div role="note" id={checkId} style={{ fontSize: "var(--fs-s)", color: "var(--ink)", borderLeft: "3px solid var(--c-warning)", paddingLeft: 8, margin: "8px 14px" }}>
-            Verify scanned codes against the schedule, then edit the code or select each row yourself. Two reads can agree on the same wrong code. Group checkboxes and Select all leave unverified rows unchecked. A row labeled “set code” needs you to enter its code first.
+            Verifique los códigos escaneados contra el cuadro y luego edite el código o seleccione cada fila usted mismo. Dos lecturas pueden coincidir en el mismo código equivocado. Las casillas de grupo y Seleccionar todo dejan sin marcar las filas no verificadas. Una fila marcada «fijar código» requiere que escriba primero su código.
           </div>
         )}
 
         {hasLegacy && (
           <div role="note" id={legacyBannerId} style={{ fontSize: "var(--fs-s)", color: "var(--ink)", borderLeft: "3px solid var(--c-warning)", paddingLeft: 8, margin: "8px 14px" }}>
-            Some codes may already exist without parentheses. Those rows are held. Check the existing condition; if it is the same finish, rename it before importing again. If they are different finishes, add the new condition manually.
+            Algunos códigos pueden ya existir sin paréntesis. Esas filas quedan retenidas. Revise la condición existente; si es el mismo acabado, renómbrela antes de importar de nuevo. Si son acabados distintos, agregue la condición nueva a mano.
           </div>
         )}
 
@@ -217,7 +217,7 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
                   const ok = isCreatable(st);
                   const isEditing = editing?.key === key;
                   const on = picked.has(key) && ok;
-                  const flag = st?.status === "legacy" ? `check existing ${st.legacyTag}` : flagFor[st?.status];
+                  const flag = st?.status === "legacy" ? `revise la existente ${st.legacyTag}` : flagFor[st?.status];
                   // The guessed-category flag, the read-as flag and the NOT USED
                   // label sit OUTSIDE the <label> (so they aren't folded into the
                   // checkbox's name) and describe the checkbox. The in-use /
@@ -237,21 +237,21 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
                   const several = [guessId, readAsId, notUsedId, useId_].filter(Boolean).length > 1;
                   const right = several ? {} : { marginLeft: "auto" };
                   const guess = guessId && (
-                    <span id={guessId} title="Category guessed from the row's own words, no printed heading names one" style={{ ...lbl, color: "var(--c-warning)", flex: "0 0 auto", cursor: "help", ...right }}>from description</span>
+                    <span id={guessId} title="Categoría deducida de las propias palabras de la fila; ningún encabezado impreso la nombra" style={{ ...lbl, color: "var(--c-warning)", flex: "0 0 auto", cursor: "help", ...right }}>por la descripción</span>
                   );
                   // The code as read, in the edit button's mono and size, so O and
                   // 0 can be told apart. The title says what was repaired; the
                   // hidden text only adds what to do, since a screen reader has
                   // just read the code out.
-                  const repaired = readAsId && `Repaired from ${r.read_as}; check the code against the schedule.`;
+                  const repaired = readAsId && `Reparado desde ${r.read_as}; revise el código contra el cuadro.`;
                   const readAs = readAsId && (
                     <span id={readAsId} title={repaired} style={{ ...lbl, textTransform: "none", color: "var(--c-warning)", flex: "0 0 auto", cursor: "help", ...right }}>
-                      read as <span style={{ fontFamily: "var(--f-mono)", fontSize: 12.5 }}>{r.read_as}</span><span style={S.visuallyHidden}>, check the code against the schedule.</span>
+                      leída como <span style={{ fontFamily: "var(--f-mono)", fontSize: 12.5 }}>{r.read_as}</span><span style={S.visuallyHidden}>, revise el código contra el cuadro.</span>
                     </span>
                   );
                   const notUsed = notUsedId && (
                     <span id={notUsedId} title={note.trimStart()} style={{ ...lbl, textTransform: "none", color: "var(--ink)", borderLeft: "2px solid var(--c-warning)", paddingLeft: 4, position: "relative", flex: "0 0 auto", cursor: "help", ...right }}>
-                      {r.not_used_text || "NOT USED"}<span style={S.visuallyHidden}>{note}</span>
+                      {r.not_used_text || "NO SE USA"}<span style={S.visuallyHidden}>{note}</span>
                     </span>
                   );
                   // Quiet unless the code wasn't found: a found code is a muted
@@ -283,11 +283,11 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
                         ) : (
                           <button
                             type="button"
-                            title="Click to fix the code"
+                            title="Clic para corregir el código"
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); startEdit(key, r); }}
                             style={{ fontFamily: "var(--f-mono)", fontWeight: 600, fontSize: 12.5, minWidth: 58, textAlign: "left", padding: "1px 3px", border: "1px dashed var(--ink-faint)", background: "transparent", color: st?.status === "empty" ? "var(--ink-muted)" : "var(--ink)", cursor: "text" }}
                           >
-                            {st?.tag || "set code"}
+                            {st?.tag || "fijar código"}
                           </button>
                         )}
                         <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -296,11 +296,11 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
                             <span style={{ color: "var(--ink-muted)", fontSize: 11 }}>  ·  {[r.manufacturer, r.size].filter(Boolean).join(" · ")}</span>
                           )}
                         </span>
-                        {flag && <span title={st?.status === "legacy" ? `An earlier import may have removed the parentheses. Check the existing ${st.legacyTag} condition; if it is this finish, rename that condition to ${st.tag} before importing again.` : st?.status === "duplicate" ? "Click the code to rename it." : undefined} style={{ ...lbl, opacity: 0.8 }}>{flag}</span>}
+                        {flag && <span title={st?.status === "legacy" ? `Una importación anterior pudo quitar los paréntesis. Revise la condición ${st.legacyTag} existente; si es este acabado, renómbrela a ${st.tag} antes de importar de nuevo.` : st?.status === "duplicate" ? "Haga clic en el código para renombrarlo." : undefined} style={{ ...lbl, opacity: 0.8 }}>{flag}</span>}
                       </label>
                       {codeCheckId && (
                         <span id={codeCheckId} style={{ flexBasis: "100%", fontSize: "var(--fs-s)", color: "var(--c-warning)" }}>
-                          {r.code_checks?.length ? `Check code: ${r.code_checks.map(({ first, second }) => second ? `${first} / ${second}` : `${first} / second read did not confirm`).join("; ")}` : "Verify scanned code"}
+                          {r.code_checks?.length ? `Revise el código: ${r.code_checks.map(({ first, second }) => second ? `${first} / ${second}` : `${first} / la segunda lectura no lo confirmó`).join("; ")}` : "Verificar código escaneado"}
                         </span>
                       )}
                       {several ? <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>{guess}{readAs}{notUsed}{onPlans}</div> : guess || readAs || notUsed || onPlans}
@@ -316,15 +316,15 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 10, padding: "10px 14px", borderTop: "1px solid var(--ink-faint)" }}>
           {empty ? (
             // nothing to pick or create: the notice says what wasn't read
-            <button autoFocus onClick={onClose} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12 }}>Close</button>
+            <button autoFocus onClick={onClose} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12 }}>Cerrar</button>
           ) : (
             <>
-              <button onClick={() => pickAll(true)} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12 }}>Select all</button>
-              <button onClick={() => pickAll(false)} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12, marginRight: "auto" }}>Deselect all</button>
-              <button onClick={onClose} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12 }}>Cancel</button>
+              <button onClick={() => pickAll(true)} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12 }}>Seleccionar todo</button>
+              <button onClick={() => pickAll(false)} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12, marginRight: "auto" }}>Deseleccionar todo</button>
+              <button onClick={onClose} style={{ padding: "7px 12px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12 }}>Cancelar</button>
               <button onClick={create} disabled={!count}
                 style={{ padding: "8px 16px", border: "none", background: count ? "var(--ink)" : "var(--text-faint)", color: "var(--paper-bright)", cursor: count ? "pointer" : "default", fontWeight: 700, fontFamily: "var(--f-mono)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                Create {count} condition{count === 1 ? "" : "s"}
+                Crear {count} condici{count === 1 ? "ón" : "ones"}
               </button>
             </>
           )}

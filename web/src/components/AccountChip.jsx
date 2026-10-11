@@ -30,17 +30,17 @@ export default function AccountChip({ note, onOpenChange }) {
       faceStyle={{ padding: "4px 8px 4px 4px" }}
       menuStyle={{ minWidth: 224 }}
       face={
-        <span aria-label="Account" style={{
+        <span aria-label="Cuenta" style={{
           width: 20, height: 20, background: "var(--cobalt)", color: "var(--paper-bright)",
           fontFamily: "var(--f-mono)", fontSize: 9, fontWeight: 700,
           display: "inline-flex", alignItems: "center", justifyContent: "center",
         }}>{initialsOf(user)}</span>
       }
       items={[
-        { section: "Signed in" },
+        { section: "Sesión iniciada" },
         { note: <>{user.email}{note ? <><br />{note}</> : null}</> },
         "divider",
-        { id: "signout", label: "Sign out", danger: true, title: "Sign out", onSelect: () => signOut() },
+        { id: "signout", label: "Cerrar sesión", danger: true, title: "Cerrar sesión", onSelect: () => signOut() },
       ]}
     />
   );

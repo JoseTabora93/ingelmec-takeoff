@@ -50,7 +50,7 @@ test("otk: build → parse round-trips the takeoff verbatim and every plan's byt
 test("otk: refuses a zip with no manifest (a plain plan-set zip is not a project)", async () => {
   const { zipSync, strToU8 } = await import("fflate");
   const plain = zipSync({ "plans/A1.pdf": strToU8("%PDF-1.4") });
-  await assert.rejects(() => parseProjectArchive(plain), /isn't an OpenTakeoff project archive/);
+  await assert.rejects(() => parseProjectArchive(plain), /este no es un archivo de proyecto/);
 });
 
 test("otk: refuses an unknown archive schema loudly instead of half-loading", async () => {
@@ -58,7 +58,7 @@ test("otk: refuses an unknown archive schema loudly instead of half-loading", as
   const future = zipSync({
     "opentakeoff.project.json": strToU8(JSON.stringify({ schema: "opentakeoff.project_archive.v9", takeoff: {} })),
   });
-  await assert.rejects(() => parseProjectArchive(future), /archive version/);
+  await assert.rejects(() => parseProjectArchive(future), /versión de archivo/);
 });
 
 test("otk: refuses a manifest with no takeoff document", async () => {
@@ -66,7 +66,7 @@ test("otk: refuses a manifest with no takeoff document", async () => {
   const hollow = zipSync({
     "opentakeoff.project.json": strToU8(JSON.stringify({ schema: "opentakeoff.project_archive.v1", plans: [] })),
   });
-  await assert.rejects(() => parseProjectArchive(hollow), /no takeoff document/);
+  await assert.rejects(() => parseProjectArchive(hollow), /no trae documento de takeoff/);
 });
 
 test("otk: ignores non-plan entries smuggled into the archive", async () => {

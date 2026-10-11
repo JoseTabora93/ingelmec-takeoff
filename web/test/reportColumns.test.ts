@@ -89,8 +89,8 @@ test("CSV with a base column toggled off drops it end-to-end", () => {
   const cols = visibleCols(CSV_PROFILE, { sy_net: false });
   const csv = totalsToCsv(rows, projectName, null, null, cols);
   const header = csv.split("\n")[1];
-  assert.ok(!header.includes("SY w/Waste"));
-  assert.ok(header.endsWith("LF w/Waste"));   // neighbours intact, order kept
+  assert.ok(!header.includes("SY c/desp"));
+  assert.ok(header.endsWith("LF c/desp"));   // neighbours intact, order kept
 });
 
 test("CSV with opt-ins: appended at the end, base 13 untouched, TOTAL blank under perimeter_ref", () => {
@@ -101,7 +101,7 @@ test("CSV with opt-ins: appended at the end, base 13 untouched, TOTAL blank unde
   const goldenHeader = golden.split("\n")[1];    // line 0 is the title comment
   // existing 13 header cells unchanged, opt-ins appended verbatim at the end
   assert.equal(lines[1],
-    goldenHeader + ',Waste SF,Waste LF,"Perimeter LF (ref, incl. openings)"');
+    goldenHeader + ',Desp. SF,Desp. LF,"Perímetro LF (ref, con vanos)"');
   // CT-1 row: waste_sf = 601.59 − 546.9, waste_lf = 0, perimeter = 44.4 + 90.12
   const ct1 = lines[2].split(",");
   assert.deepEqual(ct1.slice(-3).map(Number), [54.69, 0, 134.52]);
@@ -123,7 +123,7 @@ test("customColProfile: descriptors from definitions; get reads ctx and coerces 
   ]);
   assert.deepEqual(cols.map((c: any) => [c.key, c.header, c.defaultVisible, c.custom]), [
     ["custom:c9", "CSI Division", false, true],
-    ["custom:c0", "Untitled", false, true],
+    ["custom:c0", "Sin título", false, true],
   ]);
   const ctx = { attrsByCond: new Map([["ct1", { c9: "09 68 00", c0: 42 }]]) };
   assert.equal(cols[0].get({ id: "ct1" }, ctx), "09 68 00");
@@ -185,7 +185,7 @@ test("partitionRowsBy: vocabulary order first, ad-hoc sorted after, Unassigned l
   // vocabulary order (NOT assignment order: 09 68 00 before 09 65 00), then
   // ad-hoc sorted, then null last; "09 30 00" (no rows) dropped
   assert.deepEqual(groups.map((g: any) => g.value), ["09 68 00", "09 65 00", "aa removed", "zz removed", null]);
-  assert.deepEqual(groups.map((g: any) => g.label), ["09 68 00", "09 65 00", "aa removed", "zz removed", "Unassigned"]);
+  assert.deepEqual(groups.map((g: any) => g.label), ["09 68 00", "09 65 00", "aa removed", "zz removed", "Sin asignar"]);
   assert.deepEqual(groups.map((g: any) => g.rows.map((r: any) => r.id)), [["rb1"], ["ct1"], ["wt1"], ["lvt2"], ["cnt"]]);
 });
 
@@ -203,17 +203,17 @@ test("partitionRowsBy: '' and non-string attrs fold into the null group, never a
   // (ReportPanel suppresses all group chrome on length === 1)
   assert.equal(groups.length, 1);
   assert.equal(groups[0].value, null);
-  assert.equal(groups[0].label, "Unassigned");
+  assert.equal(groups[0].label, "Sin asignar");
   assert.equal(groups[0].rows.length, rows.length);
   // no attrsByCond at all → same single Unassigned group
   assert.equal(partitionRowsBy(rows, col, undefined).length, 1);
 });
 
-test("partitionRowsBy: a vocabulary value literally named 'Unassigned' stays separate from the null group", () => {
-  const col = { id: "d", name: "X", values: ["Unassigned"] };
-  const attrs = new Map([["ct1", { d: "Unassigned" }]]);
+test("partitionRowsBy: a vocabulary value literally named 'Sin asignar' stays separate from the null group", () => {
+  const col = { id: "d", name: "X", values: ["Sin asignar"] };
+  const attrs = new Map([["ct1", { d: "Sin asignar" }]]);
   const groups = partitionRowsBy(rows, col, attrs);
-  assert.deepEqual(groups.map((g: any) => [g.value, g.label]), [["Unassigned", "Unassigned"], [null, "Unassigned"]]);
+  assert.deepEqual(groups.map((g: any) => [g.value, g.label]), [["Sin asignar", "Sin asignar"], [null, "Sin asignar"]]);
   assert.deepEqual(groups[0].rows.map((r: any) => r.id), ["ct1"]);
   assert.equal(groups[1].rows.length, rows.length - 1);
 });
@@ -296,18 +296,18 @@ test("specColProfile: a field-column appears only when some condition carries th
   const cols = specColProfile(withSpec);
   // every field is present across the set → all four columns, in schedule order
   assert.deepEqual(cols.map((c: any) => [c.key, c.header, c.defaultVisible, c.spec]), [
-    ["spec:manufacturer", "Manufacturer", true, true],
-    ["spec:style", "Style", true, true],
-    ["spec:color", "Spec Color", true, true],   // "Spec Color", never "Color"
-    ["spec:size", "Size", true, true],
+    ["spec:manufacturer", "Fabricante", true, true],
+    ["spec:style", "Estilo", true, true],
+    ["spec:color", "Color (cuadro)", true, true],   // "Color (cuadro)", never "Color"
+    ["spec:size", "Tamaño", true, true],
   ]);
   // only manufacturer populated anywhere → exactly one column
   const one = specColProfile([{ id: "a", spec: { manufacturer: "Vendor A" } }] as any);
   assert.deepEqual(one.map((c: any) => c.key), ["spec:manufacturer"]);
   // headers cover every SPEC_FIELD, and none collides with the appearance "Color".
-  // "Description" and then "Schedule Remarks" are appended last so shipped
+  // "Descripción" and then "Notas del cuadro" are appended last so shipped
   // spec-column order is preserved.
-  assert.deepEqual(SPEC_FIELDS.map((f: any) => f.header), ["Manufacturer", "Style", "Spec Color", "Size", "Description", "Schedule Remarks"]);
+  assert.deepEqual(SPEC_FIELDS.map((f: any) => f.header), ["Fabricante", "Estilo", "Color (cuadro)", "Tamaño", "Descripción", "Notas del cuadro"]);
 });
 
 test("specColProfile: remarks is a \"Schedule Remarks\" column, appended last, only when populated", () => {
@@ -315,9 +315,9 @@ test("specColProfile: remarks is a \"Schedule Remarks\" column, appended last, o
     { id: "ct1", spec: { manufacturer: "Vendor A", description: "PORCELAIN TILE", remarks: "SEE NOTE 4" } },
   ] as any);
   assert.deepEqual(withRemarks.map((c: any) => [c.key, c.header]), [
-    ["spec:manufacturer", "Manufacturer"],
-    ["spec:description", "Description"],
-    ["spec:remarks", "Schedule Remarks"],
+    ["spec:manufacturer", "Fabricante"],
+    ["spec:description", "Descripción"],
+    ["spec:remarks", "Notas del cuadro"],
   ]);
   const ctx = { specByCond: new Map([["ct1", { remarks: "SEE NOTE 4" }]]) };
   assert.equal(withRemarks[2].get({ id: "ct1" }, ctx), "SEE NOTE 4");
@@ -336,7 +336,7 @@ test("specColProfile: description is a spec column, appended after size, only wh
     { id: "wp1", spec: { manufacturer: "Vendor A", description: "WOOD WALL PANEL" } },
   ] as any);
   assert.deepEqual(withDesc.map((c: any) => c.key), ["spec:manufacturer", "spec:description"]);
-  assert.equal(withDesc[1].header, "Description");
+  assert.equal(withDesc[1].header, "Descripción");
   // empty/absent description → no column (empty-gate), so legacy 4-field specs
   // produce byte-identical output
   const noDesc = specColProfile([{ id: "a", spec: { manufacturer: "Vendor A", size: "12x24" } }] as any);
@@ -363,7 +363,7 @@ test("CSV with spec columns: appended after the frozen 13, values per row, unspe
   const lines = csv.split("\n");
   const goldenLines = golden.split("\n");
   // frozen 13 header cells byte-identical; spec headers appended, schedule order
-  assert.equal(lines[1], goldenLines[1] + ",Manufacturer,Style,Spec Color,Size");
+  assert.equal(lines[1], goldenLines[1] + ",Fabricante,Estilo,Color (cuadro),Tamaño");
   // CT-1 body row = golden row + its four spec cells (comma value quoted)
   assert.equal(lines[2], goldenLines[2] + ',Vendor A,"Grand, Deluxe",Slate 5,"24""x24"""');
   // LVT-2: formula-shaped manufacturer guarded, empty style blank
@@ -393,7 +393,7 @@ test("rollColProfile: empty without figured layouts; ×N-applied getters through
   const rollByCond = new Map([["c1", { orderFt: 29, rollCount: 2, seamLf: 30 }]]);
   const cols = rollColProfile(rollByCond);
   assert.deepEqual(cols.map((c: any) => [c.key, c.header]),
-    [["roll:order_lf", "Roll Order LF"], ["roll:rolls", "Rolls"], ["roll:seam_lf", "Seam LF"]]);
+    [["roll:order_lf", "Pedido de rollo LF"], ["roll:rolls", "Rollos"], ["roll:seam_lf", "Seam LF"]]);
   const ctx = { rollByCond };
   const row = { id: "c1", multiplier: 3 };
   assert.equal(cols[0].get(row, ctx), 87, "order LF ×N");
@@ -405,7 +405,7 @@ test("rollColProfile: empty without figured layouts; ×N-applied getters through
   assert.equal(rollColProfile(legacy)[2].get(row, { rollByCond: legacy }), 0);
   // metric: the LF columns convert at the descriptor like every dimensioned column
   const [mOrder, , mSeam] = applyUnits(cols, "metric");
-  assert.equal(mOrder.header, "Roll Order m");
+  assert.equal(mOrder.header, "Pedido de rollo m");
   assert.equal(mOrder.get(row, ctx), round2(87 * 0.3048));
   assert.equal(mSeam.header, "Seam m");
   assert.equal(mSeam.get(row, ctx), round2(90 * 0.3048));

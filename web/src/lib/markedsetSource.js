@@ -24,12 +24,12 @@ export function sourcePageMode({ dark = false, encrypted = false } = {}) {
 /** What the sheet stamp appends when the page is a raster for a reason the
  *  reader should know. Dark mode is the user's own setting; it needs no note. */
 export function sourceStampNote(mode) {
-  return mode === "raster" ? " · raster copy, the source PDF is encrypted, so its vector page cannot be embedded" : "";
+  return mode === "raster" ? " · copia ráster: el PDF de origen está cifrado, así que su página vectorial no se puede incrustar" : "";
 }
 
 /** The refusal when a forced raster has nowhere to render — the MCP server
  *  runs this module with no DOM (light mode only, by design), so an encrypted
  *  source there is named, not printed blank and not left as a stack trace. */
 export function noCanvasForRasterMessage(label) {
-  return `${label ? `${label}: ` : ""}the source PDF is encrypted, so its page cannot be copied as vector, and this environment has no canvas to render it as an image. Export the marked set from the app, or supply an unencrypted PDF.`;
+  return `${label ? `${label}: ` : ""}el PDF de origen está cifrado, así que su página no se puede copiar como vector, y este entorno no tiene lienzo para dibujarla como imagen. Exporte el juego marcado desde la aplicación o entregue un PDF sin cifrar.`;
 }

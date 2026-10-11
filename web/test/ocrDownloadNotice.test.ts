@@ -31,7 +31,7 @@ const buttons = (props: Record<string, unknown>) =>
 test("says up to how many MB, from the raw download size", () => {
   // The staged manifest's total (det + rec + dict + runtime wasm).
   const html = render({ downloadBytes: 36_243_408, progress: null, onDownload() {}, onCancel() {} });
-  assert.match(html, /up to 36\.3 MB/);
+  assert.match(html, /hasta 36\.3 MB/);
   assert.equal(formatMB(36_200_000), "36.2 MB");
   assert.equal(formatMB(1_417), "0.1 MB");
 });
@@ -39,17 +39,17 @@ test("says up to how many MB, from the raw download size", () => {
 test("says what downloads, where the files come from, where they're kept, and where the read runs", () => {
   const html = render({ downloadBytes: 36_200_000, progress: null, onDownload() {}, onCancel() {} });
   // det + rec models, the dict, and the ORT wasm: four files, not "a model"
-  assert.match(html, /two recognition models, a character list and their runtime/);
-  assert.match(html, /from this site/);
-  assert.match(html, /kept in your browser/);
-  assert.match(html, /on this device/);
+  assert.match(html, /dos modelos de reconocimiento, una lista de caracteres y su motor de ejecución/);
+  assert.match(html, /desde este sitio/);
+  assert.match(html, /se guardan en su navegador/);
+  assert.match(html, /en este dispositivo/);
 });
 
 test("only Download calls onDownload; Cancel calls onCancel", () => {
   const calls: string[] = [];
   const props = { downloadBytes: 1e6, progress: null, onDownload: () => calls.push("download"), onCancel: () => calls.push("cancel") };
   const bs = buttons(props);
-  assert.deepEqual(bs.map(text), ["Cancel", "Download"]);
+  assert.deepEqual(bs.map(text), ["Cancelar", "Descargar"]);
   (bs[0].props.onClick as () => void)();
   assert.deepEqual(calls, ["cancel"]);
   (bs[1].props.onClick as () => void)();
@@ -63,7 +63,7 @@ test("while downloading: a progress bar, no Download button, and Cancel still ca
   assert.match(html, /<progress[^>]*value="42"[^>]*max="100"/);
   assert.match(html, /42%/);
   const bs = buttons(props);
-  assert.deepEqual(bs.map(text), ["Cancel"]);
+  assert.deepEqual(bs.map(text), ["Cancelar"]);
   (bs[0].props.onClick as () => void)();
   assert.deepEqual(calls, ["cancel"]);
 });
@@ -83,13 +83,13 @@ test("a modal dialog, labelled by its title", () => {
 
 test("Download has focus when the notice opens; Cancel takes it once the download starts", () => {
   const before = tree(idle()).filter((e) => e.type === "button");
-  assert.equal(before.find((b) => text(b) === "Download")?.props.autoFocus, true);
-  assert.notEqual(before.find((b) => text(b) === "Cancel")?.props.autoFocus, true);
+  assert.equal(before.find((b) => text(b) === "Descargar")?.props.autoFocus, true);
+  assert.notEqual(before.find((b) => text(b) === "Cancelar")?.props.autoFocus, true);
   const during = tree(busy(3)).filter((e) => e.type === "button");
-  const cancel = during.find((b) => text(b) === "Cancel")!;
+  const cancel = during.find((b) => text(b) === "Cancelar")!;
   assert.equal(cancel.props.autoFocus, true);
   // A new key remounts Cancel, so React focuses it when Download unmounts.
-  const keyOf = (els: El[]) => (els.find((b) => text(b) === "Cancel") as unknown as { key: unknown }).key;
+  const keyOf = (els: El[]) => (els.find((b) => text(b) === "Cancelar") as unknown as { key: unknown }).key;
   assert.notEqual(keyOf(before), keyOf(during));
 });
 

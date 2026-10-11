@@ -278,35 +278,35 @@ test("evaluateTags without rank → first-seen, as before", () => {
   assert.equal(r.get("t")?.status, "duplicate");
 });
 
-const TAIL = "A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it, ";
+const TAIL = "Un código de cuatro o cinco letras sin número se lee solo cuando arriba hay el encabezado o una fila ya leída, llena dos o más columnas más, y después le sigue una fila con un código numerado, como CPT-1; ";
 
 test("skippedSummary: distinct codes in first-seen order, repeats counted by line, more than 8 summarized", () => {
   assert.deepEqual(skippedSummary(["EPOX"]), { count: 1, list: "EPOX", lines: 1 });
   assert.deepEqual(skippedSummary(["EPOX", "SEAL"]), { count: 2, list: "EPOX, SEAL", lines: 2 });
-  assert.deepEqual(skippedSummary(["EPOX", "EPOX"]), { count: 1, list: "EPOX (2 lines)", lines: 2 });
-  assert.deepEqual(skippedSummary(["SEAL", "EPOX", "SEAL"]), { count: 2, list: "SEAL (2 lines), EPOX", lines: 3 });
+  assert.deepEqual(skippedSummary(["EPOX", "EPOX"]), { count: 1, list: "EPOX (2 líneas)", lines: 2 });
+  assert.deepEqual(skippedSummary(["SEAL", "EPOX", "SEAL"]), { count: 2, list: "SEAL (2 líneas), EPOX", lines: 3 });
   const ten = ["AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ"];
-  assert.deepEqual(skippedSummary(ten), { count: 10, list: "AAAA, BBBB, CCCC, DDDD, EEEE, FFFF, GGGG, HHHH, and 2 more", lines: 10 });
+  assert.deepEqual(skippedSummary(ten), { count: 10, list: "AAAA, BBBB, CCCC, DDDD, EEEE, FFFF, GGGG, HHHH y 2 más", lines: 10 });
   assert.deepEqual(skippedSummary([]), { count: 0, list: "", lines: 0 });
 });
 
 test("skippedBanner: the dialog's exact text, one and several", () => {
   assert.equal(skippedBanner(["EPOX"]),
-    "1 code wasn't read: EPOX. A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it, if it's a finish, add it as a condition yourself.");
+    "1 código no se leyó: EPOX. Un código de cuatro o cinco letras sin número se lee solo cuando arriba hay el encabezado o una fila ya leída, llena dos o más columnas más, y después le sigue una fila con un código numerado, como CPT-1; si es un acabado, agréguelo usted mismo como condición.");
   assert.equal(skippedBanner(["EPOX", "SEAL"]),
-    "2 codes weren't read: EPOX, SEAL. A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it, if they're finishes, add them as conditions yourself.");
-  assert.equal(skippedBanner(["EPOX", "EPOX"]), `1 code wasn't read: EPOX (2 lines). ${TAIL}if it's a finish, add it as a condition yourself.`);
+    "2 códigos no se leyeron: EPOX, SEAL. Un código de cuatro o cinco letras sin número se lee solo cuando arriba hay el encabezado o una fila ya leída, llena dos o más columnas más, y después le sigue una fila con un código numerado, como CPT-1; si son acabados, agréguelos usted mismo como condiciones.");
+  assert.equal(skippedBanner(["EPOX", "EPOX"]), `1 código no se leyó: EPOX (2 líneas). ${TAIL}si es un acabado, agréguelo usted mismo como condición.`);
   assert.equal(skippedBanner(["AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII"]),
-    `9 codes weren't read: AAAA, BBBB, CCCC, DDDD, EEEE, FFFF, GGGG, HHHH, and 1 more. ${TAIL}if they're finishes, add them as conditions yourself.`);
+    `9 códigos no se leyeron: AAAA, BBBB, CCCC, DDDD, EEEE, FFFF, GGGG, HHHH y 1 más. ${TAIL}si son acabados, agréguelos usted mismo como condiciones.`);
 });
 
 test("skippedNote: the agent's exact note, one, several, one code on two lines", () => {
   assert.equal(skippedNote(["EPOX"]),
-    "No rows read. A four- or five-letter code with no number wasn't read: EPOX. Find its line with read_sheet_text, check it with view_region, then create it with create_condition if it's a finish.");
+    "No se leyeron filas. Un código de cuatro o cinco letras sin número no se leyó: EPOX. Ubique su línea con read_sheet_text, verifíquela con view_region y, si es un acabado, créela con create_condition.");
   assert.equal(skippedNote(["EPOX", "SEAL"]),
-    "No rows read. Four- or five-letter codes with no number weren't read: EPOX, SEAL. Find their lines with read_sheet_text, check them with view_region, then create them with create_condition if they're finishes.");
+    "No se leyeron filas. Los códigos de cuatro o cinco letras sin número no se leyeron: EPOX, SEAL. Ubique sus líneas con read_sheet_text, verifíquelas con view_region y, si son acabados, créelas con create_condition.");
   assert.equal(skippedNote(["EPOX", "EPOX"]),
-    "No rows read. A four- or five-letter code with no number wasn't read: EPOX (2 lines). Find its lines with read_sheet_text, check it with view_region, then create it with create_condition if it's a finish.");
+    "No se leyeron filas. Un código de cuatro o cinco letras sin número no se leyó: EPOX (2 líneas). Ubique sus líneas con read_sheet_text, verifíquela con view_region y, si es un acabado, créela con create_condition.");
 });
 
 // #482: the dialog's "read as" flag stays while the code is the repaired one,

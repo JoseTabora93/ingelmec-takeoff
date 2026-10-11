@@ -65,7 +65,7 @@ function canonize(raw: string): Combo {
 // Overlay side: each row is [comboTokens[], description]; the combo is the
 // token array joined with spaces ("hold" and "M" are separate tokens).
 const overlayCombos: Combo[] = [...TOOLS, ...DRAW, ...VIEW].map((row) =>
-  canonize((row[0] as string[]).join(" "))
+  canonize((row[0] as string[]).map((t) => ({ mantener: "hold", clic: "click", rueda: "scroll", "dos dedos": "two-finger", Espacio: "Space" } as Record<string, string>)[t] ?? t).join(" "))
 );
 
 // §15 side: slice the section, take the first cell of every table body row,

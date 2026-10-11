@@ -163,7 +163,7 @@ export async function normalizeLogoToPng(file) {
   } finally {
     close();
   }
-  throw new Error("Logo too large, use a simpler image");
+  throw new Error("Logotipo demasiado grande: use una imagen más simple");
 }
 
 // createImageBitmap first (fast path), <img> + objectURL fallback — some
@@ -188,6 +188,6 @@ async function decodeImage(file) {
              close: () => URL.revokeObjectURL(url) };
   } catch {
     URL.revokeObjectURL(url);
-    throw new Error("Couldn't read that image, PNG, JPEG, WebP or SVG please");
+    throw new Error("No se pudo leer esa imagen: use PNG, JPEG, WebP o SVG");
   }
 }

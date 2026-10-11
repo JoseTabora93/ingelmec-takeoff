@@ -32,7 +32,7 @@ function Kbd({ children }) {
 
 export function Keys({ combo }) {
   // A tool with no key (Copy text) says where it lives instead of an empty cell.
-  if (!combo.length) return <span style={S.monoLabel}>rail</span>;
+  if (!combo.length) return <span style={S.monoLabel}>barra</span>;
   // Labels only — the handlers already treat ⌘ and Ctrl as one key. See lib/keys.ts.
   const apple = isApplePlatform();
   return (
@@ -65,46 +65,46 @@ function Section({ title, children }) {
 }
 
 const START = [
-  ["Open a plan", "Drag a PDF, an image, or a whole .zip plan set onto the canvas, or click Load sample plan to use the bundled VA finish plan. Plans stay on your device in the default local workspace."],
-  ["Set the scale first", "Every quantity depends on it. The Scale menu offers what the sheet's own title block states; hover it to preview a calibrated ruler on the drawing, or calibrate two points of a known dimension. Remembered per sheet."],
-  ["Add a condition", "A condition is a finish, CPT-1, LVT, base. Give it a tag, a waste %, and a colour. Press 1 a 9 to arm one."],
-  ["Measure", oneClickEnabled() ? "One-Click a room and it selects itself; or trace by hand with Area, Rectangle, Linear or Count. In One-Click, ⏎ creates it." : "Trace by hand with Area, Rectangle, Linear or Count, click the corners, ⏎ closes the shape. (One-Click Area is temporarily gated while the flood engine is re-validated.)"],
-  ["Read the report", "REPORT totals every condition, applies waste, and gives you order quantities, a buy list, and CSV / Excel export."],
+  ["Abrir un plano", "Arrastre un PDF, una imagen o un juego de planos .zip completo al lienzo, o haga clic en Cargar plano de ejemplo. Los planos se quedan en su dispositivo en el espacio local por omisión."],
+  ["Fije la escala primero", "Toda cantidad depende de ella. El menú Escala ofrece lo que declara el cajetín de la hoja; pase el cursor para previsualizar una regla calibrada sobre el dibujo, o calibre dos puntos de una dimensión conocida. Se recuerda por hoja."],
+  ["Agregue una condición", "Una condición es un acabado: CPT-1, LVT, rodapié. Dele una etiqueta, un % de desperdicio y un color. Presione 1 a 9 para armar una."],
+  ["Medir", oneClickEnabled() ? "Con One-Click, un recinto se selecciona solo; o trace a mano con Área, Rectángulo, Lineal o Conteo. En One-Click, ⏎ lo crea." : "Trace a mano con Área, Rectángulo, Lineal o Conteo: haga clic en las esquinas, ⏎ cierra la figura. (One-Click Área está temporalmente deshabilitado mientras se revalida el motor de relleno.)"],
+  ["Lea el reporte", "El REPORTE totaliza cada condición, aplica el desperdicio y le da cantidades de pedido, una lista de compras y exportación a CSV / Excel."],
 ];
 
 export const TOOLS = [
-  ...(oneClickEnabled() ? [[["O"], "One-Click Area, click inside a room, it selects itself"]] : []),
-  [["A"], "Area"], [["R"], "Rectangle"], [["L"], "Linear"], [["Q"], "Straight ⇄ Curve (mid-trace)"],
-  [["S"], "Surface Area (walls)"], [["C"], "Count"],
-  [["D"], "Deduct shape (Cut Out)"], [["⇧", "D"], "Deduct rectangle"],
-  [["H"], "Highlighter"], [["K"], "Check a dimension against what the drawing says"],
-  [["N"], "Dimension line, a standalone length label at the sheet's scale (markup, never counted)"],
-  [["V"], "Select"], [["G"], "Sheet gallery"],
-  [[], "Copy text (no key), box a note or schedule; its text goes on your clipboard"],
-  [["1", "-", "9"], "Arm condition N"],
-  ...(commandBoxEnabled() ? [[["hold", "M"], "Push-to-talk dictation, release runs it, Esc discards"]] : []),
+  ...(oneClickEnabled() ? [[["O"], "One-Click Área: haga clic dentro de un recinto y se selecciona solo"]] : []),
+  [["A"], "Área"], [["R"], "Rectángulo"], [["L"], "Lineal"], [["Q"], "Recta ⇄ Curva (en pleno trazo)"],
+  [["S"], "Superficie (muros)"], [["C"], "Conteo"],
+  [["D"], "Deducir figura (Recorte)"], [["⇧", "D"], "Deducir rectángulo"],
+  [["H"], "Resaltador"], [["K"], "Verificar una dimensión contra lo que dice el dibujo"],
+  [["N"], "Línea de cota: etiqueta de longitud independiente a la escala de la hoja (anotación, nunca se cuenta)"],
+  [["V"], "Seleccionar"], [["G"], "Galería de hojas"],
+  [[], "Copiar texto (sin tecla): encierre una nota o cuadro; su texto va al portapapeles"],
+  [["1", "-", "9"], "Armar la condición N"],
+  ...(commandBoxEnabled() ? [[["mantener", "M"], "Dictado con pulsar para hablar: soltar lo ejecuta, Esc lo descarta"]] : []),
 ];
 
 export const DRAW = [
-  [["⏎"], oneClickEnabled() ? "Finish the shape. In One-Click: Create the selection" : "Finish the shape"],
-  [["⌫"], "Back out one step, the last point, then the picked vertex, the region, the selected shape, the markup"],
-  [["⌘", "Z"], "Mid-trace pops the last point; otherwise undo"],
-  [["⇧", "⌘", "Z"], "Redo"],
-  [["Esc"], "Back out one level, vertex pick first, then anything in progress"],
-  [["hold", "⇧"], "Force the 45° angle lock at any cursor angle"],
-  ...(oneClickEnabled() ? [[["⌥", "click"], "In One-Click: carve a cutout inside a selected space"]] : []),
-  [["⇧", "click"], "Insert a vertex at an edge midpoint, and drag it"],
-  [["⌘", "C"], "Copy"], [["⌘", "V"], "Paste under the cursor"], [["⌘", "D"], "Duplicate"],
-  [["T"], "Trace another one like the selected shape, its condition and its tool arm, the selection drops"],
+  [["⏎"], oneClickEnabled() ? "Terminar la figura. En One-Click: crear la selección" : "Terminar la figura"],
+  [["⌫"], "Retroceder un paso: el último punto, luego el vértice elegido, la región, la figura seleccionada, la anotación"],
+  [["⌘", "Z"], "En pleno trazo quita el último punto; si no, deshace"],
+  [["⇧", "⌘", "Z"], "Rehacer"],
+  [["Esc"], "Retroceder un nivel: primero la selección de vértice, luego lo que esté en curso"],
+  [["mantener", "⇧"], "Forzar el bloqueo de ángulo de 45° con cualquier ángulo del cursor"],
+  ...(oneClickEnabled() ? [[["⌥", "clic"], "En One-Click: abrir un recorte dentro de un espacio seleccionado"]] : []),
+  [["⇧", "clic"], "Insertar un vértice en el punto medio de un borde y arrastrarlo"],
+  [["⌘", "C"], "Copiar"], [["⌘", "V"], "Pegar bajo el cursor"], [["⌘", "D"], "Duplicar"],
+  [["T"], "Trazar otro igual a la figura seleccionada: su condición y su herramienta se arman, la selección se suelta"],
 ];
 
 export const VIEW = [
-  [["scroll"], "Zoom toward the cursor"],
-  [["two-finger"], "Pan, both axes"],
-  [["⇧", "scroll"], "Pan"],
-  [["hold", "Space"], "Pan with any tool armed, as does middle-drag or right-drag"],
-  [["F"], "Focus mode, collapse the chrome, trade it for canvas height"],
-  [["?"], "Open this guide"],
+  [["rueda"], "Acercar hacia el cursor"],
+  [["dos dedos"], "Desplazar en ambos ejes"],
+  [["⇧", "rueda"], "Desplazar"],
+  [["mantener", "Espacio"], "Desplazar con cualquier herramienta armada, igual que arrastrar con el botón central o el derecho"],
+  [["F"], "Modo enfoque: contrae la interfaz y la cambia por altura de lienzo"],
+  [["?"], "Abrir esta guía"],
 ];
 
 export default function UserGuide({ onClose, onTour, onConnect }) {
@@ -155,12 +155,12 @@ export default function UserGuide({ onClose, onTour, onConnect }) {
         }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, marginBottom: 4 }}>
           <strong style={{ fontFamily: "var(--f-display)", fontSize: 17, letterSpacing: "-0.02em" }}>Cómo funciona Ingelmec Takeoff</strong>
-          <button onClick={onClose} title="Close (Esc)"
+          <button onClick={onClose} title="Cerrar (Esc)"
             style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: 18, cursor: "pointer", lineHeight: 1, padding: 4 }}>×</button>
         </div>
         <p style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.5, margin: "0 0 22px" }}>
-          A takeoff canvas with a local workspace, no account required. Optional cloud and AI connections share data with the services you choose. Open a plan,
-          set the scale, measure the finishes, export a quantity report.
+          Un lienzo de takeoff con espacio de trabajo local, sin cuenta. Abra un plano, fije la escala,
+          mida los acabados y exporte un reporte de cantidades. Nada sale de su navegador.
         </p>
 
         {(onTour || onConnect) && (
@@ -168,13 +168,13 @@ export default function UserGuide({ onClose, onTour, onConnect }) {
             {onTour && (
               <button type="button" onClick={onTour}
                 style={{ padding: "8px 14px", border: "none", background: "var(--cobalt)", color: "var(--accent-contrast)", fontWeight: 700, fontSize: 12.5, cursor: "pointer" }}>
-                Start the guided first takeoff
+                Iniciar el primer takeoff guiado
               </button>
             )}
             {onConnect && (
               <button type="button" onClick={onConnect}
                 style={{ padding: "8px 14px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink)", fontSize: 12.5, cursor: "pointer" }}>
-                Connect your AI
+                Conectar su IA
               </button>
             )}
           </div>
@@ -185,24 +185,24 @@ export default function UserGuide({ onClose, onTour, onConnect }) {
           <a href="/licencias.html" target="_blank" rel="noreferrer">Licencias y créditos</a>
         </nav>
 
-        <Section title="Five minutes to a takeoff">
+        <Section title="Cinco minutos para un takeoff">
           <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 9 }}>
             {START.map(([t, d]) => (
               <li key={t} style={{ fontSize: 12.5, lineHeight: 1.5 }}>
                 <strong style={{ color: "var(--ink)" }}>{t}</strong>
-                <span style={{ color: "var(--ink-soft)" }}>, {keyText(d)}</span>
+                <span style={{ color: "var(--ink-soft)" }}>: {keyText(d)}</span>
               </li>
             ))}
           </ol>
         </Section>
 
-        <Section title="Tools"><Table rows={TOOLS} /></Section>
-        <Section title="Drawing & editing"><Table rows={DRAW} /></Section>
-        <Section title="Getting around"><Table rows={VIEW} /></Section>
+        <Section title="Herramientas"><Table rows={TOOLS} /></Section>
+        <Section title="Dibujo y edición"><Table rows={DRAW} /></Section>
+        <Section title="Cómo moverse"><Table rows={VIEW} /></Section>
 
         <div style={{ borderTop: "1px solid var(--ink-faint)", paddingTop: 14, fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.5 }}>
-          This is the short version. The full manual covers conditions, markups and RFIs, revisions,
-          the report and exports, and the Agent panel.
+          Esta es la versión corta. Cubre lo esencial para medir; las condiciones, las anotaciones y los RFI,
+          las revisiones, el reporte y las exportaciones se aprenden usando la app.
         </div>
       </div>
     </div>

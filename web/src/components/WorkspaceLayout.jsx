@@ -33,7 +33,7 @@ export function DockHandle({ dock, label, locked, onDrag, onMove }) {
   const startRef = useRef(null);
   const cancel = () => { startRef.current = null; onDrag(null); };
   if (locked) return null;
-  return <button type="button" className="calm-dock-handle" aria-label={`Move ${label}`} title={`Move ${label}: drag to either edge, or use Left/Right arrow keys. Layout also has position selectors.`}
+  return <button type="button" className="calm-dock-handle" aria-label={`Mover ${label}`} title={`Mover ${label}: arrastre a cualquier borde, o use las flechas Izquierda/Derecha. La disposición también tiene selectores de posición.`}
     onKeyDown={(e) => { if (["ArrowLeft", "ArrowRight", "Escape"].includes(e.key)) { e.preventDefault(); e.stopPropagation(); if (e.key !== "Escape") onMove(dock, e.key === "ArrowLeft" ? "left" : "right"); cancel(); } }}
     onPointerDown={(e) => { if (e.button !== 0) return; e.preventDefault(); e.stopPropagation(); e.currentTarget.focus({ preventScroll: true }); startRef.current = { x: e.clientX, y: e.clientY, moved: false }; e.currentTarget.setPointerCapture(e.pointerId); }}
     onPointerMove={(e) => { const start = startRef.current; if (!start) return; e.stopPropagation(); if (!start.moved && Math.hypot(e.clientX - start.x, e.clientY - start.y) >= 6) { start.moved = true; onDrag(dock); } }}
@@ -51,7 +51,7 @@ export function DockHandle({ dock, label, locked, onDrag, onMove }) {
 
 export function DockTargets({ dragging }) {
   if (!dragging) return null;
-  return <>{["left", "right"].map((side) => <div key={side} className={`calm-dock-target calm-dock-target-${side}`} style={{ zIndex: Z.modal }} aria-hidden="true">Dock {side}</div>)}</>;
+  return <>{["left", "right"].map((side) => <div key={side} className={`calm-dock-target calm-dock-target-${side}`} style={{ zIndex: Z.modal }} aria-hidden="true">Acoplar {side === "left" ? "a la izquierda" : "a la derecha"}</div>)}</>;
 }
 
 export function WorkspaceLayoutDialog({ open, onClose, prefs, onOpenChange }) {
@@ -66,21 +66,21 @@ export function WorkspaceLayoutDialog({ open, onClose, prefs, onOpenChange }) {
   }, [open, onOpenChange]);
   const { layout, update } = prefs;
   return <dialog ref={ref} className="calm-layout-dialog" onKeyDown={(e) => e.stopPropagation()} aria-labelledby="workspace-layout-title" onCancel={(e) => { e.preventDefault(); onClose(); }}>
-    <header><div><h2 id="workspace-layout-title">Your workspace</h2><p>Saved on this browser. Your team keeps its own arrangement.</p></div><button type="button" onClick={onClose} aria-label="Close layout settings">×</button></header>
-    <section className="workspace-appearance"><h3>Appearance</h3><label>Surface<select aria-label="Workspace surface" value={layout.look} onChange={(e) => update({ look: e.target.value })}><option value="graphite">Backlit graphite</option><option value="light">Studio light</option><option value="hud">Instrument HUD</option></select></label><label>Active icon backlight<input aria-label="Active icon backlight" type="range" min="0" max="100" value={layout.backlight} onChange={(e) => update({ backlight: Number(e.target.value) })} /><output>{layout.backlight}%</output></label></section>
-    <label className="calm-lock"><input type="checkbox" checked={layout.locked} onChange={(e) => update({ locked: e.target.checked })} />Lock panel positions and sizes</label>
-    <p className="calm-layout-help">Unlock to drag a panel’s grip to either edge, or choose its position below. Opening and closing panels always stays available.</p>
-    <fieldset disabled={layout.locked}><legend>Panel arrangement</legend>
-      {[["tools", "Measuring tools"], ["sheets", "Sheets"], ["work", "Work and review"], ["takeoffs", "Takeoffs"]].map(([id, label]) => <label key={id}>{label}<select aria-label={`${label} position`} value={layout[id]} onChange={(e) => prefs.move(id, e.target.value)}><option value="left">Left sidebar</option><option value="right">Right sidebar</option></select></label>)}
-      <label>Work panel width <input aria-label="Work panel width" type="range" min="300" max="480" step="20" value={layout.workWidth} onChange={(e) => update({ workWidth: Number(e.target.value) })} /><output>{layout.workWidth}px</output></label>
-      <label>Sheets panel width <input aria-label="Sheets panel width" type="range" min="220" max="340" step="20" value={layout.sheetWidth} onChange={(e) => update({ sheetWidth: Number(e.target.value) })} /><output>{layout.sheetWidth}px</output></label>
+    <header><div><h2 id="workspace-layout-title">Su espacio de trabajo</h2><p>Guardado en este navegador. Su equipo conserva su propia disposición.</p></div><button type="button" onClick={onClose} aria-label="Cerrar ajustes de disposición">×</button></header>
+    <section className="workspace-appearance"><h3>Apariencia</h3><label>Superficie<select aria-label="Superficie del espacio de trabajo" value={layout.look} onChange={(e) => update({ look: e.target.value })}><option value="graphite">Grafito retroiluminado</option><option value="light">Luz de estudio</option><option value="hud">HUD de instrumento</option></select></label><label>Retroiluminación del icono activo<input aria-label="Retroiluminación del icono activo" type="range" min="0" max="100" value={layout.backlight} onChange={(e) => update({ backlight: Number(e.target.value) })} /><output>{layout.backlight}%</output></label></section>
+    <label className="calm-lock"><input type="checkbox" checked={layout.locked} onChange={(e) => update({ locked: e.target.checked })} />Bloquear posiciones y tamaños de los paneles</label>
+    <p className="calm-layout-help">Desbloquee para arrastrar el asa de un panel a cualquier borde, o elija su posición abajo. Abrir y cerrar paneles siempre está disponible.</p>
+    <fieldset disabled={layout.locked}><legend>Disposición de paneles</legend>
+      {[["tools", "Herramientas de medición"], ["sheets", "Hojas"], ["work", "Trabajo y revisión"], ["takeoffs", "Cantidades"]].map(([id, label]) => <label key={id}>{label}<select aria-label={`${label} position`} value={layout[id]} onChange={(e) => prefs.move(id, e.target.value)}><option value="left">Barra lateral izquierda</option><option value="right">Barra lateral derecha</option></select></label>)}
+      <label>Ancho del panel de trabajo <input aria-label="Ancho del panel de trabajo" type="range" min="300" max="480" step="20" value={layout.workWidth} onChange={(e) => update({ workWidth: Number(e.target.value) })} /><output>{layout.workWidth}px</output></label>
+      <label>Ancho del panel de hojas <input aria-label="Ancho del panel de hojas" type="range" min="220" max="340" step="20" value={layout.sheetWidth} onChange={(e) => update({ sheetWidth: Number(e.target.value) })} /><output>{layout.sheetWidth}px</output></label>
     </fieldset>
-    <div className="calm-layout-options"><label><input type="checkbox" checked={layout.readout} onChange={(e) => update({ readout: e.target.checked })} />Show floating quantity box</label><label><input type="checkbox" checked={layout.palette} onChange={(e) => update({ palette: e.target.checked })} />Show pinned condition palette</label><label><input type="checkbox" checked={layout.counter} onChange={(e) => update({ counter: e.target.checked })} />Show project quantity counter</label></div>
-    <section><h3>Saved arrangements</h3><form onSubmit={(e) => { e.preventDefault(); prefs.save(name); setMessage(`Saved “${name.trim()}”.`); setName(""); }}><input aria-label="Arrangement name" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder="e.g. My estimating desk" /><button disabled={!name.trim()}>Save current</button></form>
-      <p className="calm-layout-help">Up to 8 arrangements. Saving the same name replaces it. Loading an arrangement also restores its lock setting.</p>
-      {prefs.saved.map((s) => <div key={s.name} className="calm-saved-layout"><button type="button" onClick={() => { update(s.layout); setMessage(`Loaded “${s.name}”.`); }}>{s.name}</button><button type="button" aria-label={`Delete arrangement ${s.name}`} onClick={() => { prefs.remove(s.name); setMessage(`Removed “${s.name}” from saved arrangements.`); }}>×</button></div>)}
-      <p role="status">{prefs.storageFailed ? "Browser storage is unavailable. This layout will last for this session only." : message}</p>
+    <div className="calm-layout-options"><label><input type="checkbox" checked={layout.readout} onChange={(e) => update({ readout: e.target.checked })} />Mostrar cuadro flotante de cantidades</label><label><input type="checkbox" checked={layout.palette} onChange={(e) => update({ palette: e.target.checked })} />Mostrar la paleta de condiciones fijadas</label><label><input type="checkbox" checked={layout.counter} onChange={(e) => update({ counter: e.target.checked })} />Mostrar el contador de cantidades del proyecto</label></div>
+    <section><h3>Disposiciones guardadas</h3><form onSubmit={(e) => { e.preventDefault(); prefs.save(name); setMessage(`Se guardó «${name.trim()}».`); setName(""); }}><input aria-label="Nombre de la disposición" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder="p. ej. Mi mesa de estimación" /><button disabled={!name.trim()}>Guardar la actual</button></form>
+      <p className="calm-layout-help">Hasta 8 disposiciones. Guardar con el mismo nombre la reemplaza. Cargar una disposición también restaura su ajuste de bloqueo.</p>
+      {prefs.saved.map((s) => <div key={s.name} className="calm-saved-layout"><button type="button" onClick={() => { update(s.layout); setMessage(`Se cargó «${s.name}».`); }}>{s.name}</button><button type="button" aria-label={`Eliminar disposición ${s.name}`} onClick={() => { prefs.remove(s.name); setMessage(`Se quitó «${s.name}» de las disposiciones guardadas.`); }}>×</button></div>)}
+      <p role="status">{prefs.storageFailed ? "El almacenamiento del navegador no está disponible. Esta disposición durará solo esta sesión." : message}</p>
     </section>
-    <footer><button type="button" onClick={() => { update(DEFAULT_LAYOUT); setMessage("Default arrangement restored. Saved arrangements kept."); }}>Reset arrangement</button><button type="button" onClick={onClose}>Done</button></footer>
+    <footer><button type="button" onClick={() => { update(DEFAULT_LAYOUT); setMessage("Disposición por omisión restaurada. Se conservaron las disposiciones guardadas."); }}>Restablecer disposición</button><button type="button" onClick={onClose}>Listo</button></footer>
   </dialog>;
 }

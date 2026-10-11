@@ -3,12 +3,34 @@
 import { useState } from "react";
 import { Icon } from "../brand/icons.jsx";
 import { aiConfig, saveAiConfig } from "../lib/ai.js";
+import { SIN_EXTERNOS } from "../lib/ingelmec.js"; // INGELMEC
 
 export default function AiSettings({ onClose }) {
   const [cfg, setCfg] = useState(aiConfig);
   const set = (k) => (e) => setCfg((c) => ({ ...c, [k]: e.target.value }));
   const save = () => { saveAiConfig(cfg); onClose(true); };
   const clear = () => { saveAiConfig({ endpoint: "", apiKey: "", model: "", provider: "" }); onClose(true); };
+
+  // INGELMEC: el agente en el lienzo está cerrado. Este diálogo solo informa cómo se usa el agente en Ingelmec.
+  if (SIN_EXTERNOS) {
+    return (
+      <div onClick={() => onClose(false)} style={{ position: "absolute", inset: 0, zIndex: 60, background: "rgba(14,26,46,.45)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Agente" className="panel" style={{ width: 460, maxWidth: "100%", background: "var(--paper-bright)", boxShadow: "var(--shadow-2)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderBottom: "1px solid var(--ink)" }}>
+            <Icon name="target" size={16} />
+            <strong style={{ fontFamily: "var(--f-display)", fontSize: 15 }}>Agente</strong>
+          </div>
+          <div style={{ padding: 16, fontSize: 13, lineHeight: 1.6, color: "var(--ink)" }}>
+            <p style={{ marginTop: 0 }}>En Ingelmec el agente no se configura en este lienzo: se usa desde OpenCode por el MCP.</p>
+            <p style={{ marginBottom: 0, color: "var(--ink-muted)" }}>El trabajo que el agente entrega llega aquí como un takeoff importado (Archivo, Importar mediciones) y se revisa en Trabajo, pestaña Mediciones, hasta que una persona lo apruebe.</p>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", padding: "12px 16px", borderTop: "1px solid var(--ink-faint)" }}>
+            <button className="btn-primary" onClick={() => onClose(false)}>Cerrar</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div onClick={() => onClose(false)} style={{ position: "absolute", inset: 0, zIndex: 60, background: "rgba(14,26,46,.45)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -50,11 +72,11 @@ export default function AiSettings({ onClose }) {
           </label>
           <label style={{ display: "block", margin: "6px 0" }}>
             <span className="field-label">API key (leave blank for local runtimes)</span>
-            <input type="password" value={cfg.apiKey} onChange={set("apiKey")} placeholder="stored in this browser only"
+            <input type="password" value={cfg.apiKey} onChange={set("apiKey")} placeholder="se guarda solo en este navegador"
               className="field-input" style={{ marginTop: 4 }} />
           </label>
           <p style={{ background: "var(--paper-shadow)", padding: "8px 10px", fontSize: 12.5, marginTop: 10 }}>
-            The key is stored <strong>in this browser</strong> (localStorage), anyone with access to this browser
+            The key is stored <strong>en este navegador</strong> (localStorage), anyone with access to this browser
             profile can read it, so use a key you can revoke. Leave everything blank and the AI features stay
             out of your way entirely. The endpoint must allow requests from a browser (CORS); local runtimes
             generally allow localhost.
@@ -63,8 +85,8 @@ export default function AiSettings({ onClose }) {
         <div style={{ display: "flex", gap: 8, justifyContent: "space-between", padding: "12px 16px", borderTop: "1px solid var(--ink-faint)" }}>
           <button className="btn-ghost" onClick={clear} style={{ color: "var(--c-danger)" }}>Clear</button>
           <span style={{ display: "flex", gap: 8 }}>
-            <button className="btn-ghost" onClick={() => onClose(false)}>Cancel</button>
-            <button className="btn-primary" onClick={save}>Save</button>
+            <button className="btn-ghost" onClick={() => onClose(false)}>Cancelar</button>
+            <button className="btn-primary" onClick={save}>Guardar</button>
           </span>
         </div>
       </div>

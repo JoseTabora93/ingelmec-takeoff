@@ -226,7 +226,7 @@ export function labelGroupedRows(conditions, shapes, shapeLabels = [], ctx = nul
     const bucketShapes = byLabel.get(v);
     return {
       value: v || null,               // null = Unlabeled
-      label: v || "Unlabeled",
+      label: v || "Sin etiqueta",
       rows: conditionTotals(conditions, bucketShapes, ctx).filter((r) => r.shape_count > 0),
       perimByCond: floorPerimeterLf(bucketShapes),
     };
@@ -308,7 +308,7 @@ export function sheetLabelGroupedRows(conditions, shapes, shapeLabels = [], ctx 
 // its own screen-only reconcile clause). Bare sentence, ASCII "xN" —
 // changing a character here changes the CSV golden.
 export const BY_SHEET_BASE_NOTE =
-  "By-sheet rows show measured (base) quantities; xN multipliers apply at condition level";
+  "Las filas por hoja muestran cantidades medidas (base); los multiplicadores xN se aplican a nivel de condición";
 
 // Gate for that footnote: does any by-sheet row carry a ×N > 1?
 export function hasMultipliers(bySheet) {
@@ -394,7 +394,7 @@ export function grandTotals(rows) {
  *   (SF/LF-based). "imperial" (default) is byte-identical to the frozen export.
  * @returns {string}
  */
-export function totalsToCsv(rows, projectName = "", bySheet = null, sheetLabel = null, cols = null, ctx = null, byLabel = null, brandName = "OpenTakeoff", units = "imperial") {
+export function totalsToCsv(rows, projectName = "", bySheet = null, sheetLabel = null, cols = null, ctx = null, byLabel = null, brandName = "Ingelmec Takeoff", units = "imperial") {
   // the caller passes RAW descriptors; conversion happens here (one site per
   // output) through the same applyUnits seam the report table uses
   const columns = applyUnits(cols || CSV_PROFILE.filter((c) => c.defaultVisible), units, METRIC_CSV_LABELS);
@@ -422,15 +422,15 @@ export function totalsToCsv(rows, projectName = "", bySheet = null, sheetLabel =
   // supporting materials — per condition, then a combined buy list. Coverage
   // rates deliberately stay as entered (SF/LF-based) in metric mode — the
   // upstream metric contract; the report panel carries the footnote.
-  const basisLabel = (b) => (b === "linear" ? "LF" : b === "count" ? "EA" : b === "seam_lf" ? "seam LF" : "SF");
+  const basisLabel = (b) => (b === "linear" ? "LF" : b === "count" ? "UND" : b === "seam_lf" ? "traslape LF" : "SF");
   const perCond = [];
   for (const r of rows) for (const m of (r.materials || [])) perCond.push([r.finish_tag, m.name, m.qty, m.unit, `1 ${m.unit || "unit"} / ${m.per} ${basisLabel(m.basis)}`, m.note || ""]);
   if (perCond.length) {
     lines.push("");
-    lines.push(["Finish", "Material", "Qty", "Unit", "Coverage", "Note"].map(esc).join(","));
+    lines.push(["Acabado", "Material", "Cant.", "Unidad", "Cobertura", "Nota"].map(esc).join(","));
     for (const row of perCond) lines.push(row.map(esc).join(","));
     lines.push("");
-    lines.push(["Material (combined)", "Qty", "Unit"].map(esc).join(","));
+    lines.push(["Material (combinado)", "Cant.", "Unidad"].map(esc).join(","));
     for (const s of materialsSummary(rows)) lines.push([s.name, s.qty, s.unit].map(esc).join(","));
   }
 
@@ -439,7 +439,7 @@ export function totalsToCsv(rows, projectName = "", bySheet = null, sheetLabel =
   // because display labels are session-volatile.
   if (bySheet && bySheet.length) {
     lines.push("");
-    lines.push(["Sheet", "Sheet ID", "Finish", `Floor ${AU}`, `Wall ${AU}`, `Border ${AU}`, LU, "EA"].map(esc).join(","));
+    lines.push(["Hoja", "ID de hoja", "Acabado", `Piso ${AU}`, `Muro ${AU}`, `Borde ${AU}`, LU, "UND"].map(esc).join(","));
     for (const g of bySheet) {
       const label = sheetLabel ? sheetLabel(g.sheet_id) : g.sheet_id;
       for (const row of g.rows) {
@@ -458,14 +458,14 @@ export function totalsToCsv(rows, projectName = "", bySheet = null, sheetLabel =
   // CSV stays byte-identical.
   if (byLabel && byLabel.length) {
     lines.push("");
-    lines.push(["Label", "Finish", `Floor ${AU}`, `Wall ${AU}`, `Border ${AU}`, LU, "EA"].map(esc).join(","));
+    lines.push(["Etiqueta", "Acabado", `Piso ${AU}`, `Muro ${AU}`, `Borde ${AU}`, LU, "UND"].map(esc).join(","));
     for (const g of byLabel) {
-      const name = g.value || "Unlabeled";
+      const name = g.value || "Sin etiqueta";
       for (const row of g.rows) lines.push([name, row.finish_tag, A(row.floor_sf), A(row.wall_sf), A(row.border_sf), L(row.lf), row.ea].map(esc).join(","));
     }
   }
 
-  const title = projectName ? `# ${projectName}, ${brandName} report\n` : "";
+  const title = projectName ? `# ${projectName}, ${brandName}: reporte\n` : "";
   return title + lines.join("\n") + "\n";
 }
 

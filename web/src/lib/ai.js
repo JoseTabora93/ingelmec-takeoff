@@ -1,3 +1,4 @@
+import { SIN_EXTERNOS } from "./ingelmec.js"; // INGELMEC
 // Bring-your-own-AI — strictly opt-in, dormant until configured.
 //
 // The in-canvas takeoff agent (agentLoop.js) runs on a vision model YOU
@@ -43,6 +44,8 @@ export function aiConfig() {
 
 /** Configured = endpoint + model. A key is optional — local runtimes need none. */
 export function isAiConfigured() {
+  // INGELMEC: el agente en el lienzo está CERRADO; en Ingelmec el agente se usa desde OpenCode por el MCP
+  if (SIN_EXTERNOS) return false;
   const c = aiConfig();
   return !!(c.endpoint && c.model);
 }
@@ -173,14 +176,14 @@ export async function visionQuery({ imageDataUrl, prompt, maxTokens = 100 }) {
     res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body), signal: ctl.signal });
   } catch (e) {
     throw new Error(e?.name === "AbortError"
-      ? "The endpoint took more than 30 seconds, check the model is loaded."
-      : "Couldn't reach the endpoint, check the URL, and that it allows browser requests (CORS).");
+      ? "El endpoint tardó más de 30 segundos: revise que el modelo esté cargado."
+      : "No se pudo conectar con el endpoint: revise la URL y que permita solicitudes del navegador (CORS).");
   } finally {
     clearTimeout(timer);
   }
   if (!res.ok) throw new Error(`AI request failed (HTTP ${res.status}).`);
   const text = parseVisionResponse(cfg.provider, await res.json().catch(() => null));
-  if (text == null) throw new Error("The endpoint replied, but not with text.");
+  if (text == null) throw new Error("El endpoint respondió, pero no con texto.");
   return text;
 }
 
@@ -207,8 +210,8 @@ export async function chatWithTools({ cfg, system, messages, tools, maxTokens = 
     res = await (fetchFn || fetch)(url, { method: "POST", headers, body: JSON.stringify(body), signal: sig });
   } catch (e) {
     if (signal?.aborted || e?.name === "AbortError") throw e;
-    if (e?.name === "TimeoutError") throw new Error("The endpoint took more than 2 minutes, check the model is loaded.");
-    throw new Error("Couldn't reach the endpoint, check the URL, and that it allows browser requests (CORS).");
+    if (e?.name === "TimeoutError") throw new Error("El endpoint tardó más de 2 minutos: revise que el modelo esté cargado.");
+    throw new Error("No se pudo conectar con el endpoint: revise la URL y que permita solicitudes del navegador (CORS).");
   }
   if (!res.ok) throw new Error(`AI request failed (HTTP ${res.status}).`);
   const json = await res.json().catch(() => null);

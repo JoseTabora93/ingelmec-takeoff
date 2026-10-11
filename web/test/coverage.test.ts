@@ -273,11 +273,11 @@ test("materialKind: edge/cap profiles classify as trim, and never eat an adhesiv
 test("trim presets are LF-per-stick, with the metric stock lengths exact", () => {
   const by = Object.fromEntries((MATERIAL_PRESETS as any).trim.map((p: any) => [p.label, p.per]));
   // 2.5 m = 8.202 ft, not 8 — a stick short on every order is the failure this prevents
-  assert.ok(Math.abs(by["2.5 m stick (8′ 2-1/2″)"] - 2.5 / 0.3048) < 0.001);
-  assert.ok(Math.abs(by["3 m stick (9′ 10″)"] - 3 / 0.3048) < 0.001);
-  assert.ok(Math.abs(by["1.5 m stick (4′ 11″)"] - 1.5 / 0.3048) < 0.001);
+  assert.ok(Math.abs(by["barra de 2.5 m (8′ 2-1/2″)"] - 2.5 / 0.3048) < 0.001);
+  assert.ok(Math.abs(by["barra de 3 m (9′ 10″)"] - 3 / 0.3048) < 0.001);
+  assert.ok(Math.abs(by["barra de 1.5 m (4′ 11″)"] - 1.5 / 0.3048) < 0.001);
   // 500 LF of cap off 2.5 m sticks
-  assert.equal(Math.ceil(500 / by["2.5 m stick (8′ 2-1/2″)"]), 61);
+  assert.equal(Math.ceil(500 / by["barra de 2.5 m (8′ 2-1/2″)"]), 61);
   // a grout line must NOT pick up the trim calculator
   assert.equal(showsGroutCalc({ name: "Top cap profile", basis: "linear", grout: { ...GROUT_DEFAULTS } }), false);
 });

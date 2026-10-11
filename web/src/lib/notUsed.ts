@@ -51,6 +51,6 @@ export function notUsedKind(text: string): NotUsedKind | null {
  * appends it to the visible text for screen readers). An unpicked row that
  * can be picked also says it can be selected anyway. */
 export function notUsedNote(kind: NotUsedKind, s: { pickable: boolean; picked: boolean }): string {
-  const base = kind === "not-used" ? " The schedule marks this row not used." : " The schedule marks this row N.I.C. (not in contract).";
-  return s.pickable && !s.picked ? `${base} Select it to create a condition anyway.` : base;
+  const base = kind === "not-used" ? " El cuadro marca esta fila como no usada." : " El cuadro marca esta fila como N.I.C. (fuera de contrato).";
+  return s.pickable && !s.picked ? `${base} Selecciónela para crear una condición de todos modos.` : base;
 }

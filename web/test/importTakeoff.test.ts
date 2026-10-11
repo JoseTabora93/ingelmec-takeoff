@@ -20,9 +20,9 @@ const doc = (over: Record<string, unknown> = {}) => ({
 });
 
 test("parse: rejects non-JSON and wrong schemas, passes the real one", () => {
-  assert.throws(() => parseTakeoffImport("{nope"), /not valid JSON/);
-  assert.throws(() => parseTakeoffImport(JSON.stringify({ schema: "something.else" })), /not a takeoff export/);
-  assert.throws(() => parseTakeoffImport(JSON.stringify([1, 2])), /not a takeoff export/);
+  assert.throws(() => parseTakeoffImport("{nope"), /no es un JSON válido/);
+  assert.throws(() => parseTakeoffImport(JSON.stringify({ schema: "something.else" })), /no es una exportación de takeoff/);
+  assert.throws(() => parseTakeoffImport(JSON.stringify([1, 2])), /no es una exportación de takeoff/);
   assert.equal(parseTakeoffImport(JSON.stringify(doc())).project_name, "Agent Run");
 });
 
@@ -213,9 +213,9 @@ test("conflicting scale refuses imports atomically, including into an untraced p
   for (const shapes of [[], [{ id: "existing", sheet_id: "va.pdf" }]]) {
     const current = doc({ shapes, sheets: [{ sheet_id: "va.pdf", units_per_px: 0.025 }] });
     const before = structuredClone(current);
-    assert.throws(() => mergeTakeoffImport(current, doc()), /scale conflict on va.pdf/);
+    assert.throws(() => mergeTakeoffImport(current, doc()), /conflicto de escala en va.pdf/);
     assert.deepEqual(current, before);
-    assert.throws(() => mergeTakeoffImport(current, doc({ sheets: [] })), /imported missing/);
+    assert.throws(() => mergeTakeoffImport(current, doc({ sheets: [] })), /importada falta/);
   }
 });
 
@@ -246,7 +246,7 @@ test("multiplier (#455): 0 / negative / non-numeric is refused on both paths, no
   const working = { conditions: [{ id: "mine", finish_tag: "LVT-1" }], shapes: [{ id: "s0", sheet_id: "va.pdf", condition_id: "mine" }], markups: [], sheets: [{ sheet_id: "va.pdf", units_per_px: 0.05 }] };
   for (const m of [0, -2, "abc", "3", Number.NaN, Number.POSITIVE_INFINITY, true, {}]) {
     for (const current of [empty, working]) {   // clean-replace path and merge path
-      assert.throws(() => mergeTakeoffImport(current, bad(m)), /Couldn't import takeoff: condition multiplier must be a positive number, CPT-1 .*Nothing was imported/, `multiplier ${String(m)}`);
+      assert.throws(() => mergeTakeoffImport(current, bad(m)), /No se pudo importar el takeoff: el multiplicador de la condición debe ser un número positivo, CPT-1 .*No se importó nada/, `multiplier ${String(m)}`);
     }
   }
 });

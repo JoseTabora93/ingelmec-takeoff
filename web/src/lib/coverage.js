@@ -3,30 +3,30 @@
 export function materialKind(m) {
   if (m?.kind) return m.kind;
   const n = m?.name || "";
-  if (/mortar|thin-?set/i.test(n)) return "mortar";
-  if (/grout/i.test(n)) return "grout";
-  if (/adhes|glue|bond|mastic/i.test(n)) return "adhesive";
+  if (/mortar|mortero|thin-?set/i.test(n)) return "mortar";
+  if (/grout|boquilla|lechada/i.test(n)) return "grout";
+  if (/adhes|glue|bond|mastic|pegamento|cola\b/i.test(n)) return "adhesive";
   // Edge/cap profiles, LAST so it can't eat an adhesive whose name mentions a trim.
   // These are stick goods: they are bought by the LENGTH OF STICK, not by a spread
   // rate, which is why they get their own preset family below.
-  if (/\btrim\b|\bprofile\b|top cap|edge cap|nosing|\bschiene\b|reducer/i.test(n)) return "trim";
+  if (/\btrim\b|\bprofile\b|perfil|top cap|edge cap|nosing|\bschiene\b|reducer|reductor/i.test(n)) return "trim";
   return "";
 }
 export const MATERIAL_PRESETS = {
   adhesive: [                              // SF per gallon
-    { label: '1/16″×1/32″×1/32″ U (PSA)', per: 200 },
-    { label: '1/4″ nap roller (PSA)',      per: 300 },
-    { label: '1/16″×1/16″×1/16″ sq',       per: 150 },
-    { label: '1/8″×1/8″×1/8″ sq',          per: 100 },
-    { label: '3/16″ V (wood)',             per: 60 },
-    { label: '1/4″×1/4″ V (wood)',         per: 50 },
-    { label: '1/2″×1/2″ V (wood, coarse)', per: 40 },
+    { label: '1/16″×1/32″×1/32″ en U (PSA)', per: 200 },
+    { label: 'rodillo de 1/4″ (PSA)',      per: 300 },
+    { label: '1/16″×1/16″×1/16″ cuadrada',       per: 150 },
+    { label: '1/8″×1/8″×1/8″ cuadrada',          per: 100 },
+    { label: '3/16″ en V (madera)',             per: 60 },
+    { label: '1/4″×1/4″ en V (madera)',         per: 50 },
+    { label: '1/2″×1/2″ en V (madera, gruesa)', per: 40 },
   ],
   mortar: [                                // SF per 50-lb bag
-    { label: '1/4″×1/4″×1/4″ sq', per: 90 },
-    { label: '1/4″×3/8″×1/4″ sq', per: 65 },
-    { label: '1/2″×1/2″×1/2″ sq', per: 42 },
-    { label: '3/4″ U (large tile)', per: 30 },
+    { label: '1/4″×1/4″×1/4″ cuadrada', per: 90 },
+    { label: '1/4″×3/8″×1/4″ cuadrada', per: 65 },
+    { label: '1/2″×1/2″×1/2″ cuadrada', per: 42 },
+    { label: '3/4″ en U (loseta grande)', per: 30 },
   ],
   // LF per stick. Edge and cap profiles are stick goods, so the "coverage" that
   // divides a linear measure is simply the stock length — an odd-looking rate to
@@ -34,12 +34,12 @@ export const MATERIAL_PRESETS = {
   // profile kept getting ordered a stick short. Metric stock lengths dominate:
   // 2.5 m = 8.202 LF, 3 m = 9.843, 1.5 m = 4.921.
   trim: [                                  // LF per stick
-    { label: "2.5 m stick (8′ 2-1/2″)", per: 8.202 },
-    { label: "3 m stick (9′ 10″)",      per: 9.843 },
-    { label: "1.5 m stick (4′ 11″)",    per: 4.921 },
-    { label: "8 ft stick",              per: 8 },
-    { label: "10 ft stick",             per: 10 },
-    { label: "12 ft stick",             per: 12 },
+    { label: "barra de 2.5 m (8′ 2-1/2″)", per: 8.202 },
+    { label: "barra de 3 m (9′ 10″)",      per: 9.843 },
+    { label: "barra de 1.5 m (4′ 11″)",    per: 4.921 },
+    { label: "barra de 8 ft",              per: 8 },
+    { label: "barra de 10 ft",             per: 10 },
+    { label: "barra de 12 ft",             per: 12 },
   ],
 };
 export const GROUT_DENSITY = 8.33;         // industry-standard grout density factor

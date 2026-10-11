@@ -21,7 +21,7 @@ export function counterRows(totals, activeCondId) {
       const qtys = [];
       if (t.total_sf) qtys.push({ qty: t.total_sf, unit: "SF" });
       if (t.lf) qtys.push({ qty: t.lf, unit: "LF" });
-      if (t.ea) qtys.push({ qty: t.ea, unit: "EA" });
+      if (t.ea) qtys.push({ qty: t.ea, unit: "UND" });
       return { id: t.id, tag: t.finish_tag, color: t.color, qtys, shapes: t.shape_count, active: t.id === activeCondId };
     })
     .filter((r) => r.qtys.length);

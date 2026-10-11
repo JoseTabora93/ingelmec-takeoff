@@ -96,7 +96,7 @@ test("buildRuleFromSeed: traceable, plain-language, inactive nothing", () => {
   assert.equal(rule.seed_condition_id, "C1");
   assert.equal(rule.predicate.kind, "enclosed_subpolygon_deduct");
   assert.equal(rule.predicate.max_area_sf, 25);
-  assert.match(rule.label, /under 25 SF/);
+  assert.match(rule.label, /menos de 25 SF/);
   assert.match(rule.label, /CPT-1/);
   assert.equal(rule.active, true);
   assert.deepEqual(rule.applied_to, []);

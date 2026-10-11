@@ -300,7 +300,7 @@ test("aborting ensureReady resolves at once and cancels the download", async () 
 
 test("recognize before ensureReady rejects", async () => {
   const s = setup();
-  await assert.rejects(s.client.recognize(region()), /not ready/);
+  await assert.rejects(s.client.recognize(region()), /no está listo/);
 });
 
 test("a read transfers its pixels and resolves with the worker's words", async () => {
@@ -412,7 +412,7 @@ test("a worker crash rejects every pending read, and the next ensureReady respaw
   await assert.rejects(a, /worker script failed/);
   await assert.rejects(b, /worker script failed/);
   assert.equal(w.terminated, true);
-  await assert.rejects(client.recognize(region()), /not ready/);
+  await assert.rejects(client.recognize(region()), /no está listo/);
   assert.deepEqual(await client.ensureReady(), { ok: true });
   assert.equal(spawned.length, 2);
 });
@@ -431,7 +431,7 @@ test("dispose rejects every pending read and ends the worker", async () => {
   await assert.rejects(b, /disposed/);
   assert.equal(w.terminated, true);
   assert.ok(w.posted.some((p) => p.msg.type === "dispose"));
-  await assert.rejects(client.recognize(region()), /not ready/);
+  await assert.rejects(client.recognize(region()), /no está listo/);
 });
 
 test("a late reply from an aborted start doesn't settle the next one", async () => {
@@ -706,7 +706,7 @@ test("a read that never answers times out: it rejects OcrTimeoutError, the worke
   const idle = client.whenIdle();
   assert.equal(await settled(idle), false);
   timers.live()[0].fn();
-  await assert.rejects(a, (e: Error) => e instanceof OcrTimeoutError && e.name === "OcrTimeoutError" && e.message === "The on-device reader stopped responding.");
+  await assert.rejects(a, (e: Error) => e instanceof OcrTimeoutError && e.name === "OcrTimeoutError" && e.message === "El lector del dispositivo dejó de responder.");
   assert.equal(w.terminated, true);
   assert.equal(await settled(idle), true, "whenIdle can't hang on a hung worker");
   assert.equal(timers.live().length, 0);
@@ -774,7 +774,7 @@ test("a message from an ended worker is ignored: its late ready doesn't settle t
   old.onmessage?.({ data: { type: "ready" } });
   await tick();
   assert.equal(settledStart, false, "the old worker's ready isn't the new one's");
-  await assert.rejects(s.client.recognize(region()), /not ready/);
+  await assert.rejects(s.client.recognize(region()), /no está listo/);
   s.spawned[1].reply({ type: "ready", initId: initsOf(s.spawned[1])[0].msg.initId });
   assert.deepEqual(await restart, { ok: true });
 });
@@ -904,7 +904,7 @@ test("a restart that doesn't come up in 120 s is ended; its late ready is ignore
   await assert.rejects(b, OcrTimeoutError);
   assert.equal(w2.terminated, true);
   w2.onmessage?.({ data: { type: "ready", initId: initsOf(w2)[0].msg.initId } });
-  await assert.rejects(client.recognize(region()), /not ready/);
+  await assert.rejects(client.recognize(region()), /no está listo/);
   assert.equal(spawned.length, 2);
   assert.equal(await settled(idle), true);
   assert.equal(timers.live().length, 0);
@@ -966,12 +966,12 @@ test("a restart never downloads: with the cache evicted it ends consent-required
   await assert.rejects(a, OcrTimeoutError);
   const clicked = client.ensureReady({ consent: true });
   assert.deepEqual(await clicked, { ok: false, reason: "consent-required" });
-  await assert.rejects(b, /not ready/);
+  await assert.rejects(b, /no está listo/);
   const w2 = spawned[1];
   assert.ok(initsOf(w2).length >= 1);
   assert.ok(initsOf(w2).every((p) => p.msg.allowNetwork === false), "no init allowed the network");
   assert.equal(spawned.length, 2);
-  await assert.rejects(client.recognize(region()), /not ready/);
+  await assert.rejects(client.recognize(region()), /no está listo/);
   assert.equal(await settled(client.whenIdle()), true);
 });
 
@@ -1013,7 +1013,7 @@ test("two timeouts with no completed read between them reject the queue and stop
   await tick();
   assert.equal(spawned.length, 2, "no third worker");
   assert.equal(await settled(idle), true);
-  await assert.rejects(client.recognize(region()), /not ready/);
+  await assert.rejects(client.recognize(region()), /no está listo/);
   // A fresh ensureReady starts over, with a fresh allowance: the next hang
   // restarts again rather than giving up at once.
   assert.deepEqual(await client.ensureReady(), { ok: true });
@@ -1203,7 +1203,7 @@ test("a timeout while a newer start is still under way doesn't restart beside it
   assert.equal(!r.ok && r.reason, "error");
   await tick();
   assert.equal(s.spawned.length, 1, "no restart");
-  await assert.rejects(s.client.recognize(region()), /not ready/);
+  await assert.rejects(s.client.recognize(region()), /no está listo/);
   assert.equal(await settled(s.client.whenIdle()), true);
 });
 

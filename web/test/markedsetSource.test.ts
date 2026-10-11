@@ -25,16 +25,16 @@ test("sourcePageMode: dark wins, then encrypted, else vector", () => {
 test("sourceStampNote: only the forced raster discloses, and it names the reason", () => {
   assert.equal(sourceStampNote("vector"), "");
   assert.equal(sourceStampNote("raster-inverted"), "");
-  assert.match(sourceStampNote("raster"), /encrypted/);
-  assert.match(sourceStampNote("raster"), /raster copy/);
+  assert.match(sourceStampNote("raster"), /cifrado/);
+  assert.match(sourceStampNote("raster"), /copia ráster/);
 });
 
 test("noCanvasForRasterMessage: names the sheet, the reason, and the two ways out", () => {
   const m = noCanvasForRasterMessage("A-101");
   assert.match(m, /^A-101: /);
-  assert.match(m, /encrypted/);
-  assert.match(m, /no canvas/);
-  assert.match(m, /from the app|unencrypted/);
+  assert.match(m, /cifrado/);
+  assert.match(m, /no tiene lienzo/);
+  assert.match(m, /desde la aplicación|sin cifrar/);
   assert.doesNotMatch(noCanvasForRasterMessage(""), /^: /);
 });
 

@@ -642,3 +642,8 @@
 .workspace-calm [data-takeoffs-header] .calm-dock-handle {
   color:var(--paper-bright);
 }
+
+/* INGELMEC: en la disposición compacta con look grafito, el texto heredado quedaba en el azul oscuro
+   del tema claro (el body fija `color` una sola vez) sobre fondo oscuro: filas del reporte casi
+   invisibles. Se fija el color al token del propio espacio de trabajo, que cambia con el look. */
+.premium-workspace { color: var(--ink); }

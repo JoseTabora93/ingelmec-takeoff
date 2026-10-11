@@ -63,16 +63,16 @@ export type VoiceCapabilities = {
  *  reason and are never offerable. */
 export type VoiceOutcome = { ok: boolean; message: string; reason?: RejectReason };
 
-/** Every value MUST start with "Couldn't" — that prefix is what the commitMsg
+/** Todo valor DEBE empezar con "No se pudo": ese prefijo es lo que el commitMsg
  *  bar's isDangerMsg keys on to render red + sticky. */
 export const REJECTION_MESSAGES: Record<RejectReason, string> = {
-  empty: "Couldn't hear a command.",
-  unrecognized: 'Couldn\'t parse that, try "CPT-1", "waste 7", "label Phase 1", or "note …".',
-  unknown_tag: "Couldn't match that tag, say a live condition tag, or a Div-9 code like CPT-2 to create one.",
-  bad_number: 'Couldn\'t read the waste number, say 0 a 100, e.g. "waste 7" or "waste 7.5".',
-  trailing_words: "Couldn't parse, extra words after the command. One command at a time.",
-  deixis_no_condition: 'Couldn\'t trace, no active condition. Name one, like "CPT-1, this room".',
-  deixis_target: 'Couldn\'t aim that, "here"/"this room" places a takeoff, not a note or label clear.',
+  empty: "No se pudo oír un comando.",
+  unrecognized: 'No se pudo interpretar eso: pruebe «CPT-1», «waste 7», «label Fase 1» o «note …».',
+  unknown_tag: "No se pudo asociar esa etiqueta: diga una etiqueta de condición activa, o un código Div-9 como CPT-2 para crearla.",
+  bad_number: 'No se pudo leer el número de desperdicio: diga 0 a 100, p. ej. «waste 7» o «waste 7.5».',
+  trailing_words: "No se pudo interpretar: hay palabras de más después del comando. Un comando a la vez.",
+  deixis_no_condition: 'No se pudo trazar: no hay condición activa. Nombre una, como «CPT-1, este recinto».',
+  deixis_target: 'No se pudo apuntar eso: «aquí» o «este recinto» coloca un takeoff, no borra una nota ni una etiqueta.',
 };
 
 const fail = (message: string): VoiceOutcome => ({ ok: false, message });
@@ -92,7 +92,7 @@ export function applyVoiceIntent(caps: VoiceCapabilities, intent: Intent): Voice
       if (intent.known) {
         // the parser returned the ctx literal, so exact finish_tag lookup holds
         cond = caps.getConditions().find((c) => c.finish_tag === intent.tag);
-        if (!cond) return fail(`Couldn't find condition ${intent.tag}.`);
+        if (!cond) return fail(`No se pudo encontrar la condición ${intent.tag}.`);
       } else {
         // defensive dedup (agentTools create_condition precedent) before minting
         cond =
@@ -112,7 +112,7 @@ export function applyVoiceIntent(caps: VoiceCapabilities, intent: Intent): Voice
     }
     case "set_waste": {
       const id = caps.getActiveConditionId();
-      if (!id) return fail("Couldn't set waste, no active condition.");
+      if (!id) return fail("No se pudo fijar el desperdicio: no hay condición activa.");
       caps.updateCondition(id, { waste_pct: intent.waste });
       const tag = caps.getConditions().find((c) => c.id === id)?.finish_tag ?? "active condition";
       return done(`Waste ${intent.waste}% on ${tag}.`);
@@ -138,8 +138,8 @@ export function applyVoiceIntent(caps: VoiceCapabilities, intent: Intent): Voice
       // seed BEFORE arming: an off-sheet or stale aim rejects with ZERO calls —
       // a bad aim must not half-arm a condition (the mutation-safety bar)
       const seed = caps.getAimSeed();
-      if (!seed) return fail("Couldn't place that, aim went stale. Put the cursor on the room and say it again.");
-      if (!seed.sheetId) return fail("Couldn't place that, aim at a sheet.");
+      if (!seed) return fail("No se pudo colocar eso: la puntería quedó obsoleta. Ponga el cursor sobre el recinto y dígalo de nuevo.");
+      if (!seed.sheetId) return fail("No se pudo colocar eso: apunte a una hoja.");
       // arm the condition — the aimed click's sequence: chip click (or mint),
       // then the waste/label riders, then the trace
       let condId: string;
@@ -148,7 +148,7 @@ export function applyVoiceIntent(caps: VoiceCapabilities, intent: Intent): Voice
         let cond: { id: string; finish_tag: string } | undefined;
         if (intent.known) {
           cond = caps.getConditions().find((c) => c.finish_tag === spoken);
-          if (!cond) return fail(`Couldn't find condition ${spoken}.`);
+          if (!cond) return fail(`No se pudo encontrar la condición ${spoken}.`);
         } else {
           cond =
             caps.getConditions().find((c) => c.finish_tag.toUpperCase() === spoken.toUpperCase()) ??

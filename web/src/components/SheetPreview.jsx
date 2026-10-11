@@ -20,7 +20,7 @@ export default function SheetPreview({ sheet, label, withDoc, onClose, onOpen })
   useEffect(() => {
     let live = true, task, close;
     const closed = new Promise((r) => { close = r; });
-    setStatus("Loading detailed preview…"); setZoom(false);
+    setStatus("Cargando vista previa detallada…"); setZoom(false);
     const { file, page } = parseSheetKey(sheet);
     // the file may be in no tab: held while the preview is open
     withDoc(file, async (doc) => {
@@ -34,13 +34,13 @@ export default function SheetPreview({ sheet, label, withDoc, onClose, onOpen })
       await task.promise;
       if (live) setStatus("");
       await closed;
-    }).catch(() => { if (live) setStatus("This preview could not load. Open the sheet to inspect it on the canvas."); });
+    }).catch(() => { if (live) setStatus("No se pudo cargar esta vista previa. Abra la hoja para inspeccionarla en el lienzo."); });
     return () => { live = false; task?.cancel(); close(); };
   }, [sheet, withDoc]);
-  return <dialog ref={dialog} className="sheet-detail-dialog" aria-label={`Sheet preview: ${label}`} onCancel={(e) => { e.preventDefault(); onClose(); }}>
-    <header><div><small>Sheet preview</small><h2>{label}</h2></div><button type="button" onClick={onClose} aria-label="Close sheet preview">×</button></header>
-    <div className="sheet-detail-toolbar"><span>Inspect before opening</span><button type="button" aria-pressed={zoom} onClick={() => setZoom(v => !v)}>{zoom ? "Fit page" : "Actual pixels"}</button><button type="button" onClick={() => onOpen(sheet)}>Open sheet</button></div>
+  return <dialog ref={dialog} className="sheet-detail-dialog" aria-label={`Vista previa de la hoja: ${label}`} onCancel={(e) => { e.preventDefault(); onClose(); }}>
+    <header><div><small>Vista previa de la hoja</small><h2>{label}</h2></div><button type="button" onClick={onClose} aria-label="Cerrar vista previa de la hoja">×</button></header>
+    <div className="sheet-detail-toolbar"><span>Inspeccionar antes de abrir</span><button type="button" aria-pressed={zoom} onClick={() => setZoom(v => !v)}>{zoom ? "Ajustar página" : "Píxeles reales"}</button><button type="button" onClick={() => onOpen(sheet)}>Abrir hoja</button></div>
     {status && <p role="status">{status}</p>}
-    <div className={`sheet-detail-paper${zoom ? " actual-pixels" : ""}`}><canvas ref={canvas} aria-label={`${label} rendered page`} hidden={!!status} /></div>
+    <div className={`sheet-detail-paper${zoom ? " actual-pixels" : ""}`}><canvas ref={canvas} aria-label={`${label}: página dibujada`} hidden={!!status} /></div>
   </dialog>;
 }

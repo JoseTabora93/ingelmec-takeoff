@@ -94,18 +94,18 @@ export async function parseProjectArchive(bytes) {
     }, (err, data) => (err ? reject(err) : resolve(data)));
   });
   const raw = entries[MANIFEST_NAME];
-  if (!raw) throw new Error(`Couldn't open project: no ${MANIFEST_NAME} inside, this isn't an OpenTakeoff project archive.`);
+  if (!raw) throw new Error(`No se pudo abrir el proyecto: no hay ${MANIFEST_NAME} adentro, este no es un archivo de proyecto.`);
   let manifest;
   try { manifest = JSON.parse(strFromU8(raw)); }
-  catch { throw new Error("Couldn't open project: the archive's manifest isn't valid JSON."); }
+  catch { throw new Error("No se pudo abrir el proyecto: el manifiesto del archivo no es un JSON válido."); }
   if (manifest?.schema !== ARCHIVE_SCHEMA) {
     // refuse loudly rather than half-load: a FUTURE major shape may relocate
     // load-bearing data, and "opened but empty" is worse than a clear refusal
-    throw new Error(`Couldn't open project: archive version "${manifest?.schema || "unknown"}", this build reads ${ARCHIVE_SCHEMA}. Update OpenTakeoff and try again.`);
+    throw new Error(`No se pudo abrir el proyecto: versión de archivo «${manifest?.schema || "desconocida"}»; esta compilación lee ${ARCHIVE_SCHEMA}. Actualice la aplicación e intente de nuevo.`);
   }
   const takeoff = manifest.takeoff;
   if (!takeoff || typeof takeoff !== "object" || Array.isArray(takeoff)) {
-    throw new Error("Couldn't open project: the archive carries no takeoff document.");
+    throw new Error("No se pudo abrir el proyecto: el archivo no trae documento de takeoff.");
   }
   const pdfs = Object.entries(entries)
     .filter(([path]) => path.startsWith(PLANS_DIR))

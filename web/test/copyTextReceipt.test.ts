@@ -20,9 +20,9 @@ const render = (receipt: object, extra: Record<string, unknown> = {}) => renderT
 
 test("a written copy: Copied, the line count, the reader, the preview; no textarea", () => {
   const html = render(makeReceipt(OUT, { failed: false, scope: "box", key: "a.pdf" }));
-  assert.match(html, /Copied/);
-  assert.match(html, /2 lines/);
-  assert.match(html, /Text layer/);
+  assert.match(html, /Copiado/);
+  assert.match(html, /2 líneas/);
+  assert.match(html, /Capa de texto/);
   assert.match(html, /GENERAL NOTES\nSEE A-101 &amp; B/);
   assert.doesNotMatch(html, /<textarea/);
   assert.doesNotMatch(html, /rotated/);
@@ -30,32 +30,32 @@ test("a written copy: Copied, the line count, the reader, the preview; no textar
 });
 
 test("one line reads singular", () => {
-  assert.match(render(makeReceipt({ ...OUT, lineCount: 1 }, { failed: false, scope: "box", key: "k" })), /1 line(?!s)/);
+  assert.match(render(makeReceipt({ ...OUT, lineCount: 1 }, { failed: false, scope: "box", key: "k" })), /1 línea(?!s)/);
 });
 
 test("skipped rotated runs are counted on the receipt", () => {
   const html = render(makeReceipt({ ...OUT, skipped: 3 }, { failed: false, scope: "box", key: "k" }));
-  assert.match(html, / · 3 rotated left out/);
+  assert.match(html, / · 3 rotados omitidos/);
 });
 
 test("a refused write: the full text in a read-only textarea, a Copy button, Close", () => {
   const long = `${"A".repeat(400)}\nEND`;
   const html = render(makeReceipt({ ...OUT, text: long }, { failed: true, scope: "box", key: "k" }));
-  assert.match(html, /Couldn&#x27;t copy automatically, use Copy below/);
+  assert.match(html, /No se pudo copiar automáticamente: use Copiar abajo/);
   const ta = html.match(/<textarea[^>]*>([\s\S]*?)<\/textarea>/);
   assert.ok(ta, "a textarea holds the text");
   assert.match(ta[0], /readonly/i);
   assert.equal(ta[1].replace(/^\n/, ""), long, "the whole text, not the preview");
-  assert.match(html, />Copy<\/button>/);
-  assert.match(html, />Close<\/button>/);
+  assert.match(html, />Copiar<\/button>/);
+  assert.match(html, />Cerrar<\/button>/);
   assert.match(html, /role="dialog"/);
 });
 
 test("a box receipt offers Copy page text; a page receipt says it was the whole page", () => {
-  assert.match(render(makeReceipt(OUT, { failed: false, scope: "box", key: "k" })), />Copy page text<\/button>/);
+  assert.match(render(makeReceipt(OUT, { failed: false, scope: "box", key: "k" })), />Copiar texto de la página<\/button>/);
   const page = render(makeReceipt(OUT, { failed: false, scope: "page", key: "k" }));
   assert.doesNotMatch(page, /Copy page text/);
-  assert.match(page, /whole page/i);
+  assert.match(page, /página completa/i);
 });
 
 test("placed where the caller says, inside the canvas (left of a live Sweep panel)", () => {
@@ -69,7 +69,7 @@ test("placed where the caller says, inside the canvas (left of a live Sweep pane
 
 test("a keyless row shows that it lives on the rail, not an empty key cell", () => {
   const html = renderToStaticMarkup(React.createElement(Keys as never, { combo: [] }));
-  assert.match(html, /rail/);
+  assert.match(html, /barra/);
   assert.match(html, /font-family:var\(--f-mono\)/, "the shared mono label style");
   assert.doesNotMatch(html, /<kbd/);
 });
@@ -77,7 +77,7 @@ test("a keyless row shows that it lives on the rail, not an empty key cell", () 
 // ── docs ─────────────────────────────────────────────────────────────────────
 
 test("the in-app guide lists Copy text as a keyless tool", () => {
-  const row = TOOLS.find((r) => String(r[1]).startsWith("Copy text"));
+  const row = TOOLS.find((r) => String(r[1]).startsWith("Copiar texto"));
   assert.ok(row, "UserGuide TOOLS has a Copy text row");
   assert.deepEqual(row[0], [], "Copy text has no key (T is trace-another)");
 });
@@ -97,7 +97,7 @@ test("USER_GUIDE.md documents Copy text", () => {
 test("an OCR copy names OCR as the reader, and counts lines split at a seam", () => {
   const html = render(makeReceipt({ ...OUT, reader: "OCR", clipped: 2 }, { failed: true, scope: "box", key: "k" }));
   assert.match(html, /OCR/);
-  assert.match(html, /2 split at a seam/);
+  assert.match(html, /2 cortados en un empalme/);
   assert.match(html, /<textarea/, "an async OCR copy usually loses the click: the textarea holds the text");
   assert.doesNotMatch(render(makeReceipt(OUT, { failed: false, scope: "box", key: "k" })), /split at a seam/);
 });
