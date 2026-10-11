@@ -140,7 +140,7 @@ export function alignMembers(
   const ai = memberAtPoint(boxes, anchor[0], anchor[1]);
   const bi = memberAtPoint(boxes, moving[0], moving[1]);
   if (ai < 0 || bi < 0) return { error: "No sheets to align." };
-  if (ai === bi) return { error: "Both clicks landed on the same sheet — click the matching point on the other sheet." };
+  if (ai === bi) return { error: "Both clicks landed on the same sheet, click the matching point on the other sheet." };
   const dx = anchor[0] - moving[0], dy = anchor[1] - moving[1];
   const next = members.map((m, i) => (i === bi ? { ...m, dx: m.dx + dx, dy: m.dy + dy } : m));
   return { members: normalizeMembers(next), movedKey: members[bi].key };

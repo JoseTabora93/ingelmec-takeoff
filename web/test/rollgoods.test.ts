@@ -13,7 +13,7 @@ import {
 const rect = (w: number, h: number) => [{ x: 0, y: 0 }, { x: w, y: 0 }, { x: w, y: h }, { x: 0, y: h }];
 const CFG = { rollWidthFt: 12, rollLengthFt: 0, seamAllowanceIn: 2, wallOverageIn: 3, doorwayOverageIn: 1, direction: "auto" };
 
-test("roll material classes: carpet, sheet vinyl, rubber — never modular goods", () => {
+test("roll material classes: carpet, sheet vinyl, rubber, never modular goods", () => {
   assert.deepEqual(ROLL_FLOORING_TYPES, ["carpet", "sheet_vinyl", "rubber"]);
   assert.ok(isRollType("carpet") && !isRollType("carpet_tile") && !isRollType("lvt"));
 });

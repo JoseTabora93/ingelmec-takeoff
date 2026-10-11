@@ -21,7 +21,7 @@ export function getTheme() {
 export function toggleTheme() {
   const next = getTheme() === "dark" ? "light" : "dark";
   apply(next);
-  try { localStorage.setItem(KEY, next); } catch { /* private mode — session-only */ }
+  try { localStorage.setItem(KEY, next); } catch { /* private mode, session-only */ }
   return next;
 }
 

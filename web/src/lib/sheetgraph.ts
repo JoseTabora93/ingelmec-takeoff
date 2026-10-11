@@ -735,7 +735,7 @@ export { CODE_RE, finishCodeOk };
 // phantom building.
 const ROW_KEY_RE = /^\d{1,3}[A-Z]{0,2}$/;
 const QUALIFIED_KEY_RE = /^([A-Z]{1,2})-(\d{1,3}[A-Z]{0,2})$/;
-const CORRIDOR_KEY_RE = /^[A-Z]{1,3}(?:\d{1,3}-\d{1,3}|\d{3})[A-Z]?$/;   // CR11-9, C101 — never a two-character tag like "T1"
+const CORRIDOR_KEY_RE = /^[A-Z]{1,3}(?:\d{1,3}-\d{1,3}|\d{3})[A-Z]?$/;   // CR11-9, C101, never a two-character tag like "T1"
 
 export interface ExtractOpts {
   buildings?: Set<string>; deltas?: DeltaIndex;
@@ -2417,15 +2417,15 @@ export function detailCallouts(sheet: SheetSpans): DetailCallout[] {
 export interface SheetGraphSchedule { kind: TableKind; title: string; rows: number; region: Bbox; continues?: string; rotated_headers?: boolean }
 export interface SheetGraphSheet { key: string; role: SheetRole; confidence: number; evidence: Evidence | null; building?: string; schedules: SheetGraphSchedule[] }
 export interface SheetGraph {
-  available: boolean;                 // false = no text layer anywhere (a scanned set) — nothing half-populates
+  available: boolean;                 // false = no text layer anywhere (a scanned set), nothing half-populates
   sheets: SheetGraphSheet[];
   rooms: RoomTag[];                   // numbers CORROBORATED as rooms
-  unmatched_tags: UnmatchedTag[];     // numbers that are not, each with its reason — listed, never dropped
-  tables: ScheduleTable[];            // LOGICAL tables — a continued schedule is one entry
+  unmatched_tags: UnmatchedTag[];     // numbers that are not, each with its reason, listed, never dropped
+  tables: ScheduleTable[];            // LOGICAL tables, a continued schedule is one entry
   callouts: DetailCallout[];
   buildings: string[];                // every building designator the set names, sorted
-  revisions: RevisionMarker[];        // every delta/REV marker the set carries — the sheet is under revision where these sit
-  notes: string[];                    // named gaps found while building — never silent drops
+  revisions: RevisionMarker[];        // every delta/REV marker the set carries, the sheet is under revision where these sit
+  notes: string[];                    // named gaps found while building, never silent drops
 }
 
 export function buildSheetGraph(sheets: SheetSpans[]): SheetGraph {
@@ -2489,7 +2489,7 @@ export function buildSheetGraph(sheets: SheetSpans[]): SheetGraph {
     // drop is NAMED.
     const fin = readFinishTable(s, xo);
     if (fin && "refused" in fin) {
-      notes.push(`${s.key}: "${fin.table.title!.text}" names another schedule family, not a finish/material schedule — its ${fin.table.rows.length} rows are NOT indexed as finish definitions`);
+      notes.push(`${s.key}: "${fin.table.title!.text}" names another schedule family, not a finish/material schedule, its ${fin.table.rows.length} rows are NOT indexed as finish definitions`);
     } else if (fin) found.push(fin.table);
     // equipment schedules stack several to a sheet — every one, top to bottom
     found.push(...extractTables(s, "equipment", xo));
@@ -2511,7 +2511,7 @@ export function buildSheetGraph(sheets: SheetSpans[]): SheetGraph {
     for (const t of sheetFrags) {
       const shadow = t.kind === "finish" ? equip.find((e) => overlapFrac(t.region, e.region) >= 0.5) : undefined;
       if (shadow) {
-        notes.push(`${s.key}: "${t.title?.text || "untitled finish table"}" overlaps the equipment schedule "${shadow.title?.text || "untitled"}" — indexed once, as equipment, not as a finish definition`);
+        notes.push(`${s.key}: "${t.title?.text || "untitled finish table"}" overlaps the equipment schedule "${shadow.title?.text || "untitled"}", indexed once, as equipment, not as a finish definition`);
         continue;
       }
       fragments.push(t);
@@ -2527,7 +2527,7 @@ export function buildSheetGraph(sheets: SheetSpans[]): SheetGraph {
     if (base) mergeContinuation(base, f);
     else {
       if (f.title && isContinuationTitle(f.title.text)) {
-        notes.push(`${f.sheet}: "${f.title.text}" reads as a continuation but no earlier ${f.kind} table matches — kept as a standalone table`);
+        notes.push(`${f.sheet}: "${f.title.text}" reads as a continuation but no earlier ${f.kind} table matches, kept as a standalone table`);
       }
       tables.push(f);
     }
@@ -2549,7 +2549,7 @@ export function buildSheetGraph(sheets: SheetSpans[]): SheetGraph {
         mergeContinuation(base, adopted);
         for (const r of adopted.rows) if (r.building) buildings.add(r.building);
       } else {
-        notes.push(`${s.key}: "${text}" reads as a continuation of ${base.sheet} but no rows aligned to that table's columns — rows there are NOT indexed`);
+        notes.push(`${s.key}: "${text}" reads as a continuation of ${base.sheet} but no rows aligned to that table's columns, rows there are NOT indexed`);
       }
     }
   }
@@ -2622,13 +2622,13 @@ export function buildSheetGraph(sheets: SheetSpans[]): SheetGraph {
         reason: !roomRows.length
           ? "no room name drawn with it, and the set carries no room-finish schedule to check it against"
           : byName
-            ? `"${r.name}" is drawn with it but no room-finish row answers for it — either a room the schedule omits, or a keynote/legend row; LOOK before pricing it`
-            : "no room name drawn with it and no room-finish row answers for it — reads as a keynote, detail marker or dimension fragment rather than a room",
+            ? `"${r.name}" is drawn with it but no room-finish row answers for it, either a room the schedule omits, or a keynote/legend row; LOOK before pricing it`
+            : "no room name drawn with it and no room-finish row answers for it, reads as a keynote, detail marker or dimension fragment rather than a room",
       });
     }
   }
   if (unmatched.length) {
-    notes.push(`${unmatched.length} numbered tag(s) on plan sheets are NOT counted as rooms — no name drawn with them and no schedule row answers for them; see unmatched_tags (they are listed, never dropped)`);
+    notes.push(`${unmatched.length} numbered tag(s) on plan sheets are NOT counted as rooms, no name drawn with them and no schedule row answers for them; see unmatched_tags (they are listed, never dropped)`);
   }
 
   // compose the per-sheet view from the LOGICAL tables' parts
@@ -2719,28 +2719,28 @@ export function resolveTag(graph: SheetGraph, tag: string): ResolveResult {
     const filtered = cands.filter((c) => c.building === wantB);
     if (!filtered.length) {
       if (!graph.buildings.length) {
-        return { status: "unresolved", tag: t, room: pickRoom(wantB), reason: `the set names no buildings — no BUILDING/BLDG text or qualified schedule keys anywhere; try resolve_tag "${num}"`, ...(cands.length ? { candidates: cands.map(wire) } : {}) };
+        return { status: "unresolved", tag: t, room: pickRoom(wantB), reason: `the set names no buildings, no BUILDING/BLDG text or qualified schedule keys anywhere; try resolve_tag "${num}"`, ...(cands.length ? { candidates: cands.map(wire) } : {}) };
       }
       if (!graph.buildings.includes(wantB)) {
         return { status: "unresolved", tag: t, room: pickRoom(wantB), reason: `the set names no building "${wantB}" (buildings found: ${graph.buildings.join(", ")})`, ...(cands.length ? { candidates: cands.map(wire) } : {}) };
       }
       if (cands.length) {
-        return { status: "unresolved", tag: t, room: pickRoom(wantB), reason: `no building-${wantB} schedule row for ${num} — ${num} is listed under ${cands.map(describe).join(", ")}`, candidates: cands.map(wire) };
+        return { status: "unresolved", tag: t, room: pickRoom(wantB), reason: `no building-${wantB} schedule row for ${num}, ${num} is listed under ${cands.map(describe).join(", ")}`, candidates: cands.map(wire) };
       }
-      return { status: "unresolved", tag: t, room: pickRoom(wantB), reason: `no schedule row for ${t} — the plan shows the room but no room-finish table lists it` };
+      return { status: "unresolved", tag: t, room: pickRoom(wantB), reason: `no schedule row for ${t}, the plan shows the room but no room-finish table lists it` };
     }
     if (filtered.length > 1) {
       return { status: "unresolved", tag: t, room: pickRoom(wantB), reason: `ambiguous: ${filtered.length} schedule rows match ${t} (${filtered.map((c) => c.r.sheet).join(", ")})`, candidates: filtered.map(wire) };
     }
     chosen = filtered[0];
   } else {
-    if (!cands.length) return { status: "unresolved", tag: t, room: pickRoom(null), reason: `no schedule row for ${t} — the plan shows the room but no room-finish table lists it` };
+    if (!cands.length) return { status: "unresolved", tag: t, room: pickRoom(null), reason: `no schedule row for ${t}, the plan shows the room but no room-finish table lists it` };
     if (cands.length > 1) {
       const distinctB = [...new Set(cands.filter((c) => c.building).map((c) => c.building!))];
       if (distinctB.length > 1) {
         return {
           status: "unresolved", tag: t, room: null,
-          reason: `ambiguous: room ${num} appears in ${distinctB.length} buildings — ${cands.map(describe).join(", ")} — qualify the tag, e.g. "${distinctB[0]}-${num}"`,
+          reason: `ambiguous: room ${num} appears in ${distinctB.length} buildings, ${cands.map(describe).join(", ")}, qualify the tag, e.g. "${distinctB[0]}-${num}"`,
           candidates: cands.map(wire),
         };
       }

@@ -39,7 +39,7 @@ test("duplicated collinear segment cannot fuse faces (the fork-found leak)", () 
 test("near-coincident parallels weld onto the snap grid instead of leaking a channel", () => {
   const segs = [
     ...box(0, 0, 100, 60),
-    0, 0.4, 100, 0.4,    // 0.4 px off the top edge — sub-snap drift
+    0, 0.4, 100, 0.4,    // 0.4 px off the top edge, sub-snap drift
     50, 0.4, 50, 60,     // divider hung off the drifted line
   ];
   const A = buildPolyArrangement(segs, 1);
@@ -64,7 +64,7 @@ test("growRoom absorption gate: a big neighbour is refused, not blobbed", () => 
   const segs = [...box(0, 0, 100, 60), 50, 0, 50, 60];
   const A = buildPolyArrangement(segs, 1);
   const seed = faceAt(A, 25, 30);
-  const set = growRoom(A, seed, () => false, 100);   // neighbour is 3000 — over the gate
+  const set = growRoom(A, seed, () => false, 100);   // neighbour is 3000, over the gate
   assert.deepEqual(set, [seed]);
 });
 

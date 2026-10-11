@@ -28,7 +28,7 @@ test("sanitizeTemplates: drops malformed items; coerces missing cols/groupBy", (
   ]);
 });
 
-test("sanitizeTemplates: dedupes by name (first wins) — names key the list UI", () => {
+test("sanitizeTemplates: dedupes by name (first wins), names key the list UI", () => {
   const out = sanitizeTemplates([
     { id: "t1", name: "Phase view", cols: {}, groupBy: "label" },
     { id: "t2", name: "Phase view", cols: { csv: false }, groupBy: "sheet" },
@@ -91,7 +91,7 @@ test("delete by id; rename by id", () => {
   });
 });
 
-test("rename to an EXISTING name is a no-op — never persist a same-name pair (would drop one on reload)", () => {
+test("rename to an EXISTING name is a no-op, never persist a same-name pair (would drop one on reload)", () => {
   withMockStorage(() => {
     saveTemplate("A", {}, "");
     let list = saveTemplate("B", { csv: false }, "sheet");

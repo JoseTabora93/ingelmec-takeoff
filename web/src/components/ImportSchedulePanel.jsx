@@ -175,7 +175,7 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
         style={{ width: "min(560px, calc(100vw - 32px))", maxHeight: "min(82vh, 720px)", display: "flex", flexDirection: "column", background: "var(--paper-bright)", border: "1px solid var(--cobalt)", boxShadow: "var(--shadow-pop)", fontSize: 12.5 }}>
         {/* header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid var(--ink-faint)", background: "var(--cobalt)", color: "var(--accent-contrast)" }}>
-          <span id={titleId} style={{ fontWeight: 700 }}>{empty ? "Import from schedule — no rows read" : `Import from schedule — ${rows.length} finish${rows.length === 1 ? "" : "es"} found`}</span>
+          <span id={titleId} style={{ fontWeight: 700 }}>{empty ? "Import from schedule, no rows read" : `Import from schedule, ${rows.length} finish${rows.length === 1 ? "" : "es"} found`}</span>
           <button onClick={onClose} title="Close" style={{ background: "transparent", border: "none", color: "var(--accent-contrast)", cursor: "pointer", display: "inline-flex" }}><Icon name="close" size={14} /></button>
         </div>
 
@@ -237,7 +237,7 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
                   const several = [guessId, readAsId, notUsedId, useId_].filter(Boolean).length > 1;
                   const right = several ? {} : { marginLeft: "auto" };
                   const guess = guessId && (
-                    <span id={guessId} title="Category guessed from the row's own words — no printed heading names one" style={{ ...lbl, color: "var(--c-warning)", flex: "0 0 auto", cursor: "help", ...right }}>from description</span>
+                    <span id={guessId} title="Category guessed from the row's own words, no printed heading names one" style={{ ...lbl, color: "var(--c-warning)", flex: "0 0 auto", cursor: "help", ...right }}>from description</span>
                   );
                   // The code as read, in the edit button's mono and size, so O and
                   // 0 can be told apart. The title says what was repaired; the
@@ -246,7 +246,7 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
                   const repaired = readAsId && `Repaired from ${r.read_as}; check the code against the schedule.`;
                   const readAs = readAsId && (
                     <span id={readAsId} title={repaired} style={{ ...lbl, textTransform: "none", color: "var(--c-warning)", flex: "0 0 auto", cursor: "help", ...right }}>
-                      read as <span style={{ fontFamily: "var(--f-mono)", fontSize: 12.5 }}>{r.read_as}</span><span style={S.visuallyHidden}> — check the code against the schedule.</span>
+                      read as <span style={{ fontFamily: "var(--f-mono)", fontSize: 12.5 }}>{r.read_as}</span><span style={S.visuallyHidden}>, check the code against the schedule.</span>
                     </span>
                   );
                   const notUsed = notUsedId && (
@@ -291,7 +291,7 @@ export default function ImportSchedulePanel({ rows = [], existing = new Set(), p
                           </button>
                         )}
                         <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {r.description || <span style={{ color: "var(--ink-muted)" }}>—</span>}
+                          {r.description || <span style={{ color: "var(--ink-muted)" }}></span>}
                           {(r.manufacturer || r.size) && (
                             <span style={{ color: "var(--ink-muted)", fontSize: 11 }}>  ·  {[r.manufacturer, r.size].filter(Boolean).join(" · ")}</span>
                           )}

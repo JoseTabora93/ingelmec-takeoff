@@ -90,7 +90,7 @@ export default function LiveCounter({ rows, onActivate }) {
           {pos && (
             <button type="button" onClick={redock} title="Return to the default corner" style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0, display: "inline-flex" }}><Icon name="target" size={11} /></button>
           )}
-          <button type="button" onClick={toggleMin} title={min ? "Expand the live counter" : "Collapse to a chip"} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0, fontFamily: "var(--f-mono)", fontSize: 12, lineHeight: 1 }}>{min ? "▢" : "—"}</button>
+          <button type="button" onClick={toggleMin} title={min ? "Expand the live counter" : "Collapse to a chip"} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--ink-muted)", padding: 0, fontFamily: "var(--f-mono)", fontSize: 12, lineHeight: 1 }}>{min ? "▢" : ""}</button>
         </span>
       </div>
       {!min && (

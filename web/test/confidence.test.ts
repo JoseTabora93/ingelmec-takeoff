@@ -46,7 +46,7 @@ test("A2: hatch deduction is keyed on the escalation's verification regime, not 
   assert.match(traceConfidence({ hatchFiltered: true, hatchTier: "override" }).factors[0], /hatch-filtered\(override\)/);
 });
 
-test("A2: wedgeGrowth actually reaches the score — a token door retry is not a 3% doubt", () => {
+test("A2: wedgeGrowth actually reaches the score, a token door retry is not a 3% doubt", () => {
   // wedgeGrowth was declared and supplied by NO caller; the deduction was flat.
   const token = traceConfidence({ wedges: 2, wedgeGrowth: 1.001 });     // 0.1% annexed
   const real = traceConfidence({ wedges: 2, wedgeGrowth: 1.511 });      // 33.8% annexed
@@ -118,7 +118,7 @@ test("A3: the minimum-passage rule is visible in the score, graded by whether it
   assert.match(sole.factors[0], /undecidable-passage/);
 });
 
-test("A3/A2: 1.0 no longer claims 'verbatim' — it claims 'no signal fired'", () => {
+test("A3/A2: 1.0 no longer claims 'verbatim', it claims 'no signal fired'", () => {
   // annotation-ring-room: every signal clean, 35% off. The docstring's old
   // promise ("the boundary is the plan's own vector linework, verbatim") is
   // the thing being retired; this pins the replacement's arithmetic.

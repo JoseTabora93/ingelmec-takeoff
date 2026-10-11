@@ -52,7 +52,7 @@ let token = null;               // { accessToken, expiresAt } | null
 let user = null;                // { email, name, picture, sub, hd } | null
 let pending = null;             // { resolve, reject, id } for the current requestAccessToken, or null
 let pendingPromise = null;      // in-flight requestToken() promise, for coalescing
-let requestSeq = 0;             // monotonic id — correlates a GIS callback back to ITS request
+let requestSeq = 0;             // monotonic id, correlates a GIS callback back to ITS request
 const listeners = new Set();
 
 function clientId() {

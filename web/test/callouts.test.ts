@@ -10,9 +10,9 @@ test("parseAreaCallouts: the drawing's own area annotations, and only those", ()
     { str: "250 S.F.", x: 30, y: 30 },      // punctuated
     { str: "40 sf", x: 40, y: 40 },         // lowercase
     { str: "12.5 SQ FT", x: 50, y: 50 },    // fractional, spelled out
-    { str: "137", x: 60, y: 60 },           // room tag — a bare number is not a callout
+    { str: "137", x: 60, y: 60 },           // room tag, a bare number is not a callout
     { str: "CPT-1", x: 70, y: 70 },         // finish tag
-    { str: "CARPET 557 SF", x: 80, y: 80 }, // schedule row — anchor is in the schedule, not the room
+    { str: "CARPET 557 SF", x: 80, y: 80 }, // schedule row, anchor is in the schedule, not the room
     { str: "SF", x: 90, y: 90 },            // unit alone
     { str: "0 SF", x: 100, y: 100 },        // degenerate
   ];
@@ -41,7 +41,7 @@ test("clusterAreas: the modal region wins, ties break to the larger area", () =>
   assert.equal(g[1].members, 2);
 
   assert.deepEqual(clusterAreas([]), []);
-  const tie = clusterAreas([100, 200]);              // one member each — larger first
+  const tie = clusterAreas([100, 200]);              // one member each, larger first
   assert.deepEqual(tie.map((x) => x.sf), [200, 100]);
 });
 
@@ -171,7 +171,7 @@ test("sweepRadiusFt: the window is the room the callout claims, not a fixed grid
 
 test("nearMissCallouts: an area this parser can't read is reported, not silently absent", () => {
   const items = [
-    { str: "557 SF", x: 0, y: 0 },        // matched — not a near miss
+    { str: "557 SF", x: 0, y: 0 },        // matched, not a near miss
     { str: "± 557 SF", x: 1, y: 1 },
     { str: "(250 SF)", x: 2, y: 2 },
     { str: "706 GSF", x: 3, y: 3 },

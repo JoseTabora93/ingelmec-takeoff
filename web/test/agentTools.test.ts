@@ -91,12 +91,12 @@ test("one_click scale gate: uncalibrated sheet refuses with the shared gate text
   const { ctx, calls } = makeCtx({ uppFor: () => null, detectedLabel: () => '1/8" = 1\'-0"' });
   const out = await executeAgentTool(ctx, "one_click", { sheet: "plan.pdf", x: 0.5, y: 0.5 });
   assert.equal(out.error, agentScaleGate("plan.pdf", '1/8" = 1\'-0"'));
-  assert.match(out.error, /^Set the scale for plan\.pdf first — /);   // the MCP gate's opening line
+  assert.match(out.error, /^Set the scale for plan\.pdf first, /);   // the MCP gate's opening line
   assert.match(out.error, /detected: 1\/8/);
   assert.equal(calls.oneClick.length, 0);          // the engine never even ran
 });
 
-test("propose_shapes: evidence whitelist — junk keys dropped, strings truncated, uncited rejected", async () => {
+test("propose_shapes: evidence whitelist, junk keys dropped, strings truncated, uncited rejected", async () => {
   const { ctx, calls } = makeCtx();
   const long = "X".repeat(500);
   const ring = [[0.1, 0.1], [0.3, 0.1], [0.3, 0.3], [0.1, 0.3]];
@@ -105,7 +105,7 @@ test("propose_shapes: evidence whitelist — junk keys dropped, strings truncate
       { sheet: "plan.pdf", verts_norm: ring, condition_id: "cnd-1", measure_role: "floor_area",
         evidence: { schedule_row_tag: "CPT-1", matched_text: long, seed_norm: [0.5, 0.5], prompt_text: "sneaky", room_transcript: long } },
       { sheet: "plan.pdf", verts_norm: ring, condition_id: "cnd-1", measure_role: "floor_area",
-        evidence: { prompt_text: "junk only — nothing whitelisted survives" } },
+        evidence: { prompt_text: "junk only, nothing whitelisted survives" } },
     ],
   });
   assert.equal(out.staged, 1);
@@ -183,12 +183,12 @@ test("read_schedule: a refused table says why, naming the title when that is the
   const { ctx } = makeCtx({ readSchedule: async () => ({ rows: [], refused: "title", title: "DOOR SCHEDULE" }) });
   const out = await executeAgentTool(ctx, "read_schedule", { sheet: "plan.pdf", region: { x0: 0, y0: 0, x1: 0.5, y1: 0.5 } });
   assert.deepEqual(out.rows, []);
-  assert.match(out.note, /^That's the "DOOR SCHEDULE", not a finish\/material schedule — /);
+  assert.match(out.note, /^That's the "DOOR SCHEDULE", not a finish\/material schedule, /);
   assert.equal(Object.keys(out).sort().join(), "note,rows");
 
   const { ctx: ctx2 } = makeCtx({ readSchedule: async () => ({ rows: [], refused: "foreign-header" }) });
   const out2 = await executeAgentTool(ctx2, "read_schedule", { sheet: "plan.pdf", region: { x0: 0, y0: 0, x1: 0.5, y1: 0.5 } });
-  assert.match(out2.note, /^That table doesn't look like a finish\/material schedule — /);
+  assert.match(out2.note, /^That table doesn't look like a finish\/material schedule, /);
 });
 
 test("read_schedule: no table → the re-draw note names every key column", async () => {
@@ -232,7 +232,7 @@ test("read_schedule: { rows: [], skipped } → skipped and the exact note", asyn
 });
 
 test("read_schedule: rows keep key_rule where the reader set it; other rows have no key_rule key", async () => {
-  const rows = [srow("CPT-1"), srow("FTB-01", { key_rule: "extended", description: "CUT (C) — TILE BASE" }),
+  const rows = [srow("CPT-1"), srow("FTB-01", { key_rule: "extended", description: "CUT (C), TILE BASE" }),
     srow("CPT-2", { suggested: false, unticked_reason: "not-used", not_used_text: "NOT USED" })];
   const { ctx } = makeCtx({ readSchedule: async () => ({ rows }) });
   const out = await executeAgentTool(ctx, "read_schedule", R);

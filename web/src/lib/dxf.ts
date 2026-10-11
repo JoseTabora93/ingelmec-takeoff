@@ -142,7 +142,7 @@ export function buildSheetDxf(sheet: DxfSheetInput, opts: DxfOptions = {}): DxfB
   const { w, h } = sheet.dims;
   const upp = sheet.upp;
   if (!(w > 0) || !(h > 0)) throw new Error(`DXF: sheet ${sheet.sheet_id} has no image dimensions`);
-  if (!(upp > 0)) throw new Error(`DXF: sheet ${sheet.sheet_id} has no scale — set the scale before exporting to CAD`);
+  if (!(upp > 0)) throw new Error(`DXF: sheet ${sheet.sheet_id} has no scale, set the scale before exporting to CAD`);
 
   const toXY = ([nx, ny]: [number, number]): [number, number] => [nx * w * upp * k, (1 - ny) * h * upp * k];
   const toPx = ([nx, ny]: [number, number]): [number, number] => [nx * w, ny * h];
@@ -189,7 +189,7 @@ export function buildSheetDxf(sheet: DxfSheetInput, opts: DxfOptions = {}): DxfB
       pts.forEach(grow);
       ents.push({ kind: "lwpoly", layer: useLayer(dxfLayerName(tag, role === "linear" ? "LINEAR" : "WALL"), color), pts, closed: false });
     } else if (role === "floor_area" || role === "deduct") {
-      if (role === "deduct" && s.cuts_shape_id) { skipped.push({ id: s.id, reason: `deduct reconciled into ${s.cuts_shape_id} — ships as that ring's hole` }); continue; }
+      if (role === "deduct" && s.cuts_shape_id) { skipped.push({ id: s.id, reason: `deduct reconciled into ${s.cuts_shape_id}, ships as that ring's hole` }); continue; }
       if (verts.length < 3) { skipped.push({ id: s.id, reason: `${role} ring with fewer than 3 vertices` }); continue; }
       const pts = verts.map(toXY);
       pts.forEach(grow);
@@ -233,7 +233,7 @@ export function buildSheetDxf(sheet: DxfSheetInput, opts: DxfOptions = {}): DxfB
   const entHandles = ents.map(() => d.handle());
 
   // comment stamp — first line, so a 4 KB head read identifies our own file
-  d.add(999, `${DXF_STAMP} — sheet ${sheet.label || sheet.sheet_id} — units ${units === "m" ? "metres" : "feet"} — origin bottom-left of sheet, Y up`);
+  d.add(999, `${DXF_STAMP}, sheet ${sheet.label || sheet.sheet_id}, units ${units === "m" ? "metres" : "feet"}, origin bottom-left of sheet, Y up`);
 
   // HEADER
   d.add(0, "SECTION"); d.add(2, "HEADER");

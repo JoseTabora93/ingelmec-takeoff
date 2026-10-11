@@ -244,7 +244,7 @@ test("imageRectsOf: a surplus Q inside a form pops the form's own save, as canva
 test("mergePlacements: overlapping, touching and chained placements make one region; a gap past the slack splits", () => {
   const regions = mergePlacements([
     R(0, 0, 10, 10), R(11.5, 0, 20, 10),     // 1.5 pt apart: within the 2 pt slack
-    R(20, 0, 30, 10),                         // touches the one before (a chain A–B–C)
+    R(20, 0, 30, 10),                         // touches the one before (a chain A-B–C)
     R(5, 5, 8, 8),                            // inside the first
     R(32.5, 0, 40, 10),                       // 2.5 pt past the chain: its own
   ]);

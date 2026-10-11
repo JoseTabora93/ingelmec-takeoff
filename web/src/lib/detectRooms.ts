@@ -412,7 +412,7 @@ export interface DetectionReport {
  *  tag produced a room) that the readout is most likely to be misread as
  *  "sheet complete". */
 export const NO_TAG_CAVEAT =
-  "Only rooms carrying a room-number tag are found — corridors, elevators and vestibules usually carry none and are NOT detected. One-Click those.";
+  "Only rooms carrying a room-number tag are found, corridors, elevators and vestibules usually carry none and are NOT detected. One-Click those.";
 
 const plural = (n: number) => (n === 1 ? "" : "s");
 
@@ -429,8 +429,8 @@ export function detectionReport(t: DetectionTally, tinySf = 4): DetectionReport 
   const headline =
     t.seeds === 0
       ? t.patternHits === 0
-        ? "No room-number tags on this sheet — detection has nothing to seed from."
-        : `No room-number tags on this sheet — all ${t.patternHits} matching numeral${plural(t.patternHits)} were rejected as something else.`
+        ? "No room-number tags on this sheet, detection has nothing to seed from."
+        : `No room-number tags on this sheet, all ${t.patternHits} matching numeral${plural(t.patternHits)} were rejected as something else.`
       : n === 0
         ? `No rooms detected: ${t.seeds} room tag${plural(t.seeds)} found, ${tried === 0 ? "none was tried" : "none produced a usable region"}.`
         : `${n} of ${tried} room tag${plural(tried)} produced a room${t.cancelled ? ` (${t.seeds} on the sheet)` : ""}.`;
@@ -438,7 +438,7 @@ export function detectionReport(t: DetectionTally, tinySf = 4): DetectionReport 
   if (t.cancelled) {
     const untried = Math.max(0, t.seeds - tried);
     limits.push(untried > 0
-      ? `Stopped early — ${untried} room tag${plural(untried)} ${untried === 1 ? "was" : "were"} never tried.`
+      ? `Stopped early, ${untried} room tag${plural(untried)} ${untried === 1 ? "was" : "were"} never tried.`
       : "Stopped early.");
   }
   if (t.seeds > 0 && t.patternHits > t.seeds) {
@@ -447,10 +447,10 @@ export function detectionReport(t: DetectionTally, tinySf = 4): DetectionReport 
   }
   if (tried > n) {
     const k = tried - n;
-    limits.push(`${k} tag${plural(k)} produced nothing — the fill leaked past the room, or landed in dense linework.`);
+    limits.push(`${k} tag${plural(k)} produced nothing, the fill leaked past the room, or landed in dense linework.`);
   }
   if (t.tiny > 0) {
-    limits.push(`${t.tiny} proposal${plural(t.tiny)} under ${tinySf} SF — usually the box drawn around a room tag, not a room. Reject ${t.tiny === 1 ? "it" : "them"}.`);
+    limits.push(`${t.tiny} proposal${plural(t.tiny)} under ${tinySf} SF, usually the box drawn around a room tag, not a room. Reject ${t.tiny === 1 ? "it" : "them"}.`);
   }
   limits.push(NO_TAG_CAVEAT);
   return { headline, limits, message: [headline, ...limits].join(" "), empty: n === 0 };

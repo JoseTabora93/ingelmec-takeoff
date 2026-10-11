@@ -169,7 +169,7 @@ export function repairSlashSeven(text: string): string {
 // ── rows ─────────────────────────────────────────────────────────────────────
 /** Distinct non-empty cells, in the given order, joined " — ". */
 const joinParts = (parts: Array<string | undefined>): string =>
-  [...new Set(parts.map((p) => (p ?? "").trim()).filter(Boolean))].join(" — ");
+  [...new Set(parts.map((p) => (p ?? "").trim()).filter(Boolean))].join(", ");
 const cellsOf = (r: TableRow, ...cols: string[]) => cols.map((c) => r.cells[c]?.text);
 /** The first non-empty of the given cells. */
 const firstCell = (r: TableRow, ...cols: string[]): string => {

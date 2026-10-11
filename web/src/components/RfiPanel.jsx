@@ -57,7 +57,7 @@ export default function RfiPanel({ docked = false, rfis: rfisIn = [], markups = 
 
       {rfis.length === 0 && (
         <div style={{ padding: "14px 12px", color: "var(--ink-muted)" }}>
-          No RFIs yet — select a cloud, callout, or note in the markup panel and press <b>Raise RFI</b>.
+          No RFIs yet, select a cloud, callout, or note in the markup panel and press <b>Raise RFI</b>.
         </div>
       )}
       {rfis.length > 0 && shown.length === 0 && (
@@ -79,7 +79,7 @@ export default function RfiPanel({ docked = false, rfis: rfisIn = [], markups = 
               <span style={{ fontFamily: "var(--f-mono)", fontWeight: 700, color: "var(--cobalt)" }}>{String(r.number ?? "")}</span>
               <span style={{ padding: "1px 7px", background: st.color, color: "#fff", fontSize: 10, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" }}>{st.label}</span>
               {agent && (
-                <span title={pending ? "Raised by an agent over MCP — pending until you accept it" : "Raised by an agent over MCP — accepted"}
+                <span title={pending ? "Raised by an agent over MCP, pending until you accept it" : "Raised by an agent over MCP, accepted"}
                   style={{ padding: "1px 6px", border: "1px dashed var(--ink-muted)", color: "var(--ink-muted)", fontSize: 9.5, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" }}>
                   agent{pending ? " · pending" : ""}
                 </span>

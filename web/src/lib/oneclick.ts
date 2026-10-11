@@ -105,7 +105,7 @@ export type FloodResult =
 /** Caller's snap-grid lookup: nearest true endpoint to (x,y) within maxDist, or null. */
 export type NearestFn = (x: number, y: number, maxDist: number) => Point | null | undefined;
 
-export const MASK_MAX_DIM = 3000;   // working raster cap (Uint8 ≈ 6–7 MB)
+export const MASK_MAX_DIM = 3000;   // working raster cap (Uint8 ≈ 6 a 7 MB)
 
 /** The BASELINE bitmap dims of a page — `ceil(pageDim × baseScale)`, the exact
  *  rounding the canvas's panel render uses. This is the ONE place the answer to
@@ -134,7 +134,7 @@ export function baselineImgDims(pageW: number, pageH: number, baseScale: number)
 export interface MaskPage { pageW: number; pageH: number; renderScale: number; baseScale: number }
 const LEAK_FRACTION = 0.30;         // fill > 30% of the sheet ⇒ not an enclosed space (ws-invariant: a fraction)
 const CURVE_STEPS = 8;              // chords per bezier (door swings stay closed)
-export const GAP_BRIDGE_MAX = 2;    // mask px — leak recovery seals drafting pinholes (≤ ~2r px), never doorways
+export const GAP_BRIDGE_MAX = 2;    // mask px, leak recovery seals drafting pinholes (≤ ~2r px), never doorways
 
 // ── resolution-independent thresholds (RFC failure mode #3) ─────────────────
 // A verdict must not depend on the working raster's resolution, so every
@@ -197,8 +197,8 @@ export function minPassRadiusFor(maskPxPerFt: number): number {
 export const DETERMINISM_MIN_MPPF = 8;   // mask px per foot (a cell ≤ 1.5")
 
 // segment meta bits (extractVectorGeometry emits, classifyHatchSegs consumes)
-export const SEG_CURVE = 1;         // curve chord (bezier tessellation OR a detected polyline arc) — never hatch (door swings close gaps)
-export const SEG_CLIP = 2;          // clip-only path (endPath) — invisible ink, never a wall
+export const SEG_CURVE = 1;         // curve chord (bezier tessellation OR a detected polyline arc), never hatch (door swings close gaps)
+export const SEG_CLIP = 2;          // clip-only path (endPath), invisible ink, never a wall
 export const SEG_FILLONLY = 4;      // filled-not-stroked path (solid poché outlines classify normally)
 export const SEG_POLYARC = 8;       // provenance: SEG_CURVE came from markPolylineArcs, not a bezier op
 // meta high nibble = device line width, ceil'd and capped at 15 (0 = hairline)
@@ -213,9 +213,9 @@ export const SEG_POLYARC = 8;       // provenance: SEG_CURVE came from markPolyl
 // inside extractVectorGeometry at render time, with no sheet scale. Feet-true
 // arc tests live at cluster time instead (see arcClusterFit / DOOR_R_*_FT).
 export const ARC_MIN_CHORDS = 4;       // fewer chords is a corner chamfer, not an arc
-export const ARC_MIN_TOTAL_TURN = 30;  // deg — shallower chains are gentle wall sweeps; door swings are ~90°
-export const ARC_CHORD_TURN_MIN = 2;   // deg — near-collinear chains are straight runs with drafting jitter
-export const ARC_CHORD_TURN_MAX = 45;  // deg — sharper turns are zigzags/symbols, not tessellation
+export const ARC_MIN_TOTAL_TURN = 30;  // deg, shallower chains are gentle wall sweeps; door swings are ~90°
+export const ARC_CHORD_TURN_MIN = 2;   // deg, near-collinear chains are straight runs with drafting jitter
+export const ARC_CHORD_TURN_MAX = 45;  // deg, sharper turns are zigzags/symbols, not tessellation
 export const ARC_FIT_TOL_FRAC = 0.03;  // circle-fit residual cap as a fraction of the radius (ellipse fixtures fail this)
 
 // ── non-door curve discrimination (issue: clouds/columns read as door arcs) ──
@@ -225,8 +225,8 @@ export const ARC_FIT_TOL_FRAC = 0.03;  // circle-fit residual cap as a fraction 
 // separate question, answered here and carried in its own mask bit, so that
 // refusing a cloud can never make its chords hatch-eligible.
 // Both of these are dimensionless, so they can run at render time:
-export const ARC_CLOSED_TURN = 300;    // deg — a chain that sweeps this far closes on itself: a round column, a callout bubble, a north-arrow ring. A door leaf never passes 180°.
-export const ARC_CUSP_MIN = 3;         // consecutive cusp reversals that make a chain a revision cloud. A mirrored DOUBLE DOOR is two arcs with ONE reversal, so it must stay under this — the naive "any cusp" form deletes double doors.
+export const ARC_CLOSED_TURN = 300;    // deg, a chain that sweeps this far closes on itself: a round column, a callout bubble, a north-arrow ring. A door leaf never passes 180°.
+export const ARC_CUSP_MIN = 3;         // consecutive cusp reversals that make a chain a revision cloud. A mirrored DOUBLE DOOR is two arcs with ONE reversal, so it must stay under this, the naive "any cusp" form deletes double doors.
 export const ARC_CUSP_R_RATIO = 1.5;   // ...and a cloud's scallops all share one radius
 export const ARC_CUSP_SPAN_MULT = 8;   // ...which is small next to the chain's own run length (a double door's radius is ~1/3 of its run)
 /** mask bit: this curve cell is NOT door-swing linework (closed circle / cloud
@@ -261,7 +261,7 @@ export const DOOR_R_MAX_FT = 4.5;
  *  bit-identical, so the curved-wall protection this ceiling was written for is
  *  untouched. */
 export const DOOR_R_LEAF_MAX_FT = 7;
-export const CLUSTER_FIT_TOL_FRAC = 0.05;  // per-cluster circle-fit RMS cap (fraction of the fitted radius) — cells are integer-quantized and the arc rasters 1–2 px thick, so the absolute floor below matters more
+export const CLUSTER_FIT_TOL_FRAC = 0.05;  // per-cluster circle-fit RMS cap (fraction of the fitted radius), cells are integer-quantized and the arc rasters 1 a 2 px thick, so the absolute floor below matters more
 export const CLUSTER_FIT_TOL_PX = 1.5;
 
 // hatch classification — a hatch/poché member is a stroke INSIDE a periodic
@@ -270,15 +270,15 @@ export const CLUSTER_FIT_TOL_PX = 1.5;
 // pitch at fill scale. Walls never sit inside such a lattice; the outermost
 // rows of a real fill fail it too, so hatch-region edges stay hard for free
 // (see classifyHatchSegs).
-export const HATCH_ANGLE_TOL = 2;      // deg — CAD hatch angle jitter is ≪ 1°
-export const HATCH_MAX_PITCH = 24;     // mask px — scale-unknown fallback for the pitch cap
-export const HATCH_MAX_PITCH_FT = HATCH_MAX_PITCH / 18;  // = 4/3 ft at the 18 px/ft calibration — keeps room-scale rhythm (demising walls) hard, at every resolution
+export const HATCH_ANGLE_TOL = 2;      // deg, CAD hatch angle jitter is ≪ 1°
+export const HATCH_MAX_PITCH = 24;     // mask px, scale-unknown fallback for the pitch cap
+export const HATCH_MAX_PITCH_FT = HATCH_MAX_PITCH / 18;  // = 4/3 ft at the 18 px/ft calibration, keeps room-scale rhythm (demising walls) hard, at every resolution
 /** Which verification regime accepted a hatch escalation — see floodRegion. */
 export type HatchTier = "bounded" | "trapped" | "override";
 /** Ordering for combining tiers across a room's retries: worst wins. */
 export const HATCH_TIER_RISK: Record<HatchTier, number> = { bounded: 0, trapped: 1, override: 2 };
 export const HATCH_BOUND_FRAC = 0.7;   // ≥ this soft-bounded fraction ⇒ PREDOMINANTLY hatch (tile-grid cell): escalate unbounded
-export const HATCH_ESCALATE_FRAC = 0.02; // MODERATE band [this, HATCH_BOUND_FRAC): grow-but-verify escalation. Was 0.35 when hatch classification was a loose rhythm heuristic and a high bar kept its false positives from escalating everything; with per-stroke periodicity evidence (item C), ANY real hatch run on the boundary is worth testing — a hatched alcove of a room is often < 35% of its boundary — and grow-but-verify remains the gate. The floor only skips re-floods over boundary specks. Balanced-preset value; see escalationParams.
+export const HATCH_ESCALATE_FRAC = 0.02; // MODERATE band [this, HATCH_BOUND_FRAC): grow-but-verify escalation. Was 0.35 when hatch classification was a loose rhythm heuristic and a high bar kept its false positives from escalating everything; with per-stroke periodicity evidence (item C), ANY real hatch run on the boundary is worth testing, a hatched alcove of a room is often < 35% of its boundary, and grow-but-verify remains the gate. The floor only skips re-floods over boundary specks. Balanced-preset value; see escalationParams.
 export const HATCH_GROWTH_MAX = 2.5;     // grow-but-verify cap: reject a walls-only escalation that balloons past this × the strict area (a misclassified wall would leak or overgrow). Balanced-preset value.
 
 // Fill sensitivity — a single 0..1 knob the estimator can dial per drawing to
@@ -384,7 +384,7 @@ export function decodeConstructPath(
     else if (c === DRAW_LINETO) { ops.push(OPS.lineTo); co.push(f[k++], f[k++]); }
     else if (c === DRAW_CURVETO) { ops.push(OPS.curveTo); co.push(f[k++], f[k++], f[k++], f[k++], f[k++], f[k++]); }
     else if (c === DRAW_CLOSEPATH) { ops.push(OPS.closePath); }
-    else break; // unknown draw code — keep what parsed cleanly, refuse to guess a stride
+    else break; // unknown draw code, keep what parsed cleanly, refuse to guess a stride
   }
   return { ops, co, paintFn: first };
 }
@@ -562,7 +562,7 @@ export function extractVectorGeometry(opList: OpList, transform: number[], OPS: 
     }
     else if (fn === OPS.constructPath) {
       const decoded = decodeConstructPath(args, OPS);
-      if (!decoded) continue;                 // empty path / Path2D — nothing extractable
+      if (!decoded) continue;                 // empty path / Path2D, nothing extractable
       const devW = Math.min(15, Math.max(0, Math.ceil((lw || 0) * Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])))));
       const flags =
         (decoded.paintFn === null ? paintFlags(i) : embeddedPaintFlags(decoded.paintFn, OPS)) |
@@ -643,7 +643,7 @@ export function markPolylineArcs(segs: number[], meta: Uint8Array): number {
   };
   for (let i = 0; i < n; i++) {
     if (meta[i] & (SEG_CURVE | SEG_CLIP)) { flush(); continue; }
-    if (len(i) < 0.5) continue;                        // sliver — bridge it
+    if (len(i) < 0.5) continue;                        // sliver, bridge it
     if (chain.length) {
       const p = chain[chain.length - 1];
       // same path & pen (identical meta), endpoints joined or dash-gapped
@@ -829,7 +829,7 @@ function circleFitOk(segs: number[], chain: number[], c0: number, c1: number): {
     sxx += x * x; sxy += x * y; syy += y * y; sxz += x * z; syz += y * z;
   }
   const det = sxx * syy - sxy * sxy;
-  if (Math.abs(det) < 1e-9) return null;               // collinear — no circle
+  if (Math.abs(det) < 1e-9) return null;               // collinear, no circle
   const cx = (sxz * syy - syz * sxy) / (2 * det);
   const cy = (syz * sxx - sxz * sxy) / (2 * det);
   let r = 0;
@@ -883,7 +883,7 @@ export function classifyHatchSegs(segs: number[], meta: Uint8Array, ws: number, 
   const n = segs.length >> 2;
   const soft = new Uint8Array(n);
   if (!meta || !n) return soft;
-  const HALF_CELL = 0.5;                         // mask px — raster resolution floor
+  const HALF_CELL = 0.5;                         // mask px, raster resolution floor
   interface Cand { i: number; ang: number; x1: number; y1: number; x2: number; y2: number; w: number; }
   const cand: Cand[] = [];
   for (let i = 0; i < n; i++) {
@@ -1030,11 +1030,11 @@ export function classifyHatchSegs(segs: number[], meta: Uint8Array, ws: number, 
 // pen-width) signature. The two views are deliberately separate: replacing the
 // classifier's evidence rule (item C) must not silently re-identify families
 // that MCP callers have already matched by id.
-export const HATCH_MIN_RUN = 10;       // rows — fewer evenly-spaced parallels is plausibly walls
+export const HATCH_MIN_RUN = 10;       // rows, fewer evenly-spaced parallels is plausibly walls
 export const HATCH_PITCH_TOL = 0.35;   // regularity band around the median pitch
 export const HATCH_MIN_REGULAR = 0.7;  // fraction of gaps that must sit inside the band
 export const HATCH_OVERLAP_FRAC = 0.5; // successive rows must overlap tangentially this much
-export const ROW_EPS = 1.5;            // mask px — collinear/dashed pieces merge into one row
+export const ROW_EPS = 1.5;            // mask px, collinear/dashed pieces merge into one row
 export const WIDE_PROTECT_RATIO = 2;   // heavier-pen member of a hairline family stays hard (wall overprint)
 export const SPAN_PROTECT_RATIO = 3;   // a row spanning ≫ the run's median row is a wall riding the rhythm, not hatch
 interface HatchCand { i: number; ang: number; x1: number; y1: number; x2: number; y2: number; w: number; }
@@ -1214,18 +1214,18 @@ function sweepHatchRuns(segs: number[], meta: Uint8Array, ws: number): { clipSof
 // Under-measuring is visible on a bid; double-measuring is not. The west band
 // needs the sliver rule — a 1.15 ft × 16 ft strip is not a room and should
 // escalate unbounded — which is its own change with its own evidence.
-export const ANNOT_OFFSET_MAX_FT = 2;      // ft — how far off a wall an annotation ring is drawn
-export const ANNOT_OFFSET_MIN_FT = 0.25;   // ft — below this the pair is one drawn wall's two faces, not a ring
+export const ANNOT_OFFSET_MAX_FT = 2;      // ft, how far off a wall an annotation ring is drawn
+export const ANNOT_OFFSET_MIN_FT = 0.25;   // ft, below this the pair is one drawn wall's two faces, not a ring
 // 4 ft, because "spans a wall" is the actual claim and a wall is rarely
 // shorter. At 2 ft the rule picked up four 2.6 ft hairline stubs beside the
 // ward vestibule — door jamb pieces, not ring runs — and bought +0.68 SF (1%)
 // for a real confidence deduction, which is a bad trade twice over: the
 // measurement barely moved and the engine got less sure of it. The ring runs
 // this rule exists for are 7.8–14 ft on the VA sheet, so the floor has room.
-export const ANNOT_MIN_LEN_FT = 4;         // ft — a ring run spans a wall; poché ticks and symbol edges don't
+export const ANNOT_MIN_LEN_FT = 4;         // ft, a ring run spans a wall; poché ticks and symbol edges don't
 export const ANNOT_OVERLAP_FRAC = 0.6;     // the heavier neighbour must run ALONGSIDE, not merely cross nearby
 export const ANNOT_MIN_PEN_STEP = 1;       // nibbles the neighbour must exceed this stroke by
-const ANNOT_MAX_SCAN = 64;                 // neighbours probed per direction — dense linework stays linear
+const ANNOT_MAX_SCAN = 64;                 // neighbours probed per direction, dense linework stays linear
 
 /** Strokes that are an inset offset of a heavier parallel stroke — annotation
  *  rings, not boundaries. Same contract as classifyHatchSegs: one byte per
@@ -1344,7 +1344,7 @@ export function classifyOffsetAnnotationSegs(
 // pure, total, never throws. Feeds the SAME soft plane, so the escalation
 // ladder still verifies by boundedness — a misjudged field either leaks or
 // balloons and the strict result stands.
-export const FLECK_FIELD_FT = 2;        // grid cell for the population count — a room's worth of texture, not a sheet's
+export const FLECK_FIELD_FT = 2;        // grid cell for the population count, a room's worth of texture, not a sheet's
 export const FLECK_FIELD_MIN = 6;       // flecks in a cell (with its neighbours) before any of them is texture
 export function classifyFleckSegs(
   segs: number[], meta: Uint8Array, subpaths: SubPath[] | null | undefined, ws: number, ftPx: number,
@@ -1409,7 +1409,7 @@ export function classifyFleckSegs(
 // stops at it, the escalation ladder sees a wholly-soft boundary and reflows
 // to the room behind it, and any escalation that leaks is discarded.
 export const TAGBOX_MAX_SF = 6;         // well under any real space; measured tag boxes top out at 1.5 SF
-export const TAGBOX_TEXT_FRAC = 0.25;   // the text must FILL the box — rooms sit far below this
+export const TAGBOX_TEXT_FRAC = 0.25;   // the text must FILL the box, rooms sit far below this
 export function classifyTagBoxSegs(
   segs: number[], meta: Uint8Array, subpaths: SubPath[] | null | undefined,
   texts: TextMark[] | null | undefined, ws: number, ftPx: number,
@@ -1500,37 +1500,37 @@ export function classifyTagBoxSegs(
 // parallel partner of its own, is counted as evidence but never softened.
 // Union into the same soft plane as hatch and annotation rings; never
 // subtracted; the escalation ladder decides what soft is worth.
-export const DIMSTR_ANGLE_TOL = 2;        // deg — CAD angle jitter ≪ 1° (HATCH_ANGLE_TOL's evidence)
+export const DIMSTR_ANGLE_TOL = 2;        // deg, CAD angle jitter ≪ 1° (HATCH_ANGLE_TOL's evidence)
 export const DIMSTR_CHAIN_GAP_FT = 0.6;   // collinear pieces closer than this are one drawn line
-export const DIMSTR_CHAIN_GAP_PX = 3;     // floor — dash/quantization gaps are ink-scale, not feet
+export const DIMSTR_CHAIN_GAP_PX = 3;     // floor, dash/quantization gaps are ink-scale, not feet
 export const DIMSTR_CHAIN_OFF_FT = 0.06;  // perpendicular jitter within one drawn line
-export const DIMSTR_CHAIN_OFF_PX = 1.25;  // floor — sub-px offsets are float noise at coarse scales
+export const DIMSTR_CHAIN_OFF_PX = 1.25;  // floor, sub-px offsets are float noise at coarse scales
 export const DIMSTR_RUN_MIN_FT = 4;       // shortest measured real run is 4.7 ft; ANNOT_MIN_LEN_FT's reasoning
 export const DIMSTR_ISO_OFF_FT = 1.0;     // a parallel partner within a wall's breadth …
 export const DIMSTR_ISO_OVERLAP = 0.4;    // … spanning this fraction of the RUN makes it a wall face
 export const DIMSTR_WITNESS_MIN_FT = 0.3; // below the shortest measured witness (0.5 ft) with margin
-export const DIMSTR_WITNESS_SOFT_MAX_FT = 8;  // soften cap — longer chains are glued linework: evidence only
+export const DIMSTR_WITNESS_SOFT_MAX_FT = 8;  // soften cap, longer chains are glued linework: evidence only
 export const DIMSTR_ATTACH_FT = 0.35;     // junction slop: witness end / tick centre to the run line
-export const DIMSTR_ATTACH_PX = 2;        // floor — a junction is an ink joint, ≥ pen scale
+export const DIMSTR_ATTACH_PX = 2;        // floor, a junction is an ink joint, ≥ pen scale
 export const DIMSTR_JUNCTION_MIN_FT = 1.5;// witnesses are room-spaced; coursing/stipple rhythms are sub-foot
 export const DIMSTR_WIT_PER_JUNCTION_MAX = 2; // a dim junction is ONE witness (two at a shared boundary)
-export const DIMSTR_TICK_MIN_FT = 0.2;    // measured ticks 0.34–0.94 ft; stipple dots sit below this
+export const DIMSTR_TICK_MIN_FT = 0.2;    // measured ticks 0.34 a 0.94 ft; stipple dots sit below this
 export const DIMSTR_TICK_MAX_FT = 1.5;    // a longer oblique is drawing, not a tick
-export const DIMSTR_TICK_ANG_LO = 20;     // deg off the run — covers ~30° arrows …
+export const DIMSTR_TICK_ANG_LO = 20;     // deg off the run, covers ~30° arrows …
 export const DIMSTR_TICK_ANG_HI = 70;     // … and 45° slashes with jitter margin
 export const DIMSTR_TICK_AT_JUNCTION_FT = 0.5;  // a tick marks ITS junction, not the run at large
 export const DIMSTR_MIN_JUNCTIONS = 2;    // a dimension has two ends
 export const DIMSTR_MIN_TICKED = 2;       // … and marks both
 export const DIMSTR_TICKED_FRAC = 0.5;    // most junctions carry their mark (jamb clutter does not)
 export const DIMSTR_OVERSHOOT_FT = 0.1;   // ink past a joint (0.39 ft measured); a corner has none
-export const DIMSTR_OVERSHOOT_PX = 2;     // floor — overshoot is ink, not geometry
+export const DIMSTR_OVERSHOOT_PX = 2;     // floor, overshoot is ink, not geometry
 export const DIMSTR_TOUCH_CLUTTER_MAX = 1;// non-witness/tick chains allowed to TOUCH the run
 // path B (tick-anchored interior strings) — measured on the calibration
 // sheet's interior strings: slash pairs 3.4 px apart, junction spacing ≥ 3 ft
 export const DIMTEXT_NEAR_FT = 1.0;             // dim text sits ON its line (2 px measured); a generous foot covers styles that float it
 export const DIMTEXT_REACH_FT = 40;             // how far along the line from its text a string plausibly extends
 export const DIMTEXT_MIN_LINE_X = 1.5;          // the drawn line must dwarf the text (an underline matches it)
-export const DIMTEXT_STUB_MAX_FT = 2.5;         // ticks and witness stubs; measured 0.27–1.2 ft
+export const DIMTEXT_STUB_MAX_FT = 2.5;         // ticks and witness stubs; measured 0.27 a 1.2 ft
 export const DIMSTR_LINE_MARGIN_FT = 0.5;       // pieces just past the span still belong
 export const DIMSTR_PIECE_MAX_DIMFRAC = 0.66;   // a merge piece more dim-bounded than this is exterior band, not floor
 export const DIMSTR_PIECE_MAX_CURVEFRAC = 0.25; // …and one this curve-bounded is a door-swing pocket, not floor
@@ -1540,7 +1540,7 @@ export const DIMSTR_BAND_CLUTTER_MAX = 4; // … and the stray chains tolerated 
                                           // or a table's cell text boxes blow far past this)
 
 interface DimChain {
-  axis: number;               // deg, [0, 180) — the bin axis the chain merged on
+  axis: number;               // deg, [0, 180), the bin axis the chain merged on
   d: number;                  // mean perpendicular offset of members, mask px
   t0: number; t1: number;     // extent along the axis, mask px
   len: number;
@@ -2000,7 +2000,7 @@ export function buildMask(segs: number[], imgW: number, imgH: number, maxDim = M
   let softCount = 0;
   for (let i = 0, si = 0; i + 3 < segs.length; i += 4, si++) {
     const role = roles ? roles[si] : 0;
-    if (role === 2 || role === 3 || role === 5 || role === 6) continue;  // pattern/annotation/demolition/hidden — stated non-boundary ink
+    if (role === 2 || role === 3 || role === 5 || role === 6) continue;  // pattern/annotation/demolition/hidden, stated non-boundary ink
     // stated boundary/structure: hard, no heuristic vote. The curve bit is not
     // a vote — it records geometry (door-swing recognition), so it still rides
     // on stated-hard curve chords exactly as on heuristic-hard ones.
@@ -2057,7 +2057,7 @@ function boxOf(region: Uint8Array, mw: number, mh: number): RegionBox {
 // away. Those buffers come back here instead of to the collector; only a fill
 // that returns "ok" hands its region to the caller and leaves the pool.
 const REGION_POOL_MAX = 2;
-const regionPool: Uint8Array[] = [];   // two is the observed steady state — a fill takes one and the next leak gives it back
+const regionPool: Uint8Array[] = [];   // two is the observed steady state, a fill takes one and the next leak gives it back
 function takeRegion(n: number): Uint8Array {
   for (let k = regionPool.length - 1; k >= 0; k--) {
     if (regionPool[k].length === n) { const b = regionPool.splice(k, 1)[0]; b.fill(0); return b; }
@@ -2346,7 +2346,7 @@ function floodRegionLadder(maskObj: MaskObj, ix: number, iy: number, sensitivity
 // 3'-0" door can be anywhere from ~20 to ~160 mask px. Callers that know the
 // scale should pass sealRadiiFor(maskPxPerFt); the exported SEAL_RADII default
 // is the scale-blind floor (hairline drafting gaps only).
-export const SEAL_RADII = [1, 2, 4];    // fallback — seals gaps up to 2/4/8 px wide
+export const SEAL_RADII = [1, 2, 4];    // fallback, seals gaps up to 2/4/8 px wide
 export const DOOR_SEAL_MAX_FT = 5;      // widest opening sealing will bridge (3'-0" doors + margin)
 export const SEAL_R_MAX = 128;          // absolute radius cap (cost + the Uint8 distance transform)
 export const SEAL_VIRTUAL_MAX = 0.25;   // a sealed region's boundary must be ≥75% real linework
@@ -2606,8 +2606,8 @@ function growRegionBack(f: { region: Uint8Array; count: number; mw: number; mh: 
 // a curved wall honest is its RADIUS: 46 ft is not a door leaf, and a cluster
 // that fits one clean circle of non-leaf radius gets no allowance at all.
 export const WEDGE_SLACK = 1.3;        // growth head-room over the ideal quarter-circle
-export const WEDGE_GROWTH_FRAC = 0.30; // or this fraction of the region — corridors touch many doors
-export const WEDGE_MAX_DOORS = 12;     // absolute ceiling on the fractional allowance — 30% of a
+export const WEDGE_GROWTH_FRAC = 0.30; // or this fraction of the region, corridors touch many doors
+export const WEDGE_MAX_DOORS = 12;     // absolute ceiling on the fractional allowance, 30% of a
                                        // giant region (sheet-margin space) is not a door's worth
 /** Per-door growth allowance (mask cells) at maskPxPerFt: a DOOR_SEAL_MAX_FT
  *  leaf's swing wedge, with slack. 0 (skip the door retry) when the scale is
@@ -2715,7 +2715,7 @@ export function boundaryCurveClusters(mo: MaskObj, region: Uint8Array): number[]
 // and stay separate. A cluster that already fits one circle is returned
 // untouched, so this is a no-op everywhere the fit was fine (rooms 137 and 140
 // re-cluster to a single part and are bit-identical).
-const SPLIT_GAP = 1;                       // Chebyshev gap for the re-split — tight enough to part two arcs
+const SPLIT_GAP = 1;                       // Chebyshev gap for the re-split, tight enough to part two arcs
 const SPLIT_MIN_SEED = 8;                  // cells: below this a circle fit means nothing, so a piece can't seed a group
 export const SAME_ARC_CENTRE_FT = 0.5;     // two pieces of ONE arc share a hinge to within this
 export const SAME_ARC_RADIUS_FRAC = 0.15;  // ...and a radius to within this fraction

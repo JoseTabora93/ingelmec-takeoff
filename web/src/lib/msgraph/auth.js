@@ -30,7 +30,7 @@ export function createMsalAuth(cfg) {
       authority: `https://login.microsoftonline.com/${cfg.tenant}`,
       redirectUri: window.location.origin,
     },
-    cache: { cacheLocation: "localStorage" }, // survive reloads — sign in once
+    cache: { cacheLocation: "localStorage" }, // survive reloads, sign in once
   });
   let initP = null;
   const init = () => (initP ??= pca.initialize());

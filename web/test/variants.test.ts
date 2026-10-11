@@ -36,16 +36,16 @@ const byId = (cs: VariantCond[], id: string) => cs.find((c) => c.id === id) as V
 
 test("a variant label composes onto the base tag, and twinning a twin does not stack suffixes", () => {
   fresh();
-  assert.equal(variantTag("SV-1", "Level 2"), "SV-1 – Level 2");
-  assert.equal(baseTagOf("SV-1 – Level 2"), "SV-1");
-  assert.equal(variantTag("SV-1 – Level 2", "Level 3"), "SV-1 – Level 3");
+  assert.equal(variantTag("SV-1", "Level 2"), "SV-1, Level 2");
+  assert.equal(baseTagOf("SV-1, Level 2"), "SV-1");
+  assert.equal(variantTag("SV-1, Level 2", "Level 3"), "SV-1, Level 3");
   assert.equal(variantTag("SV-1", "   "), "SV-1");
 });
 
 test("uniqueTag walks the (2), (3) series against normalized tags", () => {
   const norm = (s: string) => s.trim().toUpperCase();
-  const taken = new Set(["SV-1 – LEVEL 2", "SV-1 – LEVEL 2 (2)"]);
-  assert.equal(uniqueTag("SV-1 – Level 2", taken, norm), "SV-1 – Level 2 (3)");
+  const taken = new Set(["SV-1, LEVEL 2", "SV-1, LEVEL 2 (2)"]);
+  assert.equal(uniqueTag("SV-1, Level 2", taken, norm), "SV-1, Level 2 (3)");
   assert.equal(uniqueTag("CPT-1", taken, norm), "CPT-1");
 });
 
@@ -53,7 +53,7 @@ test("the twin copies the material list with FRESH ids, every row following and 
   fresh();
   const p = parent();
   const { twin, parentPatch } = twinOf(p);
-  assert.equal(twin.finish_tag, "SV-1 – Level 2");
+  assert.equal(twin.finish_tag, "SV-1, Level 2");
   assert.equal(twin.variant_of, "cnd-p");
   assert.equal(twin.variant_label, "Level 2");
   assert.equal(parentPatch?.family_id, twin.family_id);        // the parent joins the family it starts
@@ -125,7 +125,7 @@ test("a row added to the family lands on every twin", () => {
   assert.notEqual(got.id, "mat-new");
 });
 
-test("a tombstoned row stays gone — a family re-add cannot resurrect it", () => {
+test("a tombstoned row stays gone, a family re-add cannot resurrect it", () => {
   fresh();
   const p = parent();
   let cs: VariantCond[] = [p, twinOf(p).twin];
@@ -232,7 +232,7 @@ test("inheritance runs down a chain: family → twin → twin of the twin", () =
   const mid = rowFor(byId(cs, a.id), "mat-a")!;
   assert.equal((byId(cs, b.id).materials || []).find((r) => r.origin_id === mid.id)!.per, 55,
     "the grandchild followed through its own parent's row id");
-  assert.equal(b.finish_tag, "SV-1 – Level 3");
+  assert.equal(b.finish_tag, "SV-1, Level 3");
 });
 
 test("deleting a family parent promotes the eldest twin and re-points its siblings", () => {
@@ -260,7 +260,7 @@ test("familyView nests twins under their parent, keeps root order, and never dro
   assert.deepEqual(familyView([p, other, a]).map((v) => [v.cond.id, v.depth]),
     [["cnd-p", 0], [a.id, 1], ["cnd-x", 0]]);
   assert.equal(familyDepths([p, other, a]).get(a.id), 1);
-  const orphan: VariantCond = { id: "cnd-o", finish_tag: "SV-1 – Level 9", variant_of: "cnd-gone", materials: [] };
+  const orphan: VariantCond = { id: "cnd-o", finish_tag: "SV-1, Level 9", variant_of: "cnd-gone", materials: [] };
   assert.deepEqual(familyView([orphan]).map((v) => [v.cond.id, v.depth]), [["cnd-o", 0]]);
 });
 

@@ -206,7 +206,7 @@ test("rev 0 round-trips: pull yields rev 0, push with expectedRev 0 writes rev 1
   assert.deepEqual(r, { rev: 1 });
 });
 
-test("provider never creates its own sidecar — it uses the injected resolver only", async () => {
+test("provider never creates its own sidecar, it uses the injected resolver only", async () => {
   const { drive, provider, sidecarCalls } = mk();
   await provider.push({ shapes: [1] }, {});
   await provider.pull();

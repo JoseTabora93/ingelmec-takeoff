@@ -72,7 +72,7 @@ const overlayCombos: Combo[] = [...TOOLS, ...DRAW, ...VIEW].map((row) =>
 // split " / " alternatives ("`⌫` / `Delete`" documents two keys) into
 // separate combos.
 const section15 = guide.slice(guide.indexOf("## 15."), guide.indexOf("## 16."));
-assert.ok(section15.length > 0, "USER_GUIDE.md no longer has a §15 followed by §16 — update this test's slicing");
+assert.ok(section15.length > 0, "USER_GUIDE.md no longer has a §15 followed by §16, update this test's slicing");
 
 function tableCombos(md: string): Combo[] {
   return md
@@ -84,7 +84,7 @@ function tableCombos(md: string): Combo[] {
 }
 
 const guideCombos = tableCombos(section15);
-assert.ok(guideCombos.length >= 20, `parsed only ${guideCombos.length} combos from §15 — the table format likely changed`);
+assert.ok(guideCombos.length >= 20, `parsed only ${guideCombos.length} combos from §15, the table format likely changed`);
 
 const matches = (overlay: Combo) => (row: Combo) =>
   overlay.keys.join(" ") === row.keys.join(" ") &&
@@ -94,7 +94,7 @@ test("every combo the overlay promises exists in USER_GUIDE.md §15", () => {
   for (const combo of overlayCombos) {
     assert.ok(
       guideCombos.some(matches(combo)),
-      `overlay shows "${combo.raw}" but no §15 row documents it — if the binding changed, §15 and UserGuide.jsx move together`
+      `overlay shows "${combo.raw}" but no §15 row documents it, if the binding changed, §15 and UserGuide.jsx move together`
     );
   }
 });
@@ -106,7 +106,7 @@ test("every tool key in §15's Tools table reaches the overlay", () => {
   for (const row of toolRows) {
     assert.ok(
       overlayCombos.some(matches(row)),
-      `§15 documents tool key "${row.raw}" but the overlay doesn't show it — add it to TOOLS (or VIEW) in UserGuide.jsx`
+      `§15 documents tool key "${row.raw}" but the overlay doesn't show it, add it to TOOLS (or VIEW) in UserGuide.jsx`
     );
   }
 });

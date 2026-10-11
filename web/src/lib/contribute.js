@@ -55,14 +55,14 @@ const ORIGIN_FIELDS = [
   "reviewed",             // a human affirmed the shape at an explicit gate
   "edited",               // corrected after Create
   "edited_before_create", // corrected between proposal and Create
-  "copied",               // pasted clone — lineage without fresh evidence
+  "copied",               // pasted clone, lineage without fresh evidence
   "seed_norm",            // normalized one-click seed point
   "proposed_verts_norm",  // the machine's original trace, frozen at first correction
   "hatch_filtered",       // one-click ran with hatch filtering
   "raster_traced",        // traced from scan pixels, not vector linework
   "fill_sensitivity",     // non-default one-click fill sensitivity
   "edits",                // per-kind correction tally, e.g. { vertex: 2, move: 1 }
-  "evidence",             // agent_v1: cited basis — DEEP-whitelisted below, never passed through
+  "evidence",             // agent_v1: cited basis, DEEP-whitelisted below, never passed through
 ];
 
 // The evidence sub-object is itself a whitelist, never a spread: exactly the
@@ -133,14 +133,14 @@ export function buildContribution({ conditions, shapes, scaleInfo = [], counters
       role: s.measure_role,
       finish: tagOf[s.condition_id] || "?",
       sheet: sheetIndex.get(s.sheet_id),
-      verts_norm: s.verts_norm,          // normalized 0..1 — shape only, no scale/location
+      verts_norm: s.verts_norm,          // normalized 0..1, shape only, no scale/location
       computed: s.computed,              // SF / LF / EA
       ...(s.curved ? { curved: true } : {}), // curved linear: verts_norm are spline control points, not a polyline
       ...(s.height_ft ? { height_ft: s.height_ft } : {}),
       ...(s.rise_ft != null ? { rise_ft: s.rise_ft } : {}),   // #441 per-run vertical override
       ...(s.drop_ft != null ? { drop_ft: s.drop_ft } : {}),
-      ...(s.id ? { id: s.id } : {}),     // opaque UUID — links re-contributions, carries no content
-      ...(s.created_at ? { created_at: s.created_at } : {}), // legacy shapes predate stamping — omitted
+      ...(s.id ? { id: s.id } : {}),     // opaque UUID, links re-contributions, carries no content
+      ...(s.created_at ? { created_at: s.created_at } : {}), // legacy shapes predate stamping, omitted
       ...(origin ? { origin } : {}),     // whitelisted provenance; updated_at/edit timing NEVER ride
     };
   });

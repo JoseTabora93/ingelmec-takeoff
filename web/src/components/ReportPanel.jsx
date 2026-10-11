@@ -38,13 +38,13 @@ const DISCLAIMER = "Cantidades derivadas de planos a las escalas indicadas; veri
 // the second waste checkbox so it reads once for the pair)
 const COL_HINTS = {
   waste_lf: "Waste SF/LF = (w/Waste) − measured",
-  perimeter_ref: "Perimeter is reference only — includes openings; not totaled",
+  perimeter_ref: "Perimeter is reference only, includes openings; not totaled",
 };
 
 const sheetNum = (v, d = 1) => {
   const r = round2(v);
   // zero-gate at the DISPLAY precision, so a ±0.02 sliver shows "—", not "(0)"
-  if (!Math.round(Math.abs(r) * 10 ** d)) return "—";
+  if (!Math.round(Math.abs(r) * 10 ** d)) return "";
   if (r < 0) return <span style={{ color: "var(--c-danger)" }}>({num(-r, d)})</span>;
   return num(r, d);
 };
@@ -76,7 +76,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
         saveActiveThemeFile(raw);
         setTheme(activeTheme());
       } catch {
-        setTheme((t) => ({ ...t, warnings: ["That file isn't valid JSON — expected a design-token file."] }));
+        setTheme((t) => ({ ...t, warnings: ["That file isn't valid JSON, expected a design-token file."] }));
       }
     };
     reader.readAsText(f);
@@ -309,7 +309,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
       const added = merged.length - before;
       // Disambiguate a zero result: an empty Drive file reads differently to a
       // user than "you already have everything on Drive."
-      setSyncMsg(added > 0 ? `Loaded ${added} from Drive.` : remote.length === 0 ? "Nothing saved on Drive yet." : "Already up to date — no new templates.");
+      setSyncMsg(added > 0 ? `Loaded ${added} from Drive.` : remote.length === 0 ? "Nothing saved on Drive yet." : "Already up to date, no new templates.");
     } catch (e) {
       setSyncMsg(`Load failed: ${String(e?.message || e)}`);
     } finally { setSyncBusy(false); }
@@ -371,7 +371,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
       return { name: dxfFileName(projectName || "takeoff", label), dxf: b.dxf };
     });
     if (built.length === 1) { downloadText(built[0].name, built[0].dxf, DXF_MIME); return; }
-    const { zipSync, strToU8 } = await import("fflate"); // lazy — same pattern as xlsx.js
+    const { zipSync, strToU8 } = await import("fflate"); // lazy, same pattern as xlsx.js
     const files = {};
     for (const f of built) files[files[f.name] ? f.name.replace(/\.dxf$/, `_${Object.keys(files).length}.dxf`) : f.name] = strToU8(f.dxf);
     downloadText(`${baseName}_dxf.zip`, zipSync(files, { level: 6 }), "application/zip");
@@ -394,7 +394,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
     // notes cell below). Custom and labor columns stay nowrap.
     if (col.custom || col.spec || col.labor) {
       const cell = col.spec ? { ...td, textAlign: "left", whiteSpace: "normal", maxWidth: 240 } : { ...td, textAlign: "left" };
-      return <td key={col.key} style={cell}>{v || "—"}</td>;
+      return <td key={col.key} style={cell}>{v || ""}</td>;
     }
     switch (col.key) {
       case "finish":
@@ -405,10 +405,10 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               <strong style={{ fontFamily: "var(--f-mono)", fontWeight: 600 }}>{r.finish_tag}</strong>
               {r.multiplier > 1 && <span style={{ color: "var(--ink-muted)", fontSize: 11 }}>×{r.multiplier}</span>}
             </span>
-            {/* proposals (#365): the pending diff beside the current values —
+            {/* proposals (#365): the pending diff beside the current values,
                 the numbers in this row are what the takeoff stands on today */}
             {editProposalByCond.get(r.id) && (
-              <span data-proposed-edit={editProposalByCond.get(r.id).id} title={`Proposed by the agent, pending your acceptance in the Takeoffs panel${editProposalByCond.get(r.id).rationale ? ` — ${editProposalByCond.get(r.id).rationale}` : ""}. This row shows the current values.`}
+              <span data-proposed-edit={editProposalByCond.get(r.id).id} title={`Proposed by the agent, pending your acceptance in the Takeoffs panel${editProposalByCond.get(r.id).rationale ? `, ${editProposalByCond.get(r.id).rationale}` : ""}. This row shows the current values.`}
                 style={{ display: "block", marginTop: 3, fontFamily: "var(--f-mono)", fontSize: 10.5, color: "var(--cobalt)", whiteSpace: "nowrap" }}>
                 proposed: {describeConditionEdit(conditions.find((c) => c.id === r.id), editProposalByCond.get(r.id)).map((d) => `${d.field} ${d.from} → ${d.to}`).join(" · ")}
               </span>
@@ -418,17 +418,17 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
       case "shapes":
         return <td key={col.key} style={td}>{v}</td>;
       case "waste_pct":
-        return <td key={col.key} style={td}>{v ? `${num(v, 0)}%` : "—"}</td>;
+        return <td key={col.key} style={td}>{v ? `${num(v, 0)}%` : ""}</td>;
       case "ea":
-        return <td key={col.key} style={td}>{v ? num(v, 0) : "—"}</td>;
+        return <td key={col.key} style={td}>{v ? num(v, 0) : ""}</td>;
       case "total_sf_net":
-        return <td key={col.key} style={{ ...td, fontWeight: 700, color: "var(--cobalt)" }}>{r.total_sf ? num(v) : "—"}</td>;
+        return <td key={col.key} style={{ ...td, fontWeight: 700, color: "var(--cobalt)" }}>{r.total_sf ? num(v) : ""}</td>;
       case "sy_net":
-        return <td key={col.key} style={{ ...td, color: "var(--cobalt)" }}>{r.total_sf ? num(v) : "—"}</td>;
+        return <td key={col.key} style={{ ...td, color: "var(--cobalt)" }}>{r.total_sf ? num(v) : ""}</td>;
       case "perimeter_ref":
-        return <td key={col.key} style={{ ...td, color: "var(--ink-muted)" }}>{v ? num(v) : "—"}</td>;
+        return <td key={col.key} style={{ ...td, color: "var(--ink-muted)" }}>{v ? num(v) : ""}</td>;
       default: // floor_sf, wall_sf, border_sf, lf, waste_sf, waste_lf, …
-        return <td key={col.key} style={td}>{v ? num(v) : "—"}</td>;
+        return <td key={col.key} style={td}>{v ? num(v) : ""}</td>;
     }
   };
 
@@ -455,7 +455,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
         <div style={{ flex: 1 }} />
         <button className="btn-ghost" onClick={() => setShowInfo(true)}
           title="Identidad de su empresa y datos del cliente/obra para el encabezado impreso y el juego marcado">Datos del proyecto</button>
-        {/* always rendered, even with zero custom columns — Sheet grouping
+        {/* always rendered, even with zero custom columns, Sheet grouping
             is useful on its own */}
         <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--ink)", whiteSpace: "nowrap" }}
           title="Divide la tabla de condiciones en secciones con subtotales">
@@ -478,7 +478,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
                 <strong style={{ fontFamily: "var(--f-display)", fontSize: 13 }}>Columnas</strong>
                 <div style={{ flex: 1 }} />
-                <button onClick={applyLaborPreset} title="No-waste actuals per condition — hides SF/SY w/Waste, shows Total SF"
+                <button onClick={applyLaborPreset} title="No-waste actuals per condition, hides SF/SY w/Waste, shows Total SF"
                   style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11.5, padding: "0 10px 0 0" }}>Labor view</button>
                 <button onClick={() => { setColPrefs({}); saveColPrefs({}); }} title="Back to the default column set"
                   style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontSize: 11.5, padding: "0 10px 0 0" }}>Reset</button>
@@ -490,9 +490,9 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               {TABLE_PROFILE.filter((c) => !c.locked && !c.defaultVisible).map(colCheckbox)}
               <div style={{ borderTop: "1px solid var(--ink-faint)", margin: "8px 0 4px", paddingTop: 6, fontFamily: "var(--f-mono)", fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Custom columns</div>
               {customCols.length ? customCols.map(colCheckbox) : (
-                <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.5 }}>No custom columns yet — define them from the condition bar in the canvas.</div>
+                <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.5 }}>No custom columns yet, define them from the condition bar in the canvas.</div>
               )}
-              {/* read-only product-spec columns — only shown when a schedule
+              {/* read-only product-spec columns, only shown when a schedule
                   import attached spec data to at least one condition */}
               {specCols.length > 0 && (
                 <>
@@ -500,7 +500,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   {specCols.map(colCheckbox)}
                 </>
               )}
-              {/* labor/subfloor-type columns — only shown once a condition has
+              {/* labor/subfloor-type columns, only shown once a condition has
                   a value typed in from the Supporting Materials panel */}
               {laborCols.length > 0 && (
                 <>
@@ -541,13 +541,13 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                 <button onClick={saveAsTemplate} disabled={!tplName.trim()} title="Save the current columns + grouping under this name"
                   style={{ padding: "3px 8px", borderRadius: 0, border: "1px dashed var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12 }}>Save</button>
               </div>
-              {/* Optional Drive sync — only when signed in and a Projects root is
+              {/* Optional Drive sync, only when signed in and a Projects root is
                   configured. Load MERGES (this device wins on a name clash); it
                   does not pull remote deletes/edits, so the copy stays "Load," not
                   "Sync," to avoid over-promising two-way behavior. */}
               {canSync && (
                 <div style={{ borderTop: "1px solid var(--ink-faint)", marginTop: 8, paddingTop: 8 }}>
-                  <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.4, marginBottom: 6 }}>Carry these across your own devices via Drive. Load only adds templates this device doesn't have — a same-name template is never overwritten (rename or delete it here first to pull a newer copy).</div>
+                  <div style={{ fontSize: 10.5, color: "var(--ink-muted)", lineHeight: 1.4, marginBottom: 6 }}>Carry these across your own devices via Drive. Load only adds templates this device doesn't have, a same-name template is never overwritten (rename or delete it here first to pull a newer copy).</div>
                   <div style={{ display: "flex", gap: 6 }}>
                     <button onClick={pushToDrive} disabled={syncBusy} title="Write your saved templates to your private Drive file"
                       style={{ flex: 1, padding: "4px 8px", borderRadius: 0, border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--cobalt)", cursor: syncBusy ? "default" : "pointer", fontSize: 12 }}>Push to Drive</button>
@@ -571,7 +571,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   style={{ border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1 }}>✕</button>
               </div>
               <div style={{ fontSize: 11, color: "var(--ink-muted)", lineHeight: 1.5, marginBottom: 8 }}>
-                Import a design-token file (e.g. a Claude Design <code>tokens.json</code>) to reskin this report — palette and fonts only. Your company identity stays where it is.
+                Import a design-token file (e.g. a Claude Design <code>tokens.json</code>) to reskin this report, palette and fonts only. Your company identity stays where it is.
               </div>
               {theme.name ? (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -603,7 +603,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             ("Revisions noted" renders from markups alone); CSV stays rows-only.
             Every item keeps the exact disabled condition + tooltip its button
             carried. RFI exports stay their own controls, shown only when RFIs exist. */}
-        {/* INGELMEC preventa — buy list off by default (lib/ingelmec.js); this
+        {/* INGELMEC preventa, buy list off by default (lib/ingelmec.js); this
             is the ONE control that brings it back (execution-stage work). */}
         <button className="btn-ghost" onClick={() => setPreventa((v) => !v)}
           title={preventa ? "Preventa activa: la lista de compras está oculta en el reporte y las exportaciones. Clic para mostrarla (etapa de ejecución)." : "Clic para ocultar la lista de compras (modo preventa)."}
@@ -624,8 +624,8 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             { id: "shapes-json", icon: "document", label: "JSON de figuras", disabled: !shapes.length, title: "Cantidades medidas por figura: sin multiplicador ni desperdicio", onSelect: exportShapesJson },
             { id: "dxf", icon: "document", label: dxfSheets.length > 1 ? `DXF (CAD) · ${dxfSheets.length} sheets` : "DXF (CAD)", disabled: !dxfSheets.length,
               title: !shapes.length ? "Nothing measured yet"
-                : !dxfSheets.length ? "Set the scale on a sheet with shapes first — a CAD file in pixels is worse than none"
-                : `AutoCAD-ready geometry: closed polylines per finish on OT-<TAG> layers, ${units === "metric" ? "metres" : "feet"}, one drawing per sheet${dxfSkipped.length ? ` — ${dxfSkipped.length} unscaled sheet${dxfSkipped.length > 1 ? "s" : ""} left out` : ""}`,
+                : !dxfSheets.length ? "Set the scale on a sheet with shapes first, a CAD file in pixels is worse than none"
+                : `AutoCAD-ready geometry: closed polylines per finish on OT-<TAG> layers, ${units === "metric" ? "metres" : "feet"}, one drawing per sheet${dxfSkipped.length ? `, ${dxfSkipped.length} unscaled sheet${dxfSkipped.length > 1 ? "s" : ""} left out` : ""}`,
               onSelect: exportDxf },
           ]}
         />
@@ -664,12 +664,12 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
 
       <div className="report-scroll" style={{ flex: 1, overflow: "auto", padding: "20px 24px" }}>
         {/* print pagination: the flow-table's thead repeats this one-line strip at
-            the top of every printed page (screen hides it) — a fixed footer would
+            the top of every printed page (screen hides it), a fixed footer would
             overlap the last row of intermediate pages */}
         <table className="report-flow"><thead><tr><td>
-          {projectName || "Proyecto sin nombre"} — {DISCLAIMER}
+          {projectName || "Proyecto sin nombre"}, {DISCLAIMER}
         </td></tr></thead><tbody><tr><td>
-        {/* print-only masthead — hidden on screen via app.css. Title-block header
+        {/* print-only masthead, hidden on screen via app.css. Title-block header
             (logo/firm row · project title · bordered fact grid), the drafting-
             spec-book letterhead treatment. */}
         <div className="report-print-header">
@@ -678,7 +678,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, borderBottom: "1.25px solid var(--ink)", paddingBottom: 9 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
               {/* clear-label: the trade-name identity. default: the OpenTakeoff
-                  brand name (no company data shown — "purely OpenTakeoff") */}
+                  brand name (no company data shown, "purely OpenTakeoff") */}
               {brand.clear ? (
                 <>
                   {company.logo && <img src={company.logo} alt="" style={{ maxHeight: 46, maxWidth: 170, objectFit: "contain", display: "block" }} />}
@@ -692,7 +692,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               ) : (
                 <>
                   {/* INGELMEC fork: default mode presents the Ingelmec identity
-                      (logo + name) instead of plain text — resolveBranding now
+                      (logo + name) instead of plain text, resolveBranding now
                       fills company in default mode too. */}
                   {company?.logo && <img src={company.logo} alt="" style={{ maxHeight: 46, maxWidth: 170, objectFit: "contain", display: "block" }} />}
                   <div style={{ fontFamily: "var(--f-display)", fontWeight: 700, fontSize: 12.5, lineHeight: 1.15 }}>{brand.brandName}</div>
@@ -718,7 +718,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                 {cells.map(([k, v], i) => (
                   <div key={k} style={{ padding: "7px 11px", borderRight: i < cells.length - 1 ? "1px solid var(--ink-faint)" : "none", minWidth: 0 }}>
                     <div style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-muted)", marginBottom: 2 }}>{k}</div>
-                    <div style={{ fontFamily: "var(--f-body)", fontSize: 12.5, fontWeight: 500, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v || "—"}</div>
+                    <div style={{ fontFamily: "var(--f-body)", fontSize: 12.5, fontWeight: 500, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v || ""}</div>
                   </div>
                 ))}
               </div>
@@ -733,13 +733,13 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
           {/* meta footer: scale provenance · attribution · disclaimer */}
           <div style={{ fontFamily: "var(--f-mono)", fontSize: 10, color: "var(--ink-muted)", lineHeight: 1.6, borderTop: "1px solid var(--ink-faint)", paddingTop: 6, marginBottom: 12 }}>
             {scaleInfo.map((si) => (
-              <div key={si.sheet_id}>{sheetLabel ? sheetLabel(si.sheet_id) : si.sheet_id} — {!si.scale_source || si.scale_source === "unknown" ? "escala fijada — procedencia sin registrar" : si.scale_source}{si.scale_confirmed === false ? <span style={{ color: "var(--c-warning)", fontWeight: 700 }}> · fijada por agente, SIN CONFIRMAR</span> : null}</div>
+              <div key={si.sheet_id}>{sheetLabel ? sheetLabel(si.sheet_id) : si.sheet_id}, {!si.scale_source || si.scale_source === "unknown" ? "escala fijada, procedencia sin registrar" : si.scale_source}{si.scale_confirmed === false ? <span style={{ color: "var(--c-warning)", fontWeight: 700 }}> · fijada por agente, SIN CONFIRMAR</span> : null}</div>
             ))}
             <div>Generado {new Date().toLocaleDateString()}</div>
             <div>{DISCLAIMER}</div>
           </div>
         </div>
-        {/* the empty-state hides once markups exist — "Revisions noted" below
+        {/* the empty-state hides once markups exist, "Revisions noted" below
             renders from markups alone, and "Nothing measured yet" reading as a
             headline above a populated table was a lie */}
         {!rows.length ? (
@@ -750,7 +750,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
           )
         ) : (
           <>
-          {/* print-visible grouping caption — the Group select lives in
+          {/* print-visible grouping caption, the Group select lives in
               .report-toolbar (display:none in print), so the printed page
               must say what the sections are. Kept on screen too (cheap,
               consistent). Suppressed with the rest of the group chrome when
@@ -770,7 +770,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               </tr>
             </thead>
             {/* ONE render path: the ungrouped view is a degenerate single group
-                (no header/subtotal chrome). One tbody PER GROUP — in sheet mode
+                (no header/subtotal chrome). One tbody PER GROUP, in sheet mode
                 the same condition repeats across groups, so r.id is only unique
                 within a group's tbody. thead + grand-total tfoot stay exactly
                 as ungrouped, so print pagination is untouched. */}
@@ -785,7 +785,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               const gctx = gp.perimByCond ? { perimByCond: gp.perimByCond, attrsByCond, specByCond, laborByCond } : ctx;
               return (
                 <tbody key={key}>
-                  {/* breakAfter is a print nicety only — unreliable on table
+                  {/* breakAfter is a print nicety only, unreliable on table
                       rows in Chromium, unimplemented in Gecko; occasional
                       header stranding at a page bottom is accepted in v1 */}
                   {grouped && (
@@ -800,7 +800,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                       {tableCols.map((c) => renderCell(c, r, gctx))}
                     </tr>
                   ))}
-                  {/* single-row group: no subtotal — it would repeat the row verbatim */}
+                  {/* single-row group: no subtotal, it would repeat the row verbatim */}
                   {sub && (
                     <tr>
                       <td style={{ ...td, textAlign: "left", borderTop: "1px solid var(--ink-soft)", color: "var(--ink-muted)", fontWeight: 600 }}>Subtotal</td>
@@ -821,7 +821,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               <tr>
                 <td style={{ ...td, textAlign: "left", borderTop: "2px solid var(--ink)", borderBottom: "2px solid var(--ink)", background: "var(--paper-cream)", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "var(--f-mono)" }}>TOTAL</td>
                 {/* finish is always first & locked; every other visible column gets its
-                    own td — footed columns render foot(g), ref columns never foot */}
+                    own td, footed columns render foot(g), ref columns never foot */}
                 {tableCols.slice(1).map((c) => (
                   c.foot && !c.ref ? (
                     <td key={c.key} style={{ ...td, borderTop: "2px solid var(--ink)", borderBottom: "2px solid var(--ink)", background: "var(--paper-cream)", fontWeight: 700, ...(c.accent ? { color: "var(--cobalt)" } : {}) }}>{num(c.foot(g))}</td>
@@ -841,7 +841,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             {tableCols.some((c) => c.key === "perimeter_ref") && (
               <> Perím {LU} (ref) suma los perímetros del trazo de piso: incluye vanos de puerta y muros compartidos; solo referencia, nunca se suma ni lleva desperdicio.</>
             )}
-            {/* bridge to the base-quantity By-sheet section below — the two
+            {/* bridge to the base-quantity By-sheet section below, the two
                 slice the same shapes with different semantics */}
             {groupBy === "sheet" && grouped && (
               <> Los grupos muestran cantidades con desperdicio (desperdicio y ×N por hoja); la sección Por hoja muestra las cantidades base medidas.</>
@@ -887,17 +887,17 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
               </div>
             ))}
             <p style={{ margin: "10px auto 0", fontSize: 11.5, color: "var(--ink-muted)", lineHeight: 1.6 }}>
-              Base quantities as measured per sheet — waste not applied.
+              Base quantities as measured per sheet, waste not applied.
               {hasMultipliers(bySheet) && (
                 // the shared note + a screen-only reconcile clause (CSV/PDF omit it)
-                <> {BY_SHEET_BASE_NOTE} — sheet subtotals × multiplier reconcile to the condition table.</>
+                <> {BY_SHEET_BASE_NOTE}, sheet subtotals × multiplier reconcile to the condition table.</>
               )}
             </p>
           </div>
         )}
         {markups.some((m) => m.type !== "svg" && m.type !== "image") && (
           <div style={{ maxWidth: 980, margin: "26px auto 0" }}>
-            {/* svg symbols and image markups aren't revision notes — excluded */}
+            {/* svg symbols and image markups aren't revision notes, excluded */}
             <h3 style={{ fontFamily: "var(--f-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink)", margin: "0 0 10px", paddingBottom: 5, borderBottom: "1.25px solid var(--ink)" }}>Revisions noted</h3>
             <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
               <thead>
@@ -916,7 +916,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                       </span>
                     </td>
                     <td style={{ ...td, textAlign: "left", fontFamily: "var(--f-mono)", fontSize: 11.5 }}>{sheetLabel ? sheetLabel(m.sheet_id) : m.sheet_id}</td>
-                    <td style={{ ...td, textAlign: "left", whiteSpace: "normal", width: "60%" }}>{resolveNote(m.text, m.condition_id, noteQty).text || "—"}</td>
+                    <td style={{ ...td, textAlign: "left", whiteSpace: "normal", width: "60%" }}>{resolveNote(m.text, m.condition_id, noteQty).text || ""}</td>
                   </tr>
                 ))}
               </tbody>
@@ -928,7 +928,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
         )}
         {matSummary.length > 0 && (
           <div style={{ maxWidth: 980, margin: "26px auto 0" }}>
-            <h3 style={{ fontFamily: "var(--f-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink)", margin: "0 0 10px", paddingBottom: 5, borderBottom: "1.25px solid var(--ink)" }}>Materiales de apoyo — lista de compras</h3>
+            <h3 style={{ fontFamily: "var(--f-display)", fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--ink)", margin: "0 0 10px", paddingBottom: 5, borderBottom: "1.25px solid var(--ink)" }}>Materiales de apoyo, lista de compras</h3>
             <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--paper-bright)", border: "1px solid var(--ink-faint)" }}>
               <thead>
                 <tr>
@@ -942,7 +942,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
                   <tr key={i}>
                     <td style={{ ...td, textAlign: "left" }}>{m.name}</td>
                     <td style={{ ...td, fontWeight: 700 }}>{num(m.qty, 2)}</td>
-                    <td style={{ ...td, textAlign: "left", paddingLeft: 16, color: "var(--ink-muted)" }}>{m.unit || "—"}</td>
+                    <td style={{ ...td, textAlign: "left", paddingLeft: 16, color: "var(--ink-muted)" }}>{m.unit || ""}</td>
                   </tr>
                 ))}
               </tbody>
@@ -965,7 +965,7 @@ export default function ReportPanel({ projectName, onProjectName, conditions, sh
             </p>
           </div>
         )}
-        {/* subtle parent credit — clear-label mode only (default mode is already
+        {/* subtle parent credit, clear-label mode only (default mode is already
             OpenTakeoff-branded in the masthead, so a separate credit is redundant) */}
         {brand.credit && (
           <p style={{ maxWidth: 980, margin: "20px auto 0", textAlign: "center", fontFamily: "var(--f-mono)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--text-faint)" }}>{brand.credit}</p>
@@ -1059,7 +1059,7 @@ function ProjectInfoModal({ clientInfo = {}, onClientInfo, onSaved, onClose }) {
       if (seq !== logoSeq.current) return;   // superseded by a later pick/remove/close
       editActive({ logo });
     } catch (err) {
-      if (seq !== logoSeq.current) return;   // stale failure — don't flash its error
+      if (seq !== logoSeq.current) return;   // stale failure, don't flash its error
       setLogoErr(err.message || String(err));
     }
   };
@@ -1079,12 +1079,12 @@ function ProjectInfoModal({ clientInfo = {}, onClientInfo, onSaved, onClose }) {
           <strong style={{ fontFamily: "var(--f-display)", fontSize: 15 }}>Datos del proyecto</strong>
         </div>
         <div style={{ padding: 16, fontSize: 13, lineHeight: 1.6, color: "var(--ink)" }}>
-          <div style={section}>Company — your trade names, saved on this device</div>
+          <div style={section}>Company, your trade names, saved on this device</div>
           {/* trade-name picker: choose which identity prints on the report + marked-set */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "8px 0" }}>
             <select name="trade-name" aria-label="Active trade name" value={profs.activeId || ""} onChange={(e) => switchProfile(e.target.value)}
               className="field-input" style={{ flex: 1, minWidth: 0 }} disabled={!profs.profiles.length}>
-              {profs.profiles.length === 0 && <option value="">No trade name yet — add one</option>}
+              {profs.profiles.length === 0 && <option value="">No trade name yet, add one</option>}
               {profs.profiles.map((p) => <option key={p.id} value={p.id}>{p.name || "Untitled trade name"}</option>)}
             </select>
             <button onClick={addTradeName} className="btn-ghost" title="Add another trade name (e.g. a second brand)"
@@ -1120,15 +1120,15 @@ function ProjectInfoModal({ clientInfo = {}, onClientInfo, onSaved, onClose }) {
           </div>
           {saveFailed && <p style={err}>Couldn't save on this device</p>}
 
-          {/* branding mode — per project. Off = OpenTakeoff (default); on brands
+          {/* branding mode, per project. Off = OpenTakeoff (default); on brands
               the report + marked set as the selected trade name, keeping a subtle
               "Measured with OpenTakeoff" credit. Disabled until a trade name exists. */}
-          <div style={{ ...section, borderTop: "1px solid var(--ink-faint)", marginTop: 14, paddingTop: 12 }}>Branding — how this project's documents present</div>
+          <div style={{ ...section, borderTop: "1px solid var(--ink-faint)", marginTop: 14, paddingTop: 12 }}>Branding, how this project's documents present</div>
           <label style={{ display: "flex", alignItems: "center", gap: 8, margin: "8px 0", cursor: profs.profiles.length ? "pointer" : "not-allowed", opacity: profs.profiles.length ? 1 : 0.6 }}>
             <input type="checkbox" name="trade-name-brand" checked={brandSel.mode === "clearlabel"} disabled={!profs.profiles.length}
               onChange={(e) => setBranding({ mode: e.target.checked ? "clearlabel" : "default" })} />
             <span style={{ fontSize: 12.5 }}>
-              Trade name — brand as your company
+              Trade name, brand as your company
               {!profs.profiles.length && <span style={{ color: "var(--ink-muted)" }}> (add a trade name first)</span>}
             </span>
           </label>
@@ -1148,7 +1148,7 @@ function ProjectInfoModal({ clientInfo = {}, onClientInfo, onSaved, onClose }) {
             </div>
           )}
 
-          <div style={{ ...section, borderTop: "1px solid var(--ink-faint)", marginTop: 14, paddingTop: 12 }}>Client / job — saved with this project</div>
+          <div style={{ ...section, borderTop: "1px solid var(--ink-faint)", marginTop: 14, paddingTop: 12 }}>Client / job, saved with this project</div>
           <label style={row}>
             <span className="field-label">Client name</span>
             <input name="client-name" autoComplete="off" value={clientInfo.client_name || ""} onChange={client("client_name")} className="field-input" style={{ marginTop: 4 }} />
@@ -1190,7 +1190,7 @@ function ContributeModal({ conditions, shapes, scaleInfo = [], provenanceCounter
     setState("sending"); setMsg("");
     try {
       await sendContribution(buildContribution({ conditions, shapes, scaleInfo, counters: provenanceCounters }), contributor.trim());
-      setState("done"); setMsg("Thank you — your takeoff is now helping train the open flooring model.");
+      setState("done"); setMsg("Thank you, your takeoff is now helping train the open flooring model.");
     } catch (e) {
       setState("error"); setMsg(e.message || String(e));
     }
@@ -1207,7 +1207,7 @@ function ContributeModal({ conditions, shapes, scaleInfo = [], provenanceCounter
           <p style={{ marginTop: 0 }}>Help grow a shared, flooring-tuned open model. We send only the <strong>derived takeoff</strong>:</p>
           <ul style={{ margin: "0 0 10px", paddingLeft: 18 }}>
             <li>condition labels, shape types, and quantities (SF / LF / EA)</li>
-            <li>normalized room geometry (shape only — no scale, no location)</li>
+            <li>normalized room geometry (shape only, no scale, no location)</li>
             <li>how each shape was made (hand-traced vs. machine-proposed) and whether you corrected it</li>
           </ul>
           <p style={{ margin: "0 0 10px", color: "var(--c-positive)", fontWeight: 600 }}>

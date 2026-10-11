@@ -32,7 +32,7 @@ const FIRST_ASK_DESKTOP = `Using OpenTakeoff, load /full/path/to/${SAMPLE_PLAN_N
 function Code({ text, label }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
-    try { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1400); } catch { /* clipboard blocked — the text is selectable */ }
+    try { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1400); } catch { /* clipboard blocked, the text is selectable */ }
   };
   return (
     <div style={{ position: "relative", margin: "6px 0 10px" }}>
@@ -53,7 +53,7 @@ const TABS = [
     id: "desktop", label: "Claude Desktop", needs: "Nothing else to install",
     body: () => (
       <>
-        <P>1. Download <A href={MCPB_URL}>opentakeoff-mcp.mcpb</A> — the link always points at the newest release.</P>
+        <P>1. Download <A href={MCPB_URL}>opentakeoff-mcp.mcpb</A>, the link always points at the newest release.</P>
         <P>2. Double-click it. Claude Desktop opens an install prompt; confirm it.</P>
         <P>The bundle carries its own dependencies, so there's no Node or npm to install. It leaves out the optional sheet renderer: every measuring and export tool works, but the agent can't draw sheet images.</P>
       </>
@@ -65,7 +65,7 @@ const TABS = [
       <>
         <P>Run this once in any terminal:</P>
         <Code label="Claude Code command" text="claude mcp add --scope user opentakeoff -- npx -y opentakeoff-mcp" />
-        <P>Check it — you should see <code>opentakeoff: npx -y opentakeoff-mcp - ✔ Connected</code>:</P>
+        <P>Check it, you should see <code>opentakeoff: npx -y opentakeoff-mcp - ✔ Connected</code>:</P>
         <Code label="check command" text="claude mcp list" />
       </>
     ),
@@ -93,7 +93,7 @@ const TABS = [
     body: () => (
       <>
         <P>claude.ai in a browser, the Claude mobile app and ChatGPT run in the cloud, not on your computer. They can only reach an MCP server at a public web address, and OpenTakeoff's server runs on your machine and reads your plan files from your disk.</P>
-        <P>A hosted server isn't shipped yet. Until it is, use Claude Desktop or a terminal agent — the other tabs.</P>
+        <P>A hosted server isn't shipped yet. Until it is, use Claude Desktop or a terminal agent, the other tabs.</P>
       </>
     ),
   },
@@ -130,7 +130,7 @@ export default function ConnectAI({ onClose }) {
         </div>
         <P>
           Give an AI agent the same takeoff engine this canvas runs: load a plan set, set the scale, measure rooms, export the marked set.
-          It runs on your own computer — the agent reads plans from your disk, nothing is hosted, no account.
+          It runs on your own computer, the agent reads plans from your disk, nothing is hosted, no account.
         </P>
 
         <div role="tablist" aria-label="Your AI app" style={{ display: "flex", flexWrap: "wrap", gap: 0, borderBottom: "1px solid var(--ink-faint)", margin: "14px 0 14px" }}>
@@ -143,7 +143,7 @@ export default function ConnectAI({ onClose }) {
         </div>
         <div role="tabpanel" aria-label={cur.label}>
           <div style={{ marginBottom: 8, fontSize: 12, color: "var(--ink-muted)" }}>
-            {cur.node ? <>Needs <A href={NODE_URL}>Node 20+</A> — check with <code>node -v</code></> : cur.needs}
+            {cur.node ? <>Needs <A href={NODE_URL}>Node 20+</A>, check with <code>node -v</code></> : cur.needs}
           </div>
           {cur.body()}
         </div>
@@ -153,7 +153,7 @@ export default function ConnectAI({ onClose }) {
             <div className="t-label" style={{ marginBottom: 8 }}>Your first question</div>
             <P>
               <a href={samplePlanUrl()} download={SAMPLE_PLAN_NAME} style={{ color: "var(--cobalt)", fontWeight: 700 }}>Download the sample plan</a>{" "}
-              — the same VA finish plan the canvas demo opens.{" "}
+, the same VA finish plan the canvas demo opens.{" "}
               {desktop
                 ? <>Then ask Claude, with the file's full path (on a Mac: right-click it in Finder, hold Option, <em>Copy … as Pathname</em>):</>
                 : <>Start your agent in the folder it downloaded to, and ask:</>}

@@ -394,11 +394,11 @@ export interface MatchOptions extends SweepOptions {
  * caller can say so. */
 export function scaleFingerprint(fp: SymbolFingerprint, k: number): SymbolFingerprint {
   if (!Number.isFinite(k) || !(k > 0)) {
-    throw new Error(`Size ratio must be a positive, finite number (seed-sheet px per target-sheet px) — got ${k}.`);
+    throw new Error(`Size ratio must be a positive, finite number (seed-sheet px per target-sheet px), got ${k}.`);
   }
   if (k === 1) return fp;
   if (k < SWEEP_MIN_SCALE || k > SWEEP_MAX_SCALE) {
-    throw new Error(`Size ratio ${k.toFixed(4)} is outside the sane band (${SWEEP_MIN_SCALE} – ${SWEEP_MAX_SCALE}) — that is a larger disagreement than any real sheet pair, so the likelier cause is a wrong scale on one of the two sheets. Check set_scale on both before sweeping across them.`);
+    throw new Error(`Size ratio ${k.toFixed(4)} is outside the sane band (${SWEEP_MIN_SCALE}, ${SWEEP_MAX_SCALE}), that is a larger disagreement than any real sheet pair, so the likelier cause is a wrong scale on one of the two sheets. Check set_scale on both before sweeping across them.`);
   }
   const rel: number[][] = [];
   const lum: number[] = [];
@@ -413,7 +413,7 @@ export function scaleFingerprint(fp: SymbolFingerprint, k: number): SymbolFinger
     totalLen += len;
   }
   if (!rel.length) {
-    throw new Error(`At a ${k.toFixed(4)} size ratio every segment of this symbol falls below ${MIN_SEG_LEN} px on the target sheet — there is no linework left to match. Marquee an instance drawn on the target sheet itself.`);
+    throw new Error(`At a ${k.toFixed(4)} size ratio every segment of this symbol falls below ${MIN_SEG_LEN} px on the target sheet, there is no linework left to match. Marquee an instance drawn on the target sheet itself.`);
   }
   return {
     rel,
@@ -442,10 +442,10 @@ export function fingerprintSymbol(segs: number[], seedRect: [Point, Point], lum?
     }
   }
   if (!seedIdx.length) {
-    throw new Error("No vector segments sit fully inside the seed rect — marquee tightly around one whole symbol instance (segments crossing the rect edge don't count as the symbol).");
+    throw new Error("No vector segments sit fully inside the seed rect, marquee tightly around one whole symbol instance (segments crossing the rect edge don't count as the symbol).");
   }
   if (seedIdx.length > MAX_SEED_SEGS) {
-    throw new Error(`The seed rect holds ${seedIdx.length} segments — that is a region, not one symbol instance. Marquee a single symbol.`);
+    throw new Error(`The seed rect holds ${seedIdx.length} segments, that is a region, not one symbol instance. Marquee a single symbol.`);
   }
 
   let totalLen = 0, cxw = 0, cyw = 0;
@@ -756,7 +756,7 @@ export function matchSymbol(fp: SymbolFingerprint, segs: number[], opts: MatchOp
   const xforms = transformsFor(opts.rotations ?? true, opts.mirror ?? true);
   const n = segs.length >> 2;
   if (scale !== 1 && opts.excludeCenter) {
-    throw new Error("excludeCenter is a point on the SEED sheet and means nothing on a target sheet at a different scale — omit it when sweeping across sheets (there is no seed there to shadow).");
+    throw new Error("excludeCenter is a point on the SEED sheet and means nothing on a target sheet at a different scale, omit it when sweeping across sheets (there is no seed there to shadow).");
   }
   const fpS = scale === 1 ? fp : scaleFingerprint(fp, scale);
   // Only the scaling trip is guarded. A caller who widens tolPx on a same-scale
@@ -764,7 +764,7 @@ export function matchSymbol(fp: SymbolFingerprint, segs: number[], opts: MatchOp
   // is not owed a refusal; a symbol that shrank into the tolerance did not
   // choose anything, and its "matches" would be noise.
   if (scale !== 1 && fpS.footprint < MIN_FOOTPRINT_TOLS * tol) {
-    throw new Error(`At a ${scale.toFixed(4)} size ratio this symbol is ${fpS.footprint.toFixed(1)} px across on the target sheet — inside the ${tol.toFixed(1)} px matching tolerance, where every placement scores alike and a "match" means nothing. The seed is drawn too large relative to the target for its linework to survive the trip: marquee an instance on the target sheet itself, or count the tag text with sweep_schedule_row.`);
+    throw new Error(`At a ${scale.toFixed(4)} size ratio this symbol is ${fpS.footprint.toFixed(1)} px across on the target sheet, inside the ${tol.toFixed(1)} px matching tolerance, where every placement scores alike and a "match" means nothing. The seed is drawn too large relative to the target for its linework to survive the trip: marquee an instance on the target sheet itself, or count the tag text with sweep_schedule_row.`);
   }
   const { rel, totalLen } = fpS;
 
@@ -1018,8 +1018,8 @@ export function matchSymbol(fp: SymbolFingerprint, segs: number[], opts: MatchOp
         mode: killed.neg.mode,
         evidence: Math.round(killed.ev * 1000) / 1000,
         reason: killed.neg.mode === "shape"
-          ? `matched the seed at ${Math.round(sc.score * 100)}%, but ${Math.round(killed.ev * 100)}% of counter-example ${killed.by + 1}'s extra linework is here too — the negative explains this placement at least as well`
-          : `matched the seed at ${Math.round(sc.score * 100)}%, but the line counter-example ${killed.by + 1} sits on runs through this placement UNBROKEN (${Math.round(killed.ev * 100)}% of it) — a real instance drawn over it would break it`,
+          ? `matched the seed at ${Math.round(sc.score * 100)}%, but ${Math.round(killed.ev * 100)}% of counter-example ${killed.by + 1}'s extra linework is here too, the negative explains this placement at least as well`
+          : `matched the seed at ${Math.round(sc.score * 100)}%, but the line counter-example ${killed.by + 1} sits on runs through this placement UNBROKEN (${Math.round(killed.ev * 100)}% of it), a real instance drawn over it would break it`,
       });
       continue;
     }
@@ -1109,11 +1109,11 @@ export function matchSymbol(fp: SymbolFingerprint, segs: number[], opts: MatchOp
       const ev = extraOf.get(s) ?? 0;
       withheld.push({
         ...row(s), extra: pct(ev),
-        reason: `reproduces ${Math.round(s.score * 100)}% of the seed but carries ~${Math.round(ev * 100)}% extra linework the seed lacks (bar ${Math.round(extraBar * 100)}%) — under variant_guard a richer variant (a different grille/register/fixture type) is a question, not a count; look before counting it. If you meant to seed a contained sub-shape and count the richer symbols, drop variant_guard or pass a counter-example around the variant you DON'T mean`,
+        reason: `reproduces ${Math.round(s.score * 100)}% of the seed but carries ~${Math.round(ev * 100)}% extra linework the seed lacks (bar ${Math.round(extraBar * 100)}%), under variant_guard a richer variant (a different grille/register/fixture type) is a question, not a count; look before counting it. If you meant to seed a contained sub-shape and count the richer symbols, drop variant_guard or pass a counter-example around the variant you DON'T mean`,
       });
       continue;
     }
-    withheld.push({ ...row(s), reason: `matched ${Math.round(s.score * 100)}% of the seed's linework (commit bar ${Math.round(scoreHigh * 100)}%) — likely a variant or an overlapped instance; look before counting it` });
+    withheld.push({ ...row(s), reason: `matched ${Math.round(s.score * 100)}% of the seed's linework (commit bar ${Math.round(scoreHigh * 100)}%), likely a variant or an overlapped instance; look before counting it` });
   }
   const order = (a: SweepMatch, b: SweepMatch): number =>
     a.at[1] - b.at[1] || a.at[0] - b.at[0] || a.rotation - b.rotation || Number(a.mirrored) - Number(b.mirrored);

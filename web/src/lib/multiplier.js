@@ -43,5 +43,5 @@ export function repairConditionMultipliers(conditions) {
 export function describeMultiplierRepair(repaired) {
   if (!repaired.length) return "";
   const list = repaired.map((r) => `${r.finish_tag} ${JSON.stringify(r.was)} → ×${r.now}`).join(", ");
-  return `Couldn't load ${repaired.length === 1 ? "a condition multiplier" : `${repaired.length} condition multipliers`} as saved (must be a positive number) — reset: ${list}. Check these quantities.`;
+  return `Couldn't load ${repaired.length === 1 ? "a condition multiplier" : `${repaired.length} condition multipliers`} as saved (must be a positive number), reset: ${list}. Check these quantities.`;
 }

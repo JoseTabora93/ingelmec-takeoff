@@ -58,7 +58,7 @@ test("ImportSchedulePanel: the flag is a sibling of the row's <label>, not insid
   assert.match(html, /<span[^>]*color:var\(--c-warning\)[^>]*>from description</);
   // accurate: a row under a printed MISC / ACCESSORIES heading is "text" too —
   // there IS a heading, it just names no category
-  assert.match(html, /title="Category guessed from the row(&#x27;|')s own words — no printed heading names one"/);
+  assert.match(html, /title="Category guessed from the row(&#x27;|')s own words, no printed heading names one"/);
   assert.doesNotMatch(html, /no printed section heading/);
 });
 
@@ -228,7 +228,7 @@ test("group checkbox: a partly picked group is data-state=some and unchecked; al
   assert.doesNotMatch(ceiling, /checked|disabled/);
 });
 
-const BANNER_TAIL = "A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it — ";
+const BANNER_TAIL = "A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it, ";
 const bannerOf = (html: string) => html.match(/<div role="note" id="([^"]+)" style="([^"]*)">([^<]*)<\/div>/);
 const unesc = (s: string) => s.replace(/&#x27;/g, "'").replace(/&quot;/g, "\"").replace(/&amp;/g, "&");
 
@@ -257,9 +257,9 @@ test("skipped notice: exact text one / several / repeated / > 8; a note the dial
   assert.doesNotMatch(none, /skipped \(couldn/);
 });
 
-test("zero rows: its own title, Close (autofocus) only — no Select all, Deselect all or Create", () => {
+test("zero rows: its own title, Close (autofocus) only, no Select all, Deselect all or Create", () => {
   const html = renderWith({ rows: [], skipped: ["EPOX"] });
-  assert.match(html, />Import from schedule — no rows read</);
+  assert.match(html, />Import from schedule, no rows read</);
   assert.doesNotMatch(html, /Select all|Deselect all|Create \d/);
   assert.match(html, /<button autofocus=""[^>]*>Close<\/button>/);
   assert.doesNotMatch(html, />Cancel</);
@@ -334,7 +334,7 @@ test("read as: the code as read, mono 12.5px, warning color, a title and hidden 
   assert.match(m![4], /font-size:12\.5px/);
   assert.equal(m![5], HIDDEN);
   // the hidden text doesn't repeat the code the visible text just read out
-  assert.equal(m![6], " — check the code against the schedule.");
+  assert.equal(m![6], ", check the code against the schedule.");
   // outside the label, pushed right on its own; the checkbox points at it
   for (const l of r.matchAll(/<label[^>]*>(.*?)<\/label>/gs)) assert.doesNotMatch(l[1], /read as/);
   assert.match(r, /<\/label><span[^>]*margin-left:auto[^>]*>read as /);

@@ -57,7 +57,7 @@ export type Mint = (prefix: string) => string;
 
 // The variant-label join: an en dash with spaces, so baseTagOf splits it back off and twinning a
 // twin never stacks suffixes.
-const SEP = " – ";
+const SEP = ", ";
 
 // Row bookkeeping that must never be copied from a patch or a parent row.
 const ROW_LINK_FIELDS = ["id", "origin_id", "inherited"] as const;

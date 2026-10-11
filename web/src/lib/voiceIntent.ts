@@ -40,7 +40,7 @@ export type RejectReason =
   | "bad_number"     // waste keyword present but number missing/invalid/out of range
   | "trailing_words" // a production matched but tokens were left over
   | "deixis_no_condition" // bare deixis ("this room" alone) with no active condition
-  | "deixis_target"; // deixis riding note/clear-label — nothing to aim at
+  | "deixis_target"; // deixis riding note/clear-label, nothing to aim at
 
 export type VoiceParse =
   | { ok: true; intent: Intent }
@@ -285,7 +285,7 @@ function takeTag(
       // synonym with no number only matches a bare live tag (e.g. ctx "CPT")
       const r = finish(prefix, null, after);
       if (r) return r;
-      return null; // synonym consumed but nothing valid — caller rejects as unknown_tag
+      return null; // synonym consumed but nothing valid, caller rejects as unknown_tag
     }
   }
 

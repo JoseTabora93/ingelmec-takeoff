@@ -620,7 +620,7 @@ test("a group label above codes that run on without a dash (CPT above CPT1) is n
 test("a group label beside its spec section is not a row, and leaves the region", () => {
   // the label prints the spec section it groups, and that line reaches past
   // every real cell
-  const spec = "09 91 23 INTERIOR PAINTING — SEE SPECIFICATIONS FOR ALL SYSTEMS AND SHEENS";
+  const spec = "09 91 23 INTERIOR PAINTING, SEE SPECIFICATIONS FOR ALL SYSTEMS AND SHEENS";
   const items: Item[] = [...FLOOR, ...BASE, { t: "row", key: "P", cells: { REMARKS: spec } }, WALLS[0], WALLS[1]];
   const spans = build({ cols: STD, items });
   const t = read(spans);
@@ -677,7 +677,7 @@ test("key-column headings are consumed and name the rows' section", () => {
   noCellHas(t, "FLOORING", "WALLS");
 });
 
-test("a heading carries the vocabulary entry it matched — phrases and punctuation", () => {
+test("a heading carries the vocabulary entry it matched, phrases and punctuation", () => {
   const wp = [R("HR-1", "HANDRAIL", "VENDOR-J", "ROUND", "ALMOND"), R("CG-2", "CORNER GUARD", "VENDOR-J", "FLUSH", "ALMOND")];
   const a = [H("FLOORING"), ...FLOOR, H("WALL BASE"), ...BASE, H("WALL PROTECTION"), ...wp];
   const ta = read(build({ cols: STD, items: a }));
@@ -838,7 +838,7 @@ test("no column map: a lone word starting inside the key column but running into
   assert.notEqual(row(t, "VCT-1").section, "BASE");
 });
 
-test("no column map: a long left-set heading is not read — its rows carry no section", () => {
+test("no column map: a long left-set heading is not read, its rows carry no section", () => {
   // the stated safe failure: with no column map, a lone span that runs out of
   // the key column is taken for a heading only when it is centered over the
   // table, and this one is set left. Its rows carry no section rather than a

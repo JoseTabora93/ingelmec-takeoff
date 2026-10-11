@@ -43,7 +43,7 @@ export const RASTER_MIN_SEGS = 500;      // fewer vector segs than this ⇒ the 
 
 // ── binarization ────────────────────────────────────────────────────────────
 export const RASTER_T = 0.15;      // Bradley: ink iff g < (1 − T) × local mean
-export const RASTER_ABS_INK = 100; // absolute dark floor — solid fills stay solid
+export const RASTER_ABS_INK = 100; // absolute dark floor, solid fills stay solid
 export const RASTER_WIN_MIN = 15;  // adaptive window floor (mask px)
 export const RASTER_WIN_DIV = 32;  // window ≈ min(mw,mh)/32, forced odd
 export const INVERT_MEAN = 128;    // global mean below this ⇒ negative scan, invert
@@ -88,10 +88,10 @@ export interface RasterScalePlan {
   dpiLimited: boolean; scanDpi: number;
 }
 export interface RasterScaleInput {
-  pageW: number; pageH: number;      // page size in PDF POINTS — the render-free truth
+  pageW: number; pageH: number;      // page size in PDF POINTS, the render-free truth
   renderScale: number;               // this sheet's pdf render scale (renderScalesRef)
-  baseScale: number;                 // sheets.RENDER_SCALE — the pin
-  maxDim: number;                    // oneclick.MASK_MAX_DIM — the working-raster cap
+  baseScale: number;                 // sheets.RENDER_SCALE, the pin
+  maxDim: number;                    // oneclick.MASK_MAX_DIM, the working-raster cap
   scanPxPerPt?: number;              // scanNativeScale's answer; 0/absent = unknown ⇒ no clamp
 }
 
@@ -164,7 +164,7 @@ export function scanNativeScale(opList: OpList, transform: number[], OPS: OpsTab
     // the image's unit square maps through m: (m0,m1) is its width edge in
     // points, (m2,m3) its height edge — rotation and mirroring included.
     const pw = Math.hypot(m[0], m[1]), ph = Math.hypot(m[2], m[3]);
-    if (pw < 1 || ph < 1) return;                 // sub-point placement — a stamp, not a plan
+    if (pw < 1 || ph < 1) return;                 // sub-point placement, a stamp, not a plan
     const area = Math.abs(m[0] * m[3] - m[1] * m[2]);
     if (area <= bestArea) return;
     bestArea = area;

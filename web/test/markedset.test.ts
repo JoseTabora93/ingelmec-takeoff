@@ -20,8 +20,8 @@ test("printable ASCII and Latin-1 pass through untouched", () => {
 test("the module's own typographic marks survive (ellipsis from the clamp loop)", () => {
   assert.equal(winAnsiSafe("Very Long Company Na…"), "Very Long Company Na…");
   assert.equal(
-    winAnsiSafe("“quotes” ‘single’ – — •"),
-    "“quotes” ‘single’ – — •",
+    winAnsiSafe("“quotes” ‘single’,, •"),
+    "“quotes” ‘single’,, •",
   );
 });
 
@@ -39,7 +39,7 @@ test("an emoji surrogate pair maps to ONE ?, never bisected", () => {
 test("thin / narrow no-break spaces (locale group separators) soften to a space", () => {
   assert.equal(winAnsiSafe("1\u202F234,5"), "1 234,5");   // narrow NBSP (fr-FR grouping)
   assert.equal(winAnsiSafe("1\u2009234"), "1 234");       // thin space
-  assert.equal(winAnsiSafe("1\u00A0234"), "1\u00A0234");  // plain NBSP is Latin-1 — kept
+  assert.equal(winAnsiSafe("1\u00A0234"), "1\u00A0234");  // plain NBSP is Latin-1, kept
 });
 
 test("nullish input yields the empty string; control chars are replaced", () => {

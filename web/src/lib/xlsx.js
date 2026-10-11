@@ -107,7 +107,7 @@ const STYLES_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
  *   application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
  */
 export async function buildXlsx(sheets) {
-  const { zipSync, strToU8 } = await import("fflate"); // lazy — same pattern as ingest.js
+  const { zipSync, strToU8 } = await import("fflate"); // lazy, same pattern as ingest.js
   const used = new Set();
   const names = sheets.map((s) => sanitizeSheetName(s.name, used));
 
@@ -221,7 +221,7 @@ export function reportWorkbook({ rows = [], bySheet = [], shapeRows = [], cols =
   // Metric display mode mirrors the standalone shapes CSV. The JSON keeps the
   // machine-readable raw-foot field names.
   const shapesTab = [
-    ["Per-shape measured quantities — no multiplier or waste; deducts negative; LF on floor/deduct/surface rows is trace reference only (incl. openings) — linear rows alone sum to condition LF"],
+    ["Per-shape measured quantities, no multiplier or waste; deducts negative; LF on floor/deduct/surface rows is trace reference only (incl. openings), linear rows alone sum to condition LF"],
     ["Shape", "Sheet", "Sheet ID", "Finish", "Role", `Area ${AU}`, LU, "EA", `Height ${M ? "m" : "ft"}`, "Height override", `Rise ${M ? "m" : "ft"}`, `Drop ${M ? "m" : "ft"}`, "Origin"],
   ];
   for (const r of shapeRows) {
@@ -239,7 +239,7 @@ export function reportWorkbook({ rows = [], bySheet = [], shapeRows = [], cols =
   // to the floor. Cells are one row per (floor, room, finish); the Sheet ID
   // rides along because display labels are session-volatile.
   const floorRoom = [
-    ["Ordered quantities per floor × room — waste % and xN applied per slice; each floor's rooms reconcile to that floor's shapes. Coverage ceils are per-cell display, not a buy list"],
+    ["Ordered quantities per floor × room, waste % and xN applied per slice; each floor's rooms reconcile to that floor's shapes. Coverage ceils are per-cell display, not a buy list"],
     ["Sheet", "Sheet ID", "Room", "Finish", `Floor ${AU}`, `Wall ${AU}`, `Border ${AU}`, LU, "EA", `Total ${AU}`, `Total ${AU} w/Waste`],
   ];
   for (const gp of byFloorRoom) {

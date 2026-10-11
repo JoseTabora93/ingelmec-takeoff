@@ -41,7 +41,7 @@ export function buildLocalFirstStore(projectId, drive, cloud) {
     base: localStore,                          // snapshots stay browser-local, scoped by folderId
     provider: driveSnapshotProvider(drive),
     folderId: projectId,
-    ensureSidecarId: cloud.ensureSidecarId,    // shared resolver (F4 — one `.opentakeoff`, no split-brain)
+    ensureSidecarId: cloud.ensureSidecarId,    // shared resolver (F4, one `.opentakeoff`, no split-brain)
   });
 
   const annSync = createSyncStore({
@@ -65,8 +65,8 @@ export function buildLocalFirstStore(projectId, drive, cloud) {
     const deviceId = await ensureDeviceId();
     const presence = createPresence({
       provider: driveSnapshotProvider(drive),
-      ensureSidecarId: cloud.ensureSidecarId,   // shared resolver (F4 — one `.opentakeoff`)
-      findSidecarId: cloud.findSidecarFolder,   // non-creating read path — an anonymous
+      ensureSidecarId: cloud.ensureSidecarId,   // shared resolver (F4, one `.opentakeoff`)
+      findSidecarId: cloud.findSidecarFolder,   // non-creating read path, an anonymous
                                                 // presence pass never litters a fresh project
       deviceId,
       getAuthor: authorName,
@@ -75,7 +75,7 @@ export function buildLocalFirstStore(projectId, drive, cloud) {
     });
     bridge.presence = presence;
     presence.start();
-  })().catch(() => { /* presence is advisory — never blocks the store */ });
+  })().catch(() => { /* presence is advisory, never blocks the store */ });
 
   const composite = { ...cloud, ...annSync, ...snapSync };
   // Non-enumerable so it rides the live `store` binding to the canvas without

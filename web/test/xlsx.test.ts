@@ -107,7 +107,7 @@ test("reportWorkbook: five tabs, Conditions mirrors the CSV columns and numbers"
   const idx = (h: string) => cols.findIndex((c: any) => c.header === h);
   const r1 = cTab.rows[1]; // c1: 100 SF, 10% waste
   assert.equal(r1[idx("Finish")], NASTY);
-  assert.equal(r1[idx("Total SF")], 100);            // measured — no waste
+  assert.equal(r1[idx("Total SF")], 100);            // measured, no waste
   assert.equal(r1[idx("Total SF w/Waste")], 110); // waste only on the w/Waste qty
   const r2 = cTab.rows[2]; // c2: linear 25 LF ×2 multiplier
   assert.equal(r2[idx("LF")], 50);
@@ -129,17 +129,17 @@ test("reportWorkbook: five tabs, Conditions mirrors the CSV columns and numbers"
   assert.deepEqual(matTab.rows[0], ["Finish", "Material", "Qty", "Unit", "Coverage", "Note"]);
   const adhesive = matTab.rows.find((r: any[]) => r[1] === "Adhesive");
   assert.ok(adhesive);
-  assert.equal(adhesive![2], 1); // ceil(100 SF measured / 100 per) — coverage runs on the MEASURED basis, never waste-adjusted
+  assert.equal(adhesive![2], 1); // ceil(100 SF measured / 100 per), coverage runs on the MEASURED basis, never waste-adjusted
   assert.ok(matTab.rows.some((r: any[]) => r[0] === "Material (combined)"));
 
   // Shapes: note row, header, one row per shape, measured only
   assert.deepEqual(shapeTab.rows[1].slice(0, 5), ["Shape", "Sheet", "Sheet ID", "Finish", "Role"]);
   assert.equal(shapeTab.rows.length, 2 + shapes.length);
   const s2 = shapeTab.rows.find((r: any[]) => r[0] === "s2");
-  assert.equal(s2![6], 25); // measured LF — no multiplier
+  assert.equal(s2![6], 25); // measured LF, no multiplier
 });
 
-test("reportWorkbook: custom column in cols — header, per-row value, blank TOTAL cell", () => {
+test("reportWorkbook: custom column in cols, header, per-row value, blank TOTAL cell", () => {
   const custom = customColProfile([{ id: "div", name: "CSI Division", values: ["09 30 00"] }]);
   const tabs = reportWorkbook({
     ...workbookArgs(),
@@ -154,7 +154,7 @@ test("reportWorkbook: custom column in cols — header, per-row value, blank TOT
   assert.equal(cTab.rows[cTab.rows.length - 1][ci], ""); // TOTAL stays blank
 });
 
-test("reportWorkbook: read-only spec columns in cols — header, per-row value, blank TOTAL cell", () => {
+test("reportWorkbook: read-only spec columns in cols, header, per-row value, blank TOTAL cell", () => {
   const spec = specColProfile([
     { id: "c1", spec: { manufacturer: "Vendor A", color: "Slate 5" } },  // both fields present
   ] as any);
@@ -215,7 +215,7 @@ test("reportWorkbook: metric Shapes tab follows the unit toggle", () => {
 // is reconciliation: a reader adding up a floor's rooms must land on the
 // floor's own total, which is why an unlabeled floor still gets a roll-up row.
 
-test("reportWorkbook: floor × room tab — one row per (floor, room, finish), ordered quantities", () => {
+test("reportWorkbook: floor × room tab, one row per (floor, room, finish), ordered quantities", () => {
   const labeled = [
     { id: "s1", sheet_id: "plan.pdf#1", condition_id: "c1", label: "101", measure_role: "floor_area", computed: { area_sf: 60, perimeter_lf: 32 } },
     { id: "s2", sheet_id: "plan.pdf#1", condition_id: "c1", label: "102", measure_role: "floor_area", computed: { area_sf: 40, perimeter_lf: 26 } },
@@ -237,7 +237,7 @@ test("reportWorkbook: floor × room tab — one row per (floor, room, finish), o
   assert.equal(body[0][10], 66, "10% waste applied per slice, like the report's grouped views");
   // the two rooms add back to the floor's own by-sheet total
   assert.equal(body[0][4] + body[1][4], 100);
-  assert.equal(body[2][7], 50, "×2 multiplier applied per slice — ORDERED, unlike the base By-sheet tab");
+  assert.equal(body[2][7], 50, "×2 multiplier applied per slice, ORDERED, unlike the base By-sheet tab");
 });
 
 test("reportWorkbook: floor × room tab is always present, header-only when nothing is grouped", () => {

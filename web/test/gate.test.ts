@@ -15,7 +15,7 @@ const withGate = async (up: boolean, fn: () => Promise<void> | void) => {
   try { await fn(); } finally { (globalThis as any).__OT_ONE_CLICK = prev; }
 };
 
-test("gate: up by default outside Vite — no env, no global", async () => {
+test("gate: up by default outside Vite, no env, no global", async () => {
   await withGate(true, () => { assert.equal(oneClickEnabled(), false); });
   await withGate(false, () => { assert.equal(oneClickEnabled(), true); });
 });

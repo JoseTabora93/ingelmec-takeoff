@@ -121,7 +121,7 @@ function machine(tag: string, g: any) {
   return { base, sync, snaps };
 }
 
-test("#315 finish line: two-machine push/pull/conflict round-trip through one Graph tenant — reconciler unchanged, #313 merge, zero loser-snapshots", async () => {
+test("#315 finish line: two-machine push/pull/conflict round-trip through one Graph tenant, reconciler unchanged, #313 merge, zero loser-snapshots", async () => {
   const g = mockGraph();
 
   // Machine A starts the takeoff in the document library.
@@ -191,7 +191,7 @@ test("a 401 mid-session asks the token source for ONE forced refresh and retries
   const dead = mockGraph({ expireToken: 99 });
   const c2 = createGraphDrive({ getToken: async () => "tok", driveId: "d1", fetch: dead.fetchImpl as any, base: BASE });
   await assert.rejects(c2.findChild("root", "x"), (e: any) => e instanceof GraphAuthError && e.stage === "sign-in" && /sign in again/.test(e.message));
-  assert.equal(dead.tokensSeen.length, 2, "one retry, then stop — never a refresh loop");
+  assert.equal(dead.tokensSeen.length, 2, "one retry, then stop, never a refresh loop");
 
   const refuse = mockGraph({ expireToken: 1 });
   const c3 = createGraphDrive({ getToken: async (opts?: any) => { if (opts?.forceRefresh) throw new Error("interaction_required"); return "tok"; }, driveId: "d1", fetch: refuse.fetchImpl as any, base: BASE });

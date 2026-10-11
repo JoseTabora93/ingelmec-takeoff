@@ -46,7 +46,7 @@ function makeCtx(overrides: Partial<VoiceCapabilities> = {}) {
     getAimSeed: () => ({ x: 320, y: 240, sheetId: "plan.pdf" }),
     traceAt: (seed, conditionId, label) => {
       log.push(["traceAt", seed, conditionId, label]);
-      return { ok: true, message: "Created 1 takeoff — 234.5 SF CPT-1. Click the next room." };
+      return { ok: true, message: "Created 1 takeoff, 234.5 SF CPT-1. Click the next room." };
     },
     ...overrides,
   };
@@ -70,7 +70,7 @@ test("activate known by non-canonical literal 'cpt 2' → exact finish_tag looku
 test("activate known + waste → activate THEN update, by id, in order", () => {
   const { caps, log } = makeCtx();
   const out = applyVoiceIntent(caps, { kind: "activate_condition", tag: "CPT-1", known: true, waste: 7 });
-  assert.deepEqual(out, { ok: true, message: "CPT-1 active — waste 7%." });
+  assert.deepEqual(out, { ok: true, message: "CPT-1 active, waste 7%." });
   assert.deepEqual(log, [
     ["activateCondition", "cnd-1"],
     ["updateCondition", "cnd-1", { waste_pct: 7 }],
@@ -80,14 +80,14 @@ test("activate known + waste → activate THEN update, by id, in order", () => {
 test("activate unknown → create then activate", () => {
   const { caps, log } = makeCtx();
   const out = applyVoiceIntent(caps, { kind: "activate_condition", tag: "LVT-2", known: false });
-  assert.deepEqual(out, { ok: true, message: "Created LVT-2 — active." });
+  assert.deepEqual(out, { ok: true, message: "Created LVT-2, active." });
   assert.deepEqual(log, [["createCondition", "LVT-2"], ["activateCondition", "cnd-LVT-2"]]);
 });
 
 test("activate unknown + waste → create, activate, update", () => {
   const { caps, log } = makeCtx();
   const out = applyVoiceIntent(caps, { kind: "activate_condition", tag: "LVT-2", known: false, waste: 5 });
-  assert.deepEqual(out, { ok: true, message: "Created LVT-2 — active, waste 5%." });
+  assert.deepEqual(out, { ok: true, message: "Created LVT-2, active, waste 5%." });
   assert.deepEqual(log, [
     ["createCondition", "LVT-2"],
     ["activateCondition", "cnd-LVT-2"],
@@ -119,7 +119,7 @@ test("set_waste → one by-id update on the active condition", () => {
 test("set_waste guard: no active condition → exact message, ZERO calls", () => {
   const { caps, log } = makeCtx({ getActiveConditionId: () => "" });
   const out = applyVoiceIntent(caps, { kind: "set_waste", waste: 7 });
-  assert.deepEqual(out, { ok: false, message: "Couldn't set waste — no active condition." });
+  assert.deepEqual(out, { ok: false, message: "Couldn't set waste, no active condition." });
   assert.deepEqual(log, []);
 });
 
@@ -133,7 +133,7 @@ test("set_label known → activate only, vocabulary untouched", () => {
 test("set_label unknown → addLabel THEN activate (vocabulary learns it)", () => {
   const { caps, log } = makeCtx();
   const out = applyVoiceIntent(caps, { kind: "set_label", label: "East Mezzanine", known: false });
-  assert.deepEqual(out, { ok: true, message: "Added label East Mezzanine — active." });
+  assert.deepEqual(out, { ok: true, message: "Added label East Mezzanine, active." });
   assert.deepEqual(log, [["addLabel", "East Mezzanine"], ["activateLabel", "East Mezzanine"]]);
 });
 
@@ -162,14 +162,14 @@ test("clear_author → setAuthor(null)", () => {
 test("add_note → one addNote call with verbatim text", () => {
   const { caps, log } = makeCtx();
   const out = applyVoiceIntent(caps, { kind: "add_note", text: "verify seam direction with GC" });
-  assert.deepEqual(out, { ok: true, message: "Note added — see Markups." });
+  assert.deepEqual(out, { ok: true, message: "Note added, see Markups." });
   assert.deepEqual(log, [["addNote", "verify seam direction with GC"]]);
 });
 
 test("runVoiceCommand end-to-end: homophone + percent through parse and apply", () => {
   const { caps, log } = makeCtx();
   const out = runVoiceCommand(caps, "cpt one waist 7.5 percent");
-  assert.deepEqual(out, { ok: true, message: "CPT-1 active — waste 7.5%." });
+  assert.deepEqual(out, { ok: true, message: "CPT-1 active, waste 7.5%." });
   assert.deepEqual(log, [
     ["activateCondition", "cnd-1"],
     ["updateCondition", "cnd-1", { waste_pct: 7.5 }],
@@ -187,20 +187,20 @@ test("rejected transcript → mapped message, ZERO calls", () => {
 
 const SEED = { x: 320, y: 240, sheetId: "plan.pdf" };
 
-test("deixis known tag: activate THEN traceAt with the seed — the aimed click's order", () => {
+test("deixis known tag: activate THEN traceAt with the seed, the aimed click's order", () => {
   const { caps, log } = makeCtx();
   const out = runVoiceCommand(caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff — 234.5 SF CPT-1. Click the next room." });
+  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff, 234.5 SF CPT-1. Click the next room." });
   assert.deepEqual(log, [
     ["activateCondition", "cnd-1"],
     ["traceAt", SEED, "cnd-1", undefined],
   ]);
 });
 
-test("deixis + waste: activate, update by id, THEN traceAt — chip click, editor save, aimed click", () => {
+test("deixis + waste: activate, update by id, THEN traceAt, chip click, editor save, aimed click", () => {
   const { caps, log } = makeCtx();
   const out = runVoiceCommand(caps, "cpt one waste seven this room");
-  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff — 234.5 SF CPT-1. Click the next room." });
+  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff, 234.5 SF CPT-1. Click the next room." });
   assert.deepEqual(log, [
     ["activateCondition", "cnd-1"],
     ["updateCondition", "cnd-1", { waste_pct: 7 }],
@@ -211,7 +211,7 @@ test("deixis + waste: activate, update by id, THEN traceAt — chip click, edito
 test("deixis unknown tag: create, activate, traceAt", () => {
   const { caps, log } = makeCtx();
   const out = runVoiceCommand(caps, "lvt two here");
-  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff — 234.5 SF CPT-1. Click the next room." });
+  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff, 234.5 SF CPT-1. Click the next room." });
   assert.deepEqual(log, [
     ["createCondition", "LVT-2"],
     ["activateCondition", "cnd-LVT-2"],
@@ -222,7 +222,7 @@ test("deixis unknown tag: create, activate, traceAt", () => {
 test("deixis + unknown label: activate, addLabel, activateLabel, traceAt carrying the label", () => {
   const { caps, log } = makeCtx();
   const out = runVoiceCommand(caps, "cpt one label East Mezzanine this one");
-  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff — 234.5 SF CPT-1. Click the next room." });
+  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff, 234.5 SF CPT-1. Click the next room." });
   assert.deepEqual(log, [
     ["activateCondition", "cnd-1"],
     ["addLabel", "East Mezzanine"],
@@ -231,10 +231,10 @@ test("deixis + unknown label: activate, addLabel, activateLabel, traceAt carryin
   ]);
 });
 
-test("deixis + known label: no addLabel — vocabulary untouched", () => {
+test("deixis + known label: no addLabel, vocabulary untouched", () => {
   const { caps, log } = makeCtx();
   const out = runVoiceCommand(caps, "cpt one label Phase 1 right here");
-  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff — 234.5 SF CPT-1. Click the next room." });
+  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff, 234.5 SF CPT-1. Click the next room." });
   assert.deepEqual(log, [
     ["activateCondition", "cnd-1"],
     ["activateLabel", "Phase 1"],
@@ -245,21 +245,21 @@ test("deixis + known label: no addLabel — vocabulary untouched", () => {
 test("bare deixis: traceAt on the ACTIVE condition, nothing re-armed", () => {
   const { caps, log } = makeCtx();
   const out = runVoiceCommand(caps, "this room");
-  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff — 234.5 SF CPT-1. Click the next room." });
+  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff, 234.5 SF CPT-1. Click the next room." });
   assert.deepEqual(log, [["traceAt", SEED, "cnd-1", undefined]]);
 });
 
-test("deixis stale aim (getAimSeed null) → exact message, ZERO calls — nothing half-arms", () => {
+test("deixis stale aim (getAimSeed null) → exact message, ZERO calls, nothing half-arms", () => {
   const { caps, log } = makeCtx({ getAimSeed: () => null });
   const out = runVoiceCommand(caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: false, message: "Couldn't place that — aim went stale. Put the cursor on the room and say it again." });
+  assert.deepEqual(out, { ok: false, message: "Couldn't place that, aim went stale. Put the cursor on the room and say it again." });
   assert.deepEqual(log, []);
 });
 
 test("deixis off-sheet aim (sheetId \"\") → exact message, ZERO calls", () => {
   const { caps, log } = makeCtx({ getAimSeed: () => ({ x: -40, y: 9999, sheetId: "" }) });
   const out = runVoiceCommand(caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: false, message: "Couldn't place that — aim at a sheet." });
+  assert.deepEqual(out, { ok: false, message: "Couldn't place that, aim at a sheet." });
   assert.deepEqual(log, []);
 });
 
@@ -270,15 +270,15 @@ test("bare deixis with no active condition → parse-level reject, ZERO calls", 
   assert.deepEqual(log, []);
 });
 
-test("deixis one-click failure (open boundary) speaks through the outcome — armed, but no commit", () => {
+test("deixis one-click failure (open boundary) speaks through the outcome, armed, but no commit", () => {
   const { caps, log } = makeCtx({
     traceAt: (seed, conditionId, label) => {
       log.push(["traceAt", seed, conditionId, label]);
-      return { ok: false, message: "Couldn't place that — that space isn't enclosed on the plan linework. Click a more enclosed spot, or trace it with Area (A)." };
+      return { ok: false, message: "Couldn't place that, that space isn't enclosed on the plan linework. Click a more enclosed spot, or trace it with Area (A)." };
     },
   });
   const out = runVoiceCommand(caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: false, message: "Couldn't place that — that space isn't enclosed on the plan linework. Click a more enclosed spot, or trace it with Area (A)." });
+  assert.deepEqual(out, { ok: false, message: "Couldn't place that, that space isn't enclosed on the plan linework. Click a more enclosed spot, or trace it with Area (A)." });
   assert.deepEqual(log, [
     ["activateCondition", "cnd-1"],
     ["traceAt", SEED, "cnd-1", undefined],
@@ -289,11 +289,11 @@ test("deixis async traceAt: the promise outcome rides through runVoiceCommand", 
   const { caps, log } = makeCtx({
     traceAt: (seed, conditionId, label) => {
       log.push(["traceAt", seed, conditionId, label]);
-      return Promise.resolve({ ok: true, message: "Created 1 takeoff — 120 SF CPT-1. Click the next room." });
+      return Promise.resolve({ ok: true, message: "Created 1 takeoff, 120 SF CPT-1. Click the next room." });
     },
   });
   const out = await runVoiceCommand(caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff — 120 SF CPT-1. Click the next room." });
+  assert.deepEqual(out, { ok: true, message: "Created 1 takeoff, 120 SF CPT-1. Click the next room." });
   assert.deepEqual(log, [
     ["activateCondition", "cnd-1"],
     ["traceAt", SEED, "cnd-1", undefined],
@@ -457,13 +457,13 @@ test("state-equal: set_waste with no active condition mutates NOTHING", async ()
   app.state.activeCond = "";
   const before = structuredClone(app.state);
   const out = await runVoiceCommand(app.caps, "waste 7");
-  assert.deepEqual(out, { ok: false, message: "Couldn't set waste — no active condition." });
+  assert.deepEqual(out, { ok: false, message: "Couldn't set waste, no active condition." });
   assert.deepEqual(app.state, before);
 });
 
 // ── deixis provenance + zero-mutation (the who-aimed-it line, both sides) ──
 
-test("deixis commits ONE shape as human one-click work — agentProposals stays empty", async () => {
+test("deixis commits ONE shape as human one-click work, agentProposals stays empty", async () => {
   const app = makeApp();
   const out = await runVoiceCommand(app.caps, "carpet one, this room");
   assert.equal(out.ok, true, out.message);
@@ -474,12 +474,12 @@ test("deixis commits ONE shape as human one-click work — agentProposals stays 
   assert.deepEqual(app.state.agentProposals, []);   // NEVER a proposal row for human aim
 });
 
-test("deixis stale aim mutates NOTHING — not even the condition arms", async () => {
+test("deixis stale aim mutates NOTHING, not even the condition arms", async () => {
   const app = makeApp();
   app.box.aim = null;
   const before = structuredClone(app.state);
   const out = await runVoiceCommand(app.caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: false, message: "Couldn't place that — aim went stale. Put the cursor on the room and say it again." });
+  assert.deepEqual(out, { ok: false, message: "Couldn't place that, aim went stale. Put the cursor on the room and say it again." });
   assert.deepEqual(app.state, before);
 });
 
@@ -488,7 +488,7 @@ test("deixis off-sheet aim mutates NOTHING", async () => {
   app.box.aim = { x: -12, y: 400, sheetId: "" };
   const before = structuredClone(app.state);
   const out = await runVoiceCommand(app.caps, "carpet one, this room");
-  assert.deepEqual(out, { ok: false, message: "Couldn't place that — aim at a sheet." });
+  assert.deepEqual(out, { ok: false, message: "Couldn't place that, aim at a sheet." });
   assert.deepEqual(app.state, before);
 });
 
@@ -503,7 +503,7 @@ const ALL_REASONS: RejectReason[] = [
   "deixis_no_condition", "deixis_target",
 ];
 
-test("PINNED: only unrecognized × configured offers — every near-miss reason never reaches the offer", () => {
+test("PINNED: only unrecognized × configured offers, every near-miss reason never reaches the offer", () => {
   for (const reason of ALL_REASONS) {
     for (const configured of [true, false]) {
       const offer = shouldOfferAgentHandoff({ ok: false, message: REJECTION_MESSAGES[reason], reason }, configured);
@@ -514,7 +514,7 @@ test("PINNED: only unrecognized × configured offers — every near-miss reason 
 
 test("router: ok outcomes and reasonless dispatcher failures never offer", () => {
   assert.equal(shouldOfferAgentHandoff({ ok: true, message: "CPT-1 active." }, true), false);
-  assert.equal(shouldOfferAgentHandoff({ ok: false, message: "Couldn't set waste — no active condition." }, true), false);
+  assert.equal(shouldOfferAgentHandoff({ ok: false, message: "Couldn't set waste, no active condition." }, true), false);
 });
 
 test("router: runVoiceCommand surfaces the reason on parse rejections only", () => {

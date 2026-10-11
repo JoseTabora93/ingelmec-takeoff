@@ -146,7 +146,7 @@ export function createTileCompositor() {
   // this gate a base-layer paint kicked off right after openSheet() would
   // race the worker's "openSheet" message and come back "sheet not open".
   const readyBySheet = new Map<string, Promise<void>>();
-  let generation = 0; // bumped on sheet/group change — invalidates in-flight paints
+  let generation = 0; // bumped on sheet/group change, invalidates in-flight paints
 
   function levelsFor(sheetKey: string, imgW: number, imgH: number) {
     let levels = levelsBySheet.get(sheetKey);
@@ -365,7 +365,7 @@ export function createTileCompositor() {
     for (const f of baseLayersBySheet.get(sheetKey) || []) if (f.density < levels[target]) candidates.push(f);
     candidates.sort((a, b) => b.density - a.density); // densest stand-in first
     for (const c of candidates) if (cached(c.level, c.density)) return c;
-    return { level: BASE_COARSE_LEVEL, density: levels[0] }; // always fetched by paintBase — safe even if not yet cached (draws nothing, not a crash)
+    return { level: BASE_COARSE_LEVEL, density: levels[0] }; // always fetched by paintBase, safe even if not yet cached (draws nothing, not a crash)
   }
 
   /** Paints [x0,y0,x1,y1) (image px, margin already applied by the caller)
@@ -494,7 +494,7 @@ export function createTileCompositor() {
     // space, which is what the worker's `transform: [1,0,0,1,-x,-y]` expects.
     let cropReq: { cancel: () => void } | undefined;
     if (bw <= 0 || bh <= 0) {
-      swap(); // degenerate region — nothing to wait for
+      swap(); // degenerate region, nothing to wait for
     } else {
       const req = pool.requestTile({
         sheetKey,
@@ -518,7 +518,7 @@ export function createTileCompositor() {
         // than what is already on screen, and revealing the placeholder buffer
         // here would blur a view the user could still read. Keep the last good
         // crop, let the base cover the rest, and say so.
-        console.warn("[tiles] detail crop failed — keeping the previous crop:", err);
+        console.warn("[tiles] detail crop failed, keeping the previous crop:", err);
       });
     }
 

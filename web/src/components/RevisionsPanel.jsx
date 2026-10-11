@@ -53,7 +53,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
       if (!id || id === "current" || payloads[id]) continue;
       store.getSnapshot(id)
         .then((rec) => {
-          if (!rec) { setErr("Revision not found — it may have been deleted in another tab."); return; }
+          if (!rec) { setErr("Revision not found, it may have been deleted in another tab."); return; }
           setPayloads((p) => ({ ...p, [id]: rec.payload || {} }));
         })
         .catch((e) => setErr(errText(e)));
@@ -65,7 +65,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
   const diff = useMemo(() => (sideA && sideB ? diffTakeoffs(sideA, sideB) : null), [sideA, sideB]);
 
   const nameOf = (id) => (id === "current" ? "Current takeoff" : revs?.find((r) => r.id === id)?.name || "Revision");
-  const defaultName = () => `Rev ${(revs?.length || 0) + 1} — ${new Date().toLocaleDateString()}`;
+  const defaultName = () => `Rev ${(revs?.length || 0) + 1}, ${new Date().toLocaleDateString()}`;
 
   const save = async (name) => {
     setBusy(true); setErr("");
@@ -87,9 +87,9 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
     setBusy(true); setErr("");
     try {
       // bank the live takeoff first — restore must never be a one-way door
-      await store.saveSnapshot(`Auto-backup before restore — ${new Date().toLocaleString()}`, current);
+      await store.saveSnapshot(`Auto-backup before restore, ${new Date().toLocaleString()}`, current);
       const rec = await store.getSnapshot(id);
-      if (!rec) { setErr("Revision not found — it may have been deleted in another tab."); setBusy(false); setConfirmId(""); return; }
+      if (!rec) { setErr("Revision not found, it may have been deleted in another tab."); setBusy(false); setConfirmId(""); return; }
       onRestore(rec.payload || {});
       await refresh();
     } catch (e) { setErr(errText(e)); }
@@ -110,7 +110,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
   // thresholds the diff's own "changed" judgment uses, so a "changed" row always
   // shows at least one visible number
   const delta = (v, isEa = false, convert = (x) => x) => {
-    if (Math.abs(v) < (isEa ? 0.5 : 0.05)) return <span style={{ color: "var(--ink-muted)" }}>—</span>;
+    if (Math.abs(v) < (isEa ? 0.5 : 0.05)) return <span style={{ color: "var(--ink-muted)" }}></span>;
     const shown = convert(v);
     return <span style={{ fontWeight: 700, color: v > 0 ? "var(--cobalt)" : "var(--c-danger)" }}>{v > 0 ? "+" : "−"}{num(Math.abs(shown), isEa ? 0 : 1)}</span>;
   };
@@ -169,7 +169,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
                 {revs.map((r) => (
                   <tr key={r.id}>
                     <td style={{ ...td, textAlign: "left", fontWeight: 600 }}>{r.name}</td>
-                    <td style={{ ...td, color: "var(--ink-muted)" }}>{r.created_at ? new Date(r.created_at).toLocaleString() : "—"}</td>
+                    <td style={{ ...td, color: "var(--ink-muted)" }}>{r.created_at ? new Date(r.created_at).toLocaleString() : ""}</td>
                     <td style={td}>{r.conditions}</td>
                     <td style={td}>{r.shapes}</td>
                     <td style={{ ...td, textAlign: "left", paddingLeft: 18 }}>
@@ -178,7 +178,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
                         title="Diff this revision against the live takeoff">Compare with current</button>{" "}
                       <button className="btn-ghost" style={{ fontSize: 11.5, padding: "3px 8px", color: confirmId === `restore:${r.id}` ? "var(--c-warning)" : undefined }}
                         onClick={() => (confirmId === `restore:${r.id}` ? restore(r.id) : setConfirmId(`restore:${r.id}`))} disabled={busy}
-                        title="Replace the live takeoff with this revision — the live takeoff is auto-backed-up first">
+                        title="Replace the live takeoff with this revision, the live takeoff is auto-backed-up first">
                         {confirmId === `restore:${r.id}` ? "Really restore? (auto-backup saved)" : "Restore"}</button>{" "}
                       <button className="btn-ghost" style={{ fontSize: 11.5, padding: "3px 8px", color: confirmId === `del:${r.id}` ? "var(--c-danger)" : undefined }}
                         onClick={() => (confirmId === `del:${r.id}` ? del(r.id) : setConfirmId(`del:${r.id}`))} disabled={busy}>
@@ -216,7 +216,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
               <p style={{ marginTop: 14, color: "var(--ink-muted)", fontSize: 12.5 }}>Pick a baseline revision to diff.</p>
             ) : identical ? (
               <p style={{ marginTop: 14, color: "var(--c-positive)", fontSize: 13, fontWeight: 600 }}>
-                Identical takeoffs — no visible quantity change between “{nameOf(baseId)}” and “{nameOf(compareId)}”.
+                Identical takeoffs, no visible quantity change between “{nameOf(baseId)}” and “{nameOf(compareId)}”.
               </p>
             ) : (
               <>
@@ -257,7 +257,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
                         </td>
                       </tr>
                     ))}
-                    {!condRows.length && <tr><td colSpan={8} style={{ ...td, textAlign: "center", color: "var(--ink-muted)" }}>Only unchanged conditions — tick “show unchanged” to list them.</td></tr>}
+                    {!condRows.length && <tr><td colSpan={8} style={{ ...td, textAlign: "center", color: "var(--ink-muted)" }}>Only unchanged conditions, tick “show unchanged” to list them.</td></tr>}
                   </tbody>
                 </table>
 
@@ -288,7 +288,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
                         ))}
                       </tbody>
                     </table>
-                    <p style={{ margin: "8px 0 0", fontSize: 11.5, color: "var(--ink-muted)" }}>Base measured quantities per sheet — multiplier and waste apply at condition level.</p>
+                    <p style={{ margin: "8px 0 0", fontSize: 11.5, color: "var(--ink-muted)" }}>Base measured quantities per sheet, multiplier and waste apply at condition level.</p>
                   </>
                 )}
 
@@ -312,7 +312,7 @@ export default function RevisionsPanel({ current, units = "imperial", onRestore,
                             <td style={td}>{num(m.a_qty, 2)}</td>
                             <td style={{ ...td, fontWeight: 700 }}>{num(m.b_qty, 2)}</td>
                             <td style={td}>{delta(m.delta)}</td>
-                            <td style={{ ...td, textAlign: "left", paddingLeft: 16, color: "var(--ink-muted)" }}>{m.unit || "—"}</td>
+                            <td style={{ ...td, textAlign: "left", paddingLeft: 16, color: "var(--ink-muted)" }}>{m.unit || ""}</td>
                           </tr>
                         ))}
                       </tbody>

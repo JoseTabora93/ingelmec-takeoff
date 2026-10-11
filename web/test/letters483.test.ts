@@ -298,9 +298,9 @@ test("LOBBY | CPT-1 | RB-1 | PT-1 → a room line (r): read as today, nothing sk
   asToday(spansOf([CPT1, RB1, L("LOBBY", { MATERIAL: "CPT-1", MANUFACTURER: "RB-1", COLOR: "PT-1" }), PT1]), "LOBBY room line");
 });
 
-test("stop set: lone PAINT above PT-1 → today; PAINT  ALL GYP. BD. — SEE SPEC → today; TILE / WOOD with cells → today", () => {
+test("stop set: lone PAINT above PT-1 → today; PAINT  ALL GYP. BD., SEE SPEC → today; TILE / WOOD with cells → today", () => {
   asToday(spansOf([CPT1, { t: "raw", spans: [["PAINT", COLS.KEY]] }, PT1, PT2]), "lone PAINT");
-  asToday(spansOf([CPT1, L("PAINT", { MATERIAL: "ALL GYP. BD. — SEE SPEC" }), PT1, PT2]), "PAINT ALL GYP. BD.");
+  asToday(spansOf([CPT1, L("PAINT", { MATERIAL: "ALL GYP. BD., SEE SPEC" }), PT1, PT2]), "PAINT ALL GYP. BD.");
   asToday(spansOf([CPT1, L("TILE", { MATERIAL: "CERAMIC", MANUFACTURER: "VENDOR-F" }), RB1, L("WOOD", { MATERIAL: "OAK", COLOR: "NATURAL" }), PT1]), "TILE / WOOD");
 });
 
@@ -447,12 +447,12 @@ test("limit: an abbreviation legend directly below the last numbered row → one
   assert.deepEqual(skippedOf(r), ["CONC", "EPOX", "RESIL"]);
 });
 
-test("limit: when 1–3-letter abbreviations already key today, a 4–5-letter legend line between them with two filled cells becomes a row", () => {
+test("limit: when 1 a 3-letter abbreviations already key today, a 4 a 5-letter legend line between them with two filled cells becomes a row", () => {
   const r = read([L("CPT", { MATERIAL: "CARPET", MANUFACTURER: "SEE SPEC" }), L("EPOX", { MATERIAL: "EPOXY", MANUFACTURER: "SEE SPEC" }), L("RB", { MATERIAL: "RUBBER BASE", MANUFACTURER: "SEE SPEC" }), CPT1, RB1]);
   assert.deepEqual(keys(r), ["CPT", "EPOX", "RB", "CPT-1", "RB-1"]);
 });
 
-test("limit: another 4–5-letter subheading with two filled cells between keyed rows keys as a row", () => {
+test("limit: another 4 a 5-letter subheading with two filled cells between keyed rows keys as a row", () => {
   assert.deepEqual(keys(read([CPT1, L("SHEET", { MATERIAL: "GOODS", MANUFACTURER: "SEE SPEC" }), RB1])), ["CPT-1", "SHEET", "RB-1"]);
 });
 
@@ -523,7 +523,7 @@ test("an all-letters MARK | DESCRIPTION | REMARKS table under FLOORING → { row
   assert.deepStrictEqual(readScheduleSpans(mk(false)), { rows: [], refused: "no-color-style-pattern" });
 });
 
-test("measured (flagged): a legend 3 pitches below that mixes abbreviations today already reads (CPT, RB) with 4–5-letter ones → the 4–5-letter lines are skipped", () => {
+test("measured (flagged): a legend 3 pitches below that mixes abbreviations today already reads (CPT, RB) with 4 a 5-letter ones → the 4 a 5-letter lines are skipped", () => {
   // CPT and RB key rows today (unchanged); as read rows they carry the run, so CONC / EPOX are reached and, with no numbered row after them, skipped
   const leg = (k: string, v: string): Item => ({ t: "raw", spans: [[k, COLS.KEY], [v, COLS.MATERIAL]] });
   const spans = spansOf([CPT1, CPT2, RB1, { t: "gap", n: 2 }, leg("CPT", "CARPET"), leg("CONC", "CONCRETE"), leg("EPOX", "EPOXY"), leg("RB", "RUBBER BASE")]);
@@ -642,7 +642,7 @@ function twoLineRows(word: string, cells: 1 | 2, s: number, pad: number, dy = 0)
   return at(rows);
 }
 
-test("a 4–5-letter word starting a row's second line in evenly spaced two-line rows (≥ 1.6 h) → the row keeps its text as today: no row, nothing skipped", () => {
+test("a 4 a 5-letter word starting a row's second line in evenly spaced two-line rows (≥ 1.6 h) → the row keeps its text as today: no row, nothing skipped", () => {
   for (const word of ["EXIST.", "(EXIST.)", "OWNER", "SHEEN"]) for (const cells of [1, 2] as const) for (const s of [28, 31, 34]) for (const pad of [0, 4, 6, 8, 10]) {
     const where = `${word}, ${cells} cell(s), lines ${s} px apart, ${pad} px between rows`;
     const spans = twoLineRows(word, cells, s, pad);

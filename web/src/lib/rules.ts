@@ -41,11 +41,11 @@ export interface RulePredicate {
 export interface Rule {
   id: string;
   created_at: string;
-  seed_shape_id: string;      // the correction that generated this rule — traceability
+  seed_shape_id: string;      // the correction that generated this rule, traceability
   seed_condition_id: string;  // project-scoped: rules never outlive the project file
   predicate: RulePredicate;
   label: string;              // plain language, generated once at creation
-  applied_to: string[];       // shape ids minted by this rule — audit trail, not a gate (overlap dedup is the gate)
+  applied_to: string[];       // shape ids minted by this rule, audit trail, not a gate (overlap dedup is the gate)
   active: boolean;
 }
 

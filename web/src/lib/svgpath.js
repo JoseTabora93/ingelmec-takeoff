@@ -99,7 +99,7 @@ function normalize(d) {
 
   let cx = 0, cy = 0;       // current point
   let sx = 0, sy = 0;       // subpath start (for Z)
-  let prevType = "other";   // "C", "Q" or "other" — for S/T reflection
+  let prevType = "other";   // "C", "Q" or "other", for S/T reflection
   let pc2x = 0, pc2y = 0;   // previous cubic 2nd control point
   let pqx = 0, pqy = 0;     // previous quadratic control point
 

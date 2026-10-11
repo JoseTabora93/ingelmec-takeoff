@@ -58,7 +58,7 @@ export function assignShapeLabel(shapes, id, value) {
   return shapes.map((s) => {
     if (s?.id !== id) return s;
     if (v) return { ...s, label: v };
-    if (!("label" in s)) return s;   // already unlabeled — nothing to clear
+    if (!("label" in s)) return s;   // already unlabeled, nothing to clear
     const { label, ...rest } = s;    // drop the key, keep everything else
     return rest;
   });

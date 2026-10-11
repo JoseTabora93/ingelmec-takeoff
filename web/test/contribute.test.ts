@@ -89,7 +89,7 @@ test("triad: manual / clean one-click / corrected one-click stay distinguishable
   }
 });
 
-test("pickOrigin: whitelist — unknown keys are dropped, never spread", () => {
+test("pickOrigin: whitelist, unknown keys are dropped, never spread", () => {
   assert.deepEqual(
     pickOrigin({
       method: "one_click_v1", reviewed: true, edits: { vertex: 1 },
@@ -116,10 +116,10 @@ test("agent_v1 round-trip: evidence is deep-whitelisted on the wire; accept-gate
       seed_norm: [0.17, 0.7],
       evidence: {
         schedule_row_tag: "LVT-9",
-        matched_text: "RM 204 " + "CLASSROOM WING CORRIDOR EAST ".repeat(10),   // >80 chars — must truncate
+        matched_text: "RM 204 " + "CLASSROOM WING CORRIDOR EAST ".repeat(10),   // >80 chars, must truncate
         seed_norm: [0.17, 0.7],
-        prompt_text: "the estimator's full goal text",   // junk — must drop
-        sheet_transcript: "arbitrary sheet text",         // junk — must drop
+        prompt_text: "the estimator's full goal text",   // junk, must drop
+        sheet_transcript: "arbitrary sheet text",         // junk, must drop
       },
     },
   }];

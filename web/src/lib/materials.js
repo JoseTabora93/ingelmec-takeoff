@@ -46,7 +46,7 @@ export const matFieldOverridden = (m, lm, f) => {
   const L = libFields(lm);
   if (f === "per") return (Number(m.per) || 0) !== L.per;
   if (f === "round") return (m.round !== false) !== L.round;
-  if (f === "basis") return (m.basis || "area") !== L.basis;   // absent basis means "area" everywhere else — don't flag it
+  if (f === "basis") return (m.basis || "area") !== L.basis;   // absent basis means "area" everywhere else, don't flag it
   if (f === "grout") return !groutParamsEqual(m.grout, L.grout);
   return String(m[f] || "") !== String(L[f] || "");
 };
@@ -106,8 +106,8 @@ export const libRevertPatch = (m, lm, f) => {
 export const renameReclassified = (m, oldName) => {
   if (!m.kind || m.grout) return m;
   const newNameKind = materialKind({ name: m.name });
-  if (newNameKind === m.kind) return m;                              // new name agrees — nothing stale
-  if (materialKind({ name: oldName }) === newNameKind) return m;     // meaning unchanged — keep the classification
+  if (newNameKind === m.kind) return m;                              // new name agrees, nothing stale
+  if (materialKind({ name: oldName }) === newNameKind) return m;     // meaning unchanged, keep the classification
   const { kind: _k, ...rest } = m;
   return rest;
 };

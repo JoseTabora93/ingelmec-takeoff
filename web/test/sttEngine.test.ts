@@ -56,7 +56,7 @@ test("wav: garbage and truncated files throw, never guess", () => {
 const modelsDir = join(dirname(fileURLToPath(import.meta.url)), "..", "public", "models");
 const modelPresent = existsSync(join(modelsDir, "onnx-community", "whisper-tiny.en", "onnx"));
 
-test("engine smoke: transformers-js initializes headlessly and decodes silence without throwing", { skip: modelPresent ? false : "voice model not staged — run: node scripts/fetch-voice-model.mjs" }, async () => {
+test("engine smoke: transformers-js initializes headlessly and decodes silence without throwing", { skip: modelPresent ? false : "voice model not staged, run: node scripts/fetch-voice-model.mjs" }, async () => {
   const engine = await createEngine("transformers-js");
   await engine.init({ baseUrl: modelsDir });
   const text = await engine.transcribe(new Float32Array(WHISPER_SAMPLE_RATE)); // 1 s silence

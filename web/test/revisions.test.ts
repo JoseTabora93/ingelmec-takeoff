@@ -122,7 +122,7 @@ test("orphan shapes (deleted condition) stay out of sheet deltas", () => {
 
 test("revSheetLabel formats page keys", () => {
   assert.equal(revSheetLabel("plan.pdf"), "plan");
-  assert.equal(revSheetLabel("plan.pdf#3"), "plan — p.3");
+  assert.equal(revSheetLabel("plan.pdf#3"), "plan, p.3");
 });
 
 test("diffToCsv carries statuses, deltas, sections, and escapes commas", () => {

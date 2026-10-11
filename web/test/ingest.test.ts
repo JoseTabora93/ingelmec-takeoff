@@ -110,7 +110,7 @@ test("an ingested image carries /Interpolate true so deep zoom stays smooth", as
   assert.deepEqual(await imageXObjects(pdfs[0]), [{ cs: "/DeviceRGB", interpolate: "true" }]);
 });
 
-test("only the drawn image needs the flag — an alpha PNG's SMask is not drawn on its own", async () => {
+test("only the drawn image needs the flag, an alpha PNG's SMask is not drawn on its own", async () => {
   // pdf.js reads Interpolate off the MAIN image dict and folds the SMask into
   // that image's alpha before one composed draw, so the mask never carries it.
   // Asserted rather than assumed: it's the reason this doesn't walk /SMask.

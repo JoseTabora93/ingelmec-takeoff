@@ -206,7 +206,7 @@ export function createSyncStore({ base, provider, folderId, onRemoteUpdate, save
     // to adopt → likewise keep local canonical rather than overwrite it with null.
     if (typeof saveSnapshot !== "function") return;
     if (!remote || remote.data == null) return;
-    pendingRemote = remote; // last-discovered wins — freshest Drive truth in serial discovery
+    pendingRemote = remote; // last-discovered wins, freshest Drive truth in serial discovery
     await flushPending();
   }
 
@@ -281,7 +281,7 @@ export function createSyncStore({ base, provider, folderId, onRemoteUpdate, save
     // Re-check: the user may have started editing during the pull await. If so
     // this is no longer a seed (their edit wins locally; 4c reconciles later).
     if (await isTouched()) return;
-    await base.saveAnnotations(remote.data); // adopt remote into local (no touched — not a local edit)
+    await base.saveAnnotations(remote.data); // adopt remote into local (no touched, not a local edit)
     // Base future pushes on remote's rev. A rev-less remote (a flag-off teammate's
     // write) stores synced_rev=null, so the next edit's push runs expectedRev=null
     // and blind-overwrites it (rev → 1). That's the mixed-fleet hazard the plan

@@ -59,7 +59,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 // { ownerDocument, enableHWA }) — this one is OffscreenCanvas all the way down.
 class OffscreenCanvasFactory {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  constructor(_opts?: unknown) { /* ownerDocument/enableHWA — irrelevant off-DOM */ }
+  constructor(_opts?: unknown) { /* ownerDocument/enableHWA, irrelevant off-DOM */ }
   create(width: number, height: number) {
     if (width <= 0 || height <= 0) throw new Error("Invalid canvas size");
     const canvas = new OffscreenCanvas(width, height);
@@ -84,7 +84,7 @@ class OffscreenCanvasFactory {
 // behavior for a DOM-less realm, not a hack.
 class WorkerFilterFactory {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  constructor(_opts?: unknown) { /* docId/ownerDocument — unused */ }
+  constructor(_opts?: unknown) { /* docId/ownerDocument, unused */ }
   addFilter() { return "none"; }
   addHCMFilter() { return "none"; }
   addAlphaFilter() { return "none"; }

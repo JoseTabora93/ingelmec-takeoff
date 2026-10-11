@@ -25,7 +25,7 @@ export default function AccountChip({ note, onOpenChange }) {
 
   return (
     <ToolMenu
-      title={`Account — ${user.email}`}
+      title={`Account, ${user.email}`}
       onOpenChange={onOpenChange}
       faceStyle={{ padding: "4px 8px 4px 4px" }}
       menuStyle={{ minWidth: 224 }}

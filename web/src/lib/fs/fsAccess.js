@@ -60,7 +60,7 @@ export async function linkFolder() {
   try {
     handle = await window.showDirectoryPicker({ mode: "readwrite" });
   } catch {
-    return null; // user cancelled (AbortError) — not an error state
+    return null; // user cancelled (AbortError), not an error state
   }
   const scope = `fsync-${mintUuid()}`;
   await metaPut(K_HANDLE, handle);

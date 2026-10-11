@@ -12,7 +12,7 @@ test("rectMidpoint: normal rect → average of the two corners", () => {
   assert.deepEqual(rectMidpoint([[0.2, 0.3], [0.6, 0.7]]), [0.4, 0.5]);
 });
 
-test("rectMidpoint: order-independent — swapped corners give the same midpoint", () => {
+test("rectMidpoint: order-independent, swapped corners give the same midpoint", () => {
   const a = rectMidpoint([[0.2, 0.3], [0.6, 0.7]]);
   const b = rectMidpoint([[0.6, 0.7], [0.2, 0.3]]);
   assert.deepEqual(a, b);
@@ -74,7 +74,7 @@ test("pendingSourceOutcome: still loading (not ready, or ready but no bitmap yet
   );
 });
 
-test("pendingSourceOutcome: attempt budget — one below the cap still waits, reaching the cap gives up", () => {
+test("pendingSourceOutcome: attempt budget, one below the cap still waits, reaching the cap gives up", () => {
   assert.deepEqual(
     pendingSourceOutcome(ref(MAX_SOURCE_TRACE_ATTEMPTS - 2), { status: "loading", sheetIsLive: true, panelReady: false }),
     { action: "wait", attempts: MAX_SOURCE_TRACE_ATTEMPTS - 1 },
@@ -85,7 +85,7 @@ test("pendingSourceOutcome: attempt budget — one below the cap still waits, re
   );
 });
 
-test("pendingSourceOutcome: never left pending on a terminal status — every non-wait outcome is either give-up or complete", () => {
+test("pendingSourceOutcome: never left pending on a terminal status, every non-wait outcome is either give-up or complete", () => {
   const statuses = ["loading", "ready", "error"];
   for (const status of statuses) {
     for (const sheetIsLive of [true, false]) {

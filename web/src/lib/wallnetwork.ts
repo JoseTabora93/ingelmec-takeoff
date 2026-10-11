@@ -35,7 +35,7 @@
 
 // meta bit, MIRRORED rather than imported: oneclick.ts consumes this module,
 // so importing back would make the cycle real. Same value, one test pins it.
-const SEG_CLIP = 2;       // clip-only path — invisible ink, never a wall
+const SEG_CLIP = 2;       // clip-only path, invisible ink, never a wall
 
 // ── geometry thresholds ──────────────────────────────────────────────────
 // Feet-true when the sheet scale is known (mppf = mask px per foot); the px

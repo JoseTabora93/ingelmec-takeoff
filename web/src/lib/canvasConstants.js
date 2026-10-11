@@ -8,7 +8,7 @@
 import { GROUT_DEFAULTS } from "./coverage.js";
 
 export const MIN_SCALE = 0.03;
-export const MAX_SCALE = 32;  // stage zoom is in raster px — with the 28MP base budget this keeps ≈ the old deep-zoom ceiling (detail view carries the crispness)
+export const MAX_SCALE = 32;  // stage zoom is in raster px, with the 28MP base budget this keeps ≈ the old deep-zoom ceiling (detail view carries the crispness)
 export const PANEL_GAP = 48;  // px between side-by-side sheets in a multi-sheet group
 // Base raster: enough density for fit-to-view + the first stretch of zoom; sharpness
 // past 1:1 comes from the DETAIL VIEW (region re-render), never from a giant full-sheet
@@ -18,14 +18,14 @@ export const PANEL_GAP = 48;  // px between side-by-side sheets in a multi-sheet
 // (verts are normalized and the render factor cancels in the area math), so the budget
 // only trades memory for base-layer sharpness. Hi-Res opts a sheet INTO the auto
 // budget per-user (the default stays the lean baseline raster).
-export const QUALITY_CEILING = 8.0;                  // hard cap on render scale (≈576 px/in) — binds only on small pages now
+export const QUALITY_CEILING = 8.0;                  // hard cap on render scale (≈576 px/in), binds only on small pages now
 export const MAX_CANVAS_DIM  = 16384;                // safe max side for a single canvas (Chrome/Firefox/Safari desktop)
-export const MAX_CANVAS_AREA = 16384 * 16384 * 0.9;  // per-canvas pixel cap — the DETAIL view's density factor uses this
+export const MAX_CANVAS_AREA = 16384 * 16384 * 0.9;  // per-canvas pixel cap, the DETAIL view's density factor uses this
 export const MAX_PANEL_AREA  = 28e6;                 // base-raster pixel budget per panel (~112MB RGBA; 4-up ≈ 450MB)
 export const MARKUP_IMG_MAX = 1600;                  // px longest side of a stored image markup (capture AND upload downscale to this, then re-encode)
-export const MAX_IMAGE_MARKUP_BYTES = 16 * 1024 * 1024;  // aggregate cap across a project's image markups — refuse a new one that would push the annotations blob past this
+export const MAX_IMAGE_MARKUP_BYTES = 16 * 1024 * 1024;  // aggregate cap across a project's image markups, refuse a new one that would push the annotations blob past this
 export const MARKUP_UPLOAD_MAX_BYTES = 25 * 1024 * 1024; // reject an upload FILE larger than this BEFORE decode (cheap OOM guard for a huge file)
-export const MARKUP_DECODE_MAX_AREA = 40e6;          // reject a decoded upload above ~40M px — a 1600px annotation never needs more, and this bounds the transient RGBA allocation (NOT the 241M render-canvas cap)
+export const MARKUP_DECODE_MAX_AREA = 40e6;          // reject a decoded upload above ~40M px, a 1600px annotation never needs more, and this bounds the transient RGBA allocation (NOT the 241M render-canvas cap)
 // Detail view: once zoomed past the base raster's 1:1 IN DEVICE PIXELS, we overlay a
 // crop of JUST the visible region, re-rendered from the PDF vectors at the current zoom —
 // the way desktop CAD viewers do. Crispness becomes unbounded (up to the per-region canvas cap)
@@ -64,7 +64,7 @@ export const RAIL_CLEAR = 56;
 export const ZONE_PANEL_W = 300;
 
 import { SNAP_CELL } from "./takeoffConstants.ts";
-export { SNAP_CELL };   // snap-grid bucket, raster px (Spline runs 12 — its budgeted raster is denser)
+export { SNAP_CELL };   // snap-grid bucket, raster px (Spline runs 12, its budgeted raster is denser)
 
 // toolbar menus — STACK-style: the menu face shows the armed tool
 export const MEASURE_TOOLS = [
@@ -74,7 +74,7 @@ export const MEASURE_TOOLS = [
   { id: "linear", icon: "linear", label: "Lineal", shortcut: "L" },
   { id: "surface", icon: "surface", label: "Área de muro", shortcut: "S" },
   { id: "count", icon: "count", label: "Conteo", shortcut: "C" },
-  { id: "symbol", icon: "symbol", label: "Símbolo — marque UNA instancia y cuente todas (#264)", shortcut: "Y" },
+  { id: "symbol", icon: "symbol", label: "Símbolo, marque UNA instancia y cuente todas (#264)", shortcut: "Y" },
 ];
 export const CUT_TOOLS = [
   { id: "deduct", icon: "deduct", label: "Deducir figura", shortcut: "D" },
@@ -88,7 +88,7 @@ export const MARKUP_TOOLS = [
   { id: "highlight", icon: "highlight", label: "Cuadro de resaltado" },
   // N, not M — M is the push-to-talk dictation hold, globally
   { id: "dimension", icon: "dimension", label: "Línea de cota", shortcut: "N" },
-  { id: "image", icon: "image", label: "Imagen — marque una región o suba un archivo" },
+  { id: "image", icon: "image", label: "Imagen, marque una región o suba un archivo" },
 ];
 export const MARKUP_IDS = MARKUP_TOOLS.map((t) => t.id);
 // highlighter inks — literal hex (SVG attrs; CSS vars don't resolve there).
@@ -115,7 +115,7 @@ export const FLOORING_DEFAULTS = [
   { finish_tag: "CPT-1", color: "#2f7d54", hatch: "speckle", waste_pct: 5,  materials: [{ name: "Adhesive", kind: "adhesive", per: 250, basis: "area", unit: "gal" }] },                  // Carpet tile
   { finish_tag: "BRD-1", color: "#be185d", hatch: "dots",    waste_pct: 10, materials: [{ name: "Adhesive", kind: "adhesive", per: 120, basis: "area", unit: "gal" }] },                  // Broadloom carpet (roll goods)
   { finish_tag: "LVT-1", color: "#b8860b", hatch: "plank",   waste_pct: 8,  materials: [{ name: "Adhesive", kind: "adhesive", per: 250, basis: "area", unit: "gal" }] },                  // Luxury vinyl plank/tile
-  { finish_tag: "WD-1",  color: "#9a3412", hatch: "plank",   waste_pct: 10, materials: [                                                                                                  // Unfinished 2.25″ solid red oak — glue-down + site-finished
+  { finish_tag: "WD-1",  color: "#9a3412", hatch: "plank",   waste_pct: 10, materials: [                                                                                                  // Unfinished 2.25″ solid red oak, glue-down + site-finished
     { name: "Adhesive (wood, SMP)",     kind: "adhesive", per: 50,  basis: "area", unit: "gal", note: "1/4″×1/4″ V (wood)" },
     { name: "Sealer (primer coat)",     per: 400, basis: "area", unit: "gal", note: "1 prime coat (~10 m²/L)" },
     { name: "Polyurethane (2K finish)", per: 136, basis: "area", unit: "gal", note: "≈3 coats @ ~408 SF/gal/coat (2K 10:1)" },
@@ -128,7 +128,7 @@ export const FLOORING_DEFAULTS = [
     // floor (lib/rollgoods.js seamLfBySrc). It reads 0 until the condition
     // carries a roll setup — which is the honest answer, since nothing has
     // decided yet how the sheet gets cut.
-    { name: "Heat-weld rod", per: 1, basis: "seam_lf", unit: "lf", note: "runs the figured seams — set the roll width on this condition" },
+    { name: "Heat-weld rod", per: 1, basis: "seam_lf", unit: "lf", note: "runs the figured seams, set the roll width on this condition" },
   ] },
   { finish_tag: "CT-1",  color: "#9333ea", hatch: "grid",    waste_pct: 10, materials: [                                                                                                  // Ceramic / porcelain tile
     { name: "Thinset mortar", kind: "mortar", per: 65, basis: "area", unit: "bag", note: '1/4″×3/8″×1/4″ sq' },

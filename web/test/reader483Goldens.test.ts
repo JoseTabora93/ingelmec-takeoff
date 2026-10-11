@@ -59,8 +59,8 @@ test("expectedChanges: marquee twins only; counts, keys and full reads agree per
   for (const [name, e] of Object.entries(expectedChanges)) {
     const t = byName.get(name);
     assert.ok(t && hasMarquee(t), `${name} is a marquee twin`);
-    assert.equal(e.counts.length, 7, `${name}: counts for slices 0–6`);
-    assert.equal(e.keys.length, 7, `${name}: keys for slices 0–6`);
+    assert.equal(e.counts.length, 7, `${name}: counts for slices 0 a 6`);
+    assert.equal(e.keys.length, 7, `${name}: keys for slices 0 a 6`);
     const g = golden(goldenFile(name)).marquee.readScheduleSpans;
     assert.ok(!e.reads[0 as never], `${name}: slice 0 is the golden`);
     for (let s = 0; s <= 6; s++) {

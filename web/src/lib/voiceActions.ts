@@ -67,12 +67,12 @@ export type VoiceOutcome = { ok: boolean; message: string; reason?: RejectReason
  *  bar's isDangerMsg keys on to render red + sticky. */
 export const REJECTION_MESSAGES: Record<RejectReason, string> = {
   empty: "Couldn't hear a command.",
-  unrecognized: 'Couldn\'t parse that — try "CPT-1", "waste 7", "label Phase 1", or "note …".',
-  unknown_tag: "Couldn't match that tag — say a live condition tag, or a Div-9 code like CPT-2 to create one.",
-  bad_number: 'Couldn\'t read the waste number — say 0–100, e.g. "waste 7" or "waste 7.5".',
-  trailing_words: "Couldn't parse — extra words after the command. One command at a time.",
-  deixis_no_condition: 'Couldn\'t trace — no active condition. Name one, like "CPT-1, this room".',
-  deixis_target: 'Couldn\'t aim that — "here"/"this room" places a takeoff, not a note or label clear.',
+  unrecognized: 'Couldn\'t parse that, try "CPT-1", "waste 7", "label Phase 1", or "note …".',
+  unknown_tag: "Couldn't match that tag, say a live condition tag, or a Div-9 code like CPT-2 to create one.",
+  bad_number: 'Couldn\'t read the waste number, say 0 a 100, e.g. "waste 7" or "waste 7.5".',
+  trailing_words: "Couldn't parse, extra words after the command. One command at a time.",
+  deixis_no_condition: 'Couldn\'t trace, no active condition. Name one, like "CPT-1, this room".',
+  deixis_target: 'Couldn\'t aim that, "here"/"this room" places a takeoff, not a note or label clear.',
 };
 
 const fail = (message: string): VoiceOutcome => ({ ok: false, message });
@@ -104,15 +104,15 @@ export function applyVoiceIntent(caps: VoiceCapabilities, intent: Intent): Voice
         caps.updateCondition(cond.id, { waste_pct: intent.waste });
         return done(
           intent.known
-            ? `${cond.finish_tag} active — waste ${intent.waste}%.`
-            : `Created ${cond.finish_tag} — active, waste ${intent.waste}%.`,
+            ? `${cond.finish_tag} active, waste ${intent.waste}%.`
+            : `Created ${cond.finish_tag}, active, waste ${intent.waste}%.`,
         );
       }
-      return done(intent.known ? `${cond.finish_tag} active.` : `Created ${cond.finish_tag} — active.`);
+      return done(intent.known ? `${cond.finish_tag} active.` : `Created ${cond.finish_tag}, active.`);
     }
     case "set_waste": {
       const id = caps.getActiveConditionId();
-      if (!id) return fail("Couldn't set waste — no active condition.");
+      if (!id) return fail("Couldn't set waste, no active condition.");
       caps.updateCondition(id, { waste_pct: intent.waste });
       const tag = caps.getConditions().find((c) => c.id === id)?.finish_tag ?? "active condition";
       return done(`Waste ${intent.waste}% on ${tag}.`);
@@ -120,7 +120,7 @@ export function applyVoiceIntent(caps: VoiceCapabilities, intent: Intent): Voice
     case "set_label": {
       if (!intent.known) caps.addLabel(intent.label);
       caps.activateLabel(intent.label);
-      return done(intent.known ? `Label ${intent.label} active.` : `Added label ${intent.label} — active.`);
+      return done(intent.known ? `Label ${intent.label} active.` : `Added label ${intent.label}, active.`);
     }
     case "clear_label":
       caps.activateLabel(null);
@@ -130,16 +130,16 @@ export function applyVoiceIntent(caps: VoiceCapabilities, intent: Intent): Voice
       return done(`Marks will sign ${intent.name}.`);
     case "clear_author":
       caps.setAuthor(null);
-      return done("Author cleared — new marks unsigned.");
+      return done("Author cleared, new marks unsigned.");
     case "add_note":
       caps.addNote(intent.text);
-      return done("Note added — see Markups.");
+      return done("Note added, see Markups.");
     case "trace_at_cursor": {
       // seed BEFORE arming: an off-sheet or stale aim rejects with ZERO calls —
       // a bad aim must not half-arm a condition (the mutation-safety bar)
       const seed = caps.getAimSeed();
-      if (!seed) return fail("Couldn't place that — aim went stale. Put the cursor on the room and say it again.");
-      if (!seed.sheetId) return fail("Couldn't place that — aim at a sheet.");
+      if (!seed) return fail("Couldn't place that, aim went stale. Put the cursor on the room and say it again.");
+      if (!seed.sheetId) return fail("Couldn't place that, aim at a sheet.");
       // arm the condition — the aimed click's sequence: chip click (or mint),
       // then the waste/label riders, then the trace
       let condId: string;
@@ -158,7 +158,7 @@ export function applyVoiceIntent(caps: VoiceCapabilities, intent: Intent): Voice
         condId = cond.id;
       } else {
         condId = caps.getActiveConditionId();
-        if (!condId) return fail(REJECTION_MESSAGES.deixis_no_condition); // defensive — the parser gates on ctx.hasActiveCondition
+        if (!condId) return fail(REJECTION_MESSAGES.deixis_no_condition); // defensive, the parser gates on ctx.hasActiveCondition
       }
       if (intent.waste !== undefined) caps.updateCondition(condId, { waste_pct: intent.waste });
       if (intent.label !== undefined) {

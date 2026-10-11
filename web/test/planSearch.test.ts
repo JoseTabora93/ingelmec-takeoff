@@ -116,7 +116,7 @@ const nineRuns = (first: string) => runs(first, ...Array.from({ length: 8 }, (_,
 test("runPlanSearch: unreadCount counts indexed scans (little or no text layer) in the set", () => {
   const map = mapOf(
     buildSheetIndex("scan.pdf", []),                   // text-less, no OCR → unread
-    buildSheetIndex("scan.pdf#2", runs("—", "  ")),    // only punctuation → still text-less
+    buildSheetIndex("scan.pdf#2", runs("", "  ")),    // only punctuation → still text-less
     buildSheetIndex("read.pdf", runs("LOBBY"), "ocr"), // has an OCR entry → read
     buildSheetIndex("blank.pdf", [], "ocr"),           // OCR ran and found nothing → read
     buildSheetIndex("vec.pdf", nineRuns("LOBBY")),     // has a text layer
@@ -1164,7 +1164,7 @@ test("mayLookUp: no cache lookup for a sheet whose entry plans no read (it was n
   assert.equal(mayLookUp(undefined), false, "no entry: wait for the sheet's plan");
 });
 
-test("readableFromIndex: the canvas's Read rows follow the index — re-derived on change, gone when the entry is dropped, the same object when nothing changed", () => {
+test("readableFromIndex: the canvas's Read rows follow the index, re-derived on change, gone when the entry is dropped, the same object when nothing changed", () => {
   const m = mapOf(labelled("h.pdf"), textless("s.pdf"), measured("v.pdf"));
   const prev = { "h.pdf": null, "s.pdf": "page", "v.pdf": null } as const;
   assert.equal(readableFromIndex(prev, m), prev, "nothing changed: the same object (no re-render)");

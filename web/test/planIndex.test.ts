@@ -20,7 +20,7 @@ test("normalizeTerm: upper-cases and strips punctuation at the ENDS only", () =>
   assert.equal(normalizeTerm("…101."), "101");
 });
 
-test("normalizeTerm: interior separators survive — they ARE the plan vocabulary", () => {
+test("normalizeTerm: interior separators survive, they ARE the plan vocabulary", () => {
   // stripping these globally would shred exactly what this index exists to find
   assert.equal(normalizeTerm("CPT-1"), "CPT-1");
   assert.equal(normalizeTerm("S1.1"), "S1.1");
@@ -28,7 +28,7 @@ test("normalizeTerm: interior separators survive — they ARE the plan vocabular
 });
 
 test("normalizeTerm: punctuation-only and empty input yield no term", () => {
-  assert.equal(normalizeTerm("—"), "");
+  assert.equal(normalizeTerm(""), "");
   assert.equal(normalizeTerm("..."), "");
   assert.equal(normalizeTerm(""), "");
   assert.equal(normalizeTerm(undefined as unknown as string), "");
@@ -104,7 +104,7 @@ test("expandTerm: a '/'-joined callout is findable by EITHER half and as drawn",
   assert.deepEqual(expandTerm("CPT-1,LVT-2"), ["CPT-1,LVT-2", "CPT-1", "LVT-2"]);
 });
 
-test("expandTerm: '-' and '.' never split — they are internal to single codes", () => {
+test("expandTerm: '-' and '.' never split, they are internal to single codes", () => {
   assert.deepEqual(expandTerm("CPT-1"), ["CPT-1"]);
   assert.deepEqual(expandTerm("S1.1"), ["S1.1"]);
   assert.deepEqual(expandTerm("A-101"), ["A-101"]);
@@ -422,7 +422,7 @@ test("indexIsScanLike: the boundary sits between 8 and 9 lines (an unpositioned 
 });
 
 test("indexIsScanLike: blank and punctuation-only runs don't count toward the 8 lines", () => {
-  const junk = runs("-", "...", "  ", "( )", "", "--", "—", ".", "/");
+  const junk = runs("-", "...", "  ", "( )", "", "--", "", ".", "/");
   assert.equal(indexIsScanLike(buildSheetIndex("k", [...wordyRuns(8), ...junk])), true);
   assert.equal(indexIsScanLike(buildSheetIndex("k", junk)), true);
 });

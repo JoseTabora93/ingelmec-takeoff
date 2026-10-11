@@ -13,7 +13,7 @@ const mono = (px: number) => (s: string) => s.length * px * 0.6;
 test("inkPx: ink is points × RENDER_SCALE at any zoom above the floor", () => {
   assert.equal(ptToImg(NOTE_PT), NOTE_PT * RENDER_SCALE);
   assert.equal(inkPx(NOTE_PT, 1), NOTE_PT * RENDER_SCALE);      // 100 %: pure ink
-  assert.equal(inkPx(NOTE_PT, 3), NOTE_PT * RENDER_SCALE);      // 300 %: still ink — it grows with the sheet on screen
+  assert.equal(inkPx(NOTE_PT, 3), NOTE_PT * RENDER_SCALE);      // 300 %: still ink, it grows with the sheet on screen
   assert.equal(inkPx(NOTE_PT, undefined), NOTE_PT * RENDER_SCALE);   // export: no zoom, no floor
   assert.equal(inkPx(NOTE_PT, 0), NOTE_PT * RENDER_SCALE);
 });
@@ -69,7 +69,7 @@ test("layoutNote: empty text is an empty block; padding rides the floor", () => 
   assert.ok(Math.abs(floored.padX - plain.padX * 2) < 1e-9, "pad scales with the font");
 });
 
-test("layoutNote: a floored (zoomed-out) note keeps its proportions — the wrap width rides the font", () => {
+test("layoutNote: a floored (zoomed-out) note keeps its proportions, the wrap width rides the font", () => {
   const text = "FIRST-USE TRIAL: net flooring, RB1 solid-wall runs, finish changes. Q1-Q3 assumptions carried. EX / hatched areas excluded.";
   const ink = ptToImg(NOTE_PT);
   const atInk = layoutNote({ text, fontPx: ink, measure: mono(ink) });

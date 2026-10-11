@@ -37,7 +37,7 @@ export default function AgentPanel({
 
   return (
     <div style={{ width: embedded ? "100%" : 340, flex: embedded ? 1 : undefined, flexShrink: 0, display: "flex", flexDirection: "column", borderLeft: embedded ? undefined : "1px solid var(--ink-faint)", background: "var(--paper-bright)", overflow: "hidden", minHeight: 0 }}>
-      {/* header strip — matches the docked-panel chrome */}
+      {/* header strip, matches the docked-panel chrome */}
       {!embedded && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", background: "var(--cobalt)", color: "var(--accent-contrast)" }}>
         <Icon name="target" size={15} />
         <strong style={{ flex: 1, fontSize: 12.5 }}>Agent{proposals.length ? ` · ${proposals.length} pending` : ""}</strong>
@@ -73,7 +73,7 @@ export default function AgentPanel({
               ) : (
                 <button onClick={run} disabled={!goal.trim()} className="btn-primary" style={{ padding: "5px 14px", fontSize: 12, cursor: goal.trim() ? "pointer" : "default", opacity: goal.trim() ? 1 : 0.5 }}>Run</button>
               )}
-              <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>{running ? "Working — proposals land as dashed outlines." : keyText("⌘⏎ runs. Your key, your endpoint.")}</span>
+              <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>{running ? "Working, proposals land as dashed outlines." : keyText("⌘⏎ runs. Your key, your endpoint.")}</span>
               <span style={{ flex: 1 }} />
               <button onClick={onOpenSettings} title="AI settings (endpoint / model / key)" style={{ border: "none", background: "transparent", cursor: "pointer", color: "var(--ink-muted)" }}><Icon name="sliders" size={13} /></button>
             </div>
@@ -87,14 +87,14 @@ export default function AgentPanel({
             ))}
           </div>
 
-          {/* pending proposals — the accept gate */}
+          {/* pending proposals, the accept gate */}
           <div style={{ borderTop: "1px solid var(--ink-faint)", maxHeight: "45%", display: "flex", flexDirection: "column", minHeight: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 12px" }}>
               <strong style={{ flex: 1, fontSize: 11.5 }}>Proposals · {proposals.length}</strong>
               {proposals.length > 0 && (
                 <>
                   <button onClick={onAcceptAll} style={{ ...ctl, color: "var(--c-positive)", fontWeight: 600 }} title={keyText("Accept every visible proposal (⏎ on the canvas does the same)")}>Accept all</button>
-                  <button onClick={onRejectAll} style={{ ...ctl, color: "var(--c-danger)" }} title="Discard every pending proposal (local only — nothing is recorded)">Reject all</button>
+                  <button onClick={onRejectAll} style={{ ...ctl, color: "var(--c-danger)" }} title="Discard every pending proposal (local only, nothing is recorded)">Reject all</button>
                 </>
               )}
             </div>
@@ -112,8 +112,8 @@ export default function AgentPanel({
                         {evidenceText(p.evidence) || "no evidence"}
                       </span>
                     </span>
-                    <button onClick={() => onAccept(p.id)} style={{ ...ctl, color: "var(--c-positive)", fontWeight: 600 }} title="Accept — commits as a takeoff (origin: agent, human-reviewed)">✓</button>
-                    <button onClick={() => onReject(p.id)} style={{ ...ctl, color: "var(--c-danger)" }} title="Reject — discard this proposal (local only)">✕</button>
+                    <button onClick={() => onAccept(p.id)} style={{ ...ctl, color: "var(--c-positive)", fontWeight: 600 }} title="Accept, commits as a takeoff (origin: agent, human-reviewed)">✓</button>
+                    <button onClick={() => onReject(p.id)} style={{ ...ctl, color: "var(--c-danger)" }} title="Reject, discard this proposal (local only)">✕</button>
                   </div>
                 );
               })}

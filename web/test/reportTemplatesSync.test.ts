@@ -161,7 +161,7 @@ test("load: non-array file contents coerce to [] (never hand junk to the merger)
 
 // ── isolation ────────────────────────────────────────────────────────────────
 
-test("two users share the folder but not the file — no clobber", async () => {
+test("two users share the folder but not the file, no clobber", async () => {
   const drive = fakeDrive();
   await pushTemplatesToDrive(drive, ROOT, "alice@x.com", [{ id: "a", name: "Alice layout" }]);
   await pushTemplatesToDrive(drive, ROOT, "bob@x.com", [{ id: "b", name: "Bob layout" }]);

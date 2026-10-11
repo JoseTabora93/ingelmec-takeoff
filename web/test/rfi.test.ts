@@ -56,8 +56,8 @@ test("rfisToCsv: title, semantics line, exact header, derived counts + sheets", 
   ];
   const csv = rfisToCsv(rfis, markups, "Job 42", (id: string) => `Sheet ${id}`);
   const lines = csv.split("\n");
-  assert.equal(lines[0], "# Job 42 — OpenTakeoff RFI log");
-  assert.equal(lines[1], "# RFI log — one row per RFI; linked markups/sheets derived from markup.rfi_id");
+  assert.equal(lines[0], "# Job 42, OpenTakeoff RFI log");
+  assert.equal(lines[1], "# RFI log, one row per RFI; linked markups/sheets derived from markup.rfi_id");
   assert.equal(lines[2], "Number,Subject,Status,Ball in court,Priority,Cost impact,Schedule impact,Date,Question,Response,Response date,Linked markups,Linked sheets");
   // Status renders the label, cost flag "yes"/blank, 2 linked markups, both sheets joined
   assert.equal(lines[3], 'RFI-001,Slab crack,Open,GC,high,yes,,7/8,Repair spec?,,,2,Sheet sh1; Sheet sh2');
@@ -92,7 +92,7 @@ test("rfisToJson: schema envelope wraps the records", () => {
 
 // ── tombstones + agent provenance (RFIs over MCP) ────────────────────────────
 
-test("liveRfis: a withdrawn RFI is a tombstone — hidden everywhere, number still reserved", () => {
+test("liveRfis: a withdrawn RFI is a tombstone, hidden everywhere, number still reserved", () => {
   const rfis = [{ id: "a", number: "RFI-001" }, { id: "b", number: "RFI-002", deleted: true }, { id: "c", number: "RFI-003" }];
   assert.deepEqual(liveRfis(rfis).map((r) => r.number), ["RFI-001", "RFI-003"]);
   assert.deepEqual(liveRfis(), []);

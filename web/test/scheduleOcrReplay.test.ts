@@ -108,7 +108,7 @@ for (const [dpi, sectionFloor, groupFloor] of [[200, 12, 14], [100, 28, 28]] as 
   test(`the ${dpi} DPI on-device read of the demo material schedule scores against the vector read`, async () => {
     const fx = fixture(dpi);
     const plan = planTiles(fx.rect, fx.rs);
-    assert.deepEqual([plan.tiles.length, plan.zoom], [1, fx.zoom], "stale fixture — capture again");
+    assert.deepEqual([plan.tiles.length, plan.zoom], [1, fx.zoom], "stale fixture, capture again");
     // provenance only: the words are a recording, replayed, so this can't
     // notice an engine change; it keeps the file honest about which engine
     // read them

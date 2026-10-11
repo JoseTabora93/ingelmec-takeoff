@@ -22,10 +22,10 @@ export const ROLE_HIDDEN = 6;
 
 /** One sheet-level layer row — what sheet_info reports and the mask consumes. */
 export interface LayerInfo {
-  id: string;          // pdf.js OCG id (objId) — stable within the document
+  id: string;          // pdf.js OCG id (objId), stable within the document
   name: string;        // the raw layer name, verbatim
   role: LayerRole;
-  confidence: number;  // 0..1 — how sure the classifier is of the role
+  confidence: number;  // 0..1, how sure the classifier is of the role
   visible: boolean;    // default-config visibility (hidden ⇒ excluded outright)
   seg_count: number;   // segments attributed to this layer on the sheet
 }
@@ -97,7 +97,7 @@ export function layerRoleCodes(layerIds: string[], infoById: Map<string, { role:
   const codes = new Uint8Array(layerIds.length);
   layerIds.forEach((id, k) => {
     const info = infoById.get(id);
-    if (!info) return; // unknown layer: code 0 — heuristics decide
+    if (!info) return; // unknown layer: code 0, heuristics decide
     codes[k] = info.visible === false ? ROLE_HIDDEN : ROLE_CODE[info.role];
   });
   return codes;

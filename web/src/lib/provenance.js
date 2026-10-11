@@ -41,7 +41,7 @@ export function setAuthorName(name) {
   try {
     if (v) globalThis.localStorage?.setItem(AUTHOR_KEY, v);
     else globalThis.localStorage?.removeItem(AUTHOR_KEY);
-  } catch { /* storage blocked — the in-memory declaration still holds */ }
+  } catch { /* storage blocked, the in-memory declaration still holds */ }
   return v;
 }
 

@@ -21,6 +21,6 @@ test("consent, tenant, registration, popup, network and revoked-token failures e
 test("the silent-acquire error is consulted when the popup fails generically; an unknown error is passed through verbatim with the report instruction", () => {
   assert.match(describeMsalError({ errorCode: "popup_window_error" }, { errorCode: "interaction_required", errorMessage: "AADSTS50079: MFA required" }), /at popup/, "the popup failure is what the user saw last");
   assert.match(describeMsalError({ message: "something new" }, { errorCode: "consent_required" }), /at consent/, "but a generic popup message defers to the silent error's code");
-  assert.equal(describeMsalError({ message: "  odd   thing  " }), "Microsoft 365 sign-in failed: odd thing — report this text verbatim on issue #315.");
-  assert.equal(describeMsalError(undefined), "Microsoft 365 sign-in failed: unknown error — report this text verbatim on issue #315.");
+  assert.equal(describeMsalError({ message: "  odd   thing  " }), "Microsoft 365 sign-in failed: odd thing, report this text verbatim on issue #315.");
+  assert.equal(describeMsalError(undefined), "Microsoft 365 sign-in failed: unknown error, report this text verbatim on issue #315.");
 });

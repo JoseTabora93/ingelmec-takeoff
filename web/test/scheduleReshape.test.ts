@@ -23,9 +23,9 @@ const fields = (spans: ReturnType<typeof table>, ocr = false) =>
   readScheduleSpans(spans, { ocr }).rows.map((r) => [r.finish_tag, r.description, r.manufacturer, r.remarks]);
 
 const FULL = [
-  ["FL-1", "RESILIENT FLOOR — SERIES-A", "VENDOR-A", "ZONE-A"],
-  ["TL-2", "CERAMIC TILE — SERIES-B", "VENDOR-B", "ZONE-B"],
-  ["RB-3", "RUBBER BASE — SERIES-C", "VENDOR-C", "ZONE-C"],
+  ["FL-1", "RESILIENT FLOOR, SERIES-A", "VENDOR-A", "ZONE-A"],
+  ["TL-2", "CERAMIC TILE, SERIES-B", "VENDOR-B", "ZONE-B"],
+  ["RB-3", "RUBBER BASE, SERIES-C", "VENDOR-C", "ZONE-C"],
 ];
 
 test("MFG / SPECIFICATION / NOTES headers read as manufacturer, description and remarks", () => {
@@ -133,9 +133,9 @@ test("a header box OCR glued over two columns (MATERIAL CODE) splits when the ce
     return readScheduleSpans(spans, { ocr }).rows.map((r) => [r.finish_tag, r.description, r.manufacturer, r.remarks]);
   };
   for (const ocr of [false, true]) assert.deepEqual(glued(ocr), [
-    ["FL-1", "Floor — SERIES-A", "VENDOR-A", "ZONE-A"],
+    ["FL-1", "Floor, SERIES-A", "VENDOR-A", "ZONE-A"],
     ["TL-2", "SERIES-B", "VENDOR-B", "ZONE-B"],
-    ["RB-3", "Base — SERIES-C", "VENDOR-C", "ZONE-C"],
+    ["RB-3", "Base, SERIES-C", "VENDOR-C", "ZONE-C"],
   ], `ocr=${ocr}`);
 });
 

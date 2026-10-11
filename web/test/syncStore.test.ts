@@ -83,7 +83,7 @@ test("mount seed: an untouched project adopts remote wholesale and signals onRem
   assert.deepEqual(updates[0].d.conditions, [{ id: "remote" }]);
 });
 
-test("mount seed is skipped once touched — a prior edit is never overwritten by remote", async () => {
+test("mount seed is skipped once touched, a prior edit is never overwritten by remote", async () => {
   const base = createLocalStore("A");
   await base.saveAnnotations({ conditions: [{ id: "mine" }], shapes: [] });
   await metaPut("sync:A:touched", true); // a prior session's real edit
@@ -165,7 +165,7 @@ test("recovery: a crashed FIRST push (rev-less base) re-pushes instead of silent
   await metaPut("sync:A:touched", true);
   const base = createLocalStore("A");
   await base.saveAnnotations({ conditions: [{ id: "first" }], shapes: [] });
-  const provider = fakeProvider(null); // remote still empty — the push never landed
+  const provider = fakeProvider(null); // remote still empty, the push never landed
   const sync = createSyncStore({ base, provider, folderId: "A" }) as any;
   await sync.whenSynced();
   await sync.whenPushed();
@@ -176,7 +176,7 @@ test("recovery: a crashed FIRST push (rev-less base) re-pushes instead of silent
   assert.equal(await metaGet("sync:A:marker"), undefined);
 });
 
-test("recovery (case c): a rev-less external write on a torn first push is RECONCILED — remote wins, local snapshotted (4c)", async () => {
+test("recovery (case c): a rev-less external write on a torn first push is RECONCILED, remote wins, local snapshotted (4c)", async () => {
   // First push torn: marker {targetRev:1, baseRev:null}. Meanwhile a flag-off teammate
   // wrote a rev-less doc. baseRev=null can't distinguish "our push never landed" from an
   // external write by REV alone (both leave remoteRev null) — but it CAN by DATA: our own
@@ -200,10 +200,10 @@ test("recovery (case c): a rev-less external write on a torn first push is RECON
   assert.equal(await metaGet("sync:A:synced_rev"), null); // adopts the rev-less remote's (absent) rev
   assert.equal(snaps.length, 1); // the opted local is snapshotted (recoverable)...
   assert.deepEqual(snaps[0].payload.conditions, [{ id: "mine" }]); // ...as our divergent work
-  assert.equal(provider._remote.rev, null); // reconcile adopts LOCALLY — no re-push over the teammate's file
+  assert.equal(provider._remote.rev, null); // reconcile adopts LOCALLY, no re-push over the teammate's file
 });
 
-test("recovery: a diverged remote is reconciled — remote wins, local snapshotted, synced_rev adopts (4c)", async () => {
+test("recovery: a diverged remote is reconciled, remote wins, local snapshotted, synced_rev adopts (4c)", async () => {
   await metaPut("sync:A:marker", { targetRev: 4, baseRev: 3 });
   await metaPut("sync:A:synced_rev", 3);
   await metaPut("sync:A:touched", true);
@@ -223,7 +223,7 @@ test("recovery: a diverged remote is reconciled — remote wins, local snapshott
   assert.deepEqual(snaps[0].payload.conditions, [{ id: "mine" }]); // ...as our divergent work
   assert.equal(snaps[0].folderId, "A");
   assert.deepEqual(updates, [{ d: { conditions: [{ id: "theirs" }], shapes: [] }, r: 7 }]); // canvas re-hydrate signalled
-  assert.equal(provider._remote.rev, 7); // reconcile adopts LOCALLY — it does not re-push
+  assert.equal(provider._remote.rev, 7); // reconcile adopts LOCALLY, it does not re-push
 });
 
 test("recovery offline: marker kept and synced_rev untouched when Drive can't be read", async () => {
@@ -262,7 +262,7 @@ test("expectedRev comes from durable synced_rev: a restored OLD snapshot pushes 
   assert.equal(await metaGet("sync:A:synced_rev"), 6);
 });
 
-test("push conflict (remote moved out from under us): reconcile — remote wins, local snapshotted, synced_rev adopts (4c)", async () => {
+test("push conflict (remote moved out from under us): reconcile, remote wins, local snapshotted, synced_rev adopts (4c)", async () => {
   const base = createLocalStore("A");
   await metaPut("sync:A:synced_rev", 3);
   await metaPut("sync:A:touched", true);
@@ -423,7 +423,7 @@ test("4c collapse: while deferred the freshest discovered remote wins the pendin
   assert.equal(await metaGet("sync:A:synced_rev"), 9);
 });
 
-test("4c degrade: with no saveSnapshot sink, a conflict leaves local ahead (4b behavior) — never a lossy adopt", async () => {
+test("4c degrade: with no saveSnapshot sink, a conflict leaves local ahead (4b behavior), never a lossy adopt", async () => {
   const base = createLocalStore("A");
   await metaPut("sync:A:synced_rev", 3);
   await metaPut("sync:A:touched", true);
@@ -461,7 +461,7 @@ test("4c: a data-less remote (deleted/unreadable) is never adopted over local", 
   assert.equal(updates.length, 0);
 });
 
-test("4c crash order: a failing loser-snapshot aborts the adopt — local and synced_rev are untouched (never a partial adopt)", async () => {
+test("4c crash order: a failing loser-snapshot aborts the adopt, local and synced_rev are untouched (never a partial adopt)", async () => {
   const base = createLocalStore("A");
   await metaPut("sync:A:synced_rev", 3);
   await metaPut("sync:A:touched", true);
@@ -482,7 +482,7 @@ test("4c crash order: a failing loser-snapshot aborts the adopt — local and sy
   assert.equal(updates.length, 0);
 });
 
-test("4c crash order: synced_rev advances AFTER the local adopt — a torn adopt-save leaves synced_rev NOT advanced", async () => {
+test("4c crash order: synced_rev advances AFTER the local adopt, a torn adopt-save leaves synced_rev NOT advanced", async () => {
   // Pins the OTHER half of the ordering (the dangerous one): if metaPut(synced_rev)
   // ran BEFORE base.saveAnnotations(remote), a tear would leave synced_rev ahead of an
   // un-adopted local → the next save pushes stale content over the winner at the
@@ -570,7 +570,7 @@ test("#73 regression: after a FAILED-pull mount, loadAnnotations still returns l
   await metaPut("sync:A:synced_rev", 2);
   await metaPut("sync:A:touched", true);
   const provider = fakeProvider({ data: { conditions: [], shapes: [] }, rev: 2 });
-  provider._failPull = true; // the mount pull FAILS — the #73 trigger
+  provider._failPull = true; // the mount pull FAILS, the #73 trigger
 
   const sync = createSyncStore({ base, provider, folderId: "A" }) as any;
   assert.deepEqual(conds(await sync.loadAnnotations()), [{ id: "pre" }]); // local returned, no throw (canvas arms)
@@ -653,7 +653,7 @@ test("#313 same-uid concurrent edit: deterministic winner, loser ring on the sha
   assert.deepEqual(provider._remote.data.shapes[0].verts_norm, [[0, 0], [0.2, 0], [0.2, 0.2]]);
 });
 
-test("#313 degrade: a synced_base whose rev mismatches synced_rev is REJECTED — uniform remote-wins, as before", async () => {
+test("#313 degrade: a synced_base whose rev mismatches synced_rev is REJECTED, uniform remote-wins, as before", async () => {
   await metaPut("sync:A:synced_rev", 3);
   await metaPut("sync:A:synced_base", { rev: 2, data: { conditions: [], shapes: [] } }); // torn/stale ancestor
   await metaPut("sync:A:touched", true);

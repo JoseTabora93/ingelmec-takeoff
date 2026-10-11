@@ -111,11 +111,11 @@ export default function StampPanel({ docked = false, library = { stamps: [], set
 
       <div style={{ padding: "8px 10px", color: "var(--ink-muted)" }}>
         {armedStamp
-          ? <span><b style={{ color: "var(--cobalt)" }}>“{armedStamp.name}” armed</b> — click the plan to place it. Esc to cancel.</span>
+          ? <span><b style={{ color: "var(--cobalt)" }}>“{armedStamp.name}” armed</b>, click the plan to place it. Esc to cancel.</span>
           : <span>Click <b>Place</b> on a stamp, then click the plan. Placed stamps are normal, editable markups.</span>}
       </div>
 
-      {/* set filter — the model carries StampSets; the palette groups by them */}
+      {/* set filter, the model carries StampSets; the palette groups by them */}
       {library.sets.length > 0 && (
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 10px 8px" }}>
           {chip("all", "All")}

@@ -84,14 +84,14 @@ test("stampEdit: manual origin gets updated_at and nothing else", () => {
   assert.deepEqual(rest, restIn);                             // every other field rides through untouched
 });
 
-test("stampEdit: no origin at all — updated_at only", () => {
+test("stampEdit: no origin at all, updated_at only", () => {
   const { origin: _o, ...bare } = machineShape();
   const out = stampEdit(bare, "edge");
   assert.match(out.updated_at, ISO);
   assert.equal("origin" in out, false);
 });
 
-test("stampEdit: pure — the input shape (and its origin) are not mutated", () => {
+test("stampEdit: pure, the input shape (and its origin) are not mutated", () => {
   const s = machineShape();
   const snapshot = structuredClone(s);
   stampEdit(s, "edge");
@@ -114,7 +114,7 @@ test("author: undeclared by default; declaring trims; clearing empties", () => {
   } finally { setAuthorName(""); }
 });
 
-test("stampEdit: declared author rides every stamp as updated_by — machine and manual alike", () => {
+test("stampEdit: declared author rides every stamp as updated_by, machine and manual alike", () => {
   try {
     setAuthorName("Aaron");
     const machine = stampEdit(machineShape(), "vertex");
@@ -126,7 +126,7 @@ test("stampEdit: declared author rides every stamp as updated_by — machine and
   } finally { setAuthorName(""); }
 });
 
-test("stampEdit: no declared author ⇒ no updated_by — payloads byte-identical to today", () => {
+test("stampEdit: no declared author ⇒ no updated_by, payloads byte-identical to today", () => {
   setAuthorName("");
   const out = stampEdit(machineShape(), "vertex");
   assert.equal("updated_by" in out, false);

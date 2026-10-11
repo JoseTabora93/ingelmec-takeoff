@@ -12,7 +12,7 @@ export function getFocusMode() {
 }
 
 export function setFocusMode(on) {
-  try { localStorage.setItem(KEY, on ? "1" : "0"); } catch { /* private mode — session-only */ }
+  try { localStorage.setItem(KEY, on ? "1" : "0"); } catch { /* private mode, session-only */ }
   window.dispatchEvent(new CustomEvent(EVT, { detail: !!on }));
 }
 

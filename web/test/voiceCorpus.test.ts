@@ -121,9 +121,9 @@ const wavs = existsSync(voiceDir)
 const modelPresent = existsSync(join(modelsDir, "onnx-community", "whisper-tiny.en", "onnx"));
 
 const skip = !modelPresent
-  ? "voice model not staged — run: node scripts/fetch-voice-model.mjs"
+  ? "voice model not staged, run: node scripts/fetch-voice-model.mjs"
   : wavs.length === 0
-    ? "no corpus recordings yet — see test/fixtures/voice/RECORDING.md"
+    ? "no corpus recordings yet, see test/fixtures/voice/RECORDING.md"
     : false;
 
 test("voice corpus: end-to-end intent accuracy over recorded fixtures", { skip, timeout: 600000 }, async () => {
@@ -164,11 +164,11 @@ test("voice corpus: end-to-end intent accuracy over recorded fixtures", { skip, 
 
   const pct = (v: { pass: number; total: number }) => (v.total ? v.pass / v.total : null);
   const fmt = (v: { pass: number; total: number }) =>
-    v.total ? `${v.pass}/${v.total} = ${((v.pass / v.total) * 100).toFixed(1)}%` : "—";
+    v.total ? `${v.pass}/${v.total} = ${((v.pass / v.total) * 100).toFixed(1)}%` : "";
   console.log(
     [
       "",
-      `Voice corpus — intent accuracy (${wavs.length} recordings)`,
+      `Voice corpus, intent accuracy (${wavs.length} recordings)`,
       ...lines,
       "  " + "-".repeat(64),
       `  quiet ${fmt(byProfile.quiet)} (floor ${(QUIET_FLOOR * 100).toFixed(0)}%)   noisy ${fmt(byProfile.noisy)} (floor ${(NOISY_FLOOR * 100).toFixed(0)}%)`,

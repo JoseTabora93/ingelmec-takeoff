@@ -27,7 +27,7 @@ test("svgPlacedBox: a vertical divider (near-zero width) does NOT explode", () =
   assert.ok(bh <= 0.08 * 1224 + 1e-6, "height is the placed longest side (~98px), not 1e9");
   assert.ok(bw < 1e-3, "the near-zero width stays near-zero");
 });
-test("svgPlacedBox: guards — bad vb / zero width / non-finite → s=0", () => {
+test("svgPlacedBox: guards, bad vb / zero width / non-finite → s=0", () => {
   assert.equal(svgPlacedBox(null as any, 0.08, 1000).s, 0);
   assert.equal(svgPlacedBox([0, 0], 0.08, 1000).s, 0);
   assert.equal(svgPlacedBox([10, 10], 0.08, Infinity).s, 0);
@@ -144,7 +144,7 @@ test("transformPath: empty / blank input → ''", () => {
 });
 
 // ── arcToBeziers ────────────────────────────────────────────────────────────
-test("arcToBeziers: quarter circle — endpoints match, midpoint ~r from center", () => {
+test("arcToBeziers: quarter circle, endpoints match, midpoint ~r from center", () => {
   // Unit-ish circle radius 10 centered at origin: from (10,0) to (0,10),
   // small arc, sweep=1 (CCW in SVG's y-down? here just check geometry).
   const r = 10;
@@ -181,7 +181,7 @@ test("arcToBeziers: rx==0 → []", () => {
   assert.deepEqual(arcToBeziers(5, 5, 10, 10, 0, 0, 1, 5, 5), []);
 });
 
-test("arcToBeziers: F.6.6 radius correction — endpoints farther than 2*rx", () => {
+test("arcToBeziers: F.6.6 radius correction, endpoints farther than 2*rx", () => {
   // Endpoints 100 apart but rx=ry=10: radii get scaled up; result non-empty,
   // endpoints still match.
   const segs = arcToBeziers(0, 0, 10, 10, 0, 0, 1, 100, 0);

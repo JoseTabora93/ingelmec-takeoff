@@ -47,7 +47,7 @@ export default function ReferencePins({ pins, selectedId, onSelect, onClose, onS
         {pins.map(p => <option key={p.id} value={p.id}>{p.text || p.src_label || "Reference"}</option>)}
       </select>
       <button type="button" aria-label={collapsed ? "Expand pin" : "Collapse pin"} onClick={() => setCollapsed(v => !v)}>{collapsed ? "+" : "−"}</button>
-      <button type="button" aria-label="Close pin" title="Close window — the pin stays saved" onClick={onClose}>×</button>
+      <button type="button" aria-label="Close pin" title="Close window, the pin stays saved" onClick={onClose}>×</button>
     </header>
     {!collapsed && <>
       <div className="reference-pin-controls">

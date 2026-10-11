@@ -225,7 +225,7 @@ export function setDrawStyle(id) {
   if (!DRAW_STYLE_IDS.includes(id)) return;   // never persist or broadcast a non-canonical id
   try {
     if (typeof localStorage !== "undefined") localStorage.setItem(KEY, id);
-  } catch { /* quota / private mode — session-only */ }
+  } catch { /* quota / private mode, session-only */ }
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(EVT, { detail: id }));
 }
 

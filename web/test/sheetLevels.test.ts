@@ -16,12 +16,12 @@ test("sanitizeSheetLevels: object-shape gate", () => {
 test("sanitizeSheetLevels: string/non-empty value filter", () => {
   const raw = {
     "a.pdf": "L1",
-    "b.pdf": "",            // empty string clears — must be dropped, not kept as a level
+    "b.pdf": "",            // empty string clears, must be dropped, not kept as a level
     "c.pdf": null,
-    "d.pdf": 3,              // non-string — corrupted record
+    "d.pdf": 3,              // non-string, corrupted record
     "e.pdf": { level: "L1" }, // object where a string is expected
     "f.pdf": "L2",
-    "g.pdf": "   ",          // whitespace-only — must be dropped like an empty string (Copilot review)
+    "g.pdf": "   ",          // whitespace-only, must be dropped like an empty string (Copilot review)
   };
   assert.deepEqual(sanitizeSheetLevels(raw), { "a.pdf": "L1", "f.pdf": "L2" });
 });
@@ -79,7 +79,7 @@ test("sortGalleryGroups: sorts a group with a level, leaves Unassigned in file/p
   const labelOf = (k: string) => ({ z1: "A-10", z2: "A-2", u1: "Z-99", u2: "A-1" } as Record<string, string>)[k] || k;
   const groups = [
     { level: "L1", keys: ["z1", "z2"] },       // out of label order (A-10 before A-2)
-    { level: "", keys: ["u1", "u2"] },          // Unassigned — file/page order is u1, u2 (label order would be reversed)
+    { level: "", keys: ["u1", "u2"] },          // Unassigned, file/page order is u1, u2 (label order would be reversed)
   ];
   const sorted = sortGalleryGroups(groups, labelOf) as Group[];
   assert.deepEqual(sorted.find((g) => g.level === "L1")!.keys, ["z2", "z1"]); // A-2 before A-10, natural sort

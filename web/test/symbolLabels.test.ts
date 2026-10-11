@@ -12,7 +12,7 @@ test("labelTokens: fixture tags in, prose and bare numbers out", () => {
   const kept = labelTokens([
     span("P-7", 0, 0), span("P-6A", 0, 0), span("FD1", 0, 0), span("CO", 0, 0),
     span("WC1", 0, 0), span("WH-1", 0, 0), span("T1", 0, 0),
-    span("2", 0, 0),                        // keynote number — no letter, never a tag
+    span("2", 0, 0),                        // keynote number, no letter, never a tag
     span("PROVIDE", 0, 0),                  // prose word
     span("CONNECT NEW STORM", 0, 0),        // a sentence containing "CO"
     span('3/4"', 0, 0),                     // a dimension
@@ -30,7 +30,7 @@ test("adjacency: the text-height radius takes the true pair and refuses the impo
   assert.equal(truePair?.label, "FD1");
   assert.equal(truePair?.via, "adjacent");
   assert.ok(truePair!.distance_px <= LABEL_ADJACENT_K * 17 + 1);
-  assert.equal(impostor, null, "the 45 px valve circle is NOT named — no label reached it");
+  assert.equal(impostor, null, "the 45 px valve circle is NOT named, no label reached it");
 });
 
 test("adjacency: nearest token wins when two are in range", () => {
@@ -56,7 +56,7 @@ test("leader: on a multi-pen sheet the chase follows the dark leader to the symb
   assert.equal(unled, null, "no leader reaches the second symbol");
 });
 
-test("leader: a one-pen sheet never chases — a wall is not a leader", () => {
+test("leader: a one-pen sheet never chases, a wall is not a leader", () => {
   // identical geometry, but EVERYTHING is dark: the 'leader' could as well be
   // a wall, so the chase must stay disarmed and the placement unnamed.
   const segs = [

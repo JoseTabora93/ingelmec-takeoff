@@ -17,14 +17,14 @@
 /** "vector" | "raster" | "raster-inverted" */
 export function sourcePageMode({ dark = false, encrypted = false } = {}) {
   if (dark) return "raster-inverted";      // the dark canvas exports a dark set: raster by design
-  if (encrypted) return "raster";          // vector copy impossible — see above
+  if (encrypted) return "raster";          // vector copy impossible, see above
   return "vector";
 }
 
 /** What the sheet stamp appends when the page is a raster for a reason the
  *  reader should know. Dark mode is the user's own setting; it needs no note. */
 export function sourceStampNote(mode) {
-  return mode === "raster" ? " · raster copy — the source PDF is encrypted, so its vector page cannot be embedded" : "";
+  return mode === "raster" ? " · raster copy, the source PDF is encrypted, so its vector page cannot be embedded" : "";
 }
 
 /** The refusal when a forced raster has nowhere to render — the MCP server

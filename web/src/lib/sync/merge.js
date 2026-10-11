@@ -103,7 +103,7 @@ function mergeKeyed(baseArr, localArr, remoteArr, identity = "id") {
       else deleted.push(id);                                  // deleted vs untouched → deleted
       continue;
     }
-    if (!lTouched && !rTouched) { out.set(id, keepLoserCarrier(l, r)); continue; } // neither moved — keep any carried loser
+    if (!lTouched && !rTouched) { out.set(id, keepLoserCarrier(l, r)); continue; } // neither moved, keep any carried loser
     if (!lTouched) { out.set(id, r); continue; }              // only remote moved
     if (!rTouched) { out.set(id, l); continue; }              // only local moved
     if (eqRec(l, r)) { out.set(id, keepLoserCarrier(l, r)); continue; } // both moved to the same place

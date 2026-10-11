@@ -433,7 +433,7 @@ export function createCloudStore(folderId, drive, { local = localStore, maxPdfBy
         // Tagged so the canvas load can leave autosave DISARMED (like a stale tab)
         // instead of overwriting Drive. See TakeoffCanvas mount-load catch.
         throw Object.assign(
-          new Error(`Couldn't read this project's saved takeoff from Drive — reload to retry. (${e?.message || e})`),
+          new Error(`Couldn't read this project's saved takeoff from Drive, reload to retry. (${e?.message || e})`),
           { name: "CloudLoadError" },
         );
       }

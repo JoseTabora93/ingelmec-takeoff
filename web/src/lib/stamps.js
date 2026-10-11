@@ -49,7 +49,7 @@ export function sanitizeStampLibrary(raw) {
   const stamps = (Array.isArray(lib.stamps) ? lib.stamps : [])
     .filter((s) => {
       if (!(isPlainObject(s) && typeof s.id === "string" && s.id && typeof s.name === "string" && s.name.trim())) return false;
-      if (seenStamp.has(s.id)) return false;   // first-wins dedup (matLib precedent) — the palette keys rows on id
+      if (seenStamp.has(s.id)) return false;   // first-wins dedup (matLib precedent), the palette keys rows on id
       seenStamp.add(s.id);
       return true;
     })

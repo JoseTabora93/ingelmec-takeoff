@@ -7,7 +7,7 @@ import { sheetBaseLabelFromKey } from "../src/lib/sheets.js";
 
 test("sheetBaseLabelFromKey: page 1 → bare file name (no #1 suffix)", () => {
   assert.equal(sheetBaseLabelFromKey("foo.pdf#1"), "foo");
-  assert.equal(sheetBaseLabelFromKey("foo.pdf"), "foo"); // no # at all — page defaults to 1
+  assert.equal(sheetBaseLabelFromKey("foo.pdf"), "foo"); // no # at all, page defaults to 1
 });
 
 test("sheetBaseLabelFromKey: page > 1 → '<base>-<page>'", () => {

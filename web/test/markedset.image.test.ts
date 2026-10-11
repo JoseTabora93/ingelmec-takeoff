@@ -36,8 +36,8 @@ function mockPage(wPt: number, hPt: number, rotate: number) {
 async function makeSourcePdf() {
   const { PDFDocument, degrees } = await import("pdf-lib");
   const src = await PDFDocument.create();
-  src.addPage([612, 792]);                      // page 1 — upright
-  const p2 = src.addPage([612, 792]);           // page 2 — rotated 90°
+  src.addPage([612, 792]);                      // page 1, upright
+  const p2 = src.addPage([612, 792]);           // page 2, rotated 90°
   p2.setRotation(degrees(90));
   return src.save();
 }

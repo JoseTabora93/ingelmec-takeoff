@@ -16,11 +16,11 @@ test("otprofile: extension detection", () => {
 test("otprofile: a well-formed v1 profile parses through", () => {
   const p = parseProfile(JSON.stringify({
     schema: PROFILE_SCHEMA,
-    name: "John — ABC Construction",
+    name: "John, ABC Construction",
     condition_templates: [],
     material_library: [],
   }));
-  assert.equal(p.name, "John — ABC Construction");
+  assert.equal(p.name, "John, ABC Construction");
 });
 
 test("otprofile: refuses non-JSON, non-objects, and unknown schemas loudly", () => {

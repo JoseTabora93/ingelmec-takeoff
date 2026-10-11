@@ -404,7 +404,7 @@ export function deriveTransitionRuns(
     const toPx = (s: TransitionSourceShape): Pt[] =>
       s.verts_norm.map(([x, y]) => [x * frame.widthPx, y * frame.heightPx] as Pt);
     const runOpts: SharedRunOpts = {
-      step_px: Math.max(1, pxPerFt * 0.25),   // a quarter-foot walk — finer than any transition matters
+      step_px: Math.max(1, pxPerFt * 0.25),   // a quarter-foot walk, finer than any transition matters
       touch_px: pxPerFt * (1 / 12),           // within an inch: one open space, not two rooms
       max_gap_px: pxPerFt * (maxGapIn / 12),
       min_len_px: pxPerFt * (minRunIn / 12),
@@ -449,17 +449,17 @@ export function transitionRefusal(gate: {
 }): string | null {
   const { activeTag, a, b, sheets, unscaled = [] } = gate;
   if (!a.tag || !b.tag) return "Pick the two finishes that meet.";
-  if (a.tag === b.tag) return "Pick two DIFFERENT finishes — a tag does not transition to itself.";
+  if (a.tag === b.tag) return "Pick two DIFFERENT finishes, a tag does not transition to itself.";
   if (activeTag === a.tag || activeTag === b.tag) {
-    return `The transition has to land on its own condition (e.g. T-1) — committing onto ${activeTag} would add its LF to one of the finishes it separates.`;
+    return `The transition has to land on its own condition (e.g. T-1), committing onto ${activeTag} would add its LF to one of the finishes it separates.`;
   }
   for (const side of [a, b]) {
-    if (!side.shapes.length) return `${side.tag} has no rooms on the open sheets — measure them first (One-Click or Area).`;
+    if (!side.shapes.length) return `${side.tag} has no rooms on the open sheets, measure them first (One-Click or Area).`;
   }
   if (unscaled.length) {
-    return `${unscaled.join(", ")} ${unscaled.length === 1 ? "has" : "have"} no scale — a transition is a real length, so calibrate before deriving.`;
+    return `${unscaled.join(", ")} ${unscaled.length === 1 ? "has" : "have"} no scale, a transition is a real length, so calibrate before deriving.`;
   }
   const shared = [...sheets.keys()].filter((k) => a.shapes.some((s) => s.sheet_id === k) && b.shapes.some((s) => s.sheet_id === k));
-  if (!shared.length) return `${a.tag} and ${b.tag} have no rooms on the same open sheet — nothing can meet.`;
+  if (!shared.length) return `${a.tag} and ${b.tag} have no rooms on the same open sheet, nothing can meet.`;
   return null;
 }

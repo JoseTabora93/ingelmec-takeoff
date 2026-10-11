@@ -121,7 +121,7 @@ test("svgToStamp: transforms land a rect at the expected user-space size", () =>
   near(s.elements[0].vb[1], 10);
 });
 
-test("svgToStamp: rotate(90) bakes — horizontal L becomes a vertical extent", () => {
+test("svgToStamp: rotate(90) bakes, horizontal L becomes a vertical extent", () => {
   const base = svgToStamp({ primitives: [prim("polyline", { points: "0,0 10,0 10,1" })] })!;
   near(base.elements[0].vb[0], 10);
   near(base.elements[0].vb[1], 1);

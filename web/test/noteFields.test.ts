@@ -38,7 +38,7 @@ test("case and inner whitespace don't matter", () => {
   assert.equal(resolveNote("{{ QTY }}", "em", labels).text, "5 EA");
 });
 
-test("unresolvable fields stay literal and are reported — never blank, never 0", () => {
+test("unresolvable fields stay literal and are reported, never blank, never 0", () => {
   assert.deepEqual(resolveNote("x{{qty}} lights", "", labels), { text: "x{{qty}} lights", unresolved: ["{{qty}}"] });
   assert.deepEqual(resolveNote("x{{qty}}", "none", labels), { text: "x{{qty}}", unresolved: ["{{qty}}"] });   // nothing measured yet
   assert.deepEqual(resolveNote("x{{qty}}", "gone", labels), { text: "x{{qty}}", unresolved: ["{{qty}}"] });   // deleted condition

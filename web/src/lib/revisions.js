@@ -106,7 +106,7 @@ function perSheet(conditions, shapes) {
 export function revSheetLabel(sheetId) {
   const { file, page } = parseSheetKey(sheetId);
   const stem = file.replace(/\.pdf$/i, "");
-  return page > 1 ? `${stem} — p.${page}` : stem;
+  return page > 1 ? `${stem}, p.${page}` : stem;
 }
 
 // Diff two takeoff payloads ({ conditions, shapes } — the autosave shape;
@@ -178,7 +178,7 @@ export function diffToCsv(diff, { aName = "baseline", bName = "current", units =
   };
   const row = (cells) => cells.map(esc).join(",");
   const lines = [];
-  if (projectName) lines.push(`# ${projectName} — OpenTakeoff revision compare`);
+  if (projectName) lines.push(`# ${projectName}, OpenTakeoff revision compare`);
   lines.push(`# ${aName} -> ${bName}`);
   lines.push(row(["Finish", "Status", `d Floor ${AU}`, `d Wall ${AU}`, `d Border ${AU}`, `d ${LU}`, "d EA", `d Total ${AU}`,
     `${AU} ordered (${aName})`, `${AU} ordered (${bName})`, `d ${AU} ordered`]));

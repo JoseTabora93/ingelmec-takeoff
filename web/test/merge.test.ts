@@ -46,7 +46,7 @@ test("add/add is symmetric in content: merging from either machine's seat conver
   assert.deepEqual(ids(a.shapes), ids(b.shapes)); // same set either way
 });
 
-test("conditions added on both sides union by id — duplicate finish_tags are both kept", () => {
+test("conditions added on both sides union by id, duplicate finish_tags are both kept", () => {
   const base = payload();
   const local = payload({ conditions: [...base.conditions, { id: "cL", finish_tag: "CT-1" }] });
   const remote = payload({ conditions: [...base.conditions, { id: "cR", finish_tag: "CT-1" }] });
@@ -76,7 +76,7 @@ test("edit/edit on one uid: updated_at-latest wins, loser ring preserved on the 
   assert.equal(m.clean, false);
 });
 
-test("edit/edit with LYING CLOCKS (identical stamps) still resolves deterministically — remote wins", () => {
+test("edit/edit with LYING CLOCKS (identical stamps) still resolves deterministically, remote wins", () => {
   const t = "2026-08-24T01:00:00.000Z";
   const base = payload({ shapes: [shape("s1")] });
   const local = payload({ shapes: [shape("s1", { updated_at: t, condition_id: "cL" })] });
@@ -151,7 +151,7 @@ test("same-sheet re-import on both sides degrades to union-plus-review, never si
   const local = payload({ shapes: [shape("newL1"), shape("newL2")] });
   const remote = payload({ shapes: [shape("newR1"), shape("newR2")] });
   const m: any = mergeAnnotations(base, local, remote);
-  assert.deepEqual(ids(m.merged.shapes), ["newL1", "newL2", "newR1", "newR2"]); // union — nothing lost
+  assert.deepEqual(ids(m.merged.shapes), ["newL1", "newL2", "newR1", "newR2"]); // union, nothing lost
   assert.deepEqual(m.review_sheets, ["plan.pdf#1"]); // ...but flagged for human review
   assert.equal(m.clean, false);
 });

@@ -220,7 +220,7 @@ test("drawDashFor: divides the pattern by the stage scale (screen-relative)", ()
   assert.equal(drawDashFor([6, 4], 0), "6 4", "a zero scale falls back to 1, never divides by 0");
 });
 
-test("drawDashFor: solid is FALSY — undefined, never '' or []", () => {
+test("drawDashFor: solid is FALSY, undefined, never '' or []", () => {
   for (const solid of [null, [], undefined]) {
     const v = drawDashFor(solid as number[] | null, 2);
     assert.equal(v, undefined, `dash for ${JSON.stringify(solid)} is undefined`);
@@ -236,7 +236,7 @@ test("rgbaFromHex: pins the output format", () => {
   assert.equal(rgbaFromHex("#fff", 0.5), "rgba(255, 255, 255, 0.5)", "shorthand hex expands");
 });
 
-test("rgbaFromHex: malformed input never throws — a safe rgba() always comes back", () => {
+test("rgbaFromHex: malformed input never throws, a safe rgba() always comes back", () => {
   const shape = /^rgba\(\d+, \d+, \d+, [\d.]+\)$/;
   for (const bad of ["garbage", "#12", "#xyzxyz", "", undefined, null]) {
     const out = rgbaFromHex(bad as string, 0.5);

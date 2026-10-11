@@ -59,7 +59,7 @@ test("a parenthesized word of three or more letters is a qualifier, not a suffix
   for (const key of ["G-01(C)", "FT-02(E)", "ACT-1(2X2)", "G-01(AB)"]) assert.ok(finishCodeOk(key), key);
   const got = readScheduleSpans(table(["CPT-1 (TYP)", "ACT-1 (2X2)", "G-01(C)"]));
   assert.deepEqual(got.rows.map((r) => r.finish_tag), ["CPT-1", "ACT-1(2X2)", "G-01(C)"]);
-  assert.match(got.rows[0].description, /^\(TYP\) — /);
+  assert.match(got.rows[0].description, /^\(TYP\), /);
   assert.equal(finishKeyText("PT-1 (CUT)"), "PT-1 CUT");
   assert.equal(finishKeyText("G-01(C)/FT-0B(C"), "G-01(C)/FT-0BC");
 });
@@ -68,7 +68,7 @@ test("an abbreviated qualifier and unpaired parentheses are judged over the whol
   for (const ocr of [false, true]) {
     const got = readScheduleSpans(table(["CPT-1 (TYP.)", "G-01(C )", "G-01 (W", "G-02"]), { ocr });
     assert.deepEqual(got.rows.map((r) => [r.finish_tag, r.read_as ?? ""]), [["CPT-1", ""], ["G-01(C)", ""], ["G-01W", "G-01 (W"], ["G-02", ""]], `ocr=${ocr}`);
-    assert.match(got.rows[0].description, /^\(TYP\.\) — /);
+    assert.match(got.rows[0].description, /^\(TYP\.\), /);
   }
   assert.equal(finishKeyText("CPT-1 (TYP.)"), "CPT-1 TYP");
 });

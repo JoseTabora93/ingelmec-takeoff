@@ -162,7 +162,7 @@ test("cached: no notice, onReading before the read, the words read as spans, row
   assert.deepEqual(h.progress, [PROGRESS], "the read's progress reaches the canvas");
 });
 
-test("too large: its message before the session runs — no notice, no engine start, nothing read", async () => {
+test("too large: its message before the session runs, no notice, no engine start, nothing read", async () => {
   for (const probe of [available(true), available(false)]) {
     const h = harness({ probe, tooLarge: () => true });
     assert.deepEqual(await h.p, { kind: "message", text: OCR_TOO_LARGE_MESSAGE });
@@ -328,7 +328,7 @@ test("the reader stopped responding (the client's OcrTimeoutError): its own mess
   await flush();
   h.c.ensure[0].settle({ ok: true });
   assert.deepEqual(await h.p, { kind: "message", text: OCR_TIMEOUT_MESSAGE });
-  assert.equal(OCR_TIMEOUT_MESSAGE, "The on-device reader stopped responding — try again.");
+  assert.equal(OCR_TIMEOUT_MESSAGE, "The on-device reader stopped responding, try again.");
 });
 
 test("the read rejects with a non-Error: String(error)", async () => {

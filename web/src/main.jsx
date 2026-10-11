@@ -4,7 +4,7 @@ import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from "react
 import "./styles/ingelmec-fonts.js"; // INGELMEC: tipografías propias, sin Google Fonts
 import "./styles/tokens.css";
 import "./styles/app.css";
-import "./styles/print.css";   // OT-only print block — kept out of app.css so tokens/app stay byte-synced with Spline
+import "./styles/print.css";   // OT-only print block, kept out of app.css so tokens/app stay byte-synced with Spline
 import TakeoffCanvas from "./pages/TakeoffCanvas.jsx";
 import ProjectHome from "./components/ProjectHome.jsx";
 import { GoogleAuthProvider, useGoogleAuth } from "./lib/google/AuthContext.jsx";
@@ -176,7 +176,7 @@ function ProjectHomeGate() {
         body="Sign in with your team Google account to browse and open them. Only accounts on the team domain can sign in."
         footer={
           <Link to="/" style={{ fontSize: 12.5, color: "var(--ink-muted)" }}>
-            skip — use the local canvas
+            skip, use the local canvas
           </Link>
         } />
     );
@@ -255,14 +255,14 @@ function FolderGate() {
       const perm = await queryFolderPermission(l.handle);
       if (!live) return;
       if (perm === "granted") await install(l);
-      else setStatus("prompt"); // "denied" also lands here — the button re-asks
+      else setStatus("prompt"); // "denied" also lands here, the button re-asks
     })();
     // Uninstall on unmount so leaving the route restores the plain local store
     // (mirrors ProjectGate's exit cleanup).
     return () => { live = false; setActiveStore(); };
   }, []);
 
-  if (status === "checking" || status === "building") return null; // ~ms IDB read — no flash
+  if (status === "checking" || status === "building") return null; // ~ms IDB read, no flash
   if (status === "plain") return <TakeoffCanvas />;
   if (status === "ready") return <TakeoffCanvas key={`folder:${link.scope}`} />;
 
@@ -273,7 +273,7 @@ function FolderGate() {
         {brand}
         <div style={{ fontSize: 15, fontWeight: 600 }}>This workspace syncs to the folder “{link.name}”</div>
         <div style={{ fontSize: 13, color: "var(--ink-muted)", maxWidth: 460 }}>
-          The browser needs you to re-allow access after a restart — one click, and your takeoff
+          The browser needs you to re-allow access after a restart, one click, and your takeoff
           keeps syncing through that folder. Nothing leaves your machine except what the folder's
           own sync client replicates.
         </div>
@@ -291,7 +291,7 @@ function FolderGate() {
         <div style={{ display: "flex", gap: 16 }}>
           <button type="button" onClick={() => setStatus("plain")}
             style={{ border: "none", background: "transparent", color: "var(--ink-muted)", fontSize: 12.5, cursor: "pointer", textDecoration: "underline" }}>
-            not now — work locally
+            not now, work locally
           </button>
           <button type="button" onClick={forget}
             style={{ border: "none", background: "transparent", color: "var(--c-danger)", fontSize: 12.5, cursor: "pointer", textDecoration: "underline" }}>
@@ -308,7 +308,7 @@ function FolderGate() {
       {brand}
       <div style={{ fontSize: 15, fontWeight: 600 }}>The synced folder “{link?.name}” can't be opened</div>
       <div style={{ fontSize: 13, color: "var(--ink-muted)", maxWidth: 460 }}>
-        {err || "The folder may have been moved or deleted."} Your takeoff is safe in this browser —
+        {err || "The folder may have been moved or deleted."} Your takeoff is safe in this browser,
         you can keep working locally, or forget the folder link.
       </div>
       <div style={{ display: "flex", gap: 16 }}>
@@ -365,7 +365,7 @@ function M365Gate({ cfg }) {
         const acc = await m.auth.currentAccount();
         if (!live) return;
         if (acc) await install();
-        else setStatus("signin"); // cached session gone — one readable click re-enters
+        else setStatus("signin"); // cached session gone, one readable click re-enters
       } catch (e) {
         if (live) { setErr(String(e?.message || e)); setStatus("dead"); }
       }
@@ -405,8 +405,8 @@ function M365Gate({ cfg }) {
         {brand}
         <div style={{ fontSize: 15, fontWeight: 600 }}>This workspace syncs through your Microsoft 365 library</div>
         <div style={{ fontSize: 13, color: "var(--ink-muted)", maxWidth: 460 }}>
-          Sign in with your work account to keep syncing. The token stays in this browser —
-          there is no server of ours between you and your tenant. (Experimental — issue #315.)
+          Sign in with your work account to keep syncing. The token stays in this browser,
+          there is no server of ours between you and your tenant. (Experimental, issue #315.)
         </div>
         <button type="button"
           onClick={async () => {
@@ -417,7 +417,7 @@ function M365Gate({ cfg }) {
               setStatus("building");
               await install();
             } catch (e) {
-              setErr(`Sign-in failed: ${String(e?.message || e)} — if this is an admin-consent block, SELF_HOSTING.md names the scope to consent.`);
+              setErr(`Sign-in failed: ${String(e?.message || e)}, if this is an admin-consent block, SELF_HOSTING.md names the scope to consent.`);
             }
           }}
           style={{ padding: "9px 16px", border: "1px solid var(--ink)", background: "var(--ink)",
@@ -426,7 +426,7 @@ function M365Gate({ cfg }) {
         </button>
         {err ? <div style={{ fontSize: 12.5, color: "var(--c-danger)", maxWidth: 460 }}>{err}</div> : null}
         <div style={{ display: "flex", gap: 16 }}>
-          <button type="button" onClick={() => setStatus("local")} style={linkBtn}>not now — work locally</button>
+          <button type="button" onClick={() => setStatus("local")} style={linkBtn}>not now, work locally</button>
           <button type="button" onClick={stop} style={{ ...linkBtn, color: "var(--c-danger)" }}>stop syncing through 365</button>
         </div>
       </div>
@@ -439,7 +439,7 @@ function M365Gate({ cfg }) {
       <div style={{ fontSize: 15, fontWeight: 600 }}>365 sync can't start</div>
       <div style={{ fontSize: 13, color: "var(--ink-muted)", maxWidth: 460 }}>
         {err || "The Microsoft sign-in layer failed to load."} Your takeoff is safe in this browser.
-        This path is experimental (issue #315) — a report of this exact message is exactly the
+        This path is experimental (issue #315), a report of this exact message is exactly the
         external testing it needs.
       </div>
       <div style={{ display: "flex", gap: 16 }}>
@@ -469,7 +469,7 @@ function WorkspaceGate() {
     return () => { live = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  if (pick === null) return null; // ~ms IDB read — no flash
+  if (pick === null) return null; // ~ms IDB read, no flash
   return pick === "m365" ? <M365Gate cfg={cfg} /> : <FolderGate />;
 }
 

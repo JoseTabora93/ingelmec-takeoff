@@ -84,7 +84,7 @@ test("roomAtPoint: a clip only wins when it describes the SAME region", () => {
   assert.ok(Math.abs(hit!.areaSF - 36) < 0.01, `the room, not the clip around it (got ${hit!.areaSF})`);
 });
 
-test("roomAtPoint: rooms NEST — a suite holding a closet is still a room", () => {
+test("roomAtPoint: rooms NEST, a suite holding a closet is still a room", () => {
   // containment proves nothing about either figure; the innermost enclosure
   // is the right answer inside the closet, and the suite is the right answer
   // outside it

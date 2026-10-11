@@ -58,12 +58,12 @@ test("values are string-filtered; non-array values become []", () => {
   assert.deepEqual(b.values, []);
 });
 
-test("values drop empties/whitespace and dedupe — '' collides with the selects' Unassigned option, dupes break React keys", () => {
+test("values drop empties/whitespace and dedupe, '' collides with the selects' Unassigned option, dupes break React keys", () => {
   const [a] = sanitizeConditionColumns([{ id: "col-a", name: "N", values: ["ok", "", "  ", "ok", "other"] }]);
   assert.deepEqual(a.values, ["ok", "other"]);
 });
 
-test("later duplicate column ids are dropped, first wins — ids key options/chips and attrs", () => {
+test("later duplicate column ids are dropped, first wins, ids key options/chips and attrs", () => {
   const out = sanitizeConditionColumns([
     { id: "col-a", name: "First", values: ["v1"] },
     { id: "col-b", name: "Other", values: [] },
@@ -72,27 +72,27 @@ test("later duplicate column ids are dropped, first wins — ids key options/chi
   assert.deepEqual(out.map((c) => [c.id, c.name]), [["col-a", "First"], ["col-b", "Other"]]);
 });
 
-test("the id 'sheet' is reserved — a column carrying it would be shadowed by the built-in Sheet group mode", () => {
+test("the id 'sheet' is reserved, a column carrying it would be shadowed by the built-in Sheet group mode", () => {
   const out = sanitizeConditionColumns([{ id: "sheet", name: "Phase", values: ["1"] }, ...cols()]);
   assert.deepEqual(out, cols());
 });
 
 // ── attrValue / sanitizeConditionAttrs / columnLabel ─────────────────────────
 
-test("attrValue: the one assigned-value rule — visible string or unassigned", () => {
+test("attrValue: the one assigned-value rule, visible string or unassigned", () => {
   const attrs = { a: "09 68 00", b: "", c: "  ", d: 42, e: null, f: " x " };
   assert.equal(attrValue(attrs, "a"), "09 68 00");
   assert.equal(attrValue(attrs, "b"), "");     // empty
   assert.equal(attrValue(attrs, "c"), "");     // whitespace-only
   assert.equal(attrValue(attrs, "d"), "");     // non-string
   assert.equal(attrValue(attrs, "e"), "");
-  assert.equal(attrValue(attrs, "f"), " x ");  // visible content — returned untrimmed
+  assert.equal(attrValue(attrs, "f"), " x ");  // visible content, returned untrimmed
   assert.equal(attrValue(attrs, "zz"), "");    // absent key
   assert.equal(attrValue(undefined, "a"), ""); // no attrs at all
 });
 
 test("sanitizeConditionAttrs: strips corrupt values at hydrate; untouched conditions keep identity", () => {
-  const clean = { id: "c1", finish_tag: "A" };                              // no attrs — passes through by identity
+  const clean = { id: "c1", finish_tag: "A" };                              // no attrs, passes through by identity
   const dirty = { id: "c2", finish_tag: "B", attrs: { ok: "v", bad: 7, empty: "", ws: "  " } };
   const broken = { id: "c3", finish_tag: "C", attrs: "not-an-object" };
   const [a, b, c] = sanitizeConditionAttrs([clean, dirty, broken]);
@@ -116,7 +116,7 @@ test("unknown item fields pass through the round-trip", () => {
 
 // ── omit-when-empty (buildPayload behavior) ──────────────────────────────────
 
-test("payload omits condition_columns when empty — byte-stable for older projects", () => {
+test("payload omits condition_columns when empty, byte-stable for older projects", () => {
   // buildPayload's exact spread: `...(conditionColumns.length ? { condition_columns: conditionColumns } : {})`.
   // Empty → the key never appears, so a project that predates custom columns
   // serializes byte-identically to before this feature (client_info precedent).

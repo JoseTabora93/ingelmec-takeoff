@@ -173,7 +173,7 @@ test("F5 branch 1: a value outside the vocabulary fails as a value, not as a mea
   }
 });
 
-test("F5 branch 2: a DIFFERENT real measurand fails — the SF gates would compare two tapes", () => {
+test("F5 branch 2: a DIFFERENT real measurand fails, the SF gates would compare two tapes", () => {
   for (const other of KNOWN_WALL_SEMANTICS.filter((v) => v !== WALL_SEMANTICS)) {
     const golden = box(0, 0, 100);
     const r = checkWallSemantics({ ...SEM, caseName: "human", declared: other, probes: [{ name: "p", golden }], points: golden });
@@ -183,7 +183,7 @@ test("F5 branch 2: a DIFFERENT real measurand fails — the SF gates would compa
   }
 });
 
-test("F5 branch 3: the declaration must be EARNED by the goldens — this is the one with teeth", () => {
+test("F5 branch 3: the declaration must be EARNED by the goldens, this is the one with teeth", () => {
   const golden = box(0, 0, 100);
   // goldens re-pinned onto something that is not the drawn linework: every
   // corner 30 px off the nearest path vertex. Nothing about the string changed.
@@ -216,7 +216,7 @@ const gp = (probe: string, sfErr: number, confidence: number, knownFail = false)
   return { caseName, probeName, expect: "golden", status: "ok", iou: 0.9, sfErr, leak: false, refused: false, confidence, knownFail };
 };
 
-test("A2 gate: an inaccurate probe may not report high confidence — known-fail included", () => {
+test("A2 gate: an inaccurate probe may not report high confidence, known-fail included", () => {
   const bad = confidenceGate([gp("acc/a", 0.000, 1.00), gp("acc/b", 0.001, 0.95), gp("wrong/x", 3.842, 0.95, true)]);
   assert.equal(bad.inaccurate.length, 1, "the known-fail probe is IN the population, not filtered out");
   assert.ok(bad.failures.some((f) => /wrong\/x/.test(f) && /anti-correlated/.test(f)), bad.failures.join("; "));
@@ -224,7 +224,7 @@ test("A2 gate: an inaccurate probe may not report high confidence — known-fail
   assert.deepEqual(good.failures, []);
 });
 
-test("A2 gate: it keys on SF ERROR, not IoU — the 4.3%-at-1.00 probe is caught", () => {
+test("A2 gate: it keys on SF ERROR, not IoU, the 4.3%-at-1.00 probe is caught", () => {
   // two-doorways/center: IoU 0.957 (invisible to any IoU threshold) but 4.33%
   // SF off — the number a bid is actually written from.
   const s = [gp("acc/a", 0.000, 1.00), gp("acc/b", 0.002, 0.95), gp("two-doorways/center", 0.0433, 1.00)];
@@ -245,7 +245,7 @@ test("A2 gate: a refusal probe that TRACES fails the ceiling whatever its confid
   assert.deepEqual(confidenceGate([...base, { caseName: "c", probeName: "r", expect: "refusal", status: "leak", correctRefusal: true }]).failures, []);
 });
 
-test("A2 gate: the floor is RELATIVE with a margin — a constant-score stub cannot pass it", () => {
+test("A2 gate: the floor is RELATIVE with a margin, a constant-score stub cannot pass it", () => {
   // "replacing traceConfidence with () => ({score: 0.5, factors: []})" — the
   // stated anti-gaming case. It satisfies every ceiling and any non-strict
   // floor; the margin is what refuses it.

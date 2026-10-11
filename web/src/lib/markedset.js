@@ -271,7 +271,7 @@ export async function buildMarkedSetPdf({ projectName, dark, sheets, shapes, mar
   const marked = sheets.filter((sh) => (shapesBy.get(sh.key) || []).length || (marksBy.get(sh.key) || []).length || (apBy.get(sh.key) || []).length);
   // a live RFI can outlive its markups, so an RFI-only project still exports
   // (cover + RFI schedule, no per-sheet pages) — only a truly empty set aborts
-  if (!marked.length && !rfis?.length) throw new Error("Nothing to export — no sheet carries takeoffs or markups.");
+  if (!marked.length && !rfis?.length) throw new Error("Nothing to export, no sheet carries takeoffs or markups.");
   const markedShapes = marked.flatMap((sh) => shapesBy.get(sh.key) || []);
 
   const doc = await PDFDocument.create();
@@ -424,7 +424,7 @@ export async function buildMarkedSetPdf({ projectName, dark, sheets, shapes, mar
       const where = sh.stitch ? `stitched · ${sh.stitch.members.length} sheets` : `page ${sh.page}`;
       draw(`${sh.label} · ${where} · ${items.length + (marksBy.get(sh.key) || []).length + (apBy.get(sh.key) || []).length} item(s)`, { x: 52, y, size: 9.5, font: bold, color: ink }); y -= 13;
       for (const r of bySheetId.get(sh.key)?.rows || []) {
-        if (y < 92) break;   // stop above the fixed footnote slot at y=60 — rows never collide with it
+        if (y < 92) break;   // stop above the fixed footnote slot at y=60, rows never collide with it
         const c = condById[r.id] || {};
         pg.drawRectangle({ x: 66, y: y - 1, width: 9, height: 7, color: rgb(...hex(c.color)), opacity: 0.8 });
         const { floor_sf: floor, wall_sf: wall, border_sf: border, lf, ea } = roundSheetRow(r);
@@ -919,7 +919,7 @@ export async function buildMarkedSetPdf({ projectName, dark, sheets, shapes, mar
                 text(capText, capX0 + 4 / ptScale, capY0 + capHimg - 3 / ptScale, textPt, ink);
               }
             }
-          } catch { /* corrupt image data or a bad provenance record — skip this one, never fail the whole marked set */ }
+          } catch { /* corrupt image data or a bad provenance record, skip this one, never fail the whole marked set */ }
         }
       }
     }

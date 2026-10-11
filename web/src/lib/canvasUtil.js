@@ -41,7 +41,7 @@ export function invertCanvasPixels(cv) {
   if (!cv || !cv.width || !cv.height) return;
   const ctx = cv.getContext("2d");
   ctx.save();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);   // raw device px — ignore any render transform
+  ctx.setTransform(1, 0, 0, 1, 0, 0);   // raw device px, ignore any render transform
   ctx.globalCompositeOperation = "difference";
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, cv.width, cv.height);
@@ -62,11 +62,11 @@ export const instantiateTemplate = (t) => ({
   hatch: t.hatch || "solid", multiplier: 1, waste_pct: Number(t.waste_pct) || 0,
   ...(t.height_ft != null ? { height_ft: t.height_ft } : {}),
   ...(t.thickness_in != null ? { thickness_in: t.thickness_in } : {}),
-  ...(t.rise_ft != null ? { rise_ft: t.rise_ft } : {}),   // #441 — a conduit template's legs are part of what it is
+  ...(t.rise_ft != null ? { rise_ft: t.rise_ft } : {}),   // #441, a conduit template's legs are part of what it is
   ...(t.drop_ft != null ? { drop_ft: t.drop_ft } : {}),
   ...(t.laborType != null ? { laborType: t.laborType } : {}),
   ...(t.subfloorType != null ? { subfloorType: t.subfloorType } : {}),
-  ...(t.roll_setup ? { roll_setup: { ...t.roll_setup } } : {}),   // #136 — deep-copied like grout: a template's roll spec must never be shared by reference
+  ...(t.roll_setup ? { roll_setup: { ...t.roll_setup } } : {}),   // #136, deep-copied like grout: a template's roll spec must never be shared by reference
   // instantiateMaterial (lib/materials.js) deep-copies the nested grout
   // geometry — a shallow spread here aliased the CT-1 seed's one grout object
   // into every fresh-workspace condition across every project in the session

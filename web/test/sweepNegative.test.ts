@@ -47,7 +47,7 @@ test("shape mode: the flush variant's box rejects it, and every wall-mount survi
   const seed: [Point, Point] = [[-2, -2], [26, 22]];            // the bare triangle at the origin
   const plain = sweepSymbols(segs, seed);
   assert.equal(plain.matches.length, wall.length - 1 + flush.length,
-    "without a counter-example the flush variants count as wall mounts — the bug being reported");
+    "without a counter-example the flush variants count as wall mounts, the bug being reported");
   assert.deepEqual(plain.rejected, [], "and nothing is rejected, because nothing was excluded");
 
   const neg: [Point, Point] = [[95, 95], [133, 129]];           // a tight box around ONE flush instance

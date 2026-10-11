@@ -76,7 +76,7 @@ test("broken scan lines: without closing the flood's own gap bridging rescues (f
   const bridged = buildRasterMask(img, W, H, 1);
   const fYes = floodRegion(bridged, 150, 150);
   assert.equal(fYes.status, "ok");
-  if (fYes.status === "ok") assert.equal(fYes.gapBridged, undefined, "closing keeps the fill clean — no rescue needed");
+  if (fYes.status === "ok") assert.equal(fYes.gapBridged, undefined, "closing keeps the fill clean, no rescue needed");
   const area = ringArea(traceRegion(fYes as any, RASTER_RDP_EPS));
   assert.ok(area > 8300 && area < 9800, `closing must not shrink the room (${area})`);
 });

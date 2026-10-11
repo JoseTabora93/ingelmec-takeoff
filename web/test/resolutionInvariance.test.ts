@@ -28,7 +28,7 @@ test("minPassRadiusFor: off without a scale, feet-consistent with one", () => {
     // round-to-nearest radius ⇒ the effective threshold sits within ONE cell
     // of MIN_PASS_FT on either side (the tightest band a 2r dilation allows;
     // a floor bias closed a 0.42 ft slit at one resolution and not another)
-    assert.ok(Math.abs(closedFt - MIN_PASS_FT) <= 1 / mppf + 1e-9, `mppf ${mppf}: closes ${closedFt} ft — more than a cell off ${MIN_PASS_FT}`);
+    assert.ok(Math.abs(closedFt - MIN_PASS_FT) <= 1 / mppf + 1e-9, `mppf ${mppf}: closes ${closedFt} ft, more than a cell off ${MIN_PASS_FT}`);
   }
 });
 
@@ -65,7 +65,7 @@ test("min-passage: a 0.3 ft slit never connects, at any resolution", () => {
   }
 });
 
-test("min-passage off (no rule): the slit percolates and B rides along — the rule is what does the work", () => {
+test("min-passage off (no rule): the slit percolates and B rides along, the rule is what does the work", () => {
   const { segs, seedA } = slitScene(0.3 * PXFT);
   const mo = buildMask(segs, 800, 500, 800, null, PXFT);      // canvas big enough that A+B clears the 30% leak cap
   const mppf = mo.mppf ?? 0;
@@ -191,7 +191,7 @@ function a1Scene(sheet: A1Sheet, rs: number) {
 // 5.374 is the audit's worked Hi-Res example on an 11×17.
 const A1_SCALES = [2.07, 2.0704, 3, 5.374];
 
-test("A1/F3: the mask is bit-identical across render scales — sub-cap AND cap-bound", () => {
+test("A1/F3: the mask is bit-identical across render scales, sub-cap AND cap-bound", () => {
   for (const sheet of A1_SHEETS) {
     const base = a1Scene(sheet, A1_BASE_RS);
     const mb = buildMask(base.segs, base.w, base.h, MASK_MAX_DIM, null, base.pxPerFt, base.base, base.page);
@@ -214,12 +214,12 @@ test("A1/F3: the mask is bit-identical across render scales — sub-cap AND cap-
       assert.equal(m.mh, mb.mh, `${sheet.name}: mask height drifted at rs ${rs} (${m.mh} vs ${mb.mh})`);
       let diff = 0;
       for (let i = 0; i < mb.mask.length; i++) if (mb.mask[i] !== m.mask[i]) diff++;
-      assert.equal(diff, 0, `${sheet.name}: ${diff} mask cells differ at rs ${rs} — the raster still follows the render scale`);
+      assert.equal(diff, 0, `${sheet.name}: ${diff} mask cells differ at rs ${rs}, the raster still follows the render scale`);
     }
   }
 });
 
-test("A1/F3: measured area is identical across render scales — sub-cap AND cap-bound", () => {
+test("A1/F3: measured area is identical across render scales, sub-cap AND cap-bound", () => {
   for (const sheet of A1_SHEETS) {
     const areas = [A1_BASE_RS, ...A1_SCALES].map((rs) => {
       const s = a1Scene(sheet, rs);
@@ -251,7 +251,7 @@ test("F3: the vector and the raster mask of one sheet land on ONE grid, at every
       const ras = rasterMaskScale({ pageW: sheet.pageW, pageH: sheet.pageH, renderScale: rs, baseScale: A1_BASE_RS, maxDim: MASK_MAX_DIM });
       assert.equal(vec.mw, ras.mw, `${sheet.name} at rs ${rs}: vector mask ${vec.mw}×${vec.mh}, raster mask ${ras.mw}×${ras.mh}`);
       assert.equal(vec.mh, ras.mh, `${sheet.name} at rs ${rs}: vector mask ${vec.mw}×${vec.mh}, raster mask ${ras.mw}×${ras.mh}`);
-      assert.ok(Math.abs(vec.ws - ras.ws) < 1e-12, `${sheet.name} at rs ${rs}: ws ${vec.ws} vs ${ras.ws} — image px → mask px must be one number`);
+      assert.ok(Math.abs(vec.ws - ras.ws) < 1e-12, `${sheet.name} at rs ${rs}: ws ${vec.ws} vs ${ras.ws}, image px → mask px must be one number`);
     }
   }
 });
@@ -296,7 +296,7 @@ test("F3: baselineImgDims is ceil(pageDim × baseScale) and never zero", () => {
 test("F3: TakeoffCanvas.ensureMask still pins the mask to the page in POINTS", () => {
   const text = readFileSync(fileURLToPath(new URL("../src/pages/TakeoffCanvas.jsx", import.meta.url)), "utf8");
   const call = text.match(/mo = buildMask\([^;]*?\);/s);
-  assert.ok(call, "ensureMask's buildMask call not found — re-point this guard");
+  assert.ok(call, "ensureMask's buildMask call not found, re-point this guard");
   const site = call[0];
   assert.match(site, /baseScale:\s*RENDER_SCALE/, "the baseline must be RENDER_SCALE, the pin");
   assert.match(site, /renderScale:\s*rsNow/, "…and k must come from this sheet's own render scale");
@@ -361,7 +361,7 @@ test("A3: a room bounded only by the min-passage rule reports itself as SEALED, 
   assert.equal(floodRegion(mo, seed[0], seed[1], 0.5).status, "leak", "without the rule this space is not enclosed");
   const f = floodRegionSealed(mo, seed[0], seed[1], 0.5, sealRadiiFor(mppf), doorWedgeCapPx(mppf), minPassRadiusFor(mppf)) as Extract<FloodResult, { status: "ok" }>;
   assert.equal(f.status, "ok");
-  assert.equal(f.minPassDelta, 1, "the verbatim flood bounded nothing — the rule is the whole measurement");
+  assert.equal(f.minPassDelta, 1, "the verbatim flood bounded nothing, the rule is the whole measurement");
   assert.equal(f.sealedPx, minPassRadiusFor(mppf), "so it reports a seal, and the readout says 'sealed'");
   assert.equal(typeof f.virtualFrac, "number", "with the ladder's own virtual-boundary fraction");
   const c = traceConfidence(floodSignals(f, { areaSF: f.count / (mppf * mppf) }));
@@ -389,7 +389,7 @@ function picketRoom(gapPx: number, dashPx: number) {
   return segs;
 }
 
-test("A3/D-1: the min-passage path takes the ladder's ≥75%-real-boundary rule — a region it refuses is refused", () => {
+test("A3/D-1: the min-passage path takes the ladder's ≥75%-real-boundary rule, a region it refuses is refused", () => {
   const PICKET_PXFT = 72;                       // ⇒ minPassRadiusFor = 18 px
   const segs = picketRoom(18, 4);
   const mo = buildMask(segs, 1400, 1000, 1400, null, PICKET_PXFT);
@@ -404,7 +404,7 @@ test("A3/D-1: the min-passage path takes the ladder's ≥75%-real-boundary rule 
   assert.notEqual(f.status, "ok", `a region >25% synthetic boundary must be refused, not measured (got ${f.status})`);
 });
 
-test("A3/D-1: the guard does not fire on ordinary rooms — the corpus refusal rate stays 0", () => {
+test("A3/D-1: the guard does not fire on ordinary rooms, the corpus refusal rate stays 0", () => {
   // the same construction with a SOLID boundary: the guard must be silent.
   const segs = picketRoom(0, 600);
   const mo = buildMask(segs, 1400, 1000, 1400, null, 72);

@@ -137,11 +137,11 @@ export function useAnnotationWorkbench(options) {
         for(const m of candidates){
           if(rows.some(row=>Math.hypot(row.center[0]-m.at[0],row.center[1]-m.at[1])<Math.max(3,Math.min(w,h)/4)))continue;
           const angle=(m.rotation||0)*Math.PI/180,rw=Math.abs(Math.cos(angle))*w+Math.abs(Math.sin(angle))*h,rh=Math.abs(Math.sin(angle))*w+Math.abs(Math.cos(angle))*h;
-          rows.push({center:m.at,rect:[[m.at[0]-rw/2,m.at[1]-rh/2],[m.at[0]+rw/2,m.at[1]+rh/2]],checked:!m.held,held:!!m.held,text:m.seed?'Seed symbol':m.held?'Near match — review':'Matched symbol'});
+          rows.push({center:m.at,rect:[[m.at[0]-rw/2,m.at[1]-rh/2],[m.at[0]+rw/2,m.at[1]+rh/2]],checked:!m.held,held:!!m.held,text:m.seed?'Seed symbol':m.held?'Near match, review':'Matched symbol'});
         }
         warning=(res.complete===false||res.candidates?.dropped>0)?`${res.candidates?.dropped||0} candidates were not scored. This is a partial search.`:'';
       }
-      setReview({key:p.key,rows,warning,text:'',kind:'cloud'});o.message(`${rows.length} results — review and choose which to annotate.`);
+      setReview({key:p.key,rows,warning,text:'',kind:'cloud'});o.message(`${rows.length} results, review and choose which to annotate.`);
     }catch(e){o.message(e.message||String(e));}finally{if(token===request.current)setBusy(false);}
   }
   const finish=(a,b,p)=>{
@@ -220,7 +220,7 @@ export function useAnnotationWorkbench(options) {
     const made=chosen.map(r=>{const a=[Math.max(0,r.rect[0][0]-pad),Math.max(0,r.rect[0][1]-pad)],b=[Math.min(p.img.w,r.rect[1][0]+pad),Math.min(p.img.h,r.rect[1][1]+pad)];
       const base={sheet_id:p.key,color:style.color,annotation_style:style,text:review.text.trim(),source_region:[a.map((x,i)=>x/(i?p.img.h:p.img.w)),b.map((x,i)=>x/(i?p.img.h:p.img.w))]};
       return review.kind==='cloud'?{...base,type:'cloud',rect:base.source_region}:{...base,type:'callout',target:[(a[0]+b[0])/2/p.img.w,(a[1]+b[1])/2/p.img.h],at:[Math.min(.8,(b[0]+20)/p.img.w),Math.max(0,a[1]/p.img.h)]};});
-    if(!made.length)return;commitNew(made);setReview(null);options.setTool('select');options.message(`Added ${made.length} ${review.kind==='cloud'?'clouds':'notes'} — undo removes the whole batch.`);
+    if(!made.length)return;commitNew(made);setReview(null);options.setTool('select');options.message(`Added ${made.length} ${review.kind==='cloud'?'clouds':'notes'}, undo removes the whole batch.`);
   };
   const shownStyle=!active&&selectedRows.length?annotationStyle({...style,...selectedRows[0].annotation_style,color:selectedRows[0].color||style.color}):style;
   const controls=(active||selectedRows.length>0)&&!editor&&!review;
@@ -228,7 +228,7 @@ export function useAnnotationWorkbench(options) {
   // Condition row — face re-arms the last tool, caret lists them all.
   const [lastKey,lastLabel,lastIcon]=tools.find(t=>t[0]===mode)||tools[0];
   const control=<span className="annotation-split" role="group" aria-label="Annotate">
-    <button type="button" aria-pressed={active} disabled={!options.ready} onClick={()=>active?options.setTool('select'):arm(lastKey)} title={active?`${lastLabel} armed — click to put it down`:`Annotate — ${lastLabel}`}>{toolIcon(lastIcon)}<span>{lastLabel}</span></button>
+    <button type="button" aria-pressed={active} disabled={!options.ready} onClick={()=>active?options.setTool('select'):arm(lastKey)} title={active?`${lastLabel} armed, click to put it down`:`Annotate, ${lastLabel}`}>{toolIcon(lastIcon)}<span>{lastLabel}</span></button>
     <ToolMenu title="Todas las herramientas de anotación" disabled={!options.ready} onOpenChange={options.onMenuDepth} faceStyle={{padding:'4px 5px'}} face={null} items={[
       {section:'Annotate'},
       ...tools.map(([key,label,icon])=>({id:key,checked:active&&mode===key,iconNode:toolIcon(icon),label,onSelect:()=>arm(key),title:key==='selection'?'Sweep a box to select editable markups; Shift-click adds individual marks':label})),

@@ -142,7 +142,7 @@ test("a run drawn twice (faux bold) reads once", () => {
 test("tilt: only near-horizontal runs are kept; the rest are skipped and reported", () => {
   const toks = [
     tok("flat", 0, 100),                    // ang absent (OCR lines) → horizontal
-    tok("tilted", 0, 140, 10, 8),           // 8° — inside MAX_TILT_DEG
+    tok("tilted", 0, 140, 10, 8),           // 8°, inside MAX_TILT_DEG
     tok("under", 0, 160, 10, 352),          // −8°
     tok("vert", 0, 180, 10, 90),            // vertical, reading down
     tok("up", 0, 200, 10, 270),             // vertical, reading up

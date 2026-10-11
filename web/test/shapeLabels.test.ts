@@ -14,7 +14,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { sanitizeShapeLabels, shapeLabelValue, sanitizeShapeLabelsOnShapes, renameShapeLabel, assignShapeLabel } from "../src/lib/shapeLabels.js";
 
-const vocab = () => ["Phase 1", "Phase 2", "Level 1 — Slab"];   // untrimmed em-dash content is legal
+const vocab = () => ["Phase 1", "Phase 2", "Level 1, Slab"];   // untrimmed em-dash content is legal
 
 // ── sanitizeShapeLabels ──────────────────────────────────────────────────────
 
@@ -41,9 +41,9 @@ test("dedupe keeps the first occurrence", () => {
 
 // ── shapeLabelValue ──────────────────────────────────────────────────────────
 
-test("shapeLabelValue: the one assigned-value rule — visible string or empty", () => {
+test("shapeLabelValue: the one assigned-value rule, visible string or empty", () => {
   assert.equal(shapeLabelValue({ label: "Phase 1" }), "Phase 1");
-  assert.equal(shapeLabelValue({ label: " Phase 2 " }), " Phase 2 ");   // visible content — returned untrimmed
+  assert.equal(shapeLabelValue({ label: " Phase 2 " }), " Phase 2 ");   // visible content, returned untrimmed
   assert.equal(shapeLabelValue({ label: "" }), "");                     // empty
   assert.equal(shapeLabelValue({ label: "   " }), "");                  // whitespace-only
   assert.equal(shapeLabelValue({ label: 42 }), "");                     // non-string
@@ -59,10 +59,10 @@ test("sanitizeShapeLabelsOnShapes: non-array → []", () => {
   assert.deepEqual(sanitizeShapeLabelsOnShapes(undefined as any), []);
 });
 
-test("a shape with NO label passes through by identity — no new object", () => {
+test("a shape with NO label passes through by identity, no new object", () => {
   const s = { id: "s1", kind: "poly", points: [1, 2, 3, 4] };
   const [out] = sanitizeShapeLabelsOnShapes([s]);
-  assert.equal(out, s);   // same reference — no re-render churn
+  assert.equal(out, s);   // same reference, no re-render churn
 });
 
 test("a shape with a visible label passes through by identity", () => {
@@ -141,7 +141,7 @@ test("a non-matching id leaves every shape untouched by identity", () => {
 
 // ── omit-when-empty (buildPayload behavior) ──────────────────────────────────
 
-test("payload omits shape_labels when empty — byte-stable for older projects", () => {
+test("payload omits shape_labels when empty, byte-stable for older projects", () => {
   // buildPayload's exact spread: `...(shapeLabels.length ? { shape_labels: shapeLabels } : {})`,
   // mirroring the condition_columns omit-when-empty convention. Empty → the key
   // never appears, so a project that predates shape labels serializes

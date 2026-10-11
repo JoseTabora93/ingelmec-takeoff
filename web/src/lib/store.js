@@ -94,7 +94,7 @@ function openDB() {
     req.onblocked = () => {
       settled = true;
       reject(Object.assign(
-        new Error("OpenTakeoff is open in another tab with older data — close it or reload."),
+        new Error("OpenTakeoff is open in another tab with older data, close it or reload."),
         { name: "BlockedError" },
       ));
     };
@@ -115,7 +115,7 @@ function openDB() {
       if (req.error?.name === "VersionError") {
         // This build is OLDER than the database — a stale tab after a future bump.
         reject(Object.assign(
-          new Error("This tab is running an older OpenTakeoff — reload to update."),
+          new Error("This tab is running an older OpenTakeoff, reload to update."),
           { name: "VersionError" },
         ));
       } else {
@@ -135,13 +135,13 @@ export function isStaleTabError(e) {
 // The one UI copy for stale-tab failures. TakeoffCanvas routes its message
 // tint on exact equality with this string, so every surface must use the
 // constant — a local paraphrase would silently render in the success color.
-export const STALE_TAB_MESSAGE = "OpenTakeoff was updated in another tab — reload this tab to continue.";
+export const STALE_TAB_MESSAGE = "OpenTakeoff was updated in another tab, reload this tab to continue.";
 
 // Map raw store errors to copy the user can act on; falls back to the
 // error's own message for everything unrecognized.
 export function friendlyStoreError(e) {
   if (e?.name === "QuotaExceededError") {
-    return "Not enough storage space for this snapshot — delete old snapshots or unused PDFs and try again.";
+    return "Not enough storage space for this snapshot, delete old snapshots or unused PDFs and try again.";
   }
   return e?.message || String(e);
 }
@@ -344,7 +344,7 @@ export const localStore = {
         const prevHash = existing.hash || peekHash;
         // a legacy record the peek didn't see: only a build older than v3
         // could write one, and it can't open this database
-        if (!prevHash) throw new Error(`${file.name} changed while it was being added — try again.`);
+        if (!prevHash) throw new Error(`${file.name} changed while it was being added, try again.`);
         if (prevHash === hash) {
           if (!existing.hash || !existing.rev) {
             // backfill the legacy record's identity so the next compare is cheap
@@ -699,7 +699,7 @@ export function projectIdFromUrl() {
   try {
     return new URLSearchParams(window.location.search).get("project") || "";
   } catch {
-    return "";   // no window (SSR/tests) or a malformed query — stay local
+    return "";   // no window (SSR/tests) or a malformed query, stay local
   }
 }
 

@@ -118,12 +118,12 @@ test("parseLenInput rejects scientific notation and negatives", () => {
 
 test("checkVerdict grades the rounded value the chip displays", () => {
   // green ≤ 1.0 as displayed
-  assert.deepEqual(checkVerdict(0.95), { shown: 0.9, grade: "match" }); // 0.95 is 0.9499… in IEEE — displays 0.9
+  assert.deepEqual(checkVerdict(0.95), { shown: 0.9, grade: "match" }); // 0.95 is 0.9499… in IEEE, displays 0.9
   assert.deepEqual(checkVerdict(1.0), { shown: 1, grade: "match" });
   assert.deepEqual(checkVerdict(1.04), { shown: 1, grade: "match" });   // displays "+1.0%" → must be green
   assert.equal(checkVerdict(1.06).grade, "close");                      // displays "+1.1%" → amber
   // amber ≤ 5.0 as displayed
-  assert.deepEqual(checkVerdict(4.95), { shown: 5, grade: "close" });   // 4.95 rounds up — displays 5.0
+  assert.deepEqual(checkVerdict(4.95), { shown: 5, grade: "close" });   // 4.95 rounds up, displays 5.0
   assert.deepEqual(checkVerdict(5.0), { shown: 5, grade: "close" });
   assert.deepEqual(checkVerdict(5.04), { shown: 5, grade: "close" });   // displays "+5.0%" → must be amber
   assert.equal(checkVerdict(5.06).grade, "wrong");                      // displays "+5.1%" → red
@@ -160,7 +160,7 @@ test("wall height converts at the edge, feet stay internal", () => {
   assert.equal(heightUnit("metric"), "m");
 });
 
-test("a typed metric height is METRES — the #115 regression guard", () => {
+test("a typed metric height is METRES, the #115 regression guard", () => {
   // the bug: a metric user typing a 2.4 m wall got 2.4 FEET stored
   assert.ok(Math.abs(heightInputToFeet(2.4, "metric") - 7.874015748) < 1e-6);
   assert.equal(heightInputToFeet(2.4, "imperial"), 2.4);

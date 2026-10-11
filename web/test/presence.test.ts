@@ -109,7 +109,7 @@ test("finish line: the second device sees name + open sheet within one beat", as
   assert.equal(peers.length, 1);
   assert.equal(peers[0].name, "Michael");
   assert.equal(peers[0].sheet, "plan.pdf#3");
-  assert.equal(peers[0].ageMs, 60_000); // "last seen 1 min ago" — honest age, not "is editing"
+  assert.equal(peers[0].ageMs, 60_000); // "last seen 1 min ago", honest age, not "is editing"
 
   // and the write side carried the whole declared record
   const rec = p._files.get(".opentakeoff/presence/dev-a.json");
@@ -120,7 +120,7 @@ test("finish line: the second device sees name + open sheet within one beat", as
 test("a kill -9'd session goes stale (hidden), then its file is garbage-collected by the next writer", async () => {
   const p = memProvider();
   const clock = { t: 1_000_000 };
-  await device(p, "dev-dead", "Ghost", clock).beat(); // then the process dies — file frozen
+  await device(p, "dev-dead", "Ghost", clock).beat(); // then the process dies, file frozen
 
   const live = device(p, "dev-live", "Michael", clock);
   await live.beat();
@@ -128,7 +128,7 @@ test("a kill -9'd session goes stale (hidden), then its file is garbage-collecte
 
   clock.t += 50 * 60_000; // past stale (3 missed 15-min beats = 45 min), inside the GC horizon (4× stale = 3 h)
   await live.beat();
-  assert.equal(live.peers().length, 0); // hidden — silent lately
+  assert.equal(live.peers().length, 0); // hidden, silent lately
   assert.equal(p._files.has(".opentakeoff/presence/dev-dead.json"), true); // not yet collected
 
   clock.t += 3 * 60 * 60_000; // past the GC horizon
@@ -154,7 +154,7 @@ test("finish line: an 8-hour session with one live peer stays under 100 provider
   // The peer's beat costs are subtracted approximately; even counting BOTH
   // sessions' traffic the ceiling holds, so assert the hard budget on the
   // remainder and a sanity ceiling on the raw sum.
-  assert.ok(p.calls < 100, `our session spent ${p.calls} provider calls — budget is <100`);
+  assert.ok(p.calls < 100, `our session spent ${p.calls} provider calls, budget is <100`);
 });
 
 test("heartbeats with garbage timestamps or missing names never enter the room", async () => {

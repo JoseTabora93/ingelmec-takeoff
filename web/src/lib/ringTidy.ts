@@ -33,7 +33,7 @@ export interface TidyResult {
 
 export interface TidyOpts {
   nearest?: NearestFn | null;   // snap-grid lookup; null → no anchors (pure simplify+ortho)
-  eps?: number;                 // RDP tolerance, image px (1.5 — the mask-trace law)
+  eps?: number;                 // RDP tolerance, image px (1.5, the mask-trace law)
   minGapPx?: number;            // micro-segment collapse distance (2, snapVertices' own)
   axisTolDeg?: number;
   maxAreaDriftPct?: number;     // guardrail: result drifting more area than this is refused

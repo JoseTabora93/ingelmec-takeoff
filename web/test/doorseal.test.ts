@@ -67,7 +67,7 @@ function room(withSwing: boolean) {
 const maskOf = (segs: number[], meta: Uint8Array) =>
   buildMask(segs, W, H, 3000, meta, FT, FT, { pageW: W, pageH: H, renderScale: 1, baseScale: 1 }, null, null);
 
-test("a doorway with no swing drawn yields no seal — refusing beats guessing", () => {
+test("a doorway with no swing drawn yields no seal, refusing beats guessing", () => {
   const { segs, meta } = room(false);
   const mo = maskOf(segs, meta);
   assert.equal(findDoorSeals(segs, meta, mo, FT).length, 0);

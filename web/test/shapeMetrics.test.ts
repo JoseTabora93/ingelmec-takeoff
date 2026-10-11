@@ -44,7 +44,7 @@ test("surface_area: condition-height fallback vs drawn height vs explicit 0 over
   assert.ok(approx(computeShapeMetrics(s, DIMS, UPP, { height_ft: 8 }).area_sf!, 80));
   assert.ok(approx(computeShapeMetrics({ ...s, height_ft: 9 }, DIMS, UPP, { height_ft: 8 }).area_sf!, 90));
   assert.ok(approx(computeShapeMetrics({ ...s, height_override: true, height_ft: 0 }, DIMS, UPP, { height_ft: 8 }).area_sf!, 0),
-    "explicit override 0 stays 0 — never silently re-heights");
+    "explicit override 0 stays 0, never silently re-heights");
 });
 
 test("count: always {count: 1}, dims/scale irrelevant", () => {

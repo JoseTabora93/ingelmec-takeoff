@@ -80,7 +80,7 @@ test("computeRollTakeoff: unscaled sheets and non-floor shapes are skipped, neve
   const offSheet = { ...room("r2", "cpt"), sheet_id: "unrendered" };
   const linear = { ...room("r3", "cpt"), measure_role: "linear" };
   const { byCond } = computeRollTakeoff(conds, [offSheet, linear], dimsFor, uppFor);
-  assert.equal(byCond.size, 0, "nothing figured — no ring can speak feet");
+  assert.equal(byCond.size, 0, "nothing figured, no ring can speak feet");
 });
 
 test("collectRollOverrides flattens lanes with the parent laneCount; corrupt layouts are ignored", () => {
@@ -129,6 +129,6 @@ test("rollReportRows: ×N applies like every reported quantity; only figured con
     { tag: r.finish_tag, lf: r.order_lf, rolls: r.rolls, unit: r.order_unit },
     { tag: "CPT-1", lf: 87, rolls: 3, unit: "sy" },   // 29 ft × 3 units
   );
-  assert.ok(!("price" in r) && !("cost" in r), "quantities only — no dollars, ever");
+  assert.ok(!("price" in r) && !("cost" in r), "quantities only, no dollars, ever");
   assert.deepEqual(rollReportRows(null, []), []);
 });

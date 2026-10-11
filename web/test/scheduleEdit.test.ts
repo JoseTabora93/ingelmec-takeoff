@@ -278,7 +278,7 @@ test("evaluateTags without rank → first-seen, as before", () => {
   assert.equal(r.get("t")?.status, "duplicate");
 });
 
-const TAIL = "A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it — ";
+const TAIL = "A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it, ";
 
 test("skippedSummary: distinct codes in first-seen order, repeats counted by line, more than 8 summarized", () => {
   assert.deepEqual(skippedSummary(["EPOX"]), { count: 1, list: "EPOX", lines: 1 });
@@ -292,9 +292,9 @@ test("skippedSummary: distinct codes in first-seen order, repeats counted by lin
 
 test("skippedBanner: the dialog's exact text, one and several", () => {
   assert.equal(skippedBanner(["EPOX"]),
-    "1 code wasn't read: EPOX. A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it — if it's a finish, add it as a condition yourself.");
+    "1 code wasn't read: EPOX. A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it, if it's a finish, add it as a condition yourself.");
   assert.equal(skippedBanner(["EPOX", "SEAL"]),
-    "2 codes weren't read: EPOX, SEAL. A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it — if they're finishes, add them as conditions yourself.");
+    "2 codes weren't read: EPOX, SEAL. A four- or five-letter code with no number is read only when the header or a read row is above it, it fills two or more other columns, and a row with a numbered code, like CPT-1, comes after it, if they're finishes, add them as conditions yourself.");
   assert.equal(skippedBanner(["EPOX", "EPOX"]), `1 code wasn't read: EPOX (2 lines). ${TAIL}if it's a finish, add it as a condition yourself.`);
   assert.equal(skippedBanner(["AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII"]),
     `9 codes weren't read: AAAA, BBBB, CCCC, DDDD, EEEE, FFFF, GGGG, HHHH, and 1 more. ${TAIL}if they're finishes, add them as conditions yourself.`);

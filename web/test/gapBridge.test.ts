@@ -47,7 +47,7 @@ test("4px gap: needs radius 2, and the ring still traces to the room", () => {
   assert.ok(area > 145 * 145 && area < 160 * 160, `ring area ${area}`);
 });
 
-test("a real doorway (30px) never seals — the leak stands", () => {
+test("a real doorway (30px) never seals, the leak stands", () => {
   const f = floodRegion(mask(gappedSegs(20, 20, 180, 180, 90, 119)), 100, 100);
   assert.equal(f.status, "leak");
 });
@@ -70,5 +70,5 @@ test("dilateHard: hard bit grows by Chebyshev r, soft bits and dims ride through
   assert.equal(d.mask[0], 2, "soft bit untouched");
   assert.equal(d.ws, 0.5);
   assert.equal(d.softCount, 1);
-  assert.ok(GAP_BRIDGE_MAX <= 2, "cap stays pinhole-sized — doorways must keep leaking");
+  assert.ok(GAP_BRIDGE_MAX <= 2, "cap stays pinhole-sized, doorways must keep leaking");
 });

@@ -223,7 +223,7 @@ const fmt = (s: Record<string, number>) => Object.entries(s).map(([k, v]) => `${
 
 // ── per-fixture scoring ──────────────────────────────────────────────────────
 for (const f of CORPUS.filter((x) => x.layered)) {
-  test(`corpus IoU — ${f.name}`, (t) => {
+  test(`corpus IoU, ${f.name}`, (t) => {
     const { roleless, filtered } = build(f);
     const sr = scoreRooms(roleless, f), sf = scoreRooms(filtered, f);
     t.diagnostic(`${f.name}: filtered ${fmt(sf)} (mean ${mean(Object.values(sf)).toFixed(3)}) · roleless ${fmt(sr)} (mean ${mean(Object.values(sr)).toFixed(3)})`);
@@ -236,12 +236,12 @@ for (const f of CORPUS.filter((x) => x.layered)) {
     }
     if (f.expect.rolelessMax !== undefined) {
       assert.ok(mean(Object.values(sr)) <= f.expect.rolelessMax,
-        `${f.name}: roleless mean ${mean(Object.values(sr)).toFixed(3)} beats ${f.expect.rolelessMax} — the fixture no longer discriminates (heuristics improved? re-pin the corpus)`);
+        `${f.name}: roleless mean ${mean(Object.values(sr)).toFixed(3)} beats ${f.expect.rolelessMax}, the fixture no longer discriminates (heuristics improved? re-pin the corpus)`);
     }
   });
 }
 
-test("corpus IoU — aggregate: the stated layers are worth a measured floor over the whole corpus", (t) => {
+test("corpus IoU, aggregate: the stated layers are worth a measured floor over the whole corpus", (t) => {
   const layered = CORPUS.filter((x) => x.layered);
   const sf: number[] = [], sr: number[] = [];
   for (const f of layered) {
@@ -257,7 +257,7 @@ test("corpus IoU — aggregate: the stated layers are worth a measured floor ove
 });
 
 // ── the zero-delta half of the finish line ───────────────────────────────────
-test("unlayered control: attribution is invisible — mask bytes identical to the layered scene built roleless, regions identical, IoU delta exactly 0", () => {
+test("unlayered control: attribution is invisible, mask bytes identical to the layered scene built roleless, regions identical, IoU delta exactly 0", () => {
   const control = CORPUS.find((x) => !x.layered)!;
   const tile = CORPUS.find((x) => x.name.startsWith("tile-grid (AIA"))!;
   const c = build(control), l = build(tile);

@@ -98,7 +98,7 @@ export function createGraphDrive({ getToken, driveId, fetch = globalThis.fetch, 
         refreshed = true;
         let fresh;
         try { fresh = await getToken({ forceRefresh: true }); }
-        catch (e) { throw new GraphAuthError(`Microsoft 365 sign-in expired and could not be refreshed silently — sign in again (${String(e?.message || e)}).`, 401); }
+        catch (e) { throw new GraphAuthError(`Microsoft 365 sign-in expired and could not be refreshed silently, sign in again (${String(e?.message || e)}).`, 401); }
         init = { ...init, headers: { ...init.headers, Authorization: `Bearer ${fresh}` } };
         continue;
       }
@@ -111,8 +111,8 @@ export function createGraphDrive({ getToken, driveId, fetch = globalThis.fetch, 
     if (res.ok) return res;
     let detail = "";
     try { detail = (await res.text()) || ""; } catch { /* body may be unreadable */ }
-    if (res.status === 401) throw new GraphAuthError(`Microsoft 365 rejected the sign-in token on ${what} (HTTP 401) even after a refresh — sign in again${detail ? `: ${detail}` : "."}`, 401);
-    if (res.status === 403) throw new GraphAuthError(`Microsoft 365 refused ${what} (HTTP 403) — the signed-in account cannot reach this library, or the app was not granted Files.ReadWrite.All (see SELF_HOSTING.md, Microsoft 365 → step 1)${detail ? `: ${detail}` : "."}`, 403);
+    if (res.status === 401) throw new GraphAuthError(`Microsoft 365 rejected the sign-in token on ${what} (HTTP 401) even after a refresh, sign in again${detail ? `: ${detail}` : "."}`, 401);
+    if (res.status === 403) throw new GraphAuthError(`Microsoft 365 refused ${what} (HTTP 403), the signed-in account cannot reach this library, or the app was not granted Files.ReadWrite.All (see SELF_HOSTING.md, Microsoft 365 → step 1)${detail ? `: ${detail}` : "."}`, 403);
     throw new Error(`Graph ${what} failed (HTTP ${res.status})${detail ? `: ${detail}` : ""}.`);
   }
 
@@ -234,7 +234,7 @@ export function createGraphDrive({ getToken, driveId, fetch = globalThis.fetch, 
 
   async function deleteFile(fileId) {
     const res = await graphFetch(item(fileId), { method: "DELETE", headers: await authHeaders() });
-    if (res.status === 404) return; // already gone — deletion is idempotent here
+    if (res.status === 404) return; // already gone, deletion is idempotent here
     await assertOk(res, "delete");
   }
 

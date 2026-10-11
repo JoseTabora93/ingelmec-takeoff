@@ -451,7 +451,7 @@ export function outcomeMessage(o: CopyOutcome, scope: "box" | "page", isScanLike
   const scanLike = isScanLike && !hybrid;
   if (o.kind === "aborted") return "";
   if (o.kind === "rotated-only") {
-    return `Only rotated text ${scope === "box" ? "in that box" : "on this sheet"} (${o.skipped} rotated run${o.skipped === 1 ? "" : "s"}: dimension strings, vertical headers) — nothing reads left to right.`;
+    return `Only rotated text ${scope === "box" ? "in that box" : "on this sheet"} (${o.skipped} rotated run${o.skipped === 1 ? "" : "s"}: dimension strings, vertical headers), nothing reads left to right.`;
   }
   if (o.kind === "text") return "";
   const where = scope === "box" ? "in that box" : "on this sheet";
@@ -589,6 +589,6 @@ export function receiptPlacement({ sweepOpen, zoneOpen, narrow }: { sweepOpen: b
 /** Why a copy can't start on this panel, or null. A stitched surface has no
  * page of its own (its members' pages are each their own). */
 export function copyUnavailable(p: { stitch: boolean; hasPage: boolean }): string | null {
-  if (p.stitch) return "Copy text works on single sheets — open the sheet on its own.";
+  if (p.stitch) return "Copy text works on single sheets, open the sheet on its own.";
   return p.hasPage ? null : "Open a sheet first.";
 }

@@ -147,7 +147,7 @@ test("fs write atomicity: a crash before close leaves the previous sidecar intac
   const p2 = createFsProvider(async () => sabotaged);
   await assert.rejects(p2.push({ conditions: [{ id: "v2" }], shapes: [] }, { expectedRev: 1 } as any));
   const pulled: any = await p.pull();
-  assert.equal(pulled.rev, 1); // old content fully intact — no half-written sidecar
+  assert.equal(pulled.rev, 1); // old content fully intact, no half-written sidecar
   assert.deepEqual(pulled.data.conditions, [{ id: "v1" }]);
 });
 
@@ -162,15 +162,15 @@ test("fs pull propagates corrupt JSON (caller keeps local canonical)", async () 
   await assert.rejects(p.pull());
 });
 
-test("conflict copies are surfaced by name — sync-client fork styles all match", async () => {
+test("conflict copies are surfaced by name, sync-client fork styles all match", async () => {
   const root = fakeRoot();
   const sidecar = await root.getDirectoryHandle(".opentakeoff", { create: true });
   for (const name of [
-    "annotations.json",                                  // ours — excluded
+    "annotations.json",                                  // ours, excluded
     "annotations (1).json",                              // Drive/OneDrive style
     "annotations.sync-conflict-20260824-142233-ABCDEF.json", // Syncthing style
     "annotations (Ed's MacBook's conflicted copy 2026-08-24).json", // Dropbox style
-    "snapshots.json",                                    // unrelated — excluded
+    "snapshots.json",                                    // unrelated, excluded
   ]) {
     await (async () => {
       const fh = await sidecar.getFileHandle(name, { create: true });
@@ -263,7 +263,7 @@ test("#316 finish line: two machines converge through the folder; a forced concu
   await B.sync.checkRemote();
   await B.sync.whenPushed();
   assert.deepEqual(shapeIds(await B.base.loadAnnotations()), ["LA", "LB", "S1", "S2"]);
-  assert.equal(B.snaps.length, 0); // zero losers — nothing needed rescuing
+  assert.equal(B.snaps.length, 0); // zero losers, nothing needed rescuing
 
   // Replication brings B's union back to A; A three-way merges forward.
   await replicate(rootB, rootA);
@@ -280,7 +280,7 @@ test("#316 finish line: two machines converge through the folder; a forced concu
   assert.deepEqual(shapeIds(finalA.data), ["LA", "LB", "S1", "S2"]);
 });
 
-test("#316 rev regression (sync client restores an old file) routes through the reconciler — snapshotted remote-wins, never a wrong-ancestor merge", async () => {
+test("#316 rev regression (sync client restores an old file) routes through the reconciler, snapshotted remote-wins, never a wrong-ancestor merge", async () => {
   const root = fakeRoot();
   const A = machine("R", root);
   await A.sync.whenSynced();

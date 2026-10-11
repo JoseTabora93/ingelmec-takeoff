@@ -48,7 +48,7 @@ test("sanitize: drops malformed entries without wedging the rest", () => {
     { id: "stitch:dup", members: [{ key: "a", dx: 0, dy: 0 }, { key: "a", dx: 1, dy: 0 }] },               // dup member
     { id: "stitch:nan", members: [{ key: "a", dx: NaN, dy: 0 }, { key: "b", dx: 1, dy: 0 }] },             // non-finite
     good,
-    { ...good },                                                                 // duplicate id — dropped
+    { ...good },                                                                 // duplicate id, dropped
   ], MAX);
   assert.equal(out.length, 1);
   assert.equal(out[0].id, "stitch:ok");
@@ -123,7 +123,7 @@ test("mergePoints: offsets into stitch space, drops hidden (clipped-out) endpoin
   assert.deepEqual(pts, [[10, 10]]);
 });
 
-test("mergeSegs: midpoint ownership — kept whole, never cut (hatch row spans survive)", () => {
+test("mergeSegs: midpoint ownership, kept whole, never cut (hatch row spans survive)", () => {
   // A's row [0..100] (mid 50 ∈ A's box) rides whole even though it pokes past
   // the seam at 90; B's copy of the same strip [80..140]→ stage (mid 110 ∈ B's
   // box) also rides whole. Neither is cut — the classifier sees true spans.

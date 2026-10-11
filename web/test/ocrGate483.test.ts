@@ -66,7 +66,7 @@ function tallRows(text: string): GraphSpan[] {
   return out;
 }
 
-test("ocr gate: a third key-column line of a tall row stays merged — no unglue candidates", () => {
+test("ocr gate: a third key-column line of a tall row stays merged, no unglue candidates", () => {
   for (const text of ["PT-2 SATIN", "CPT-2 NOT USED", "CT-2 GROUT JOINTS"]) {
     const vec = tallRows(text);
     const ocr = asOcr(vec);
@@ -96,14 +96,14 @@ test("ocr gate: a whole row pass 1 merged into the row above is a row (FTB-01 CU
   assert.deepEqual(keys(readScheduleSpans(vec)), ["CPT-1", "FTB-01", "PT-1"]);
   const ocr = asOcr(vec);
   assert.deepEqual(keys(readScheduleSpans(ocr, { ocr: true })), ["CPT-1", "FTB-01", "PT-1"]);
-  assert.equal(readScheduleSpans(ocr, { ocr: true }).rows[1].description, "CUT (C) — CERAMIC TILE");
+  assert.equal(readScheduleSpans(ocr, { ocr: true }).rows[1].description, "CUT (C), CERAMIC TILE");
   // with one cell beside it the line is not a whole row, and stays merged as before
   const oneCell = asOcr(spansOf([CPT1, R("FTB-01 CUT (C)", "CERAMIC TILE", ""), PT1]));
   assert.deepEqual(keys(readScheduleSpans(oneCell, { ocr: true })), ["CPT-1", "PT-1"]);
   asTodayOcr(oneCell, "FTB-01 one cell");
 });
 
-test("ocr gate: four- and five-letter codes are neither read nor reported — no letters candidates", () => {
+test("ocr gate: four- and five-letter codes are neither read nor reported, no letters candidates", () => {
   const cases: Array<[string, Item[]]> = [
     ["filled EPOX between coded rows", [CPT1, EPOX, RB1, PT1]],
     ["one-cell EPOX between coded rows", [CPT1, { t: "raw", spans: [["EPOX", COLS.KEY], ["EPOXY", COLS.MATERIAL]] }, RB1, PT1]],
@@ -128,7 +128,7 @@ test("ocr gate: an all-letters table under { ocr: true } is no table, as before 
   assert.deepEqual(readScheduleSpans(ocr, { ocr: true }), { rows: [], refused: "no-table" });
 });
 
-test("ocr gate: every other rule stays — NOT USED and qualifier lines pass 1 left unattached, and re-keys of today's rows", () => {
+test("ocr gate: every other rule stays, NOT USED and qualifier lines pass 1 left unattached, and re-keys of today's rows", () => {
   // one-pitch lines between coded rows in a regular table sit beyond the attach radius: unattached
   const vec = spansOf([
     ...FLOOR.slice(0, 3), KEYLINE("CPT-9 NOT USED"), R("FTB-01 CUT (C)", "CERAMIC TILE", "VENDOR-F"), ...BASE,
@@ -170,7 +170,7 @@ test("ocr reset: a lone keyed line across the blank band is the row the band end
   for (const k of ["RB-9", ...keysOf(BASE), ...keysOf(WALLS)]) assert.equal(s[k], "", k);
 });
 
-test("ocr reset: a line the marquee rules consumed is still a line — the rows either side are not one blank band apart", () => {
+test("ocr reset: a line the marquee rules consumed is still a line, the rows either side are not one blank band apart", () => {
   // a header repeated in the key column (MATERIAL | MANUFACTURER | COLOR) in the blank band: (h) consumes it
   const hdr: Item = { t: "raw", spans: [["MATERIAL", COLS.KEY], ["MANUFACTURER", COLS.MANUFACTURER], ["COLOR", COLS.COLOR]] };
   const withLine = asOcr(spansOf([H("FLOORING"), ...FLOOR, gap(1), hdr, ...BASE]));

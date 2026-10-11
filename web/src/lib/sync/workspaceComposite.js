@@ -48,7 +48,7 @@ export function buildSyncedWorkspaceStore({ scope, provider, snapProvider, ensur
   });
 
   const annSync = createSyncStore({
-    base: localStore, // createLocalStore(null) IS localStore — the workspace continues
+    base: localStore, // createLocalStore(null) IS localStore, the workspace continues
     provider,
     folderId: scope,
     onRemoteUpdate: (data, rev) => bridge.onRemoteUpdate?.(data, rev),

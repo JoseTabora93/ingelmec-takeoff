@@ -38,7 +38,7 @@ test("per-sheet base × multiplier reconciles with the conditionTotals row (unro
   assert.equal(round2(sheetSum), condRow.floor_sf); // 40.02, not 40
 });
 
-test("a deduct alone on a sheet yields a negative floor_sf — never clamped", () => {
+test("a deduct alone on a sheet yields a negative floor_sf, never clamped", () => {
   const conds = [{ id: "c", finish_tag: "CT-1" }];
   const shapes = [
     shape("c", "plan", "floor_area", { area_sf: 100 }),
@@ -51,7 +51,7 @@ test("a deduct alone on a sheet yields a negative floor_sf — never clamped", (
   assert.equal(round2(100 - 25.5), conditionTotals(conds, shapes)[0].floor_sf);
 });
 
-test("sheets order by file then page — not draw order; shapeless sheets and conditions don't appear", () => {
+test("sheets order by file then page, not draw order; shapeless sheets and conditions don't appear", () => {
   const conds = [
     { id: "a", finish_tag: "A" },
     { id: "b", finish_tag: "B" },
@@ -102,7 +102,7 @@ test("linear shapes contribute LF and border SF to the sheet row", () => {
 // sheet's shapes (waste + ×N applied per slice), same canonical sheet order,
 // per-group perimByCond, orphan/shapeless sheets dropped.
 
-test("sheetGroupedRows: sheets order by file then numeric page — not draw order", () => {
+test("sheetGroupedRows: sheets order by file then numeric page, not draw order", () => {
   const conds = [{ id: "c", finish_tag: "CT-1" }];
   const shapes = [
     shape("c", "b-plans.pdf#2", "floor_area", { area_sf: 1 }),   // drawn first
@@ -113,14 +113,14 @@ test("sheetGroupedRows: sheets order by file then numeric page — not draw orde
   assert.deepEqual(groups.map((g) => g.sheet_id), ["a-plans.pdf", "b-plans.pdf#2", "b-plans.pdf#10"]);
 });
 
-test("sheetGroupedRows: slices carry ORDERED quantities — waste % and ×N applied per sheet", () => {
+test("sheetGroupedRows: slices carry ORDERED quantities, waste % and ×N applied per sheet", () => {
   const conds = [{ id: "c", finish_tag: "LVT-2", multiplier: 2, waste_pct: 10 }];
   const shapes = [
     shape("c", "s1", "floor_area", { area_sf: 10 }),
     shape("c", "s2", "floor_area", { area_sf: 20 }),
   ];
   const [g1, g2] = sheetGroupedRows(conds, shapes);
-  assert.equal(g1.rows[0].floor_sf, 20);           // 10 × 2 — multiplier applied, unlike sheetTotals
+  assert.equal(g1.rows[0].floor_sf, 20);           // 10 × 2, multiplier applied, unlike sheetTotals
   assert.equal(g1.rows[0].total_sf_net, 22);       // × 1.1 waste on top
   assert.equal(g2.rows[0].floor_sf, 40);
   assert.equal(g2.rows[0].total_sf_net, 44);
@@ -166,7 +166,7 @@ test("sheetGroupedRows: orphan-only sheets dropped; shapeless sheets never appea
   assert.deepEqual(sheetGroupedRows(conds, []), []);
 });
 
-test("sheetGroupedRows: perimByCond is per-sheet — a floor trace on one sheet never leaks into another's map", () => {
+test("sheetGroupedRows: perimByCond is per-sheet, a floor trace on one sheet never leaks into another's map", () => {
   const conds = [{ id: "c", finish_tag: "CT-1" }, { id: "d", finish_tag: "LVT-2" }];
   const shapes = [
     shape("c", "s1", "floor_area", { area_sf: 100, perimeter_lf: 40 }),

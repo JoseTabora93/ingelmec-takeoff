@@ -106,31 +106,31 @@ test("OCR read: the floor's own base, W7 in MATERIAL and the base in DESCRIPTION
   // a text layer has no 7 for /: the same words name a cove base
   assert.equal(byTag(rowsOf(ITEMS, false), "EP-1").category, "base");
   const ep = byTag(rowsOf(ITEMS, true), "EP-1");
-  assert.equal(ep.description, "EPOXY FLOORING W/ — 4 IN. COVE BASE");
+  assert.equal(ep.description, "EPOXY FLOORING W/, 4 IN. COVE BASE");
   assert.notEqual(ep.category, "base");
 });
 
 test("OCR read: the repair is MATERIAL, DESCRIPTION and PRODUCT only", () => {
   const rows = rowsOf(ITEMS, true);
   const cpt = byTag(rows, "CPT-1");
-  assert.equal(cpt.description, "CARPET / BROADLOOM — LOOP / BLUE");
+  assert.equal(cpt.description, "CARPET / BROADLOOM, LOOP / BLUE");
   assert.equal(cpt.style, "TEXTURE 7 LOOP");
   assert.equal(cpt.spec_color, "W7 OAK");
   assert.equal(byTag(rows, "TL-1").spec_color, "OAK 7 GREY");
   const p = byTag(rowsOf(PRODUCTS, true), "CPT-2");
-  assert.equal(p.description, "CARPET — HYPER / EARTH");
+  assert.equal(p.description, "CARPET, HYPER / EARTH");
   assert.equal(p.spec_color, "BLUE 7 GREY");
 });
 
 test("the item spans read as a text layer: exactly as printed, no read_as", () => {
   const rows = rowsOf(ITEMS, false);
   assert.deepEqual(rows.map((r) => [r.finish_tag, r.description, r.category, r.style, r.spec_color]), [
-    ["EP-1", "EPOXY FLOORING W7 — 4 IN. COVE BASE", "base", "", "GREY"],
-    ["CPT-1", "CARPET 7 BROADLOOM — LOOP 7 BLUE", "unassigned", "TEXTURE 7 LOOP", "W7 OAK"],
+    ["EP-1", "EPOXY FLOORING W7, 4 IN. COVE BASE", "base", "", "GREY"],
+    ["CPT-1", "CARPET 7 BROADLOOM, LOOP 7 BLUE", "unassigned", "TEXTURE 7 LOOP", "W7 OAK"],
     ["TL-1", "TILE", "unassigned", "", "OAK 7 GREY"],
   ]);
   for (const r of rows) assert.ok(!has(r, "read_as"), r.finish_tag);
-  assert.equal(byTag(rowsOf(PRODUCTS, false), "CPT-2").description, "CARPET — HYPER 7 EARTH");
+  assert.equal(byTag(rowsOf(PRODUCTS, false), "CPT-2").description, "CARPET, HYPER 7 EARTH");
 });
 
 // ── end to end: a bordered OCR read to the dialog's rows ────────────────────
@@ -156,8 +156,8 @@ test("end to end: bordered key cells read through boxWords as their codes", () =
   assert.equal(lines.filter((l) => /^\[|_$/.test(l.str)).length, 3, "fixture: three bordered key cells");
   const rows = rowsOf(wordsToSpans(boxWords(lines)), true);
   assert.deepEqual(rows.map((r) => r.finish_tag), ["CPT-1", "CPT-2", "LVT-1", "FTB-01", "RB-1", "RB-2", "P-1", "P-2", "CT-1"]);
-  assert.match(byTag(rows, "P-1").description, /^SAT — PAINT/);
-  assert.match(byTag(rows, "FTB-01").description, /^CUT \(C\) — CERAMIC TILE/);
+  assert.match(byTag(rows, "P-1").description, /^SAT, PAINT/);
+  assert.match(byTag(rows, "FTB-01").description, /^CUT \(C\), CERAMIC TILE/);
   for (const r of rows) assert.ok(!has(r, "read_as"), r.finish_tag);
 });
 

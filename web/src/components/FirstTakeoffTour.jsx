@@ -77,7 +77,7 @@ export default function FirstTakeoffTour({ done, step, sheetOpen, sampleBusy, on
         }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
           <span className="t-label" style={{ color: "var(--cobalt)" }}>
-            {finished ? "First takeoff — done" : `First takeoff · step ${n + 1} of ${TOUR_STEPS.length}`}
+            {finished ? "First takeoff, done" : `First takeoff · step ${n + 1} of ${TOUR_STEPS.length}`}
           </span>
           <button type="button" onClick={onClose} title="End the guided takeoff" aria-label="End the guided takeoff"
             style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: 17, cursor: "pointer", lineHeight: 1, padding: 2 }}>×</button>

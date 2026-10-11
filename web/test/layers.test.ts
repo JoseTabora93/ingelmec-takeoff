@@ -44,7 +44,7 @@ test("field variants: xref prefixes, bind separators, spaces, truncation, bare w
     "…but a conforming AIA name grades surer than a bare word");
 });
 
-test("the degenerate cases are unknown — the exporter flattened, nothing is stated", () => {
+test("the degenerate cases are unknown, the exporter flattened, nothing is stated", () => {
   for (const name of ["0", "", "Layer 1", "Layer1", "LAYER 12", "XYZ-99", "MISC"]) {
     assert.equal(role(name), "unknown", name);
   }
@@ -89,7 +89,7 @@ test("buildLayerInfos: joins ids + attribution to the document's declarations; u
   assert.deepEqual(buildLayerInfos([], undefined, byId), []);
 });
 
-test("effectiveLayerRoles: include forces hard boundary, exclude drops, stale ids no-op — the MCP filter semantics", () => {
+test("effectiveLayerRoles: include forces hard boundary, exclude drops, stale ids no-op, the MCP filter semantics", () => {
   const infos = buildLayerInfos(["w", "p", "d"], Int32Array.from([0, 1, 2]), new Map([
     ["w", { name: "A-WALL-FULL", visible: true }],
     ["p", { name: "A-FLOR-PATT", visible: true }],

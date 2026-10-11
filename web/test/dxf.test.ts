@@ -151,7 +151,7 @@ test("metres: $INSUNITS 6 and the frame scales by 0.3048", () => {
   assert.ok(Math.abs(shoelace(ring.pts) - 600 * 0.3048 * 0.3048) < 1e-6);
 });
 
-test("refuses without a scale or dims — a CAD file in pixels is worse than none", () => {
+test("refuses without a scale or dims, a CAD file in pixels is worse than none", () => {
   assert.throws(() => buildSheetDxf({ sheet_id: SHEET, dims: DIMS, upp: 0, shapes: [room], conditions: CONDS }), /no scale/);
   assert.throws(() => buildSheetDxf({ sheet_id: SHEET, dims: { w: 0, h: 0 }, upp: UPP, shapes: [room], conditions: CONDS }), /no image dimensions/);
 });

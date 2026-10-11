@@ -48,7 +48,7 @@ test("attribution follows the nearest enclosing OC group, through nesting and no
     END,                                     // pop the plain BMC
     END,                                     // pop wall
     line(0, 4, 10, 4),                       // −1
-    END,                                     // UNBALANCED extra pop — must not throw
+    END,                                     // UNBALANCED extra pop, must not throw
     line(0, 5, 10, 5),                       // still −1
   ]), ID, OPS as never);
   assert.deepEqual(geo.layerIds, ["wall", "hatch"]);
@@ -68,7 +68,7 @@ test("only a single stated group attributes: one-id OCMDs do, multi-id OCMDs and
   assert.deepEqual([...geo.layerOf!], [0, -1, -1]);
 });
 
-test("no marked content: empty table, all −1 — and the roleless mask is byte-identical (the invisible fallback)", () => {
+test("no marked content: empty table, all −1, and the roleless mask is byte-identical (the invisible fallback)", () => {
   const ops: Op[] = [line(0, 0, 50, 0), line(0, 10, 50, 10), line(20, 0, 20, 10)];
   const geo = extractVectorGeometry(opList(ops), ID, OPS as never);
   assert.deepEqual(geo.layerIds, []);
@@ -122,7 +122,7 @@ test("stated layers unlock what the pitch heuristics cannot: the tile-grid room 
   assert.ok(nRoom > 280 * 280, `the whole 300×300 room, not a slice: ${nRoom}`);
 });
 
-test("an INCLUDED demolition wall splits the room — visibility and overrides both bite", () => {
+test("an INCLUDED demolition wall splits the room, visibility and overrides both bite", () => {
   const geo = fixtureScene();
   const roles = segRoles(geo.layerOf, layerRoleCodes(geo.layerIds!, infoFor(true, "boundary")))!;
   const mask = buildMask(geo.segs, 1200, 1200, 3000, geo.meta, roles);

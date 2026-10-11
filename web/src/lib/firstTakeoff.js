@@ -11,12 +11,12 @@ export const TOUR_STEPS = [
   {
     id: "open",
     title: "Open a plan",
-    body: "Start on the bundled sample: a real VA medical-center floor finish plan. Your own PDFs work the same way — drag them onto the canvas.",
+    body: "Start on the bundled sample: a real VA medical-center floor finish plan. Your own PDFs work the same way, drag them onto the canvas.",
   },
   {
     id: "scale",
     title: "Set the scale",
-    body: "Every quantity stands on it. Open the Set scale menu and pick “Plan says … — use it”: that's the scale printed on the sheet.",
+    body: "Every quantity stands on it. Open the Set scale menu and pick “Plan says …, use it”: that's the scale printed on the sheet.",
     target: '[data-tour="scale"]',
   },
   {

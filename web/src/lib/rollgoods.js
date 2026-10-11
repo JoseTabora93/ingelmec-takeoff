@@ -8,7 +8,7 @@
 // engine + tests first. Directions: 'ns' = strips run along world Y (lanes
 // tile across X); 'ew' = strips run along world X (lanes tile across Y).
 
-const OVERLAP_EPS_FT = 0.02; // ~1/4in — flush cuts aren't treated as overlapping
+const OVERLAP_EPS_FT = 0.02; // ~1/4in, flush cuts aren't treated as overlapping
 export function uid(p = "cut") { return p + Math.random().toString(36).slice(2, 9); }
 
 // The roll-goods material classes. OpenTakeoff conditions are trade-agnostic

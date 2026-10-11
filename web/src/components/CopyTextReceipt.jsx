@@ -24,7 +24,7 @@ export default function CopyTextReceipt({ receipt: r, placement, onClose, onCopy
     <div role={r.failed ? "dialog" : "status"} aria-label="Copy text result"
       style={{ ...placement, width: RECEIPT_W, maxWidth: "calc(100% - 20px)", zIndex: Z.canvasUi, background: "var(--paper-cream)", border: `1px solid ${r.failed ? "var(--c-danger)" : "var(--ink-faint)"}`, boxShadow: "var(--shadow-pop)", fontSize: "var(--fs-s)", color: "var(--ink)" }}>
       <div style={{ ...S.monoReadout, fontSize: "var(--fs-xs)", display: "flex", gap: "var(--sp-2)", alignItems: "baseline", padding: "var(--sp-2) var(--sp-3)", borderBottom: "1px solid var(--ink-faint)" }}>
-        <b style={{ color: r.failed ? "var(--c-danger)" : "var(--c-positive)" }}>{r.failed ? "Couldn't copy automatically — use Copy below" : "Copied"}</b>
+        <b style={{ color: r.failed ? "var(--c-danger)" : "var(--c-positive)" }}>{r.failed ? "Couldn't copy automatically, use Copy below" : "Copied"}</b>
         <span>{r.lineCount} line{r.lineCount === 1 ? "" : "s"}{r.scope === "page" ? " · whole page" : ""}</span>
         <span style={{ marginLeft: "auto", color: "var(--ink-muted)" }}>{r.reader}{r.skipped > 0 ? ` · ${r.skipped} rotated left out` : ""}{r.clipped > 0 ? ` · ${r.clipped} split at a seam` : ""}</span>
         <button type="button" onClick={onClose} title="Close" aria-label="Close"

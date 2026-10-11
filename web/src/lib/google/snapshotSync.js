@@ -133,7 +133,7 @@ export function createSnapshotSync({ base, provider, folderId, ensureSidecarId, 
       try {
         await base.putSnapshot(record);
       } catch {
-        continue; // an incomplete record fails putSnapshot's guards — skip it
+        continue; // an incomplete record fails putSnapshot's guards, skip it
       }
     }
   }

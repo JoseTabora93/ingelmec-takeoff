@@ -47,12 +47,12 @@ test("pdf-lib on the encrypted fixture: loads with ignoreEncryption, reports isE
   assert.equal(plain.isEncrypted, false, "the control fixture is the same page, unencrypted");
 });
 
-test("the copyPages path (single sheet, light mode) saves a page whose content cannot be decoded — the silent blank sheet", async () => {
+test("the copyPages path (single sheet, light mode) saves a page whose content cannot be decoded, the silent blank sheet", async () => {
   const src = await PDFDocument.load(ENCRYPTED, { ignoreEncryption: true });
   const out = await PDFDocument.create();
   const [copied] = await out.copyPages(src, [0]);
   out.addPage(copied);
-  const bytes = await out.save();   // no throw — that is the problem
+  const bytes = await out.save();   // no throw, that is the problem
   const back = await PDFDocument.load(bytes);
   assert.equal(back.isEncrypted, false, "the output is not marked encrypted, so viewers try to read the bytes as-is");
   const contents = back.getPage(0).node.lookup(PDFName.of("Contents"));

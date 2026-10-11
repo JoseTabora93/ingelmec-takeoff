@@ -686,7 +686,7 @@ test("outcomeMessage on a stray-text scan doesn't claim the sheet has no text at
 // ── where Copy text can't read ───────────────────────────────────────────────
 
 test("copyUnavailable: a stitch says to open the sheet on its own; no page says open one; a page is fine", () => {
-  assert.equal(copyUnavailable({ stitch: true, hasPage: false }), "Copy text works on single sheets — open the sheet on its own.");
+  assert.equal(copyUnavailable({ stitch: true, hasPage: false }), "Copy text works on single sheets, open the sheet on its own.");
   assert.equal(copyUnavailable({ stitch: false, hasPage: false }), "Open a sheet first.");
   assert.equal(copyUnavailable({ stitch: false, hasPage: true }), null);
 });

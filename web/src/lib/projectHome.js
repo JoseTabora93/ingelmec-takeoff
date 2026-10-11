@@ -39,7 +39,7 @@ export async function listProjectFolders(drive, folderId) {
 export function browserStorage() {
   try {
     if (globalThis.localStorage) return globalThis.localStorage;
-  } catch { /* blocked site data — fall through */ }
+  } catch { /* blocked site data, fall through */ }
   return { getItem: () => null, setItem: () => {} };
 }
 
@@ -59,7 +59,7 @@ export function createRecents(storage) {
       try {
         parsed = JSON.parse(storage.getItem(RECENTS_KEY));
       } catch {
-        return [];   // corrupt JSON, or getItem itself threw — treat as empty
+        return [];   // corrupt JSON, or getItem itself threw, treat as empty
       }
       if (!Array.isArray(parsed)) return [];
       // Only well-formed { id, name } entries survive — anything else under our

@@ -39,7 +39,7 @@ test("ordering: vocabulary order first, then ad-hoc values sorted, then Unlabele
   assert.deepEqual(g.map((x) => x.label), ["Phase 1", "Alpha", "Zeta", "Unlabeled"]);
 });
 
-test("empty buckets are dropped — a vocab label with no shapes doesn't render", () => {
+test("empty buckets are dropped, a vocab label with no shapes doesn't render", () => {
   const g = labelGroupedRows(conditions(), [shape("s1", "Phase 1", 1)], ["Phase 1", "Phase 2"]);
   assert.deepEqual(g.map((x) => x.label), ["Phase 1"]);
 });
@@ -51,7 +51,7 @@ test("perimByCond is per-bucket, not whole-project", () => {
   assert.ok(g[0].perimByCond instanceof Map);
 });
 
-test("reportJson emits shape_labels + by_label — additive, always present, empty when unused", () => {
+test("reportJson emits shape_labels + by_label, additive, always present, empty when unused", () => {
   const empty = reportJson({});
   assert.deepEqual(empty.shape_labels, []);
   assert.deepEqual(empty.by_label, []);
@@ -87,7 +87,7 @@ test("sheetLabelGroupedRows: floors in canonical order, rooms in label order wit
     sheetShape("s2", "p.pdf#1", "102", 50),
   ];
   const g = sheetLabelGroupedRows(conditions(), shapes, ["101", "102"]);
-  assert.deepEqual(g.map((x: any) => x.sheet_id), ["p.pdf#1", "p.pdf#2"], "file then numeric page — never draw order");
+  assert.deepEqual(g.map((x: any) => x.sheet_id), ["p.pdf#1", "p.pdf#2"], "file then numeric page, never draw order");
   assert.deepEqual(g[0].groups.map((x: any) => x.label), ["101", "102"]);
   assert.deepEqual(g[1].groups.map((x: any) => x.label), ["102"]);
   assert.equal(g[0].groups[0].rows[0].floor_sf, 100);
@@ -101,7 +101,7 @@ test("sheetLabelGroupedRows: an unlabeled floor still rolls up, so floors reconc
   ];
   const g = sheetLabelGroupedRows(conditions(), shapes, ["101"]);
   assert.deepEqual(g.map((x: any) => x.groups.map((y: any) => y.label)), [["101"], ["Unlabeled"]]);
-  assert.equal(g[1].groups[0].rows[0].floor_sf, 50, "the whole floor, in one row — nothing dropped for want of a label");
+  assert.equal(g[1].groups[0].rows[0].floor_sf, 50, "the whole floor, in one row, nothing dropped for want of a label");
   // every cell of every floor adds back to the ungrouped condition row
   const cells = g.flatMap((x: any) => x.groups.flatMap((y: any) => y.rows.map((r: any) => r.floor_sf)));
   assert.equal(cells.reduce((a: number, b: number) => a + b, 0), conditionTotals(conditions(), shapes)[0].floor_sf);

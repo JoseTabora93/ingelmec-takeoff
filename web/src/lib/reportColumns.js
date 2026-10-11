@@ -300,7 +300,7 @@ export function partitionRowsBy(rows, columnDef, attrsByCond) {
 export function forceIncludeGroupCol(cols, customCols, groupBy) {
   if (!groupBy) return cols;
   const key = "custom:" + groupBy;
-  if (cols.some((c) => c.key === key)) return cols; // already visible — no duplicate
+  if (cols.some((c) => c.key === key)) return cols; // already visible, no duplicate
   const col = customCols.find((c) => c.key === key);
   return col ? [...cols, col] : cols;
 }

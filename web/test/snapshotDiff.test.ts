@@ -92,7 +92,7 @@ test("deleted-and-recreated condition matches by finish_tag and diffs unchanged"
   assert.equal(d.identical, true);
 });
 
-test("DUPLICATE finish_tags: two same-tag recreated conditions pair by order — no phantom changes", () => {
+test("DUPLICATE finish_tags: two same-tag recreated conditions pair by order, no phantom changes", () => {
   // the adversarial-review probe: two conditions sharing finish_tag "CT-1",
   // both deleted and recreated with fresh uids, quantities byte-identical.
   // A bare "tag:CT-1" key collided in the by-sheet Maps — one baseline row
@@ -121,7 +121,7 @@ test("DUPLICATE finish_tags: two same-tag recreated conditions pair by order —
 
 // ── 3b. display-threshold status ─────────────────────────────────────────────
 
-test("a sub-display delta (|Δ| < 0.05) is 'unchanged' — status agrees with the dash cells", () => {
+test("a sub-display delta (|Δ| < 0.05) is 'unchanged', status agrees with the dash cells", () => {
   // 0.03 SF rounds to "—" in every 1-decimal delta cell; the row must not
   // claim "changed" (it used to, off the raw round2 deltas)
   const cond = { id: "c", finish_tag: "CT-1" };
@@ -181,7 +181,7 @@ test("multiplier 1→2 changes the condition row; base sheet rows equal → shee
 
 // ── 6. waste change ──────────────────────────────────────────────────────────
 
-test("waste_pct-only edit moves total_sf_net alone — measured quantities stay equal", () => {
+test("waste_pct-only edit moves total_sf_net alone, measured quantities stay equal", () => {
   const shapes = [floorShape("s1", "c", "plan", 100)];
   const A = payload([{ id: "c", finish_tag: "CT-1", waste_pct: 0 }], shapes);
   const B = payload([{ id: "c", finish_tag: "CT-1", waste_pct: 10 }], shapes);
@@ -215,7 +215,7 @@ test("a shape moved to another sheet: condition unchanged, by_sheet shows −/+ 
 
 // ── 8. missing/empty payloads ────────────────────────────────────────────────
 
-test("missing payload arrays are tolerated — diff against {}", () => {
+test("missing payload arrays are tolerated, diff against {}", () => {
   const P = payload([{ id: "c", finish_tag: "CT-1" }], [floorShape("s1", "c", "plan", 100)]);
 
   const empty = diffSnapshots({}, {});

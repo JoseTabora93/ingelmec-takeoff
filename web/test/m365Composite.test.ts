@@ -54,7 +54,7 @@ test("a save through the composite lands .opentakeoff/annotations.json in the te
   const data = JSON.parse(new TextDecoder().decode(ann.content as Uint8Array));
   assert.equal(data.rev, 1);
   assert.deepEqual(data.conditions, [{ id: "c-365" }]);
-  store.dispose(); // heartbeat down — no timer leaks into the runner
+  store.dispose(); // heartbeat down, no timer leaks into the runner
 });
 
 test("a read-only viewer on a fresh library never litters an empty sidecar", async () => {
@@ -79,7 +79,7 @@ test("the composite keeps the workspace-store shape: sync methods shadow, bridge
   store.dispose();
 });
 
-test("a second browser seeds from the tenant and a conflicting edit merges (#313) — same behavior as every other transport", async () => {
+test("a second browser seeds from the tenant and a conflicting edit merges (#313), same behavior as every other transport", async () => {
   const g = mockGraph();
   // browser one starts the takeoff
   const one: any = buildM365Store(cfg, clientOver(g));

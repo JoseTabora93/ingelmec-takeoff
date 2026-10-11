@@ -22,7 +22,7 @@ test("top-bar band (row): Line and Fill are two swatch buttons, palettes closed 
   assert.match(html, /⦸/, "no-fill reads as ⦸ on the fill swatch");
 });
 
-test("docked panel (stack): inline palettes stay — it has the room", () => {
+test("docked panel (stack): inline palettes stay, it has the room", () => {
   const html = render("stack");
   assert.doesNotMatch(html, /data-testid="line-swatch"/);
   const swatches = (html.match(/title="#[0-9a-f]{6}"/g) || []).length;

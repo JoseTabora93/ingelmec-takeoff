@@ -23,7 +23,7 @@ const mask = buildMask(segs, 1200, 900);
 test("seedLadderPx: anchor-first, offsets scale with the label's own height", () => {
   const probes = seedLadderPx(LABEL);
   assert.equal(probes.length, 4);
-  assert.deepEqual(probes[0], [300, 245], "probe one is the label center — bubble-less plans stay one-flood fast");
+  assert.deepEqual(probes[0], [300, 245], "probe one is the label center, bubble-less plans stay one-flood fast");
   const h = LABEL.y1 - LABEL.y0;
   assert.deepEqual(probes[1], [300, 245 + 2 * h], "second probe steps below by 2× label height");
   assert.deepEqual(probes[2], [300, 245 - 2 * h], "third probe steps above");
@@ -33,7 +33,7 @@ test("the bubble is found and rejected; the ladder recovers the real room", () =
   // probe one: label center — floods the bubble, clean, label-sized
   const [p1, p2] = seedLadderPx(LABEL);
   const f1 = floodRegion(mask, p1[0], p1[1]);
-  assert.equal(f1.status, "ok", "the bubble flood IS clean — that's the trap");
+  assert.equal(f1.status, "ok", "the bubble flood IS clean, that's the trap");
   const ring1 = traceRegion(f1 as never) as [number, number][];
   assert.ok(isLabelBubblePx(ring1, LABEL), "…and the bubble test catches it, scale-free");
 

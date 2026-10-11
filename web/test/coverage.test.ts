@@ -108,7 +108,7 @@ test("groutParamsEqual: structural, never by reference; absent KEYS compare as t
 // geometry produced the defaults, compared equal, and never ambered the
 // geometry row). Updates the pre-round-3 expectation that
 // groutParamsEqual(undefined, { ...GROUT_DEFAULTS }) === true.
-test("groutParamsEqual: presence quadrants — exactly one side absent is never equal", () => {
+test("groutParamsEqual: presence quadrants, exactly one side absent is never equal", () => {
   assert.ok(groutParamsEqual({ ...GROUT_DEFAULTS }, { ...GROUT_DEFAULTS }), "both present, equal values");
   assert.ok(groutParamsEqual(undefined, undefined), "both absent");
   assert.ok(!groutParamsEqual(undefined, { ...GROUT_DEFAULTS }), "absent vs present (defaults)");
@@ -169,7 +169,7 @@ test("groutDerivedFields: piece WIDTH is the parent dimension, and getting it wr
   // OTHER dimension — and coverage falls 615 → 512, a 20% over-order. Against a 6×6
   // catalog cove it is 60%. Width is not a detail on this line, it is the line.
   const at = (w: number) => groutDerivedFields({ ...GROUT_DEFAULTS, tileW: w, tileT: 0.375, joint: 0.125, bagLbs: 25 }, "linear", 0.5)!.per;
-  assert.equal(at(24), 615);   // 6H × 24W — field-cut from a 12×24, ripped across the 12
+  assert.equal(at(24), 615);   // 6H × 24W, field-cut from a 12×24, ripped across the 12
   assert.equal(at(12), 512);   // the same tile read the wrong way round
   assert.equal(at(6), 384);    // a 6×6 catalog cove piece
 });
@@ -216,7 +216,7 @@ test("groutRateStale: a rate derived at one base height is flagged on another", 
   const g = { ...GROUT_DEFAULTS, tileW: 6, tileT: 0.375, joint: 0.125, bagLbs: 25 };
   const at6 = groutDerivedFields(g, "linear", 0.5)!;          // 6" base → 384 lf/bag
   const line = { name: "Grout", kind: "grout", basis: "linear", grout: g, per: at6.per };
-  assert.equal(groutRateStale(line, 0.5), false, "derived for this height — clean");
+  assert.equal(groutRateStale(line, 0.5), false, "derived for this height, clean");
   assert.equal(groutRateStale(line, 0.3333), true, "a 4\" base does not get a 6\"-base rate");
   // no height at all: not figurable, yet the line carries a rate → flag it
   assert.equal(groutRateStale(line, 0), true);

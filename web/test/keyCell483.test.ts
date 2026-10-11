@@ -57,11 +57,11 @@ const FTB = (key: string, mat = "TILE BASE") => M(key, mat, "VENDOR-F", "WHITE 6
 const CODED = [CPT1, CPT2, LVT1, VCT1, RB1, RB2, PT1, PT2];
 
 // ── the qualifier split: eligible lines always split ─────────────────────
-test("FTB-01 CUT (C) between coded rows → FTB-01, description `CUT (C) — TILE BASE`, key_rule extended", () => {
+test("FTB-01 CUT (C) between coded rows → FTB-01, description `CUT (C), TILE BASE`, key_rule extended", () => {
   const r = read([CPT1, FTB("FTB-01 CUT (C)"), PT1]);
   assert.deepEqual(keys(r), ["CPT-1", "FTB-01", "PT-1"]);
   const f = rowOf(r, "FTB-01");
-  assert.equal(f.description, "CUT (C) — TILE BASE");
+  assert.equal(f.description, "CUT (C), TILE BASE");
   assert.equal(f.key_rule, "extended");
   assert.equal(f.manufacturer, "VENDOR-F");
   // the row it was merged into today reads without it
@@ -70,10 +70,10 @@ test("FTB-01 CUT (C) between coded rows → FTB-01, description `CUT (C) — TIL
   assert.ok(!has(rowOf(r, "PT-1"), "key_rule"));
 });
 
-test("FTB-02 COVE → FTB-02, description `COVE — TILE BASE`", () => {
+test("FTB-02 COVE → FTB-02, description `COVE, TILE BASE`", () => {
   const r = read([CPT1, FTB("FTB-02 COVE"), PT1]);
   assert.deepEqual(keys(r), ["CPT-1", "FTB-02", "PT-1"]);
-  assert.equal(rowOf(r, "FTB-02").description, "COVE — TILE BASE");
+  assert.equal(rowOf(r, "FTB-02").description, "COVE, TILE BASE");
 });
 
 test("a 6-row FTB block between 1+1, 1+2, 2+1 and 4+4 coded rows reads all six", () => {
@@ -120,13 +120,13 @@ test("key-cell forms OCR returns: a suffix glued to the word, a spaced suffix, t
     const r = read([CPT1, FTB(form), PT1]);
     const code = form.match(/^[A-Z]+-\d+/)![0];
     assert.deepEqual(keys(r), ["CPT-1", code, "PT-1"], form);
-    assert.equal(rowOf(r, code).description, `${desc} — TILE BASE`, form);
+    assert.equal(rowOf(r, code).description, `${desc}, TILE BASE`, form);
   }
 });
 
 test("FTB-01 (CUT) (C) → splits, qualifier `(CUT) (C)`", () => {
   const r = read([CPT1, FTB("FTB-01 (CUT) (C)"), PT1]);
-  assert.equal(rowOf(r, "FTB-01").description, "(CUT) (C) — TILE BASE");
+  assert.equal(rowOf(r, "FTB-01").description, "(CUT) (C), TILE BASE");
   const t = mrows(spansOf([CPT1, FTB("FTB-01 (CUT) (C)"), PT1]));
   assert.equal(t.find((x) => x.key === "FTB-01")!.qualifier, "(CUT) (C)");
 });
@@ -146,7 +146,7 @@ test("TB-1 CUT | CT-1 | G-1 (a glued code today keys) → row TB-1", () => {
 test("collision rule: a lone P-1 SAT splits to P-1 with qualifier SAT (no key_rule)", () => {
   const r = read([CPT1, M("P-1 SAT", "PAINT", "VENDOR-E", "WHITE 601"), RB1]);
   assert.deepEqual(keys(r), ["CPT-1", "P-1", "RB-1"]);
-  assert.equal(rowOf(r, "P-1").description, "SAT — PAINT");
+  assert.equal(rowOf(r, "P-1").description, "SAT, PAINT");
   assert.ok(!has(rowOf(r, "P-1"), "key_rule"));
 });
 
@@ -164,16 +164,16 @@ test("collision rule: CPT-1 + CPT-1 ALT → CPT-1, CPT-1ALT; CPT-1 (ALT) alone �
 test("collision rule: CPT-1 TYP + CPT-1 ALT → CPT-1, CPT-1ALT (ALT-blocked rows leave the twin check first)", () => {
   const r = read([M("CPT-1 TYP", "BROADLOOM CARPET", "VENDOR-A", "GREY 101"), M("CPT-1 ALT", "CARPET TILE", "VENDOR-A", "GREY"), RB1]);
   assert.deepEqual(keys(r), ["CPT-1", "CPT-1ALT", "RB-1"]);
-  assert.equal(rowOf(r, "CPT-1").description, "TYP — BROADLOOM CARPET");
+  assert.equal(rowOf(r, "CPT-1").description, "TYP, BROADLOOM CARPET");
 });
 
 test("collision rule: RB-1 CUT alone → RB-1 + CUT; CPT-1 TYP alone → CPT-1 + TYP", () => {
   const a = read([CPT2, M("RB-1 CUT", "RUBBER BASE", "VENDOR-B", "BLACK 505"), PT1]);
   assert.deepEqual(keys(a), ["CPT-2", "RB-1", "PT-1"]);
-  assert.equal(rowOf(a, "RB-1").description, "CUT — RUBBER BASE");
+  assert.equal(rowOf(a, "RB-1").description, "CUT, RUBBER BASE");
   const b = read([M("CPT-1 TYP", "BROADLOOM CARPET", "VENDOR-A", "GREY 101"), RB1, PT1]);
   assert.deepEqual(keys(b), ["CPT-1", "RB-1", "PT-1"]);
-  assert.equal(rowOf(b, "CPT-1").description, "TYP — BROADLOOM CARPET");
+  assert.equal(rowOf(b, "CPT-1").description, "TYP, BROADLOOM CARPET");
 });
 
 test("collision rule: P-1 SAT beside a plain P-1 row → P-1SAT kept (the split key collides)", () => {
@@ -244,7 +244,7 @@ test("continuation in a short table: RB-1@38, FTB-01 CUT (C) | CERAMIC TILE@76, 
   spans.push(sp("PT-1", COLS.KEY, 133), sp("PAINT", COLS.MATERIAL, 133), sp("VENDOR-E", COLS.MANUFACTURER, 133), sp("WHITE 601", COLS.COLOR, 133));
   const r = readScheduleSpans(spans);
   assert.deepEqual(keys(r), ["RB-1", "FTB-01", "PT-1"]);
-  assert.equal(rowOf(r, "FTB-01").description, "CUT (C) — CERAMIC TILE BASE TRIM");
+  assert.equal(rowOf(r, "FTB-01").description, "CUT (C), CERAMIC TILE BASE TRIM");
   assert.equal(rowOf(r, "PT-1").description, "PAINT");
   assert.equal(rowOf(r, "RB-1").description, "RUBBER BASE");
 });
@@ -254,7 +254,7 @@ test("continuation in a short table, the next row 57 px below the wrap: the wrap
   spans.push(sp("PT-1", COLS.KEY, 95 + 57), sp("PAINT", COLS.MATERIAL, 95 + 57), sp("VENDOR-E", COLS.MANUFACTURER, 95 + 57), sp("WHITE 601", COLS.COLOR, 95 + 57));
   const r = readScheduleSpans(spans);
   assert.deepEqual(keys(r), ["RB-1", "FTB-01", "PT-1"]);
-  assert.equal(rowOf(r, "FTB-01").description, "CUT (C) — CERAMIC TILE BASE TRIM");
+  assert.equal(rowOf(r, "FTB-01").description, "CUT (C), CERAMIC TILE BASE TRIM");
   assert.equal(rowOf(r, "PT-1").description, "PAINT");
   assert.equal(rowOf(r, "RB-1").description, "RUBBER BASE");
 });
@@ -282,7 +282,7 @@ test("a 40 px key-column wrap in 76 px single-line rows stays merged", () => {
   unchanged(spans, "40 px wrap");
 });
 
-test("tall rows (pitch 76 and 95, lines 17–21 px apart) with a third-line COVE key-column wrap, and three-line rows at pitch 68: unchanged", () => {
+test("tall rows (pitch 76 and 95, lines 17 a 21 px apart) with a third-line COVE key-column wrap, and three-line rows at pitch 68: unchanged", () => {
   for (const [pitch, gap] of [[76, 17], [76, 21], [95, 19], [95, 21], [68, 19]] as const) {
     const spans: GraphSpan[] = [sp("CODE", 100, 0), sp("MATERIAL", 220, 0), sp("MANUFACTURER", 520, 0), sp("COLOR", 1000, 0)];
     ["CPT-1", "RB-1", "RB-2", "PT-1"].forEach((k, i) => {
@@ -372,7 +372,7 @@ test("a rotated-header table with an FTB row reads it", () => {
   [["CPT-1", "CARPET"], ["FTB-01 CUT (C)", "TILE BASE"], ["RB-1", "RUBBER BASE"]].forEach(([k, m], i) => { const y = 100 + PITCH * i; spans.push(sp(k, 100, y), sp(m, 220, y), sp("GREY", 520, y)); });
   const r = readScheduleSpans(spans);
   assert.deepEqual(keys(r), ["CPT-1", "FTB-01", "RB-1"]);
-  assert.equal(rowOf(r, "FTB-01").description, "CUT (C) — TILE BASE");
+  assert.equal(rowOf(r, "FTB-01").description, "CUT (C), TILE BASE");
 });
 
 test("MARK | DESCRIPTION | REMARKS + BASES + only FTB rows → rows under BASES (hasSection from the consumed heading); guardRegion = the header band", () => {
@@ -463,7 +463,7 @@ test("whole-sheet twins through a drawn box: the key-cell forms read by the marq
     assert.deepEqual(keys(readScheduleSpans(t.spans)), want[t.name], t.name);
   }
   const ftb = rowOf(readScheduleSpans(TWINS.find((x) => x.name === "ws-key-ftb01-cut-c")!.spans), "FTB-01");
-  assert.equal(ftb.description, "CUT (C) — PORCELAIN TILE");
+  assert.equal(ftb.description, "CUT (C), PORCELAIN TILE");
   assert.equal(ftb.key_rule, "extended");
   const nic = rowOf(readScheduleSpans(TWINS.find((x) => x.name === "ws-key-cpt2-nic")!.spans), "CPT-2");
   assert.ok(!has(nic, "key_rule"), "a re-keyed pass-1 row");
@@ -525,7 +525,7 @@ test("limit: a word-split key cell (FTB-01 | CUT | (C) as separate spans) gets n
   assert.ok(!has(t[1], "qualifier") && !has(t[1], "keyRule"), "today's row, no qualifier");
 });
 
-test("limit: inside the run, a lone <code> <word> line keys a row — PT-1 OPTION, L1 FLOORING, ALT-1 DEDUCT, A-601 FINISH PLAN, C101 OFFICE", () => {
+test("limit: inside the run, a lone <code> <word> line keys a row, PT-1 OPTION, L1 FLOORING, ALT-1 DEDUCT, A-601 FINISH PLAN, C101 OFFICE", () => {
   for (const [line, key] of [["PT-1 OPTION", "PT-1"], ["L1 FLOORING", "L1"], ["ALT-1 DEDUCT", "ALT-1"], ["A-601 FINISH PLAN", "A-601"], ["C101 OFFICE", "C101"]]) {
     const r = read([CPT1, { t: "raw", spans: [[line, COLS.KEY]] }, RB1]);
     assert.deepEqual(keys(r), ["CPT-1", key, "RB-1"], line);
@@ -543,7 +543,7 @@ test("centred key codes with no column map are eligible: a longer key starts lef
     sp("CPT-1", c("CPT-1"), 38), sp("CARPET", 220, 38), sp("FTB-01 CUT (C)", c("FTB-01 CUT (C)"), 76), sp("TILE BASE", 220, 76), sp("PT-1", c("PT-1"), 114), sp("PAINT", 220, 114)];
   const r = readScheduleSpans(spans);
   assert.deepEqual(keys(r), ["CPT-1", "FTB-01", "PT-1"]);
-  assert.equal(rowOf(r, "FTB-01").description, "CUT (C) — TILE BASE");
+  assert.equal(rowOf(r, "FTB-01").description, "CUT (C), TILE BASE");
   assert.equal(rowOf(r, "CPT-1").description, "CARPET");
 });
 
@@ -605,7 +605,7 @@ test("guards read the pass-1 region: a new row below today's rows widens the tab
   assert.deepStrictEqual(m.guardRegion, plain.table.region);
 });
 
-test("no pass-1 rows: the run pitch is the LOWER median line gap — FTB lines at gaps 38, 38, 120, 120 read 2 rows", () => {
+test("no pass-1 rows: the run pitch is the LOWER median line gap, FTB lines at gaps 38, 38, 120, 120 read 2 rows", () => {
   const spans: GraphSpan[] = [sp("MARK", 100, 0), sp("DESCRIPTION", 220, 0), sp("REMARKS", 760, 0), sp("BASES", 100, 38)];
   let y = 38;
   ["FTB-01 CUT", "FTB-02 COVE", "FTB-03 CUT", "FTB-04 COVE"].forEach((k, i) => { y += [38, 38, 120, 120][i]; spans.push(sp(k, 100, y), sp("TILE BASE", 220, y), sp("VENDOR-F", 760, y)); });

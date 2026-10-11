@@ -17,7 +17,7 @@ export const Z = {
   scrim: 40,
   modal: 50,     // dialogs incl. the in-app guide
   toast: 60,     // status toasts, banners that must beat modals
-  dragGhost: 70, // drag previews — always on top
+  dragGhost: 70, // drag previews, always on top
 };
 
 /* Sanctioned SVG literals — CSS vars don't resolve in SVG presentation

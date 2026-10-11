@@ -80,7 +80,7 @@ export function createTilePool(size = POOL_SIZE) {
     if (!dead) return;
     workers[i] = undefined as unknown as Worker;
     try { dead.terminate(); } catch { /* already gone */ }
-    console.warn(`[tiles] render worker ${i} died — respawning:`, err);
+    console.warn(`[tiles] render worker ${i} died, respawning:`, err);
     for (const [reqId, p] of pending) {
       if (p.workerIdx === i) { if (p.timer) clearTimeout(p.timer); p.reject(new Error("render worker crashed")); pending.delete(reqId); }
     }
@@ -135,7 +135,7 @@ export function createTilePool(size = POOL_SIZE) {
     const promise = new Promise<void>((res, rej) => { resolve = res; reject = rej; });
     const st: SheetOpenState = { openId: nextOpenId++, promise, resolve, reject, settled: false, readyCount: 0 };
     sheetOpen.set(sheetKey, st);
-    sheetBytes?.set(sheetKey, { pageNum, data }); // pool owns `data` — retained (phone only) so a respawned worker can be re-fed
+    sheetBytes?.set(sheetKey, { pageNum, data }); // pool owns `data`, retained (phone only) so a respawned worker can be re-fed
     for (let i = 0; i < size; i++) {
       const copy = data.slice(0); // independent transferable per worker
       ensureWorker(i).postMessage({ type: "openSheet", sheetKey, openId: st.openId, pageNum, data: copy }, [copy]);
@@ -152,7 +152,7 @@ export function createTilePool(size = POOL_SIZE) {
       // error event, leaving this promise pending forever. A tile this small
       // pool renders takes seconds; 30s of silence means the worker is gone.
       const timer = sheetBytes
-        ? setTimeout(() => { const p = pending.get(reqId); if (p) onWorkerDeath(p.workerIdx, "tile timed out — treating the worker as killed"); }, 30_000)
+        ? setTimeout(() => { const p = pending.get(reqId); if (p) onWorkerDeath(p.workerIdx, "tile timed out, treating the worker as killed"); }, 30_000)
         : undefined;
       pending.set(reqId, { resolve, reject, workerIdx, timer });
       w.postMessage({ type: "renderTile", reqId, sheetKey: req.sheetKey, scale: req.scale, rect: req.rect, dark: req.dark });

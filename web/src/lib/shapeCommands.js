@@ -85,8 +85,8 @@ export const PROVENANCE_POLICY = {
   replace: "no stamp, no counted, no undo entry (whole-array non-edit)",
   review: "origin.reviewed → true + accepted_ts per still-pending shape; restore puts the prior origin back verbatim",
   ruleApply: "add semantics (created_at + id mint per shape, ONE undo entry per batch); caller-built rule_v1 origin carries rule_id + seed_shape_id",
-  cutout: "#137 — mints the deduct (id + created_at) AND patches its parent's verts_norm/verts_norm_holes/computed as ONE undo entry; parent patch stamps nothing, nothing counts; restore unmints the deduct and reverts the parent verbatim. `runs` carries the OPEN-RUN half of the same ring — wall tile and base are polylines, so the deduct CLIPS them (patch + mint the far side of a middle cut + delete a run swallowed whole) inside this one entry, and a ring that crosses only runs mints no deduct at all",
-  rollcut: "#136 — NO stamp: a manual roll-cut override (slide/resize/reorder/reset) writes LAYOUT metadata (shape.roll_layout) over the shape, never its geometry or provenance; a row without roll_layout clears the key; `prev` (grab-time rows) builds the inverse when a live preview already wrote the final state",
+  cutout: "#137, mints the deduct (id + created_at) AND patches its parent's verts_norm/verts_norm_holes/computed as ONE undo entry; parent patch stamps nothing, nothing counts; restore unmints the deduct and reverts the parent verbatim. `runs` carries the OPEN-RUN half of the same ring, wall tile and base are polylines, so the deduct CLIPS them (patch + mint the far side of a middle cut + delete a run swallowed whole) inside this one entry, and a ring that crosses only runs mints no deduct at all",
+  rollcut: "#136, NO stamp: a manual roll-cut override (slide/resize/reorder/reset) writes LAYOUT metadata (shape.roll_layout) over the shape, never its geometry or provenance; a row without roll_layout clears the key; `prev` (grab-time rows) builds the inverse when a live preview already wrote the final state",
 };
 
 // Undo depth — one bounded gesture history, not an archive (revisions are).
@@ -172,7 +172,7 @@ const assignSnapshot = (s) => ({
  */
 export function applyShapeCommand(shapes, cmd) {
   if (!cmd || !(cmd.type in PROVENANCE_POLICY)) {
-    throw new Error(`Unknown shape command type: ${cmd && cmd.type} — add it to PROVENANCE_POLICY (and decide what it stamps) first.`);
+    throw new Error(`Unknown shape command type: ${cmd && cmd.type}, add it to PROVENANCE_POLICY (and decide what it stamps) first.`);
   }
   switch (cmd.type) {
     // ruleApply IS an add structurally (mint id/created_at, inverse = noCount
@@ -225,7 +225,7 @@ export function applyShapeCommand(shapes, cmd) {
         const prev = cmd.prev || geomSnapshot(s);
         const stamped = stampEdit(withGeomFields(s, prev), kindFor(cmd.editKind));
         const out = { ...stamped, verts_norm: cmd.verts_norm };
-        if (cmd.computed !== undefined) out.computed = cmd.computed;   // move gestures omit computed — translation never re-prices
+        if (cmd.computed !== undefined) out.computed = cmd.computed;   // move gestures omit computed, translation never re-prices
         inverse = geomInverse(cmd.id, cmd.editKind, prev);
         return out;
       });
@@ -332,7 +332,7 @@ export function applyShapeCommand(shapes, cmd) {
             runRedo.push({ id: s.id, next: cutoutSnapshot(s) });
             return withCutout(s, t.prev);
           });
-        if (redoParentNext === null) return { shapes, inverse: null };   // parent vanished — refuse rather than orphan the patch
+        if (redoParentNext === null) return { shapes, inverse: null };   // parent vanished, refuse rather than orphan the patch
         const rez = runsIn?.resurrect || { shapes: [], at: [] };
         rez.shapes.forEach((s, k) => next.splice(Math.min(rez.at[k] ?? next.length, next.length), 0, s));
         const runsBack = (runRedo.length || remint.length || rez.shapes.length)
@@ -361,11 +361,11 @@ export function applyShapeCommand(shapes, cmd) {
         runPrevs.push({ id: s.id, prev: cutoutSnapshot(s) });
         return withCutout(s, t.next);
       });
-      if (parentPrev === null) return { shapes, inverse: null };   // parent vanished mid-gesture — refuse rather than mint an orphaned deduct
+      if (parentPrev === null) return { shapes, inverse: null };   // parent vanished mid-gesture, refuse rather than mint an orphaned deduct
       const runMinted = (runsIn?.mint || []).map((m) => (m.id ? m : { id: `shp-${mintUuid()}`, created_at: nowIso(), ...m, ...mintAuthor(m) }));
       if (minted) next.push(minted);
       if (runMinted.length) next.push(...runMinted);
-      if (!minted && !runPrevs.length && !runMinted.length && !runRemoved.length) return { shapes, inverse: null };   // nothing landed — never a phantom undo entry
+      if (!minted && !runPrevs.length && !runMinted.length && !runRemoved.length) return { shapes, inverse: null };   // nothing landed, never a phantom undo entry
       const runsBack = (runPrevs.length || runMinted.length || runRemoved.length)
         ? { targets: runPrevs, ...(runMinted.length ? { unmintIds: runMinted.map((m) => m.id) } : {}), ...(runRemoved.length ? { resurrect: { shapes: runRemoved, at: runAt } } : {}) }
         : null;

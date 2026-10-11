@@ -141,10 +141,10 @@ test("description joins distinct DESCRIPTION and PRODUCT cells; the words that s
   ];
   const rows = rowsOf(readScheduleSpans(build({ key: "MARK", cols: ["DESCRIPTION", "MANUFACTURER", "PRODUCT", "COLOR"], items })));
   assert.deepEqual(Object.fromEntries(rows.map((r) => [r.finish_tag, r.description])), {
-    "RB-7": "RUBBER BASE — PRODUCT-A", "RB-8": "RUBBER BASE",
-    "LVT-7": "LUXURY VINYL TILE — STYLE-A BASE", "CPT-7": "BROADLOOM CARPET — TRANSITION SERIES",
-    "CPT-8": "CARPET TILE — PRODUCT-B", "HR-7": "HANDRAIL — PRODUCT-C",
-    "P-7": "PAINT", "VCT-7": "VINYL COMPOSITION TILE — STANDARD",
+    "RB-7": "RUBBER BASE, PRODUCT-A", "RB-8": "RUBBER BASE",
+    "LVT-7": "LUXURY VINYL TILE, STYLE-A BASE", "CPT-7": "BROADLOOM CARPET, TRANSITION SERIES",
+    "CPT-8": "CARPET TILE, PRODUCT-B", "HR-7": "HANDRAIL, PRODUCT-C",
+    "P-7": "PAINT", "VCT-7": "VINYL COMPOSITION TILE, STANDARD",
   });
   assert.deepEqual(Object.fromEntries(rows.map((r) => [r.finish_tag, r.category])), {
     "RB-7": "base", "RB-8": "base", "LVT-7": "unassigned", "CPT-7": "unassigned",
@@ -157,9 +157,9 @@ test("description joins MATERIAL and DESCRIPTION; a phrase never spans the two c
   const items = [row("RB-9", "RUBBER", "WALL BASE", "VENDOR-P", "BLACK 21"), row("TS-9", "ALUMINUM", "TRANSITION STRIP", "VENDOR-P", "SATIN 22"), row("CPT-9", "CARPET", "BROADLOOM", "VENDOR-Q", "BLUE 23"), row("CG-9", "STAINLESS STEEL", "CORNER GUARD", "VENDOR-S", "NATURAL 24"), row("P-9", "PAINT", "PAINT", "VENDOR-R", "WHITE 25"), row("LVT-9", "VINYL", "LUXURY VINYL TILE", "VENDOR-R", "OAK 26")];
   const rows = rowsOf(readScheduleSpans(build({ key: "MARK", cols: ["MATERIAL", "DESCRIPTION", "MANUFACTURER", "COLOR"], items, colX: { MATERIAL: 220, DESCRIPTION: 470, MANUFACTURER: 760, COLOR: 1000 } })));
   assert.deepEqual(Object.fromEntries(rows.map((r) => [r.finish_tag, [r.description, r.category]])), {
-    "RB-9": ["RUBBER — WALL BASE", "base"], "TS-9": ["ALUMINUM — TRANSITION STRIP", "transition"],
-    "CPT-9": ["CARPET — BROADLOOM", "unassigned"], "CG-9": ["STAINLESS STEEL — CORNER GUARD", "wall_protection"],
-    "P-9": ["PAINT", "unassigned"], "LVT-9": ["VINYL — LUXURY VINYL TILE", "unassigned"],
+    "RB-9": ["RUBBER, WALL BASE", "base"], "TS-9": ["ALUMINUM, TRANSITION STRIP", "transition"],
+    "CPT-9": ["CARPET, BROADLOOM", "unassigned"], "CG-9": ["STAINLESS STEEL, CORNER GUARD", "wall_protection"],
+    "P-9": ["PAINT", "unassigned"], "LVT-9": ["VINYL, LUXURY VINYL TILE", "unassigned"],
   });
 });
 
@@ -168,7 +168,7 @@ test("a MARK|DESCRIPTION|MANUFACTURER|PRODUCT|REMARKS materials table is read", 
   const rows = rowsOf(readScheduleSpans(build({ key: "MARK", cols: ["DESCRIPTION", "MANUFACTURER", "PRODUCT", "REMARKS"], items })));
   assert.deepEqual(rows.map((r) => r.finish_tag), keysOf(items));
   const by = byKey(rows);
-  assert.equal(by["CPT-1"].description, "BROADLOOM CARPET — LOOP 20");
+  assert.equal(by["CPT-1"].description, "BROADLOOM CARPET, LOOP 20");
   assert.equal(by["CPT-1"].manufacturer, "VENDOR-A");
   assert.equal(by["LVT-1"].remarks, "ADHESIVE: VENDOR-K");
   assert.equal(by["LVT-1"].style, "", "PRODUCT is part of the description, not the style");
@@ -214,7 +214,7 @@ test("a refusal by title names the title, so the caller can say what the table i
   assert.equal(r.title, "DOOR SCHEDULE");
 });
 
-test("a pump schedule is refused by the equipment re-read — the header guard alone would read it", () => {
+test("a pump schedule is refused by the equipment re-read, the header guard alone would read it", () => {
   // GPM and HP are device columns the guard does not list, and DESCRIPTION +
   // MANUFACTURER name a materials table, so only the equipment reader's
   // device columns tell this one apart
@@ -363,17 +363,17 @@ test("item words: the other exclusions and the plural and phrase forms", () => {
   for (const t of ["THRESHOLDS", "REDUCER", "STAIR NOSINGS", "EDGE STRIP", "TRANSITIONS"]) assert.equal(b4(t), "transition", t);
   for (const t of ["WALL PROTECTION", "CORNERGUARD", "PROTECTIVE RAILS", "BUMPER GUARD"]) assert.equal(b4(t), "wall_protection", t);
   // the " — " between two cells is a word of its own: RUBBER | BASE is not RUBBER BASE, but BASE alone still is base
-  assert.equal(b4("RUBBER — BASE"), "base");
-  assert.equal(b4("TRANSITION — HANDRAIL"), "none");
+  assert.equal(b4("RUBBER, BASE"), "base");
+  assert.equal(b4("TRANSITION, HANDRAIL"), "none");
 });
 
 test("item words: punctuation around a word does not hide it; BASE BID and the plural exclusions name nothing", () => {
   const TABLE: Array<[string, string]> = [
     ["RUBBER BASE.", "base"], ["RUBBER BASE;", "base"], ["RUBBER BASE:", "base"], ['"COVE BASE"', "base"], ["THRESHOLD.", "transition"],
     ["CORNER GUARDS.", "wall_protection"], ["WALL-MOUNTED HANDRAIL.", "wall_protection"], ["WATER-BASED SEALER.", "none"],
-    ["LVT — BASE BID", "none"], ["CARPET (BASE BID)", "none"], ["BASE COATS", "none"], ["BASE PLATES", "none"], ["BASE SHEETS", "none"],
+    ["LVT, BASE BID", "none"], ["CARPET (BASE BID)", "none"], ["BASE COATS", "none"], ["BASE PLATES", "none"], ["BASE SHEETS", "none"],
     // the cell boundary still blocks a phrase, punctuation or not
-    ["TRANSITION. — HANDRAIL.", "none"], ["RUBBER. — BASE.", "base"],
+    ["TRANSITION., HANDRAIL.", "none"], ["RUBBER., BASE.", "base"],
   ];
   for (const [text, want] of TABLE) assert.equal(b4(text), want, text);
 });

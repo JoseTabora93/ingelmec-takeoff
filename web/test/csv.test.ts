@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import { csvEsc } from "../src/lib/csv.js";
 import { conditionTotals, totalsToCsv } from "../src/lib/totals.js";
 
-test("csvEsc: numbers pass through untouched — the formula guard is string-only", () => {
+test("csvEsc: numbers pass through untouched, the formula guard is string-only", () => {
   assert.equal(csvEsc(-12.5), "-12.5");   // a negative deduct cell, NOT '-12.5
   assert.equal(csvEsc(0), "0");
   assert.equal(csvEsc(null), "");
@@ -24,7 +24,7 @@ test("csvEsc: strings starting = + - @ or tab get a leading apostrophe", () => {
   assert.equal(csvEsc("plain text"), "plain text");
 });
 
-test("csvEsc: the prefix applies before the quote test — the whole prefixed cell quotes", () => {
+test("csvEsc: the prefix applies before the quote test, the whole prefixed cell quotes", () => {
   assert.equal(csvEsc("=1,2"), "\"'=1,2\"");
 });
 

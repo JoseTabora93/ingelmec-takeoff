@@ -32,7 +32,7 @@ export function parseTakeoffImport(text) {
     throw new Error("Couldn't import takeoff: that file is not valid JSON.");
   }
   if (!doc || typeof doc !== "object" || Array.isArray(doc) || doc.schema !== ANN_SCHEMA) {
-    throw new Error(`Couldn't import takeoff: not a takeoff export (expected schema "${ANN_SCHEMA}" — the file export_takeoff or the app writes).`);
+    throw new Error(`Couldn't import takeoff: not a takeoff export (expected schema "${ANN_SCHEMA}", the file export_takeoff or the app writes).`);
   }
   return doc;
 }
@@ -73,7 +73,7 @@ export function mergeTakeoffImport(current, imported, knownFiles = null) {
   const badMult = impConds.filter((c) => !isValidMultiplier(c.multiplier));
   if (badMult.length) {
     const list = badMult.map((c) => `${c.finish_tag ?? c.id} (${JSON.stringify(c.multiplier)})`).join(", ");
-    throw new Error(`Couldn't import takeoff: condition multiplier must be a positive number — ${list}. Fix the file and re-import. Nothing was imported.`);
+    throw new Error(`Couldn't import takeoff: condition multiplier must be a positive number, ${list}. Fix the file and re-import. Nothing was imported.`);
   }
   const localScales = new Map(arr(cur.sheets).filter((s) => typeof s?.sheet_id === "string").map((s) => [s.sheet_id, s.units_per_px]));
   const incomingScales = new Map(arr(imported.sheets).filter((s) => typeof s?.sheet_id === "string").map((s) => [s.sheet_id, s.units_per_px]));
@@ -182,7 +182,7 @@ export function mergeTakeoffImport(current, imported, knownFiles = null) {
     .map((p) => (condMap.has(p.condition_id) ? { ...p, condition_id: condMap.get(p.condition_id) } : p))
     .filter((p) => condIds.has(p.condition_id))
     .filter((p) => p.proposed.finish_tag === undefined || !takenTags.has(tagKey(p.proposed.finish_tag)) || tagKey(p.proposed.finish_tag) === tagKey(conditions.find((c) => c.id === p.condition_id)?.finish_tag))
-    .filter((p) => !arr(cur.condition_edit_proposals).some((q) => q?.condition_id === p.condition_id));   // one pending diff per condition — the operator's own stays
+    .filter((p) => !arr(cur.condition_edit_proposals).some((q) => q?.condition_id === p.condition_id));   // one pending diff per condition, the operator's own stays
   // ── approvals (#176): transport, not minting ──────────────────────────────
   // The markup rule (append new ids, skip ones already here) behind the same
   // load gate the canvas hydrate runs — an estimator seal arriving by file

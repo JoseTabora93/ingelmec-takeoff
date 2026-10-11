@@ -62,9 +62,9 @@ export function describeConditionEdit(cond, proposal) {
     if (f === "finish_tag") rows.push({ field: "tag", from: String(cur.finish_tag ?? ""), to: String(diff.finish_tag) });
     else if (f === "waste_pct") rows.push({ field: "waste", from: `${Number(cur.waste_pct) || 0}%`, to: `${Number(diff.waste_pct)}%` });
     else if (f === "multiplier") rows.push({ field: "multiplier", from: `×${Number(cur.multiplier) || 1}`, to: `×${Number(diff.multiplier)}` });
-    else if (f === "height_ft") rows.push({ field: "height", from: cur.height_ft != null ? `${cur.height_ft} ft` : "—", to: `${Number(diff.height_ft)} ft` });
-    else if (f === "rise_ft") rows.push({ field: "rise", from: cur.rise_ft != null ? `${cur.rise_ft} ft` : "—", to: `${Number(diff.rise_ft)} ft` });
-    else if (f === "drop_ft") rows.push({ field: "drop", from: cur.drop_ft != null ? `${cur.drop_ft} ft` : "—", to: `${Number(diff.drop_ft)} ft` });
+    else if (f === "height_ft") rows.push({ field: "height", from: cur.height_ft != null ? `${cur.height_ft} ft` : "", to: `${Number(diff.height_ft)} ft` });
+    else if (f === "rise_ft") rows.push({ field: "rise", from: cur.rise_ft != null ? `${cur.rise_ft} ft` : "", to: `${Number(diff.rise_ft)} ft` });
+    else if (f === "drop_ft") rows.push({ field: "drop", from: cur.drop_ft != null ? `${cur.drop_ft} ft` : "", to: `${Number(diff.drop_ft)} ft` });
     else if (f === "roll_setup") rows.push({ field: "roll goods", from: roll(cur.roll_setup), to: roll(diff.roll_setup) });
   }
   return rows;
@@ -99,7 +99,7 @@ export function acceptConditionEditProposal(conditions, proposal, nowIso = () =>
   if (!Object.keys(patch).length) return { conditions: list, error: "The proposal carries nothing to apply." };
   if (patch.finish_tag !== undefined) {
     const clash = list.find((x) => x && x.id !== c.id && tagKey(x.finish_tag) === tagKey(patch.finish_tag));
-    if (clash) return { conditions: list, error: `${clash.finish_tag} already carries that tag — a condition cannot be renamed onto another.` };
+    if (clash) return { conditions: list, error: `${clash.finish_tag} already carries that tag, a condition cannot be renamed onto another.` };
   }
   return { conditions: list.map((x) => (x.id === c.id ? { ...x, ...patch, updated_at: nowIso() } : x)), error: null };
 }

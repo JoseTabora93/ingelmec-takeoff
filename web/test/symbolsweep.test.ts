@@ -29,7 +29,7 @@ function place(sets: { at: Point; rot?: number; mir?: boolean; sc?: number; segs
   for (const s of sets) {
     const th = ((s.rot ?? 0) * Math.PI) / 180;
     const c = Math.cos(th), sn = Math.sin(th);
-    const k = s.sc ?? 1;   // drawn size — a detail sheet draws the same mark larger
+    const k = s.sc ?? 1;   // drawn size, a detail sheet draws the same mark larger
     const tx = (x0: number, y0: number): Point => {
       const x = x0 * k, y = y0 * k;
       const mx = s.mir ? -x : x;
@@ -110,11 +110,11 @@ test("a perturbed near-miss lands in withheld with a reason, and is never a matc
   assert.ok(Math.abs(w.at[0] - 200 - 11.95) < 3, "reported where the near-miss sits");
 });
 
-test("tolerance behavior: jitter within tolPx matches, beyond it does not — and a wider tolerance recovers it", () => {
+test("tolerance behavior: jitter within tolPx matches, beyond it does not, and a wider tolerance recovers it", () => {
   const segs = place([
     { at: [0, 0] },
-    { at: [100, 0], jitter: 0.7 },   // endpoints off ±0.7px — inside the 2px ball
-    { at: [200, 0], jitter: 5 },     // endpoints off ±5px — outside it
+    { at: [100, 0], jitter: 0.7 },   // endpoints off ±0.7px, inside the 2px ball
+    { at: [200, 0], jitter: 5 },     // endpoints off ±5px, outside it
   ]);
   const tight = sweepSymbols(segs, RECT);   // default tol 2
   assert.equal(tight.matches.length, 1, "0.7px jitter matches at tol 2");
@@ -132,10 +132,10 @@ test("a decoy cluster sharing some segments does NOT match", () => {
   ]);
   const r = sweepSymbols(segs, RECT);
   assert.equal(r.matches.length, 1);
-  assert.equal(r.withheld.length, 0, "0.688 is below the withhold floor — not the symbol, not a near-miss");
+  assert.equal(r.withheld.length, 0, "0.688 is below the withhold floor, not the symbol, not a near-miss");
 });
 
-test("the work ceiling is reported, never silent — a truncated count says so", () => {
+test("the work ceiling is reported, never silent, a truncated count says so", () => {
   const many = Array.from({ length: 40 }, (_, i) => ({ at: [i * 50, 0] as Point }));
   const segs = place(many);
   const r = sweepSymbols(segs, RECT, { maxCandidates: 10 });
@@ -148,7 +148,7 @@ test("the work ceiling is reported, never silent — a truncated count says so",
   assert.equal(full.matches.length, 39);
 });
 
-test("the default scores every proposal — no caller-side cap needed for a complete count (#261)", () => {
+test("the default scores every proposal, no caller-side cap needed for a complete count (#261)", () => {
   // 40 instances of a symbol whose segment lengths repeat sheet-wide: the
   // anchor-rarity walk proposes far more placements than instances exist,
   // which is exactly the small-dense-symbol case the old 20k default bit on.
@@ -180,7 +180,7 @@ test("cross-sheet: a fingerprint from a detail sheet finds every instance on a p
   // the "plan sheet": three instances, one rotated — different array entirely
   const plan = place([{ at: [50, 50] }, { at: [250, 50] }, { at: [100, 200], rot: 90 }]);
   const r = matchSymbol(fp, plan);
-  assert.equal(r.matches.length, 3, "no seed on this sheet — every instance counts");
+  assert.equal(r.matches.length, 3, "no seed on this sheet, every instance counts");
   assert.equal(r.matches.filter((m) => m.rotation !== 0).length, 1);
   assert.ok(r.matches.every((m) => m.score === 1));
   // deterministic: same fingerprint, same sheet, same result
@@ -229,7 +229,7 @@ test("#186 the bug: an enlarged detail seed finds NOTHING on the plans, silently
   const plan = place([{ at: [50, 50] }, { at: [250, 50] }, { at: [100, 200], rot: 90 }]);
   const blind = matchSymbol(fp, plan);
   assert.equal(blind.matches.length, 0);
-  assert.equal(blind.withheld.length, 0, "not even a near-miss — indistinguishable from absence");
+  assert.equal(blind.withheld.length, 0, "not even a near-miss, indistinguishable from absence");
 });
 
 test("#186 the fix: the stated ratio resizes the seed and every plan instance is found", () => {
@@ -238,7 +238,7 @@ test("#186 the fix: the stated ratio resizes the seed and every plan instance is
   const r = matchSymbol(fp, plan, { scale: 1 / 12 });
   assert.equal(r.matches.length, 3, "all three, including the rotated one");
   assert.equal(r.matches.filter((m) => m.rotation !== 0).length, 1);
-  assert.ok(r.matches.every((m) => m.score === 1), "exact linework, exact score — no tolerance was loosened to get here");
+  assert.ok(r.matches.every((m) => m.score === 1), "exact linework, exact score, no tolerance was loosened to get here");
   assert.equal(r.scaled?.segments, 6);
   assert.equal(r.scaled?.sub_pixel_dropped, 0);
   assert.equal(r.scaled?.tol_px, 2, "shrinking never loosens the endpoint test");
@@ -251,7 +251,7 @@ test("#186 the reverse trip: a plan seed swept across an enlarged detail sheet",
   assert.equal(matchSymbol(fp, detail).matches.length, 0, "size-true finds nothing");
   const r = matchSymbol(fp, detail, { scale: 12 });
   assert.equal(r.matches.length, 1);
-  assert.equal(r.scaled?.tol_px, 24, "magnifying the seed magnifies its drawn jitter — tolerance rides UP with it");
+  assert.equal(r.scaled?.tol_px, 24, "magnifying the seed magnifies its drawn jitter, tolerance rides UP with it");
 });
 
 test("#186 scale 1 is the pre-#186 search, bit for bit", () => {
@@ -260,7 +260,7 @@ test("#186 scale 1 is the pre-#186 search, bit for bit", () => {
   const plan = place([{ at: [50, 50] }, { at: [250, 50] }, { at: [100, 200], rot: 90 }]);
   const bare = matchSymbol(fp, plan);
   assert.deepEqual(matchSymbol(fp, plan, { scale: 1 }), bare);
-  assert.equal(bare.scaled, undefined, "a same-scale result is the object it always was — no new key");
+  assert.equal(bare.scaled, undefined, "a same-scale result is the object it always was, no new key");
   assert.equal(scaleFingerprint(fp, 1), fp, "and the fingerprint is not even copied");
 });
 
@@ -316,7 +316,7 @@ test("EXTRA disclosure (default): a richer variant still matches, but its extra 
     { at: [300, 0], segs: [...sq, [0, 0, 20, 20]] },   // the "register"
   ]);
   const r = sweepSymbols(segs, [[-2, -2], [22, 22]]);
-  assert.equal(r.matches.length, 3, "supersets still match by default — the #259 contract");
+  assert.equal(r.matches.length, 3, "supersets still match by default, the #259 contract");
   const suspect = r.matches.filter((m) => m.extra !== undefined);
   assert.equal(suspect.length, 1, "exactly one match is a named variant suspect");
   assert.ok(suspect[0].at[0] > 290 && suspect[0].at[0] < 330, "and it is the square-plus-diagonal");
@@ -368,7 +368,7 @@ test("VARIANT GUARD stands down in manual mode: counter-examples keep the contai
   ]);
   const fp = fingerprintSymbol(segs, [[-2, -2], [22, 22]]);
   const withNeg = matchSymbol(fp, segs, { excludeCenter: fp.center, variantGuard: true, exclude: [[[297, -3], [323, 23]]] });
-  assert.equal(withNeg.matches.length, 2, "both drains count — the guard stood down for manual mode");
+  assert.equal(withNeg.matches.length, 2, "both drains count, the guard stood down for manual mode");
   assert.equal(withNeg.rejected.length, 1, "and the louver variant is the negative's rejection");
   const bare = matchSymbol(fp, segs, { excludeCenter: fp.center, variantGuard: true });
   assert.equal(bare.matches.length, 0, "without negatives the guard holds: nothing over the bar commits");

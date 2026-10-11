@@ -60,7 +60,7 @@ test("hidden bar: N of M, totals-unchanged promise, Show all fires", () => {
   const props = { hidden: 8, total: 9, onShowAll: () => { shown += 1; } };
   const out = html(React.createElement(HiddenConditionsBar as any, props));
   assert.match(out, /role="status"/);
-  assert.match(out, /8<!-- --> of <!-- -->9<!-- --> hidden on the plan — totals unchanged|8 of 9 hidden on the plan — totals unchanged/);
+  assert.match(out, /8<!-- --> of <!-- -->9<!-- --> hidden on the plan, totals unchanged|8 of 9 hidden on the plan, totals unchanged/);
   assert.match(out, />Show all</);
   const el: any = (HiddenConditionsBar as any)(props);
   const btn = React.Children.toArray(el.props.children).find((c: any) => c?.type === "button") as any;

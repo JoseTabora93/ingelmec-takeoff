@@ -48,7 +48,7 @@ test("replace keeps the operator's open view when the export carries none", () =
   assert.deepEqual(explicit.payload.sheet_tabs, ["va.pdf#3"]);
 });
 
-test("merge: same finish tag joins the operator's condition — no duplicate, shapes remapped", () => {
+test("merge: same finish tag joins the operator's condition, no duplicate, shapes remapped", () => {
   const current = {
     conditions: [{ id: "mine", finish_tag: " cpt-1 " }],   // tag match is case/space-insensitive
     shapes: [{ id: "s0", sheet_id: "va.pdf", condition_id: "mine" }],
@@ -154,7 +154,7 @@ test("merge gates imported approvals like the hydrate does: corrupt records drop
   assert.equal(mergeTakeoffImport(current, doc()).payload.approvals, undefined);
 });
 
-test("a sealed-but-untraced project MERGES instead of being replaced — a seal is operator ink", () => {
+test("a sealed-but-untraced project MERGES instead of being replaced, a seal is operator ink", () => {
   const current = { project_name: "My Bid", shapes: [], markups: [], conditions: [], sheets: [], approvals: [{ id: "apr-seal", actor: "estimator", sheet_id: "va.pdf", at: [0.3, 0.3] }] };
   const { payload, note } = mergeTakeoffImport(current, doc());
   assert.equal(note.replaced, false, "the seal blocked the clean-replace path");
@@ -174,13 +174,13 @@ test("an imported twin follows its parent through a de-collided id", () => {
     schema: "opentakeoff.takeoff.v1",
     conditions: [
       { id: "cnd-1", finish_tag: "SV-9", family_id: "fam-1", materials: [{ id: "m1", name: "Adhesive", per: 185 }] },
-      { id: "cnd-2", finish_tag: "SV-9 – Level 2", family_id: "fam-1", variant_of: "cnd-1",
+      { id: "cnd-2", finish_tag: "SV-9, Level 2", family_id: "fam-1", variant_of: "cnd-1",
         materials: [{ id: "m2", name: "Adhesive", per: 185, origin_id: "m1", inherited: true }] },
     ],
     shapes: [], sheets: [],
   };
   const { payload } = mergeTakeoffImport(cur, imported);
-  const twin = payload.conditions.find((c: any) => c.finish_tag === "SV-9 – Level 2") as any;
+  const twin = payload.conditions.find((c: any) => c.finish_tag === "SV-9, Level 2") as any;
   const parent = payload.conditions.find((c: any) => c.finish_tag === "SV-9") as any;
   assert.notEqual(parent.id, "cnd-1", "the parent's id collided with the operator's and was freed");
   assert.equal(twin.variant_of, parent.id, "the twin follows the parent's NEW id");
@@ -194,14 +194,14 @@ test("a twin whose parent merged into the operator's own condition keeps its mat
     schema: "opentakeoff.takeoff.v1",
     conditions: [
       { id: "cnd-a", finish_tag: "SV-9", family_id: "fam-1", materials: [{ id: "m1", name: "Adhesive", per: 185 }] },
-      { id: "cnd-b", finish_tag: "SV-9 – Level 2", family_id: "fam-1", variant_of: "cnd-a",
+      { id: "cnd-b", finish_tag: "SV-9, Level 2", family_id: "fam-1", variant_of: "cnd-a",
         materials: [{ id: "m2", name: "Adhesive", per: 185, origin_id: "m1", inherited: true }] },
     ],
     shapes: [], sheets: [],
   };
   const { payload } = mergeTakeoffImport(cur, imported);
-  const twin = payload.conditions.find((c: any) => c.finish_tag === "SV-9 – Level 2") as any;
-  assert.equal(twin.variant_of, undefined, "nothing to follow — the parent is the operator's condition");
+  const twin = payload.conditions.find((c: any) => c.finish_tag === "SV-9, Level 2") as any;
+  assert.equal(twin.variant_of, undefined, "nothing to follow, the parent is the operator's condition");
   assert.equal(twin.family_id, "fam-1", "grouping is cosmetic and rides along");
   assert.equal(twin.materials.length, 1);
   assert.equal(twin.materials[0].per, 185, "it keeps the numbers the file carried");
@@ -240,13 +240,13 @@ test("legacy agent traces are pending on replace and merge; explicit approval su
   }
 });
 
-test("multiplier (#455): 0 / negative / non-numeric is refused on both paths — nothing lands", () => {
+test("multiplier (#455): 0 / negative / non-numeric is refused on both paths, nothing lands", () => {
   const bad = (m: unknown) => doc({ conditions: [{ id: "c1", finish_tag: "CPT-1", multiplier: m, materials: [] }] });
   const empty = { conditions: [], shapes: [], markups: [], sheets: [] };
   const working = { conditions: [{ id: "mine", finish_tag: "LVT-1" }], shapes: [{ id: "s0", sheet_id: "va.pdf", condition_id: "mine" }], markups: [], sheets: [{ sheet_id: "va.pdf", units_per_px: 0.05 }] };
   for (const m of [0, -2, "abc", "3", Number.NaN, Number.POSITIVE_INFINITY, true, {}]) {
     for (const current of [empty, working]) {   // clean-replace path and merge path
-      assert.throws(() => mergeTakeoffImport(current, bad(m)), /Couldn't import takeoff: condition multiplier must be a positive number — CPT-1 .*Nothing was imported/, `multiplier ${String(m)}`);
+      assert.throws(() => mergeTakeoffImport(current, bad(m)), /Couldn't import takeoff: condition multiplier must be a positive number, CPT-1 .*Nothing was imported/, `multiplier ${String(m)}`);
     }
   }
 });

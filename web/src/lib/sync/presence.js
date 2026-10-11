@@ -141,7 +141,7 @@ export function createPresence({
           await provider.deleteFile(c.id).catch(() => {});
           continue;
         }
-        if (age > stale) continue; // silent lately — hidden, not deleted yet
+        if (age > stale) continue; // silent lately, hidden, not deleted yet
         next.push({ device: dev, name: rec.name, sheet: rec.sheet ?? null, at: rec.at, ageMs: age });
       }
       next.sort((a, b) => a.name.localeCompare(b.name) || a.device.localeCompare(b.device));
@@ -157,7 +157,7 @@ export function createPresence({
     onPeers(cb) { subscribers.add(cb); return () => subscribers.delete(cb); },
     start() {
       if (timer) return;
-      beat(); // first read is immediate — the room shows without waiting a cycle
+      beat(); // first read is immediate, the room shows without waiting a cycle
       timer = setInterval(beat, intervalMs);
       // In Node (tests, tooling) an interval holds the event loop open; unref
       // lets the process exit. Browsers return a number — optional chain no-ops.

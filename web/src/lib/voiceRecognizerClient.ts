@@ -11,7 +11,7 @@
 
 export type VoiceModelStatus =
   | { phase: "unprobed" }
-  | { phase: "uninstalled" }              // no model on this origin — feature absent
+  | { phase: "uninstalled" }              // no model on this origin, feature absent
   | { phase: "loading"; pct: number }
   | { phase: "ready" }
   | { phase: "error"; message: string };  // retryable (ensureReady again)

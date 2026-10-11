@@ -28,7 +28,7 @@ test("mergeProposals: a migration chain cannot leave two entries on one peak (#2
   // Old behavior: K1 ends at (7.4, 0.950) and K2 at (7.6, 0.926) — 0.2 px
   // apart, both above the commit bar, one drain counted twice.
   const out = mergeProposals([P(0, 0, 0.93), P(7.6, 0, 0.926), P(3.8, 0, 0.94), P(7.4, 0, 0.95)], 4);
-  assert.equal(out.length, 1, `one physical peak, one entry — got ${out.length}`);
+  assert.equal(out.length, 1, `one physical peak, one entry, got ${out.length}`);
   assert.equal(out[0].score, 0.95, "and the entry is the peak's best reading");
 
   // Distinct placements beyond the radius are never collapsed.
@@ -77,7 +77,7 @@ test("dense jittered instances each count exactly once, matches pairwise separat
       segs.push(ax + ox + j(), ay + oy + j(), bx + ox + j(), by + oy + j());
     }
   };
-  place(100, 100);                          // the seed — clean
+  place(100, 100);                          // the seed, clean
   const instances: [number, number][] = [[300, 100], [500, 100], [100, 300], [300, 300], [500, 300]];
   for (const [x, y] of instances) place(x, y, 0.8);   // drafting jitter inside tol 2
 
@@ -89,7 +89,7 @@ test("dense jittered instances each count exactly once, matches pairwise separat
   for (let i = 0; i < res.matches.length; i++) {
     for (let j = i + 1; j < res.matches.length; j++) {
       const d = Math.hypot(res.matches[i].at[0] - res.matches[j].at[0], res.matches[i].at[1] - res.matches[j].at[1]);
-      assert.ok(d > 4, `rows ${i} and ${j} are ${d.toFixed(1)} px apart — one instance, two rows`);
+      assert.ok(d > 4, `rows ${i} and ${j} are ${d.toFixed(1)} px apart, one instance, two rows`);
     }
   }
 });
@@ -120,6 +120,6 @@ test("adjacent REAL instances are not swallowed: abutting tiles all count (#293 
   for (const [c, r] of far) {
     const cx = c * TW + TW / 2, cy = r * TH + TH / 2;
     assert.ok(res.matches.some((m) => Math.hypot(m.at[0] - cx, m.at[1] - cy) < 8),
-      `the tile at column ${c}, row ${r} is counted — adjacency must survive the coalesce`);
+      `the tile at column ${c}, row ${r} is counted, adjacency must survive the coalesce`);
   }
 });

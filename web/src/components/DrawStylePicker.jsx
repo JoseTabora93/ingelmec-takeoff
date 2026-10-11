@@ -47,7 +47,7 @@ export default function DrawStylePicker({ styles, ids, activeId, onPick }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-soft)", whiteSpace: "nowrap" }}>Style</span>
         <button type="button" aria-haspopup="true" aria-expanded={open} onClick={() => setOpen((v) => !v)}
-          title="Drawing style — the look of the measuring draft (stroke, vertices, readout chip). Applies to the canvas live."
+          title="Drawing style, the look of the measuring draft (stroke, vertices, readout chip). Applies to the canvas live."
           style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", cursor: "pointer", border: `1px solid ${open ? "var(--cobalt)" : "var(--ink-faint)"}`, background: "var(--paper-cream)", color: "var(--ink)", fontSize: 12.5 }}>
           <StylePreview t={active} />
           <span style={{ flex: 1, textAlign: "left" }}>{active.label}</span>

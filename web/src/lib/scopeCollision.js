@@ -157,7 +157,7 @@ export function scopeCollisions(shapes, conditions, frameFor, opts = {}) {
         // a union the overlay refuses: fall back to the pairwise sum for THIS
         // sheet, disclosed, rather than a silent zero
         sheetShared = [...collisions, ...duplicates].filter((p) => p.sheet_id === sheetId).reduce((n, p) => n + p.shared_sf, 0);
-        unmeasured.push({ shape_id: "", sheet_id: sheetId, reason: "union refused — sheet's shared floor is the pairwise sum" });
+        unmeasured.push({ shape_id: "", sheet_id: sheetId, reason: "union refused, sheet's shared floor is the pairwise sum" });
       }
     }
     bySheetOut.push({ sheet_id: sheetId, shared_floor_sf: round2(sheetShared) });

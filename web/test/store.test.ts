@@ -34,7 +34,7 @@ function rawOpen(version: number, upgrade?: (db: IDBDatabase) => void): Promise<
 function probeUpgrade(version: number): Promise<void> {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open("opentakeoff", version);
-    req.onblocked = () => reject(new Error("upgrade blocked — a store connection leaked"));
+    req.onblocked = () => reject(new Error("upgrade blocked, a store connection leaked"));
     req.onsuccess = () => { req.result.close(); resolve(); };
     req.onerror = () => reject(req.error);
   });
@@ -183,7 +183,7 @@ test("putSnapshot: idempotent, id-preserving upsert of a verbatim record incl. s
   await assert.rejects(store.putSnapshot({ id: "snap_x", ts: 1 } as any), /record\.payload/);
 });
 
-test("createLocalStore(null) is the same global store — anonymous app is byte-identical", async () => {
+test("createLocalStore(null) is the same global store, anonymous app is byte-identical", async () => {
   // null scope returns the very same object: no new key, no migration, the
   // existing "annotations" blob IS the anonymous project.
   assert.equal(createLocalStore(null), localStore);
@@ -301,7 +301,7 @@ test("database newer than this build surfaces as a stale-tab VersionError", asyn
     db.createObjectStore("meta");
     db.createObjectStore("snapshots", { keyPath: "id" });
   });
-  future.close(); // no live connection — this is a version mismatch, not a block
+  future.close(); // no live connection, this is a version mismatch, not a block
 
   await assert.rejects(store.listSheets(), (e: any) => {
     assert.equal(e.name, "VersionError");
@@ -336,12 +336,12 @@ test("blocked open rejects BlockedError, then closes its late success (no zombie
 test("friendlyStoreError maps quota to actionable copy; other errors pass through", () => {
   assert.equal(
     friendlyStoreError(Object.assign(new Error("raw engine text"), { name: "QuotaExceededError" })),
-    "Not enough storage space for this snapshot — delete old snapshots or unused PDFs and try again.",
+    "Not enough storage space for this snapshot, delete old snapshots or unused PDFs and try again.",
   );
   assert.equal(friendlyStoreError(new Error("boom")), "boom");
   // TakeoffCanvas routes its message tint on EXACT equality with this string —
   // pin the copy so an edit there can't silently turn the warning green
-  assert.equal(STALE_TAB_MESSAGE, "OpenTakeoff was updated in another tab — reload this tab to continue.");
+  assert.equal(STALE_TAB_MESSAGE, "OpenTakeoff was updated in another tab, reload this tab to continue.");
 });
 
 test("two cloudStores over one IndexedDB scope snapshots by folderId (end-to-end)", async () => {

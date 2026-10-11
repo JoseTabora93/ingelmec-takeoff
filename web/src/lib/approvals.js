@@ -42,7 +42,7 @@ import { mintUuid, nowIso } from "./provenance.js";
 export const APPROVAL_POLICY = {
   add: "mints id (apr- + uuid) + ts per record; restore: true re-adds VERBATIM at the recorded indices (undo of a lift)",
   delete: "no stamp; inverse re-adds the removed records verbatim, original order included",
-  replace: "whole-array non-edit (hydrate) — nothing mints, inverse null (never recorded)",
+  replace: "whole-array non-edit (hydrate), nothing mints, inverse null (never recorded)",
 };
 
 export const APPROVAL_ACTORS = ["estimator", "agent"];
@@ -108,7 +108,7 @@ export function approvalTally(approvals) {
  */
 export function applyApprovalCommand(approvals, cmd) {
   if (!cmd || !(cmd.type in APPROVAL_POLICY)) {
-    throw new Error(`Unknown approval command type: ${cmd && cmd.type} — add it to APPROVAL_POLICY (and decide what it mints) first.`);
+    throw new Error(`Unknown approval command type: ${cmd && cmd.type}, add it to APPROVAL_POLICY (and decide what it mints) first.`);
   }
   switch (cmd.type) {
     case "add": {
@@ -118,7 +118,7 @@ export function applyApprovalCommand(approvals, cmd) {
       const minted = cmd.restore ? cmd.approvals : cmd.approvals.map((a) => {
         const { id, ts, ...rest } = a;
         if (!APPROVAL_ACTORS.includes(rest.actor)) {
-          throw new Error(`Unknown approval actor: ${rest.actor} — must be one of ${APPROVAL_ACTORS.join(", ")}.`);
+          throw new Error(`Unknown approval actor: ${rest.actor}, must be one of ${APPROVAL_ACTORS.join(", ")}.`);
         }
         return { id: id || `apr-${mintUuid()}`, ts: ts || nowIso(), ...rest };
       });

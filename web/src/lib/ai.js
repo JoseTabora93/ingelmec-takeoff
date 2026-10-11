@@ -126,7 +126,7 @@ export function parseVisionResponse(provider, json) {
 
 /** Constrained scale-reading prompt: exactly one known label, or UNKNOWN. */
 export function scaleReadPrompt(labels) {
-  return `This image is the title block region of a construction drawing. Find the stated drawing scale (usually after the word SCALE). Reply with exactly one of the following labels, character for character, or the single word UNKNOWN if no scale is stated. Labels: ${labels.join(" | ")}. Reply with the label only — no other words.`;
+  return `This image is the title block region of a construction drawing. Find the stated drawing scale (usually after the word SCALE). Reply with exactly one of the following labels, character for character, or the single word UNKNOWN if no scale is stated. Labels: ${labels.join(" | ")}. Reply with the label only, no other words.`;
 }
 
 /** One chat-with-tools turn: system + running messages + tool declarations.
@@ -164,7 +164,7 @@ export function buildChatRequest(cfg, { system, messages, tools, maxTokens = 409
  *  plain-language message on any failure. */
 export async function visionQuery({ imageDataUrl, prompt, maxTokens = 100 }) {
   const cfg = aiConfig();
-  if (!isAiConfigured()) throw new Error("AI isn't configured — open AI settings first.");
+  if (!isAiConfigured()) throw new Error("AI isn't configured, open AI settings first.");
   const { url, headers, body } = buildVisionRequest(cfg, { imageDataUrl, prompt, maxTokens });
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), 30000);
@@ -173,8 +173,8 @@ export async function visionQuery({ imageDataUrl, prompt, maxTokens = 100 }) {
     res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body), signal: ctl.signal });
   } catch (e) {
     throw new Error(e?.name === "AbortError"
-      ? "The endpoint took more than 30 seconds — check the model is loaded."
-      : "Couldn't reach the endpoint — check the URL, and that it allows browser requests (CORS).");
+      ? "The endpoint took more than 30 seconds, check the model is loaded."
+      : "Couldn't reach the endpoint, check the URL, and that it allows browser requests (CORS).");
   } finally {
     clearTimeout(timer);
   }
@@ -192,7 +192,7 @@ export async function visionQuery({ imageDataUrl, prompt, maxTokens = 100 }) {
  *  `cfg`/`fetchFn` are injectable for tests (default: live config + fetch). */
 export async function chatWithTools({ cfg, system, messages, tools, maxTokens = 4096, signal, fetchFn }) {
   const c = cfg || aiConfig();
-  if (!(c.endpoint && c.model)) throw new Error("AI isn't configured — open AI settings first.");
+  if (!(c.endpoint && c.model)) throw new Error("AI isn't configured, open AI settings first.");
   const { url, headers, body } = buildChatRequest(c, { system, messages, tools, maxTokens });
   // 120s per turn — agent turns run longer than the 30s vision reads. The
   // caller's abort signal still wins whenever the runtime supports combining.
@@ -207,8 +207,8 @@ export async function chatWithTools({ cfg, system, messages, tools, maxTokens = 
     res = await (fetchFn || fetch)(url, { method: "POST", headers, body: JSON.stringify(body), signal: sig });
   } catch (e) {
     if (signal?.aborted || e?.name === "AbortError") throw e;
-    if (e?.name === "TimeoutError") throw new Error("The endpoint took more than 2 minutes — check the model is loaded.");
-    throw new Error("Couldn't reach the endpoint — check the URL, and that it allows browser requests (CORS).");
+    if (e?.name === "TimeoutError") throw new Error("The endpoint took more than 2 minutes, check the model is loaded.");
+    throw new Error("Couldn't reach the endpoint, check the URL, and that it allows browser requests (CORS).");
   }
   if (!res.ok) throw new Error(`AI request failed (HTTP ${res.status}).`);
   const json = await res.json().catch(() => null);

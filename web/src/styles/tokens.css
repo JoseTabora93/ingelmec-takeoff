@@ -35,13 +35,13 @@
 
   /* chrome theming — novel colors pulled out of inline styles */
   --ink-secondary: #4e5d73;      /* secondary readout text */
-  --text-faint:    #8b99ac;      /* faint text/fills — --ink-faint stays hairline-only */
+  --text-faint:    #8b99ac;      /* faint text/fills, --ink-faint stays hairline-only */
   --tint-select:   #e8eefc;      /* checked-row cobalt tint */
   --tint-active:   #edf6f1;      /* active-row green tint */
   --surface-pop:   #ffffff;      /* active chip / lifted fills */
-  --well:          #ffffff;      /* media wells (PDF thumbs, stamp previews) — light in ALL themes */
+  --well:          #ffffff;      /* media wells (PDF thumbs, stamp previews), light in ALL themes */
   --accent-contrast: #ffffff;    /* text/rules on cobalt surfaces */
-  --hairline-warm: #f0e2c8;      /* calibration-prompt border — stays amber-warm on purpose */
+  --hairline-warm: #f0e2c8;      /* calibration-prompt border, stays amber-warm on purpose */
   --divider-soft:  #e7ecf3;      /* readout divider fill */
   --scrim:         rgba(13, 21, 38, .45);
   --shadow-pop:    0 6px 22px rgba(13, 21, 38, .14);
@@ -99,7 +99,7 @@
   /* ergonomic control faces */
   --ctl-s: 26px;   /* compact: zoom steppers, tab close */
   --ctl-m: 32px;   /* standard buttons / inputs */
-  --ctl-l: 36px;   /* tool-rail faces — min comfortable hit target */
+  --ctl-l: 36px;   /* tool-rail faces, min comfortable hit target */
 
   /* shell dimensions */
   --topbar-h: 44px; --rail-w: 56px; --props-w: 264px; --status-h: 28px;
@@ -146,7 +146,7 @@
     --ink:        #d6e2f2;
     --ink-soft:   #a9bbd2;
     --ink-muted:  #566476;
-    --ink-faint:  #161c24;     /* hairlines only — fails contrast as text */
+    --ink-faint:  #161c24;     /* hairlines only, fails contrast as text */
     --text-faint: #7e8ca0;
 
     /* accent → true HUD blue */

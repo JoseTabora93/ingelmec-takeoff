@@ -24,8 +24,8 @@ test("roomLabelSeeds: keeps only room-number tokens, ANY token in a multi-word i
   const items = [
     { str: "OFFICE 101", x: 50, y: 60 },
     { str: "CORRIDOR 104", x: 70, y: 80 },
-    { str: "FLOOR FINISH PLAN", x: 0, y: 0 },        // no digits — dropped
-    { str: "SCALE: 1/4\" = 1'-0\"", x: 10, y: 10 },  // no matching token — dropped
+    { str: "FLOOR FINISH PLAN", x: 0, y: 0 },        // no digits, dropped
+    { str: "SCALE: 1/4\" = 1'-0\"", x: 10, y: 10 },  // no matching token, dropped
     { str: "139A", x: 90, y: 90 },                    // bare number+letter
   ];
   const seeds = roomLabelSeeds(items);
@@ -44,8 +44,8 @@ test("detectRegions: a clean room floods and is kept, status-gated (leak/tiny dr
   const segs = squareSegs(20, 20, 100, 100); // 80x80 interior
   const mask = buildMask(segs, 300, 300);
   const seeds = [
-    { str: "101", seed: [60, 60] as [number, number] },   // inside the room — clean
-    { str: "999", seed: [5, 5] as [number, number] },      // outside the enclosure — leaks
+    { str: "101", seed: [60, 60] as [number, number] },   // inside the room, clean
+    { str: "999", seed: [5, 5] as [number, number] },      // outside the enclosure, leaks
   ];
   const found = detectRegions(mask, seeds);
   assert.equal(found.length, 1, "only the clean flood survives the status gate");
@@ -91,7 +91,7 @@ test("detectRegions: a sub-half-foot slit does not merge two rooms into double-c
   const wallX = 316;                                 // 12 ft from the left wall
   const sharedWall = [
     wallX, 100, wallX, 187,                          // upper stretch
-    wallX, 193, wallX, 280,                          // lower stretch — 6 px slit between
+    wallX, 193, wallX, 280,                          // lower stretch, 6 px slit between
   ];
   const mask = buildMask([...outer, ...shell, ...sharedWall], 1000, 800, MASK_MAX_DIM, null, PXFT);
   const found = detectRegions(mask, [
@@ -225,11 +225,11 @@ test("detectionReport: limits are never empty, and the caveat is always last", (
 
 test("detectionReport: no tags at all is a stated outcome, not an empty screen", () => {
   const none = detectionReport(tally({ patternHits: 0, seeds: 0, regions: 0, proposals: 0 }));
-  assert.equal(none.headline, "No room-number tags on this sheet — detection has nothing to seed from.");
+  assert.equal(none.headline, "No room-number tags on this sheet, detection has nothing to seed from.");
   assert.equal(none.empty, true);
   // numerals present but all rejected reads differently — the reason matters
   const filtered = detectionReport(tally({ patternHits: 7, seeds: 0, regions: 0, proposals: 0 }));
-  assert.equal(filtered.headline, "No room-number tags on this sheet — all 7 matching numerals were rejected as something else.");
+  assert.equal(filtered.headline, "No room-number tags on this sheet, all 7 matching numerals were rejected as something else.");
   assert.equal(filtered.empty, true);
   // …and with zero seeds there is no "N of the seeds were junk" line to add
   assert.equal(filtered.limits.length, 1);
@@ -253,7 +253,7 @@ test("detectionReport: singular/plural, and the tiny threshold is the caller's",
   assert.match(one.headline, /1 room tag found/);
   assert.match(one.message, /1 tag produced nothing/);
   const t = detectionReport(tally({ proposals: 9, tiny: 1 }), 6);
-  assert.match(t.message, /1 proposal under 6 SF .* Reject it\./);
+  assert.match(t.message, /1 proposal under 6 SF.* Reject it\./);
 });
 
 test("detectionReport: message is the headline plus every limit, in order", () => {
@@ -274,7 +274,7 @@ test("detectionReport: a cancelled pass counts failures against what was TRIED",
   // 10 tags on the sheet, stopped after 4, of which 3 produced a room
   const r = detectionReport(cancelTally({ tried: 4, regions: 3, proposals: 3, cancelled: true }));
   assert.match(r.headline, /3 of 4 room tags produced a room \(10 on the sheet\)/);
-  assert.ok(r.limits.some((l) => /Stopped early — 6 room tags were never tried/.test(l)),
+  assert.ok(r.limits.some((l) => /Stopped early, 6 room tags were never tried/.test(l)),
     `must say what was skipped, got ${JSON.stringify(r.limits)}`);
   assert.ok(r.limits.some((l) => /^1 tag produced nothing/.test(l)),
     `only the ONE tried-and-failed tag is a failure, got ${JSON.stringify(r.limits)}`);

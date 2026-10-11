@@ -54,7 +54,7 @@ test("one 20-ft-wide room off a 12-ft roll figures ONE seam its whole length", (
     rollWidthFt: 12, seamAllowanceIn: 2, wallOverageIn: 3, doorwayOverageIn: 0,
   });
   assert.equal(strips.length, 2);
-  assert.equal(seamLfForStrips(strips), 30, "one seam, the full run — NOT the cut length (30.5 with overage)");
+  assert.equal(seamLfForStrips(strips), 30, "one seam, the full run, NOT the cut length (30.5 with overage)");
   assert.deepEqual([...seamLfBySrc(strips)], [["r", 30]]);
 });
 
@@ -64,7 +64,7 @@ test("the same area as two separate 10-ft rooms figures NO seam", () => {
   const b = layoutRingStrips({ id: "b", ring: [{ x: 20, y: 0 }, { x: 30, y: 0 }, { x: 30, y: 30 }, { x: 20, y: 30 }] }, "ns", cfg);
   assert.equal(a.length, 1);
   assert.equal(b.length, 1);
-  assert.equal(seamLfForStrips([...a, ...b]), 0, "600 SF either way — the layout, not the area, decides");
+  assert.equal(seamLfForStrips([...a, ...b]), 0, "600 SF either way, the layout, not the area, decides");
   assert.equal(seamLfBySrc([...a, ...b]).size, 0, "zero entries, not zero-valued ones");
 });
 
@@ -89,7 +89,7 @@ test("an L-shaped room seams only where its two lanes actually face each other",
   assert.equal(seamLfForStrips(strips), 15);
 });
 
-test("seams are measured net of wall overage — a weld does not run up the wall", () => {
+test("seams are measured net of wall overage, a weld does not run up the wall", () => {
   const ring = [{ x: 0, y: 0 }, { x: 20, y: 0 }, { x: 20, y: 30 }, { x: 0, y: 30 }];
   const cut = (wallOverageIn: number) => layoutRingStrips({ id: "r", ring }, "ns",
     { rollWidthFt: 12, seamAllowanceIn: 2, wallOverageIn, doorwayOverageIn: 0 });
@@ -135,7 +135,7 @@ test("a seam_lf materials row divides against the figured seams, ×N and coverag
   const [row] = conditionTotals(cs, shapes, { seamByShape: seamLfByShape(byCond) });
   assert.equal(row.materials[0].basis_qty, 60, "30 ft of seam ×2 units");
   assert.equal(row.materials[0].qty, 60);
-  assert.equal(row.materials[1].qty, 1, "ceil(60 / 100) — you buy whole coils");
+  assert.equal(row.materials[1].qty, 1, "ceil(60 / 100), you buy whole coils");
   // and the basis is disclosed on the line, so a pricing consumer can see it
   assert.equal(row.materials[0].basis, "seam_lf");
 });
@@ -149,7 +149,7 @@ test("a seam_lf row reads 0 without a roll setup, and without shapes to lay out"
   const bare = [{ id: "sv", finish_tag: "SV-1", materials }];
   const [noSetup] = conditionTotals(bare, [rect("wide", "sv", 5, 5, 20, 30)],
     { seamByShape: seamLfByShape(computeRollTakeoff(bare, [], dimsFor, uppFor).byCond) });
-  assert.ok(noSetup.materials[0].qty === 0, "no layout, no quantity — never a percentage of something else");
+  assert.ok(noSetup.materials[0].qty === 0, "no layout, no quantity, never a percentage of something else");
   assert.ok(noSetup.materials[0].basis_qty === 0);
   // a roll setup but no committed floor shapes
   const empty = [{ id: "sv", finish_tag: "SV-1", roll_setup: mintRollSetup("sheet_vinyl"), materials }];

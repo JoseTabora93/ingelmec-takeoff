@@ -96,7 +96,7 @@ test("CPT-2 NIC with a key-column wrap (4\") COVE 19 px under it → CPT-2 (its 
   assertUnticked(rowOf(r, "CPT-2"), "NIC", "wrap");
 });
 
-test("every form as a whole non-key cell — MATERIAL, DESCRIPTION, REMARKS only, SIZE → unticked, the cell as printed", () => {
+test("every form as a whole non-key cell, MATERIAL, DESCRIPTION, REMARKS only, SIZE → unticked, the cell as printed", () => {
   for (const [form, , text] of FORMS) {
     const mat = read([CPT1, { t: "row", key: "CPT-2", cells: { MATERIAL: form } }, RB1]);
     assertUnticked(rowOf(mat, "CPT-2"), text, `MATERIAL ${form}`);

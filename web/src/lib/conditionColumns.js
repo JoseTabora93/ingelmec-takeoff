@@ -24,7 +24,7 @@ export function sanitizeConditionColumns(raw) {
   return raw
     .filter((c) => {
       if (!(c && typeof c === "object" && !Array.isArray(c) && typeof c.id === "string" && c.id && typeof c.name === "string")) return false;
-      if (c.id === "sheet") return false;   // reserved by the report's Group select — a column with this id would be shadowed by the built-in Sheet mode
+      if (c.id === "sheet") return false;   // reserved by the report's Group select, a column with this id would be shadowed by the built-in Sheet mode
       if (seenIds.has(c.id)) return false;
       seenIds.add(c.id);
       return true;

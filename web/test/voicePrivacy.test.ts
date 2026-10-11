@@ -18,7 +18,7 @@ import { WHISPER_SAMPLE_RATE } from "../src/lib/stt/wav.ts";
 const modelsDir = join(dirname(fileURLToPath(import.meta.url)), "..", "public", "models");
 const modelPresent = existsSync(join(modelsDir, "onnx-community", "whisper-tiny.en", "onnx"));
 
-test("privacy: a full dictation cycle performs ZERO network calls", { skip: modelPresent ? false : "voice model not staged — run: node scripts/fetch-voice-model.mjs", timeout: 300000 }, async () => {
+test("privacy: a full dictation cycle performs ZERO network calls", { skip: modelPresent ? false : "voice model not staged, run: node scripts/fetch-voice-model.mjs", timeout: 300000 }, async () => {
   const calls: string[] = [];
   const g = globalThis as Record<string, unknown>;
   const orig = { fetch: g.fetch, XMLHttpRequest: g.XMLHttpRequest, WebSocket: g.WebSocket };

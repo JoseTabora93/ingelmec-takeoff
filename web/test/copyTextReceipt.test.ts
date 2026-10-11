@@ -41,7 +41,7 @@ test("skipped rotated runs are counted on the receipt", () => {
 test("a refused write: the full text in a read-only textarea, a Copy button, Close", () => {
   const long = `${"A".repeat(400)}\nEND`;
   const html = render(makeReceipt({ ...OUT, text: long }, { failed: true, scope: "box", key: "k" }));
-  assert.match(html, /Couldn&#x27;t copy automatically — use Copy below/);
+  assert.match(html, /Couldn&#x27;t copy automatically, use Copy below/);
   const ta = html.match(/<textarea[^>]*>([\s\S]*?)<\/textarea>/);
   assert.ok(ta, "a textarea holds the text");
   assert.match(ta[0], /readonly/i);

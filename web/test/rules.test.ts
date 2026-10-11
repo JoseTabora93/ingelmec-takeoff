@@ -125,7 +125,7 @@ test("applyRuleToProject: propagates to the other room only, dedups the seeded o
   assert.ok(cen[0] > 700 && cen[0] < 740 && cen[1] > 300 && cen[1] < 340, `centroid ${cen} should sit in column b`);
 });
 
-test("applyRuleToProject: idempotent — accepted candidates never re-propose", () => {
+test("applyRuleToProject: idempotent, accepted candidates never re-propose", () => {
   const seed = detectCandidateRule([roomA, roomB, seedDeduct], seedDeduct)!;
   const rule = buildRuleFromSeed(seedDeduct, seed, "CPT-1", { id: "rule-1", now: "2026-07-25T00:00:00.000Z" });
   const first = applyRuleToProject(rule, [roomA, roomB, seedDeduct], sheetData);
@@ -150,5 +150,5 @@ test("applyRuleToProject: sheets without data are skipped, not crashed on", () =
   const rule = buildRuleFromSeed(seedDeduct, seed, "CPT-1", { id: "rule-1", now: "2026-07-25T00:00:00.000Z" });
   const elsewhere: RuleShape = { ...roomB, id: "shp-roomC", sheet_id: "S2" };
   const candidates = applyRuleToProject(rule, [roomA, roomB, elsewhere, seedDeduct], sheetData);
-  assert.equal(candidates.length, 1);   // still just room B — S2 has no mask data
+  assert.equal(candidates.length, 1);   // still just room B, S2 has no mask data
 });

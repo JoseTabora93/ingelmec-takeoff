@@ -242,7 +242,7 @@ test("continuation sheets: '— CONT'D' fragments merge into ONE logical table, 
   if (base.status === "resolved") assert.ok(base.finishes.every((f) => f.source.sheet === "cont.pdf#2"));
 });
 
-test("continuation sheets: a title-only continuation adopts the base's columns — gated on alignment", () => {
+test("continuation sheets: a title-only continuation adopts the base's columns, gated on alignment", () => {
   // aligned columns: rows adopt, the table reads as one
   const g = buildSheetGraph([contPlan, contSchedBase, contSchedHeaderless]);
   const tab = g.tables.find((t) => t.kind === "room-finish")!;
@@ -363,7 +363,7 @@ const MB_KEY: Record<string, Record<string, string>> = {
   "B-201": { FLOOR: "CPT-2", BASE: "RB-2", WALL: "P-2" },
 };
 
-test("multi-building: an unqualified reused number REFUSES and lists the candidates — never first-match", () => {
+test("multi-building: an unqualified reused number REFUSES and lists the candidates, never first-match", () => {
   const g = buildSheetGraph([bldgPlanA, bldgPlanB, bldgSchedA, bldgSchedB]);
   assert.deepEqual(g.buildings, ["A", "B"]);
   assert.equal(g.sheets.find((s) => s.key === "mb.pdf#1")!.building, "A");
@@ -411,7 +411,7 @@ test("multi-building: qualified ROW keys ('A-134') carry their building; sheet n
     spans: [
       sp("BUILDING A - FIRST FLOOR FINISH PLAN", 300, 900),
       sp("OFFICE", 100, 100), sp("A-134", 100, 112),
-      sp("A-601", 600, 50), // a sheet-number reference — NOT a room
+      sp("A-601", 600, 50), // a sheet-number reference, NOT a room
     ],
   };
   const qPlanB: SheetSpans = {
@@ -473,13 +473,13 @@ test("SCORED phase 2: continuation + rotated + multi-building, precision/recall 
   assert.ok(recall >= 0.99, `recall ${recall}`);
 });
 
-test("the failure modes REFUSE with reasons — never silent omission", () => {
+test("the failure modes REFUSE with reasons, never silent omission", () => {
   const g = buildSheetGraph([planSheet, schedSheet]);
   // on the plan, not in the schedule — THE lost-bid case
   const missing = resolveTag(g, "104");
   assert.equal(missing.status, "unresolved");
   assert.match((missing as { reason: string }).reason, /no schedule row for 104/);
-  assert.equal(missing.room?.name, "STORAGE", "the plan bubble is STILL cited even though 104 is uncorroborated — that ink is the evidence the schedule may have missed a room");
+  assert.equal(missing.room?.name, "STORAGE", "the plan bubble is STILL cited even though 104 is uncorroborated, that ink is the evidence the schedule may have missed a room");
   assert.equal(missing.room?.sheet, "set.pdf#1");
   // reused room numbers across buildings — ambiguity refuses
   const dupSheet: SheetSpans = { ...schedSheet, key: "set.pdf#3", spans: schedSheet.spans.map((s) => ({ ...s })) };
@@ -512,7 +512,7 @@ test("the failure modes REFUSE with reasons — never silent omission", () => {
 // a small-font span (a remark cell's 6pt text): the baseline-offset shape
 const rsp = (str: string, x: number, y: number): GraphSpan => ({ str, x, y, w: str.length * 5, h: 6 });
 
-test("revisionOf: whole-span markers only — a bare number or running text never matches", () => {
+test("revisionOf: whole-span markers only, a bare number or running text never matches", () => {
   assert.equal(revisionOf("Δ2"), "2");
   assert.equal(revisionOf("∆ 3"), "3");
   assert.equal(revisionOf("2▲"), "2");
@@ -631,7 +631,7 @@ const WIDE_KEY: Record<string, Record<string, string>> = {
   "503": { FLOOR: "VCT-8", BASE: "RB-8", WALL: "P-8" },
 };
 
-test("wide REMARKS: wrapped and baseline-offset remark lines merge into their row — in order, cited", () => {
+test("wide REMARKS: wrapped and baseline-offset remark lines merge into their row, in order, cited", () => {
   const tab = extractTable(wideSched, "room-finish")!;
   assert.deepEqual(tab.rows.map((r) => r.key), ["501", "502", "503"], "notes below the table mint nothing");
   const r501 = tab.rows.find((r) => r.key === "501")!;
@@ -682,7 +682,7 @@ import { drawnDeltaMarkers } from "../src/lib/sheetgraph.ts";
 const tri = (a: [number, number], b: [number, number], c: [number, number]): number[] =>
   [a[0], a[1], b[0], b[1], b[0], b[1], c[0], c[1], c[0], c[1], a[0], a[1]];
 
-test("drawn deltas: a bare digit inside a digit-scale triangle — circles, roofs, and open shapes are not", () => {
+test("drawn deltas: a bare digit inside a digit-scale triangle, circles, roofs, and open shapes are not", () => {
   const digit = sp("2", 100, 100); // bbox [100,100,105,108], center (102.5, 104)
   // a closed digit-scale triangle around the digit → marker
   const hit = drawnDeltaMarkers([digit], tri([90, 96], [115, 96], [102, 122]));
@@ -774,7 +774,7 @@ const sideSched: SheetSpans = {
   ],
 };
 
-test("side-by-side tables: a code-column right edge hugs the table — the legend next door stays out", () => {
+test("side-by-side tables: a code-column right edge hugs the table, the legend next door stays out", () => {
   const tab = extractTable(sideSched, "room-finish")!;
   assert.equal(tab.rows.length, 2);
   const r701 = tab.rows.find((r) => r.key === "701")!;
@@ -785,7 +785,7 @@ test("side-by-side tables: a code-column right edge hugs the table — the legen
   }
 });
 
-test("finish tables headed SYMBOL extract and chain — the INTERIOR FINISH SCHEDULE shape", () => {
+test("finish tables headed SYMBOL extract and chain, the INTERIOR FINISH SCHEDULE shape", () => {
   // field-found: a real set's finish table is headed SYMBOL | MATERIAL
   // DESCRIPTION | MANUFACTURER | PRODUCT — no CODE/MARK anywhere, so the
   // definitions never chained and every resolution lost its manufacturer
@@ -828,7 +828,7 @@ const twoTierSched: SheetSpans = {
   ],
 };
 
-test("two-tier headers: N/E/S/W sub-columns anchor under their parent — BASE and CEILING stay clean", () => {
+test("two-tier headers: N/E/S/W sub-columns anchor under their parent, BASE and CEILING stay clean", () => {
   const tab = extractTable(twoTierSched, "room-finish")!;
   assert.ok(tab.headers.includes("WALLS N"), `sub-columns are named by parent+sub: ${tab.headers.join(" | ")}`);
   assert.deepEqual(tab.headers.filter((h) => h.startsWith("WALLS ")), ["WALLS N", "WALLS E", "WALLS S", "WALLS W"]);
@@ -861,7 +861,7 @@ test("two-tier headers: N/E/S/W sub-columns anchor under their parent — BASE a
   assert.equal(r.finishes.find((f) => f.surface === "CEILING")!.code, "EXP-1");
 });
 
-test("a lone unexplained token never mints a column — the sub-tier needs a parent above it", () => {
+test("a lone unexplained token never mints a column, the sub-tier needs a parent above it", () => {
   const noParent: SheetSpans = {
     key: "np.pdf#1", sheet_number: "A-610",
     spans: [
@@ -887,11 +887,11 @@ test("isNonFinishSchedule: other families refuse, anything naming FINISH or MATE
     assert.equal(isNonFinishSchedule(t), true, t);
   }
   for (const t of ["INTERIOR FINISH SCHEDULE", "MATERIAL SCHEDULE", "ROOM FINISH SCHEDULE", "DOOR FINISH SCHEDULE", "FINISH LEGEND"]) {
-    assert.equal(isNonFinishSchedule(t), false, `${t} must be kept — when in doubt, keep and let the caller look`);
+    assert.equal(isNonFinishSchedule(t), false, `${t} must be kept, when in doubt, keep and let the caller look`);
   }
 });
 
-test("a DOOR SCHEDULE never becomes a finish table — and the drop is NAMED", () => {
+test("a DOOR SCHEDULE never becomes a finish table, and the drop is NAMED", () => {
   const doorSheet: SheetSpans = {
     key: "door.pdf#1",
     sheet_number: "A-611",
@@ -998,7 +998,7 @@ test("three-tier headers: the LOWEST tier defines the columns, the tiers above N
   assert.equal(res.finishes.find((f) => f.surface === "BASE")!.code, "WB-1");
 });
 
-test("a table ends where its rows stop — a legend far below is not extra rows", () => {
+test("a table ends where its rows stop, a legend far below is not extra rows", () => {
   const sched: SheetSpans = {
     key: "end.pdf#1", sheet_number: "A-622",
     spans: [
@@ -1231,7 +1231,7 @@ test("#374: resolve_tag answers FLOOR / BASE / WAINSCOT for a room on a two-tier
   assert.equal((r as any).finishes[0].surface, "FLOOR FINISH", "FLOOR still leads the answer");
   const u = resolveTag(g, "103A");
   assert.equal(u.status, "unresolved");
-  assert.match((u as any).reason, /no finish cells/, "103A has a row but no finishes — the reason says so, not 'no row'");
+  assert.match((u as any).reason, /no finish cells/, "103A has a row but no finishes, the reason says so, not 'no row'");
 });
 
 // ── equipment schedules (the MEP family) ─────────────────────────────────────
@@ -1275,13 +1275,13 @@ test("equipment: every stacked schedule on the sheet extracts, in order, keyed b
   assert.equal(extractTable(mechSheet, "equipment")?.title?.text, "ELECTRIC BASEBOARD HEATER SCHEDULE");
 });
 
-test("equipment: a material schedule that says MARK and MANUFACTURER is refused by the gate — no powered column", () => {
+test("equipment: a material schedule that says MARK and MANUFACTURER is refused by the gate, no powered column", () => {
   const onlyMaterial: SheetSpans = { key: "m", spans: mechSheet.spans.filter((t) => t.y >= 360) };
   assert.equal(extractTable(onlyMaterial, "equipment"), null);
   assert.equal(extractTable(onlyMaterial, "finish")?.rows[0].key, "CPT-1");
 });
 
-test("equipment: the whole graph indexes each schedule once — the fan schedule never doubles as a finish table", () => {
+test("equipment: the whole graph indexes each schedule once, the fan schedule never doubles as a finish table", () => {
   const g = buildSheetGraph([mechSheet]);
   const kinds = g.tables.map((t) => `${t.kind}:${t.title?.text}`).sort();
   assert.deepEqual(kinds, [
@@ -1298,7 +1298,7 @@ test("equipment: the whole graph indexes each schedule once — the fan schedule
   assert.equal(fan.rows[0].sheet, "mech.pdf#2");
 });
 
-test("equipment: row keys are marks — EBB-1, EF1, AHU-2A, VAV-12 — and a bare sheet number is not one", () => {
+test("equipment: row keys are marks, EBB-1, EF1, AHU-2A, VAV-12, and a bare sheet number is not one", () => {
   const one = (key: string) => extractTable({ key: "k", spans: [
     sp("PUMP SCHEDULE", 60, 40),
     sp("MARK", 60, 60), sp("GPM", 120, 60), sp("HP", 180, 60), sp("VOLTS", 240, 60),
@@ -1312,7 +1312,7 @@ test("equipment: row keys are marks — EBB-1, EF1, AHU-2A, VAV-12 — and a bar
   assert.equal(one("134"), null, "a bare room number is not a mark");
 });
 
-test("equipment: a LIGHT FIXTURE SCHEDULE keyed by letter TYPE reads — any trade, not one module", () => {
+test("equipment: a LIGHT FIXTURE SCHEDULE keyed by letter TYPE reads, any trade, not one module", () => {
   const t = extractTable({ key: "e", spans: [
     sp("LIGHT FIXTURE SCHEDULE", 60, 40),
     sp("TYPE", 60, 60), sp("DESCRIPTION", 120, 60), sp("LAMPS", 300, 60), sp("VOLTS", 360, 60), sp("MOUNTING", 420, 60),

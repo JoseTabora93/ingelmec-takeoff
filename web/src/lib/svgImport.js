@@ -368,7 +368,7 @@ export function svgToStamp({ primitives, name } = {}) {
   const elements = baked.map(({ path, color, fill }) => ({
     type: "svg",
     path: transformPath(path, (x, y) => [x - minX, y - minY]),
-    vb: [vbW, vbH],   // a fresh array per element — never share the reference (aliasing footgun)
+    vb: [vbW, vbH],   // a fresh array per element, never share the reference (aliasing footgun)
     at: [0, 0],
     w: DEFAULT_W,
     color,

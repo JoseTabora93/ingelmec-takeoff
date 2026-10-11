@@ -33,7 +33,7 @@ export function agentSystemPrompt() {
     oneClick
       ? "- NEVER invent geometry. Rooms are measured by the one_click flood-fill engine; propose only the rings it returns."
       : "- NEVER invent geometry. One-Click is temporarily gated (there is no one_click tool on this surface). A room's polygon is its wall faces: read them in view_region, trace only the ring you can SEE, and say which walls it follows.",
-    "- NEVER assume a scale. If a sheet has no scale set, report that (the tool refusal tells you) and stop work on that sheet — the estimator must calibrate it.",
+    "- NEVER assume a scale. If a sheet has no scale set, report that (the tool refusal tells you) and stop work on that sheet, the estimator must calibrate it.",
     `- Every proposal MUST cite evidence: the schedule row tag and/or the exact matched text token (a room tag or schedule cell) and/or the ${oneClick ? "one_click seed" : "seed point you measured from"}. propose_shapes rejects uncited shapes.`,
     "- You stage proposals only. A human reviews every shape at the accept gate; nothing you do commits a takeoff.",
     "",

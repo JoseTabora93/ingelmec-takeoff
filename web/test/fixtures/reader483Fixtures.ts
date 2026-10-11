@@ -449,15 +449,15 @@ export const expectedChanges: Record<string, TwinExpectation> = {
       // slices 1–2: the golden { rows: [], refused: "no-table" } (headerOnly with empty skipped → no-table)
       3: { rows: [
         // description = joinParts([qualifier, DESCRIPTION]); BASES → base by heading (pass 2's section); REMARKS cell → remarks
-        row("FTB-01", { section: "BASES", category: "base", category_source: "heading", description: "CUT (C) — TILE BASE", remarks: "VENDOR-F", key_rule: "extended" }),
-        row("FTB-02", { section: "BASES", category: "base", category_source: "heading", description: "COVE — TILE BASE", remarks: "VENDOR-F", key_rule: "extended" }),
+        row("FTB-01", { section: "BASES", category: "base", category_source: "heading", description: "CUT (C), TILE BASE", remarks: "VENDOR-F", key_rule: "extended" }),
+        row("FTB-02", { section: "BASES", category: "base", category_source: "heading", description: "COVE, TILE BASE", remarks: "VENDOR-F", key_rule: "extended" }),
       ] },
     },
     changes: [
       { slice: 3, kind: "refusal-flip", fields: { from: "no-table", to: "rows" }, clause: "a table with no pass-1 rows; hasSection from the consumed BASES heading; the guards (a printed heading → no header refusal): MARK|DESCRIPTION|REMARKS + BASES + only FTB rows → rows under BASES" },
       { slice: 3, kind: "added-row", rows: ["FTB-01", "FTB-02"], clause: "pass-1-unattached lines are eligible; the qualifier split (eligible lines always split); the table run from the header; section = pass 2's curSection" },
-      { slice: 3, kind: "description-prefix", rows: ["FTB-01"], fields: { description: "CUT (C) — TILE BASE" }, clause: "description = joinParts([qualifier, …]): FTB-01 → `CUT (C) — TILE BASE`" },
-      { slice: 3, kind: "description-prefix", rows: ["FTB-02"], fields: { description: "COVE — TILE BASE" }, clause: "the qualifier split (COVE: 4 letters, not in DENY); description = joinParts([qualifier, …])" },
+      { slice: 3, kind: "description-prefix", rows: ["FTB-01"], fields: { description: "CUT (C), TILE BASE" }, clause: "description = joinParts([qualifier, …]): FTB-01 → `CUT (C), TILE BASE`" },
+      { slice: 3, kind: "description-prefix", rows: ["FTB-02"], fields: { description: "COVE, TILE BASE" }, clause: "the qualifier split (COVE: 4 letters, not in DENY); description = joinParts([qualifier, …])" },
     ],
   },
   "mq-alternation": {

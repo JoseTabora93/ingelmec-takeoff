@@ -13,7 +13,7 @@ test("playFromCondition keeps recipe fields, drops ids/geometry", () => {
   }, mint("play"));
   assert.equal(play.name, "LVT std");
   assert.equal(play.waste_pct, 8);
-  assert.equal((play as any).multiplier, undefined);   // project-specific — never saved
+  assert.equal((play as any).multiplier, undefined);   // project-specific, never saved
   assert.equal((play as any).id, "play-1");
   assert.equal(play.materials.length, 1);
   assert.equal((play.materials[0] as any).id, undefined);

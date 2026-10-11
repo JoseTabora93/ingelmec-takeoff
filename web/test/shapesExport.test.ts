@@ -14,7 +14,7 @@ test("shapesDetail: every shape appears exactly once, input order preserved", ()
   assert.deepEqual(rows.map((r: any) => r.shape_id), ["a", "b", "c"]);
 });
 
-test("shapesDetail: signs and roles — deduct negative, count carries EA only, linear carries LF + border SF", () => {
+test("shapesDetail: signs and roles, deduct negative, count carries EA only, linear carries LF + border SF", () => {
   const shapes = [
     { id: "d", sheet_id: "sh1", condition_id: "ct", measure_role: "deduct", computed: { area_sf: 30 } },
     { id: "n", sheet_id: "sh1", condition_id: "ct", measure_role: "count", computed: { count: 4, area_sf: 999, perimeter_lf: 999 } },
@@ -44,7 +44,7 @@ test("shapesDetail: shape rows reconcile with conditionTotals (multiplier 1, no 
   assert.equal(linRows.reduce((n: number, r: any) => n + r.lf, 0), ct.lf);
 });
 
-test("shapesDetail: origin column — method passthrough, missing origin is 'untracked'", () => {
+test("shapesDetail: origin column, method passthrough, missing origin is 'untracked'", () => {
   const shapes = [
     { ...floor("a", 10), origin: { method: "one_click_v1" } },
     { ...floor("b", 10), origin: { method: "manual" } },
@@ -65,7 +65,7 @@ test("shapesDetail: height_override only when the flag is literally true", () =>
   assert.equal(w2.height_override, true);
 });
 
-test("shapesDetail: height_ft — legacy shapes fall back to the condition height; an override wins outright, even 0", () => {
+test("shapesDetail: height_ft, legacy shapes fall back to the condition height; an override wins outright, even 0", () => {
   const conds9 = [{ id: "ct", finish_tag: "CT-1", height_ft: 9 }];
   const shapes = [
     { id: "legacy", sheet_id: "sh1", condition_id: "ct", measure_role: "surface_area", computed: { area_sf: 90 } },   // predates per-shape heights
@@ -73,7 +73,7 @@ test("shapesDetail: height_ft — legacy shapes fall back to the condition heigh
     { id: "zero", sheet_id: "sh1", condition_id: "ct", measure_role: "surface_area", computed: { area_sf: 0 }, height_ft: 0, height_override: true },
   ];
   const [legacy, own, zero] = shapesDetail(conds9, shapes);
-  assert.equal(legacy.height_ft, 9);   // condition fallback — what its SF was computed with
+  assert.equal(legacy.height_ft, 9);   // condition fallback, what its SF was computed with
   assert.equal(own.height_ft, 8);
   assert.equal(zero.height_ft, 0);     // overridden 0 stays 0, never the condition's 9
 });
@@ -86,7 +86,7 @@ test("shapesDetail: surface_area carries wall SF and run LF (reference)", () => 
   assert.equal(w.ea, 0);
 });
 
-test("shapesToCsv: empty project — semantics line + header only", () => {
+test("shapesToCsv: empty project, semantics line + header only", () => {
   const csv = shapesToCsv(shapesDetail(conds, []));
   const lines = csv.split("\n");
   assert.ok(lines[0].startsWith("# Per-shape measured quantities"));
@@ -95,7 +95,7 @@ test("shapesToCsv: empty project — semantics line + header only", () => {
   assert.equal(lines.length, 3);
 });
 
-test("shapesDetail: dangling condition_id tolerated — empty finish", () => {
+test("shapesDetail: dangling condition_id tolerated, empty finish", () => {
   const shapes = [{ id: "x", sheet_id: "sh1", condition_id: "gone", measure_role: "floor_area", computed: { area_sf: 10 } }];
   const [row] = shapesDetail(conds, shapes);
   assert.equal(row.finish, "");
@@ -109,8 +109,8 @@ test("shapesToCsv: title, semantics line, exact header, quoting, negative deduct
   ];
   const csv = shapesToCsv(shapesDetail(conds2, shapes), "Job 42");
   const lines = csv.split("\n");
-  assert.equal(lines[0], "# Job 42 — OpenTakeoff shapes");
-  assert.equal(lines[1], "# Per-shape measured quantities — no multiplier or waste; deducts negative; LF on floor/deduct/surface rows is trace reference only (incl. openings) — linear rows alone sum to condition LF; a linear row's LF includes its Rise + Drop");
+  assert.equal(lines[0], "# Job 42, OpenTakeoff shapes");
+  assert.equal(lines[1], "# Per-shape measured quantities, no multiplier or waste; deducts negative; LF on floor/deduct/surface rows is trace reference only (incl. openings), linear rows alone sum to condition LF; a linear row's LF includes its Rise + Drop");
   assert.equal(lines[2], "Shape,Sheet,Sheet ID,Finish,Role,Area SF,LF,EA,Height ft,Height override,Rise ft,Drop ft,Origin");
   assert.ok(lines[3].includes('"CT-1, honed"'));
   // full-line equality: the -12.5 deduct is a NUMBER cell — a type-blind
@@ -159,7 +159,7 @@ test("shapesToJson: schema envelope wraps the rows", () => {
 });
 
 // #441 — a linear row's LF is the total; Rise/Drop columns split the legs out.
-test("shapesDetail: linear rise/drop columns — condition default, per-run override, non-linear rows 0", () => {
+test("shapesDetail: linear rise/drop columns, condition default, per-run override, non-linear rows 0", () => {
   const conds2 = [{ id: "ec", finish_tag: "EC-1", rise_ft: 2, drop_ft: 8 }];
   const shapes = [
     { id: "r1", sheet_id: "sh1", condition_id: "ec", measure_role: "linear", computed: { perimeter_lf: 52, plan_lf: 42, vertical_lf: 10, area_sf: 0 } },

@@ -128,7 +128,7 @@ test("hatch: 45° hatch and crosshatch fill to the walls", () => {
   }
 });
 
-test("hatch: wall-to-wall tile grid — strict pass returns one tile, meta returns the room", () => {
+test("hatch: wall-to-wall tile grid, strict pass returns one tile, meta returns the room", () => {
   const grid: number[] = [];
   for (let x = 100; x <= 700; x += 24) grid.push(x, 100, x, 500);
   for (let y = 100; y <= 500; y += 24) grid.push(100, y, 700, y);
@@ -156,7 +156,7 @@ test("hatch: room-scale rhythm (parallel walls above the pitch cap) is never hat
   assert.ok(approx(ringArea(traceRegion(f)), 60 * 400, 0.08), "one unit only");
 });
 
-test("hatch: fill-only (poché) walls riding the tile rhythm stay hard — the room traces", () => {
+test("hatch: fill-only (poché) walls riding the tile rhythm stay hard, the room traces", () => {
   // The VA demo plan's failure mode: walls drawn as SOLID FILLED shapes whose
   // short 0°/90° outline edges sit exactly on the tile grid's pitch. If they
   // classify as hatch, the escalated fill crosses solid ink and leaks — the
@@ -226,7 +226,7 @@ test("escalation: a moderately hatch-bounded room recovers past the divider (gro
   assert.ok(f.count > strict.count, `escalated fill is larger than strict (${strict.count} → ${f.count})`);
 });
 
-test("escalation: a runaway escalation (balloons past the cap) is discarded — strict stands", () => {
+test("escalation: a runaway escalation (balloons past the cap) is discarded, strict stands", () => {
   // Same left room and softFrac, but the neighbor is far larger (40 wide): removing
   // the divider grows the fill several-fold, over HATCH_GROWTH_MAX, so the strict
   // fill is kept and the result is NOT flagged hatchFiltered.
@@ -239,7 +239,7 @@ test("escalation: a runaway escalation (balloons past the cap) is discarded — 
   assert.equal(f.count, strict.count, "the strict fill is preserved unchanged");
 });
 
-test("escalation: Strict sensitivity empties the moderate band — the room that Balanced recovers stays strict", () => {
+test("escalation: Strict sensitivity empties the moderate band, the room that Balanced recovers stays strict", () => {
   // The recover fixture (softFrac ≈ 0.43) escalates at Balanced; at SENS_STRICT the
   // moderate band collapses (escalateFrac == HATCH_BOUND_FRAC) so it must NOT.
   const { mo, seed } = twoRoomMask(8, 6, 48);
@@ -277,7 +277,7 @@ function gappedRoomSegs(gapFrom: number, gapTo: number): number[] {
   ];
 }
 
-test("seal: a doorway gap leaks the plain flood but seals — smallest radius wins", () => {
+test("seal: a doorway gap leaks the plain flood but seals, smallest radius wins", () => {
   const mask = buildMask(gappedRoomSegs(55, 58), 300, 300);   // 2 open cells
   // Since upstream's gap bridging, the PLAIN flood also recovers this pinhole —
   // as a bridged rescue that says so (gapBridged), never as a clean fill.
@@ -306,7 +306,7 @@ test("seal: a wider doorway escalates the radius; growback restores the true roo
   }
 });
 
-test("seal: an opening wider than the largest radius still refuses — the leak stands", () => {
+test("seal: an opening wider than the largest radius still refuses, the leak stands", () => {
   const mask = buildMask(gappedRoomSegs(55, 68), 300, 300);   // 12 open cells > 2×max(SEAL_RADII)
   assert.ok(2 * Math.max(...SEAL_RADII) < 12, "fixture must exceed the seal reach");
   assert.equal(floodRegionSealed(mask, 60, 60).status, "leak");
@@ -337,7 +337,7 @@ test("dilateHardMask: hard cells fatten by r (diamond), soft (hatch) cells are n
   assert.equal(d.softCount, 1, "soft bookkeeping carries over");
 });
 
-test("seal: hatch semantics survive sealing — a hatched room behind a doorway still escalates", () => {
+test("seal: hatch semantics survive sealing, a hatched room behind a doorway still escalates", () => {
   // the hatched-room fixture from the hatch suite, but with a doorway gap in the
   // top wall: strict flood leaks; the sealed retry must still run the tiered
   // escalation (hatch transparent) and come back hatchFiltered.
@@ -367,7 +367,7 @@ test("sealRadiiFor: doubling ladder up to the door-bridging radius, capped, fall
   assert.deepEqual(sealRadiiFor(NaN), SEAL_RADII);
 });
 
-test("seal: a DOOR-scale opening seals with scale-aware radii — and growback stays out of the corridor", () => {
+test("seal: a DOOR-scale opening seals with scale-aware radii, and growback stays out of the corridor", () => {
   // 3-ft door at ~18 px/ft: a 54-px opening in the south wall of a 216×180 room
   // floating on a 1000×800 sheet (ws=1 under the default mask cap). The old
   // fixed 1/2/4 ladder can't bridge it; sealRadiiFor(18) reaches r=45.
@@ -456,7 +456,7 @@ test("door swing: drawn leaf + swing arc bounds the room WITHOUT sealing (the co
   const f = floodRegionSealed(mask, 200, 200, SENS_BALANCED, sealRadiiFor(18));
   assert.equal(f.status, "ok");
   if (f.status !== "ok") return;
-  assert.equal(f.sealedPx, undefined, "the door linework bounds the fill — sealing must not fire");
+  assert.equal(f.sealedPx, undefined, "the door linework bounds the fill, sealing must not fire");
   const bare = ringArea(traceRegion(f));
   const minusWedge = 214 * 178 - (Math.PI * R * R) / 4;
   assert.ok(approx(bare, minusWedge, 0.05), `room minus swing wedge ≈ ${Math.round(minusWedge)}, got ${bare}`);
@@ -645,7 +645,7 @@ test("subpaths: one moveTo run is one figure; its range covers exactly its segme
   assert.equal(s.closed, false);
 });
 
-test("subpaths: each moveTo starts a NEW figure — a stipple field is many, not one", () => {
+test("subpaths: each moveTo starts a NEW figure, a stipple field is many, not one", () => {
   const items: Array<[number, unknown[]]> = [];
   const path: number[] = [];
   const coords: number[] = [];
@@ -783,7 +783,7 @@ test("offset annotation: a hairline run inboard of a heavier wall is soft", () =
   const [segs, meta] = offsetPair(27, 2, 1);          // 1.5 ft inboard, pen 1 vs 2
   const soft = classifyOffsetAnnotationSegs(segs, meta, 1, A_MAX, A_MIN, A_LEN);
   assert.equal(soft[1], 1, "the hairline ring classifies");
-  assert.equal(soft[0], 0, "the wall does not — what it shadows is LIGHTER");
+  assert.equal(soft[0], 0, "the wall does not, what it shadows is LIGHTER");
 });
 
 test("offset annotation: same pen is no evidence, so nothing is softened", () => {
@@ -798,7 +798,7 @@ test("offset annotation: past the offset cap the pair is unrelated linework", ()
 });
 
 test("offset annotation: a wall's own two faces are below the minimum offset", () => {
-  const [segs, meta] = offsetPair(2, 2, 1);           // 2 px apart — one drawn wall
+  const [segs, meta] = offsetPair(2, 2, 1);           // 2 px apart, one drawn wall
   assert.equal(classifyOffsetAnnotationSegs(segs, meta, 1, A_MAX, A_MIN, A_LEN)[1], 0);
 });
 
@@ -878,13 +878,13 @@ test("dimension string: a rectangle's corners are joints where nothing continues
   // Fitness false positive this rejection exists for
   const segs = [
     100, 100, 500, 100,   // top edge (the would-be run)
-    100, 136, 500, 136,   // bottom edge — 2 ft off, OUTSIDE the iso window
+    100, 136, 500, 136,   // bottom edge, 2 ft off, OUTSIDE the iso window
     100, 100, 100, 136,   // left side: stops AT the top edge
     500, 100, 500, 136,   // right side: stops AT the top edge
   ];
   for (let x = 140; x <= 460; x += 40) segs.push(x - 4, 98, x + 4, 106);  // pattern obliques near the edge
   const soft = classifyDimensionStringSegs(segs, new Uint8Array(segs.length >> 2), 1, D_FT);
-  assert.equal(soft[0], 0, "box edge stays hard — its only junctions are corners");
+  assert.equal(soft[0], 0, "box edge stays hard, its only junctions are corners");
 });
 
 test("dimension string: sub-foot witness rhythm is coursing, not dimensioning", () => {
@@ -995,7 +995,7 @@ function putLeaf(m: Uint8Array, cx: number, cy: number, r: number, a: number) {
   for (let t = 0; t <= r; t += 0.25) {
     for (const o of [-0.5, 0, 0.5]) {
       const x = Math.round(cx + ux * t - uy * o), y = Math.round(cy + uy * t + ux * o);
-      m[y * MW + x] |= 1;                       // hard, NOT curve — that is what makes it a leaf
+      m[y * MW + x] |= 1;                       // hard, NOT curve, that is what makes it a leaf
     }
   }
 }
@@ -1034,7 +1034,7 @@ test("doorLeafCells: finds the straight radius at the arc's end, and only hard i
   const fit = arcClusterFit(cl, MW, m);
   const leaf = doorLeafCells(fit, cl, MW, MH, m, 18);
   assert.ok(leaf && leaf.length > 10, "the leaf is found");
-  for (const i of leaf as number[]) assert.equal(m[i] & MASK_CURVE_BIT, 0, "never returns arc cells — the arc must stay hard");
+  for (const i of leaf as number[]) assert.equal(m[i] & MASK_CURVE_BIT, 0, "never returns arc cells, the arc must stay hard");
 });
 
 test("doorLeafCells: an arc with no leaf drawn returns null", () => {
@@ -1043,7 +1043,7 @@ test("doorLeafCells: an arc with no leaf drawn returns null", () => {
   assert.equal(doorLeafCells(arcClusterFit(cl, MW, m), cl, MW, MH, m, 18), null);
 });
 
-test("doorLeafCells: opens a CONTIGUOUS run — a dotted opening does not breach a barrier", () => {
+test("doorLeafCells: opens a CONTIGUOUS run, a dotted opening does not breach a barrier", () => {
   const m = blank();
   const cl = putArc(m, 100, 100, 30, 0, Math.PI / 2);
   putLeaf(m, 100, 100, 30, 0);
@@ -1109,7 +1109,7 @@ test("markPolylineArcs: a DASHED arc (gaps between dashes, dash-split chords) st
   assert.ok(curveBits >= (segs.length >> 2) - 2, "chords carry the polyarc provenance bit");
 });
 
-test("markPolylineArcs: a joined off-circle stub doesn't kill the arc — trimmed, arc marked, stub not (review round 8)", () => {
+test("markPolylineArcs: a joined off-circle stub doesn't kill the arc, trimmed, arc marked, stub not (review round 8)", () => {
   // a straight stub meets the arc start at a plausible signed turn; its
   // vertex is off the circle, so an all-or-nothing fit would reject the
   // whole window. The trim-retry must recover the arc without the stub.
@@ -1133,7 +1133,7 @@ test("markPolylineArcs: straight dashed lines, zigzags, and ellipses are NOT arc
   const zigzag: number[] = [];
   for (let k = 0; k < 12; k++) zigzag.push(100 + k * 10, k % 2 ? 60 : 50, 110 + k * 10, k % 2 ? 50 : 60);
   const ellipse: number[] = [];
-  { // 2:1 ellipse, 24 chords — turns are arc-like but no single circle fits
+  { // 2:1 ellipse, 24 chords, turns are arc-like but no single circle fits
     let px = 260, py = 300;
     for (let k = 1; k <= 24; k++) {
       const a = (k / 24) * 2 * Math.PI;
@@ -1210,7 +1210,7 @@ test("periodicity: dashed hatch rows (pieces) still classify soft", () => {
   assert.ok(cnt > soft.length * 0.6, `interior dashed rows classify soft (got ${cnt}/${soft.length})`);
 });
 
-test("periodicity: a floating hatch patch is a finish zone — two clicks, two regions, both measured", () => {
+test("periodicity: a floating hatch patch is a finish zone, two clicks, two regions, both measured", () => {
   // 600×400 room; the left quarter carries a floor pattern whose edge row
   // (the outermost hatch line) has no lattice beyond it, so it stays hard:
   // it IS the finish boundary. A click in the open side reads up to it; a
@@ -1232,7 +1232,7 @@ test("periodicity: a floating hatch patch is a finish zone — two clicks, two r
   assert.ok(approx(ringArea(traceRegion(patch)), (240 - 100) * 400, 0.06), `patch reads wall-to-wall, got ${ringArea(traceRegion(patch))}`);
 });
 
-test("extractVectorGeometry: meta emission — paint ops, line width, form XObject matrix", () => {
+test("extractVectorGeometry: meta emission, paint ops, line width, form XObject matrix", () => {
   const OPS: Record<string, number> = {
     save: 1, restore: 2, transform: 3, constructPath: 4, setLineWidth: 5, setGState: 6,
     moveTo: 10, lineTo: 11, curveTo: 12, curveTo2: 13, curveTo3: 14, closePath: 15, rectangle: 16,
@@ -1407,7 +1407,7 @@ describe("extractVectorGeometry: pdf.js ≥ 4.6 folded constructPath", () => {
     assert.equal(g.subpaths![0].closed, true, "DrawOPS closePath closes the figure");
   });
 
-  test("the folded paint op supplies the paint flags — fill and endPath verdicts", () => {
+  test("the folded paint op supplies the paint flags, fill and endPath verdicts", () => {
     const opList = {
       fnArray: [OPS.constructPath, OPS.constructPath, OPS.constructPath],
       argsArray: [
@@ -1498,7 +1498,7 @@ test("classifyHatchSegs stays sub-quadratic on a dense same-angle tick swarm", (
   const soft = classifyHatchSegs(segs, meta, 1, 24);
   const ms = performance.now() - t0;
   assert.equal(soft.length, segs.length / 4);
-  assert.ok(ms < 1500, `classifyHatchSegs took ${Math.round(ms)} ms on 40k same-angle segments in ${ROWS} rows — the row query has gone quadratic again`);
+  assert.ok(ms < 1500, `classifyHatchSegs took ${Math.round(ms)} ms on 40k same-angle segments in ${ROWS} rows, the row query has gone quadratic again`);
 });
 
 // ── segsIntersect / ringSelfIntersects ──────────────────────────────────────
@@ -1523,7 +1523,7 @@ describe("segsIntersect", () => {
     assert.equal(segsIntersect([0, 0], [2, 0], [3, -1], [3, 1]), false, "vertical bar past the segment's end");
   });
 
-  test("collinear overlapping is true — horizontal (x-axis) and vertical (dx=0 axis) runs", () => {
+  test("collinear overlapping is true, horizontal (x-axis) and vertical (dx=0 axis) runs", () => {
     // horizontal: axis picks x; the two runs overlap on [2,4]
     assert.equal(segsIntersect([0, 0], [4, 0], [2, 0], [6, 0]), true);
     // vertical: x can't tell points apart, so the code compares y — the overlap
@@ -1570,7 +1570,7 @@ describe("ringSelfIntersects", () => {
     assert.equal(ringSelfIntersects([[0, 0], [4, 0], [4, 4], [0, 4]]), false);
   });
 
-  test("a concave-but-simple ring (L-shape) does NOT self-intersect — adjacent shared vertices are legitimate", () => {
+  test("a concave-but-simple ring (L-shape) does NOT self-intersect, adjacent shared vertices are legitimate", () => {
     assert.equal(ringSelfIntersects([[0, 0], [4, 0], [4, 2], [2, 2], [2, 4], [0, 4]]), false);
   });
 
@@ -1606,7 +1606,7 @@ describe("minAreaRect", () => {
     assert.ok(r);
     assert.ok(Math.abs(r!.w - 8) < 1e-9 && Math.abs(r!.h - 6) < 1e-9);
   });
-  test("a right triangle ties on a leg or the hypotenuse — the axis-aligned box wins", () => {
+  test("a right triangle ties on a leg or the hypotenuse, the axis-aligned box wins", () => {
     const r = minAreaRect([[0, 0], [8, 0], [8, 6]]);
     assert.ok(r);
     assert.ok(Math.abs(r!.w - 8) < 1e-9 && Math.abs(r!.h - 6) < 1e-9);

@@ -15,7 +15,7 @@ import { ftIn } from "../lib/units";
 import { rollColorForType } from "../lib/rollgoods.js";
 import { HatchSwatch } from "./hatches.jsx";
 
-const PXFT = 9; // diagram scale, px per foot — a 12-ft roll draws 108px wide
+const PXFT = 9; // diagram scale, px per foot, a 12-ft roll draws 108px wide
 
 // One roll's diagram: the roll drawn VERTICALLY (width across, length down),
 // cuts at their packed (cutY across, cutX down) positions, numbered when they
@@ -24,7 +24,7 @@ const PXFT = 9; // diagram scale, px per foot — a 12-ft roll draws 108px wide
 // locally and hands the full new order up on release — the re-pack happens in
 // the engine, never here.
 function RollDiagram({ ri, editable, onReorder }) {
-  const [drag, setDrag] = useState(null); // { id, dx, dy } — local preview only
+  const [drag, setDrag] = useState(null); // { id, dx, dy }, local preview only
   const svgRef = useRef(null);
   const W = ri.config.rollWidthFt * PXFT;
   const lenFt = Math.max(ri.orderFt, 1);
@@ -71,7 +71,7 @@ function RollDiagram({ ri, editable, onReorder }) {
           <text x={pad + W + 4} y={y - 3} fontSize={9} fill="var(--ink-muted)" fontFamily="var(--f-mono)">roll {k + 2}</text>
         </g>;
       })}
-      {/* cuts — cutY across the width (screen x), cutX down the length (screen y) */}
+      {/* cuts, cutY across the width (screen x), cutX down the length (screen y) */}
       {ri.strips.map((s) => {
         const lw = Math.max(0, s.laneMax - s.laneMin), ln = Math.max(0, s.runMax - s.runMin);
         const isDrag = drag && drag.id === s.id;
@@ -82,7 +82,7 @@ function RollDiagram({ ri, editable, onReorder }) {
         return (
           <g key={s.id} onPointerDown={(e) => startDrag(e, s)}
             style={editable ? { cursor: "grab" } : undefined}>
-            <title>{`Cut ${n}${s.label ? ` — ${s.label}` : ""}: ${ftIn(ln)} × ${ftIn(lw)}${s.overRoll ? " — LONGER THAN ONE ROLL (needs a cross-seam)" : ""}`}</title>
+            <title>{`Cut ${n}${s.label ? `, ${s.label}` : ""}: ${ftIn(ln)} × ${ftIn(lw)}${s.overRoll ? ", LONGER THAN ONE ROLL (needs a cross-seam)" : ""}`}</title>
             <rect x={x} y={y} width={w} height={h}
               fill={rollFill + (isDrag ? "88" : "66")}
               stroke={s.overRoll ? "var(--c-danger)" : "var(--ink)"} strokeWidth={s.overRoll ? 1.6 : 0.8} />
@@ -104,7 +104,7 @@ function RollDiagram({ ri, editable, onReorder }) {
 }
 
 export default function RollPanel({
-  layouts, // [{ condId, tag, color, fill, hatch, multiplier, ri }] — ri = computeRollTakeoff summary
+  layouts, // [{ condId, tag, color, fill, hatch, multiplier, ri }], ri = computeRollTakeoff summary
   show, onShow, edit, onEdit,
   onReorder, onResetOrder, onClose,
 }) {
@@ -115,14 +115,14 @@ export default function RollPanel({
         <Icon name="roll" size={15} />
         <strong style={{ flex: 1, fontSize: 12.5 }}>Roll goods</strong>
         <button onClick={() => onShow(!show)} title="Draw the figured cuts over the plan" style={ctl(show)}>cuts</button>
-        <button onClick={() => onEdit(!edit)} title="Edit cuts on the plan — drag a cut along its lane, pull its ends to resize; double-click resets a cut to the figured layout" style={ctl(edit)}>edit</button>
+        <button onClick={() => onEdit(!edit)} title="Edit cuts on the plan, drag a cut along its lane, pull its ends to resize; double-click resets a cut to the figured layout" style={ctl(edit)}>edit</button>
         <button onClick={onClose} title="Close panel" style={{ border: "none", background: "transparent", color: "var(--paper-cream)", fontSize: 16, cursor: "pointer", padding: "0 2px" }}>×</button>
       </div>
       <div style={{ flex: 1, overflow: "auto", fontSize: 12 }}>
         {layouts.length === 0 && (
           <div style={{ padding: 14, color: "var(--ink-muted)", lineHeight: 1.6 }}>
             No roll-goods conditions yet. Open a condition's properties in the Takeoffs
-            panel and add a roll setup (carpet, sheet vinyl, rubber) — its floor areas
+            panel and add a roll setup (carpet, sheet vinyl, rubber), its floor areas
             get figured into cuts here.
           </div>
         )}
@@ -132,8 +132,8 @@ export default function RollPanel({
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 2 }}>
                 <span style={{ borderRadius: 4, overflow: "hidden", lineHeight: 0, flexShrink: 0 }}><HatchSwatch type={hatch || "solid"} line={color} fill={fill} /></span>
                 <b style={{ fontFamily: "var(--f-mono)", fontSize: 12 }}>{tag}</b>
-                {multiplier > 1 && <span style={{ color: "var(--ink-muted)", fontSize: 11 }} title="The condition's ×N applies to the ORDER — the diagram shows one unit's cuts">×{multiplier}</span>}
-                <span style={{ marginLeft: "auto", color: "var(--ink-muted)", fontSize: 10.5, fontFamily: "var(--f-mono)" }}>{ri.direction === "ns" ? "run N–S" : "run E–W"}</span>
+                {multiplier > 1 && <span style={{ color: "var(--ink-muted)", fontSize: 11 }} title="The condition's ×N applies to the ORDER, the diagram shows one unit's cuts">×{multiplier}</span>}
+                <span style={{ marginLeft: "auto", color: "var(--ink-muted)", fontSize: 10.5, fontFamily: "var(--f-mono)" }}>{ri.direction === "ns" ? "run N-S" : "run E-W"}</span>
               </div>
               <div style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink)", marginBottom: 6 }}>
                 order {ftIn(ri.orderFt)} · {Math.round(ri.qty * 100) / 100} {ri.unit.toUpperCase()} · {ri.cutCount} cut{ri.cutCount === 1 ? "" : "s"}
@@ -141,18 +141,18 @@ export default function RollPanel({
               </div>
               {ri.oversize && (
                 <div style={{ margin: "0 0 6px", padding: "5px 8px", border: "1px solid var(--c-danger)", color: "var(--c-danger)", fontSize: 11, lineHeight: 1.45 }}>
-                  A cut is longer than one whole roll — it needs a cross-seam the math can't place. Split the run on the plan (edit mode) or raise the max roll length.
+                  A cut is longer than one whole roll, it needs a cross-seam the math can't place. Split the run on the plan (edit mode) or raise the max roll length.
                 </div>
               )}
               <div style={{ overflowX: "auto" }}>
                 <RollDiagram ri={ri} editable onReorder={(ids) => onReorder(condId, ids)} />
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
-                <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>Drag a cut on the roll to change the cutting order — the roll re-packs.</span>
-                <button onClick={() => onResetOrder(condId)} title="Clear the manual cutting order — the packer sequences widest-then-longest again"
+                <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>Drag a cut on the roll to change the cutting order, the roll re-packs.</span>
+                <button onClick={() => onResetOrder(condId)} title="Clear the manual cutting order, the packer sequences widest-then-longest again"
                   style={{ marginLeft: "auto", flexShrink: 0, padding: "2px 8px", border: "1px solid var(--ink-faint)", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 10.5 }}>reset order</button>
               </div>
-              {/* the cut list — numbered in cutting order, with the piece and the room extent */}
+              {/* the cut list, numbered in cutting order, with the piece and the room extent */}
               <div style={{ marginTop: 6 }}>
                 {ri.strips.slice().sort((a, b) => (ri.nums.get(a.id) || 0) - (ri.nums.get(b.id) || 0)).map((s) => {
                   const n = ri.nums.get(s.id) || 0;

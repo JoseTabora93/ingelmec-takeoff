@@ -146,7 +146,7 @@ test("TileLRU.set on an existing key replaces its byte accounting, not doubles i
   assert.equal(lru.get("a"), "v2");
 });
 
-test("TileLRU.onEvict fires for every value leaving the cache — evict, replace, and clear", () => {
+test("TileLRU.onEvict fires for every value leaving the cache, evict, replace, and clear", () => {
   const closed: string[] = [];
   const lru = new TileLRU(200, (v) => closed.push(v as string));
   lru.set("a", "A", 100);

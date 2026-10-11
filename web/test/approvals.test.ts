@@ -93,7 +93,7 @@ test("replace is the hydrate non-edit: inverse null, non-array loads as []", () 
   assert.deepEqual(applyApprovalCommand([seal()], { type: "replace", approvals: undefined }).approvals, []);
 });
 
-test("an unknown command type throws — the APPROVAL_POLICY table is the gate", () => {
+test("an unknown command type throws, the APPROVAL_POLICY table is the gate", () => {
   assert.throws(() => applyApprovalCommand([], { type: "stamp" }), /Unknown approval command type/);
   for (const t of ["add", "delete", "replace"]) assert.ok(t in APPROVAL_POLICY);
 });
@@ -113,7 +113,7 @@ test("sanitizeApprovals: non-arrays load as [], junk drops, valid records surviv
     seal({ id: "apr-3", sheet_id: 7 }),            // bad sheet key
     seal({ id: "apr-4", at: [0.1] }),              // bad point
     seal({ id: "apr-5", at: [0.1, NaN] }),         // non-finite point
-    seal({ actor: "agent" }),                      // duplicate id — first wins
+    seal({ actor: "agent" }),                      // duplicate id, first wins
   ]);
   assert.deepEqual(out, [good]);
 });

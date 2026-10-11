@@ -189,7 +189,7 @@ test("partitionRowsBy: vocabulary order first, ad-hoc sorted after, Unassigned l
   assert.deepEqual(groups.map((g: any) => g.rows.map((r: any) => r.id)), [["rb1"], ["ct1"], ["wt1"], ["lvt2"], ["cnt"]]);
 });
 
-test("partitionRowsBy: '' and non-string attrs fold into the null group — never an empty-labeled ad-hoc group", () => {
+test("partitionRowsBy: '' and non-string attrs fold into the null group, never an empty-labeled ad-hoc group", () => {
   const col = { id: "d", name: "X", values: ["real"] };
   const attrs = new Map([
     ["ct1", { d: "" }],                // empty string → null group
@@ -265,7 +265,7 @@ test("loadGroupBy returns '' without localStorage; saveGroupBy swallows too", ()
 // condition.spec = { manufacturer, style, color, size }; ABSENT when no spec.
 // fixture rows (shape_count > 0): ct1, lvt2, rb1, wt1, cnt — none carry a spec.
 
-test("specValue: the visible-string rule — object required, non-strings/empties/whitespace are nothing", () => {
+test("specValue: the visible-string rule, object required, non-strings/empties/whitespace are nothing", () => {
   assert.equal(specValue({ manufacturer: "Vendor A" }, "manufacturer"), "Vendor A");
   assert.equal(specValue({ manufacturer: "  keep spaces  " }, "manufacturer"), "  keep spaces  "); // untrimmed
   assert.equal(specValue({ style: "" }, "style"), "");
@@ -398,7 +398,7 @@ test("rollColProfile: empty without figured layouts; ×N-applied getters through
   const row = { id: "c1", multiplier: 3 };
   assert.equal(cols[0].get(row, ctx), 87, "order LF ×N");
   assert.equal(cols[1].get(row, ctx), 6, "rolls ×N");
-  assert.equal(cols[2].get(row, ctx), 90, "figured seam LF ×N — N units are N cuttings of the same layout");
+  assert.equal(cols[2].get(row, ctx), 90, "figured seam LF ×N, N units are N cuttings of the same layout");
   assert.equal(cols[0].get({ id: "other", multiplier: 1 }, ctx), "", "a non-roll condition's cell is blank");
   // a summary predating the seam figure reads 0, never NaN
   const legacy = new Map([["c1", { orderFt: 10, rollCount: 1 }]]);

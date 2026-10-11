@@ -86,6 +86,6 @@ export async function saveBrandingSelection(projectId, sel) {
     });
     return true;
   } catch {
-    return false; // quota / private mode / stale tab — caller decides what to do
+    return false; // quota / private mode / stale tab, caller decides what to do
   }
 }

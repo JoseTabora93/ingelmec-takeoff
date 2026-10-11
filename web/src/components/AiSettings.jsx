@@ -15,7 +15,7 @@ export default function AiSettings({ onClose }) {
       <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: 520, maxWidth: "100%", maxHeight: "90%", overflow: "auto", background: "var(--paper-bright)", boxShadow: "var(--shadow-2)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", borderBottom: "1px solid var(--ink)" }}>
           <Icon name="target" size={16} />
-          <strong style={{ fontFamily: "var(--f-display)", fontSize: 15 }}>AI — bring your own key</strong>
+          <strong style={{ fontFamily: "var(--f-display)", fontSize: 15 }}>AI, bring your own key</strong>
         </div>
         <div style={{ padding: 16, fontSize: 13, lineHeight: 1.6, color: "var(--ink)" }}>
           <p style={{ marginTop: 0 }}>
@@ -54,7 +54,7 @@ export default function AiSettings({ onClose }) {
               className="field-input" style={{ marginTop: 4 }} />
           </label>
           <p style={{ background: "var(--paper-shadow)", padding: "8px 10px", fontSize: 12.5, marginTop: 10 }}>
-            The key is stored <strong>in this browser</strong> (localStorage) — anyone with access to this browser
+            The key is stored <strong>in this browser</strong> (localStorage), anyone with access to this browser
             profile can read it, so use a key you can revoke. Leave everything blank and the AI features stay
             out of your way entirely. The endpoint must allow requests from a browser (CORS); local runtimes
             generally allow localhost.

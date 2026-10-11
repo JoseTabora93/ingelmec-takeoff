@@ -16,7 +16,7 @@ const approx = (a: number, b: number, tol = 1e-6) => Math.abs(a - b) <= tol;
 const SQUARE = [[0, 0], [100, 0], [100, 100], [0, 100]];
 const FAR_SQUARE = [[500, 500], [600, 500], [600, 600], [500, 600]];
 
-test("subtractCutout: square hole fully inside — area nets, perimeter ADDS the hole boundary", () => {
+test("subtractCutout: square hole fully inside, area nets, perimeter ADDS the hole boundary", () => {
   const hole = [[40, 40], [60, 40], [60, 60], [40, 60]];   // 20×20 = 400
   const r = subtractCutout(SQUARE, [], hole);
   assert.ok(r);
@@ -27,7 +27,7 @@ test("subtractCutout: square hole fully inside — area nets, perimeter ADDS the
   assert.ok(approx(outerAlone.area, 10000) && approx(outerAlone.perim, 400), "outer ring untouched by an interior hole");
 });
 
-test("subtractCutout: edge-touching cut bites the OUTER ring — only the overlap is removed", () => {
+test("subtractCutout: edge-touching cut bites the OUTER ring, only the overlap is removed", () => {
   const hole = [[90, 40], [110, 40], [110, 60], [90, 60]];   // half inside
   const r = subtractCutout(SQUARE, [], hole);
   assert.ok(r);
@@ -144,7 +144,7 @@ test("cutRun: names the degenerate cases instead of collapsing them to null", ()
   assert.ok(approx(cut?.len ?? 0, 160));
 });
 
-test("cutRunsAcross: EVERY run the ring touches is cut — no unambiguous-parent rule", () => {
+test("cutRunsAcross: EVERY run the ring touches is cut, no unambiguous-parent rule", () => {
   const corner = cutRunsAcross([
     { id: "a", runPx: [[0, 50], [200, 50]] },
     { id: "b", runPx: [[100, 0], [100, 200]] },

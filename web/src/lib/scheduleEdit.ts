@@ -145,8 +145,8 @@ const SKIPPED_RULE = "A four- or five-letter code with no number is read only wh
 export function skippedBanner(skipped: readonly string[]): string {
   const { count, list } = skippedSummary(skipped);
   return count === 1
-    ? `1 code wasn't read: ${list}. ${SKIPPED_RULE} — if it's a finish, add it as a condition yourself.`
-    : `${count} codes weren't read: ${list}. ${SKIPPED_RULE} — if they're finishes, add them as conditions yourself.`;
+    ? `1 code wasn't read: ${list}. ${SKIPPED_RULE}, if it's a finish, add it as a condition yourself.`
+    : `${count} codes weren't read: ${list}. ${SKIPPED_RULE}, if they're finishes, add them as conditions yourself.`;
 }
 
 // The agent's read_schedule note when skipped codes are all a box held.

@@ -13,7 +13,7 @@ const MAX = 4;
 test("group mode: sheetGroup and lastGroup are the SAME array instance (so setLastGroup(sheetGroup) bails)", () => {
   const r = normalizeLoadedGroups({ sheet_group: ["A", "B"], last_group: ["A", "B"] }, MAX);
   assert.deepEqual(r.sheetGroup, ["A", "B"]);
-  assert.equal(r.lastGroup, r.sheetGroup); // reference equality — the whole point
+  assert.equal(r.lastGroup, r.sheetGroup); // reference equality, the whole point
 });
 
 test("group mode: a differing saved last_group is collapsed to the current group (matches effect 824's own behavior)", () => {
@@ -29,7 +29,7 @@ test("single-sheet load: keeps the DISTINCT remembered group for Regroup", () =>
   const r = normalizeLoadedGroups({ sheet_group: [], last_group: ["A", "B"] }, MAX);
   assert.deepEqual(r.sheetGroup, []);
   assert.deepEqual(r.lastGroup, ["A", "B"]);
-  assert.notEqual(r.lastGroup, r.sheetGroup); // distinct — sheetGroup<2 so no sync-effect churn anyway
+  assert.notEqual(r.lastGroup, r.sheetGroup); // distinct, sheetGroup<2 so no sync-effect churn anyway
 });
 
 test("no groups: both empty", () => {

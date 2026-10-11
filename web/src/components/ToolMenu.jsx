@@ -18,7 +18,7 @@ const MENU_W = 232;
 export default function ToolMenu({ face, active = false, accent = "cobalt", title = "", items, onOpenChange, faceStyle, menuStyle, disabled = false, flyout = null }) {
   const [open, setOpen] = useState(false);
   const [flip, setFlip] = useState(false);
-  const [flyAt, setFlyAt] = useState(null);   // {left|right, top, maxH?} for fixed positioning off the trigger rect — fixed, so ancestor overflow can't clip it (the rail)
+  const [flyAt, setFlyAt] = useState(null);   // {left|right, top, maxH?} for fixed positioning off the trigger rect, fixed, so ancestor overflow can't clip it (the rail)
   const rootRef = useRef(null);
 
   useEffect(() => {

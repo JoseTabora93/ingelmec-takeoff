@@ -27,7 +27,7 @@ test("load repair: bad values fall to what the report already billed, good ones 
   assert.deepEqual(conditions.slice(2).map((c: any) => c.multiplier), [1, 1, 1, 3]);
   assert.deepEqual(repaired.map((r) => r.finish_tag), ["ZERO", "NEG", "JUNK", "STR"]);
   const msg = describeMultiplierRepair(repaired);
-  assert.equal(msg, 'Couldn\'t load 4 condition multipliers as saved (must be a positive number) — reset: ZERO 0 → ×1, NEG -2 → ×1, JUNK "abc" → ×1, STR "3" → ×3. Check these quantities.');
+  assert.equal(msg, 'Couldn\'t load 4 condition multipliers as saved (must be a positive number), reset: ZERO 0 → ×1, NEG -2 → ×1, JUNK "abc" → ×1, STR "3" → ×3. Check these quantities.');
   assert.equal(isDangerMsg(msg), true);   // sticky: a changed quantity must not age out unread
   assert.match(describeMultiplierRepair(repaired.slice(0, 1)), /^Couldn't load a condition multiplier as saved/);
   assert.equal(describeMultiplierRepair([]), "");

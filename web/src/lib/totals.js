@@ -25,7 +25,7 @@ import { GETTERS, CSV_PROFILE, colGetter, floorPerimeterLf, applyUnits, METRIC_C
 import { M_PER_FT, M2_PER_SF } from "./units";
 import { attrValue } from "./conditionColumns.js";
 import { shapeLabelValue } from "./shapeLabels.js";
-import { compareSheetKeys } from "./sheetKey"; // NOT ./sheets — that module imports pdfjs-dist
+import { compareSheetKeys } from "./sheetKey"; // NOT ./sheets, that module imports pdfjs-dist
 import { hasFields, qtyLabels, resolveNote } from "./noteFields.ts";
 
 // Re-export so existing consumers (markedset, snapshotDiff, ReportPanel, tests)
@@ -465,7 +465,7 @@ export function totalsToCsv(rows, projectName = "", bySheet = null, sheetLabel =
     }
   }
 
-  const title = projectName ? `# ${projectName} — ${brandName} report\n` : "";
+  const title = projectName ? `# ${projectName}, ${brandName} report\n` : "";
   return title + lines.join("\n") + "\n";
 }
 
@@ -581,7 +581,7 @@ export function reportJson({ projectName = "", rows = [], bySheet = [], scaleInf
     // RAW internal feet (SF/LF/SY keys, uninterpretable otherwise); this is
     // the display system the exporting user was reading — the units port's
     // "JSON stays raw, but says so" contract.
-    units: "imperial (SF/LF — raw internal values)",
+    units: "imperial (SF/LF, raw internal values)",
     display_units: displayUnits === "metric" ? "metric" : "imperial",
     // roll_goods APPENDS last (additive-only v1, #136): one row per roll-goods
     // condition — the figured order (order_lf / rolls / order_qty in the

@@ -71,7 +71,7 @@ test("replay: the fixture is the read of this sheet's picture, at the page read'
   assert.ok(ocr().terms["CPT-1"], "the read has CPT-1 too (the schedule row)");
 });
 
-test("replay: text pass first, then the read — codes as OCR, text-layer words as text", async () => {
+test("replay: text pass first, then the read, codes as OCR, text-layer words as text", async () => {
   const { text } = await hybrid();
   const map = new Map<string, SheetIndex>();
   assert.equal(putSheetIndex(map, KEY, text), true);
@@ -81,7 +81,7 @@ test("replay: text pass first, then the read — codes as OCR, text-layer words 
   assertFound(map, "text → read");
 });
 
-test("replay: after a reload — the thumbnail's seed, the cached read, then the text pass", async () => {
+test("replay: after a reload, the thumbnail's seed, the cached read, then the text pass", async () => {
   const { text, label } = await hybrid();
   for (const [pass, how] of [[text, "measured pass"], [label, "label-loop pass"]] as const) {
     const map = new Map<string, SheetIndex>();

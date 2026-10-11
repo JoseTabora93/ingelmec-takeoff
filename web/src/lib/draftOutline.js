@@ -24,7 +24,7 @@ export function setDraftOutline(on) {
   const v = !!on;
   try {
     if (typeof localStorage !== "undefined") localStorage.setItem(KEY, v ? ON : OFF);
-  } catch { /* quota / private mode — session-only */ }
+  } catch { /* quota / private mode, session-only */ }
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(EVT, { detail: v }));
 }
 

@@ -18,11 +18,11 @@ import { buildPolyArrangement, faceAt, pointInRing } from "./polyarr";
 
 /** Tunables the harness exposed as env flags. Defaults = the shipped config. */
 export const DEFAULT_OPTS = Object.freeze({
-  GROWMAXW: 0.75,   // ft — growth refuses narrower faces unless touched on 2+ sides
-  LCMIN: 0.7,       // ft — line-closure gap floor (window-mullion breaks)
-  POCKETSF: 25,     // sf — fixture/starved pocket cap
-  GATESF: 15,       // sf — growth absorb gate cap
-  HOLESF: 40,       // sf — interior holes smaller than this are NOT subtracted (gross ruler)
+  GROWMAXW: 0.75,   // ft, growth refuses narrower faces unless touched on 2+ sides
+  LCMIN: 0.7,       // ft, line-closure gap floor (window-mullion breaks)
+  POCKETSF: 25,     // sf, fixture/starved pocket cap
+  GATESF: 15,       // sf, growth absorb gate cap
+  HOLESF: 40,       // sf, interior holes smaller than this are NOT subtracted (gross ruler)
 });
 let OPTS = { ...DEFAULT_OPTS };
 export function setNetOptions(o) { OPTS = { ...DEFAULT_OPTS, ...(o || {}) }; }
@@ -1354,9 +1354,9 @@ export function build(g, ftPx, texts){
   for(const c of lineClosures) extendedClosures.push(c);
   // closures become thin MATERIAL STRIPS: growth must stop at a door in BOTH
   // directions, and a bare line would be merged across by room growth.
-  const closureStrips=[];      // door strips only — these are SOLID
-  const trustedStrips=[];      // arc/panel-evidenced door strips — real doors
-  const passStrips=[];         // window/interruption closures — bays live beyond
+  const closureStrips=[];      // door strips only, these are SOLID
+  const trustedStrips=[];      // arc/panel-evidenced door strips, real doors
+  const passStrips=[];         // window/interruption closures, bays live beyond
   for(const {seg:[a,b], door, kind} of extendedClosures){
     const d=Math.hypot(b[0]-a[0],b[1]-a[1])||1;
     const nx=-(b[1]-a[1])/d, ny=(b[0]-a[0])/d;
@@ -1459,7 +1459,7 @@ export function build(g, ftPx, texts){
         if(len<4*ftPx || len<5*r.thick) continue;
       }
       const [f1,f2]=sideFaces(poly);
-      if(f1>=0 && f1===f2) continue;      // same space on both sides — not a wall
+      if(f1>=0 && f1===f2) continue;      // same space on both sides, not a wall
       kept.push(poly);
     }
     material.length=0; material.push(...kept);

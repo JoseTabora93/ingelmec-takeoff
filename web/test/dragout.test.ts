@@ -10,7 +10,7 @@ import { dragPart, dragFilename, downloadUrlEntry, sheetContentSignature } from 
 
 // ── dragPart: every drop target gets a safe ASCII name ─────────────────────
 test("dragPart: spaces collapse to dashes, unsafe chars drop", () => {
-  assert.equal(dragPart("Harlan Hotel — Level 1"), "Harlan-Hotel-Level-1");
+  assert.equal(dragPart("Harlan Hotel, Level 1"), "Harlan-Hotel-Level-1");
   assert.equal(dragPart("A1.1 FINISH PLAN"), "A1.1-FINISH-PLAN");
 });
 
@@ -38,7 +38,7 @@ test("dragFilename: unnamed project reads as takeoff", () => {
 });
 
 // ── downloadUrlEntry ────────────────────────────────────────────────────────
-test("downloadUrlEntry: mime:filename:url — url may carry colons", () => {
+test("downloadUrlEntry: mime:filename:url, url may carry colons", () => {
   assert.equal(
     downloadUrlEntry("a-marked.pdf", "blob:http://localhost:5173/x"),
     "application/pdf:a-marked.pdf:blob:http://localhost:5173/x",

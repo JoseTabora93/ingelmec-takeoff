@@ -93,7 +93,7 @@ test("cutout: mints the deduct, patches the parent, ONE symmetric undo entry", (
     },
   };
   const res = applyShapeCommand(before, cmd as any);
-  assert.equal(res.shapes.length, 2, "ONE new shape lands — no orphan second overlay");
+  assert.equal(res.shapes.length, 2, "ONE new shape lands, no orphan second overlay");
   const patched = res.shapes.find((s: any) => s.id === "shp-parent");
   assert.equal(patched.verts_norm_holes.length, 1, "parent gained the real hole ring");
   assert.equal(patched.computed.area_sf, 96, "parent's own computed nets the hole out");
@@ -153,7 +153,7 @@ test("cutout runs: a ring through the middle of a wall run cuts it and lands the
   const undone = applyShapeCommand(res.shapes, res.inverse);
   assert.deepEqual(undone.shapes, before, "one undo puts the whole run back");
   const redone = applyShapeCommand(undone.shapes, undone.inverse);
-  assert.deepEqual(redone.shapes, res.shapes, "redo re-cuts verbatim — same ids, same order");
+  assert.deepEqual(redone.shapes, res.shapes, "redo re-cuts verbatim, same ids, same order");
 });
 
 test("cutout runs: an area cut and a run cut drawn in one ring are ONE undo entry", () => {
@@ -246,7 +246,7 @@ test("add: round-trip via the noCount inverse delete is identity", () => {
 test("add: restore:true re-inserts VERBATIM (no created_at re-stamp, no id re-mint) at the recorded indices", () => {
   const a = manualShape("shp-a"), b = machineShape("shp-b"), c = manualShape("shp-c");
   const res = applyShapeCommand([a, c], { type: "add", shapes: [clone(b)], restore: true, at: [1] });
-  assert.deepEqual(res.shapes, [a, b, c]);          // spliced back into the middle — z-order restored
+  assert.deepEqual(res.shapes, [a, b, c]);          // spliced back into the middle, z-order restored
   assert.equal(res.shapes[1].created_at, b.created_at);   // resurrection is not creation
   assert.equal(res.shapes[1].id, b.id);
 });
@@ -273,7 +273,7 @@ test("geom: stamps once via stampEdit and freezes proposed_verts_norm from the T
   assert.match(out.updated_at, ISO);
 });
 
-test("geom: undo removes the edited flag/edits/freeze it added and the updated_at key itself — no phantom edit left behind", () => {
+test("geom: undo removes the edited flag/edits/freeze it added and the updated_at key itself, no phantom edit left behind", () => {
   const m = machineShape();
   assert.ok(!("updated_at" in m) && !m.origin.edited);
   const res = applyShapeCommand([m], {
@@ -361,7 +361,7 @@ test("label: assigns/clears with assignShapeLabel semantics and NO provenance st
   // set on an unlabeled shape
   const set = roundTrip(shapes, { type: "label", ids: [bare.id], value: "Phase 2" });
   assert.equal(set.shapes[0].label, "Phase 2");
-  assert.ok(!("updated_at" in set.shapes[0]), "labeling is a documented non-edit — nothing stamps");
+  assert.ok(!("updated_at" in set.shapes[0]), "labeling is a documented non-edit, nothing stamps");
   assert.deepEqual(set.shapes[0].origin, { method: "manual" });
   // clear an existing label (empty value removes the key, never leaves \"\")
   const cleared = roundTrip(shapes, { type: "label", ids: [tagged.id], value: "" });
@@ -404,7 +404,7 @@ test("delete → undo → redo-of-undo tallies exactly once (the redo command is
 
 // ── replace ──────────────────────────────────────────────────────────────────
 
-test("replace: no stamps, no counted, no inverse — the whole-array escape hatch", () => {
+test("replace: no stamps, no counted, no inverse, the whole-array escape hatch", () => {
   const next = [manualShape("shp-r1")];
   const res = applyShapeCommand([machineShape()], { type: "replace", shapes: next });
   assert.equal(res.shapes, next);          // taken as-is (hydrate already sanitized)
@@ -429,7 +429,7 @@ test("recordCommand: caps the undo stack at UNDO_CAP (oldest falls off) and clea
 
 // ── vertsEqual (the structural zero-motion guard) ────────────────────────────
 
-test("vertsEqual: exact structural comparison — the zero-motion / snapped-back guard", () => {
+test("vertsEqual: exact structural comparison, the zero-motion / snapped-back guard", () => {
   assert.ok(vertsEqual([[0.1, 0.2], [0.3, 0.4]], [[0.1, 0.2], [0.3, 0.4]]));
   assert.ok(!vertsEqual([[0.1, 0.2]], [[0.1, 0.2], [0.3, 0.4]]));   // vertex count differs (insert/delete)
   assert.ok(!vertsEqual([[0.1, 0.2]], [[0.1, 0.20000001]]));
@@ -441,8 +441,8 @@ test("vertsEqual: exact structural comparison — the zero-motion / snapped-back
 test("review: accepts only still-pending shapes (reviewed → true + accepted_ts, nothing else); undo un-accepts verbatim; redo re-accepts verbatim", () => {
   const pending = machineShape("shp-p1");
   pending.origin = { method: "one_click_v1", actor: "agent", seed_norm: [0.4, 0.3], reviewed: false };
-  const accepted = machineShape("shp-a1");   // reviewed: true — must ride through untouched
-  const manual = manualShape("shp-m1");      // no reviewed key — not a proposal, must ride through
+  const accepted = machineShape("shp-a1");   // reviewed: true, must ride through untouched
+  const manual = manualShape("shp-m1");      // no reviewed key, not a proposal, must ride through
   const input = [pending, accepted, manual];
 
   const r1 = applyShapeCommand(input, { type: "review", ids: ["shp-p1", "shp-a1", "shp-m1"] });
@@ -451,7 +451,7 @@ test("review: accepts only still-pending shapes (reviewed → true + accepted_ts
   assert.match(out.origin.accepted_ts, ISO);
   assert.equal(out.origin.actor, "agent");                        // the rest of the origin rides through
   assert.deepEqual(out.origin.seed_norm, [0.4, 0.3]);
-  assert.equal(out.updated_at, undefined, "accepting is affirmation, not an edit — no updated_at");
+  assert.equal(out.updated_at, undefined, "accepting is affirmation, not an edit, no updated_at");
   assert.equal(r1.shapes[1], accepted, "already-accepted shape untouched (same reference)");
   assert.equal(r1.shapes[2], manual, "manual shape untouched (same reference)");
 
@@ -470,7 +470,7 @@ test("review: an empty or all-non-pending id set is a no-op with an empty restor
 
 // ── ruleApply (#88) ──────────────────────────────────────────────────────────
 
-test("ruleApply: add semantics — mints ids/created_at, one noCount-delete inverse for the batch", () => {
+test("ruleApply: add semantics, mints ids/created_at, one noCount-delete inverse for the batch", () => {
   const base = [manualShape()];
   const drafts = [1, 2].map((i) => ({
     sheet_id: "a.pdf#1", condition_id: "cnd-1", measure_role: "deduct",
@@ -508,7 +508,7 @@ test("rollcut: sets / clears roll_layout with an exact inverse; prev overrides t
   // set on a — inverse row carries NO roll_layout key (clear on undo)
   const r1 = applyShapeCommand(shapes, { type: "rollcut", rows: [{ id: "a", roll_layout: rl }] });
   assert.deepEqual(r1.shapes[0].roll_layout, rl);
-  assert.equal(r1.shapes[0].updated_at, undefined, "no stamp — layout metadata is not a shape edit");
+  assert.equal(r1.shapes[0].updated_at, undefined, "no stamp, layout metadata is not a shape edit");
   assert.deepEqual(r1.inverse, { type: "rollcut", rows: [{ id: "a" }] });
   const undone = applyShapeCommand(r1.shapes, r1.inverse);
   assert.deepEqual(undone.shapes, shapes, "undo restores the input verbatim, key absence included");
@@ -551,13 +551,13 @@ test("add: declared author is stamped at mint; a shape already attributed keeps 
   } finally { setAuthorName(""); }
 });
 
-test("add: undeclared session mints no author field — payloads byte-identical", () => {
+test("add: undeclared session mints no author field, payloads byte-identical", () => {
   setAuthorName("");
   const { shapes } = applyShapeCommand([], { type: "add", shapes: [{ sheet_id: "a#1", verts_norm: [[0, 0], [1, 0], [1, 1]] }] });
   assert.equal("author" in shapes[0], false);
 });
 
-test("add restore (undo of a delete) never re-attributes — resurrection is not creation", () => {
+test("add restore (undo of a delete) never re-attributes, resurrection is not creation", () => {
   try {
     const dead = { id: "shp-x", created_at: "2026-01-01T00:00:00.000Z", sheet_id: "a#1", verts_norm: [[0, 0], [1, 0], [1, 1]] };
     setAuthorName("Michael E");

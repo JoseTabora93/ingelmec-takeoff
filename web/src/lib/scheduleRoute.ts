@@ -22,11 +22,11 @@ import { STRAY_TEXT_MAX } from "./strayText.ts";
 const WHERE = "(its CODE / TAG / MARK / SYMBOL column and MATERIAL / MANUFACTURER / COLOR headers)";
 
 /** The re-drag hint when the box held text but no table. */
-export const NO_SCHEDULE_HINT = `No schedule found in that box — drag around the finish/material schedule ${WHERE}.`;
+export const NO_SCHEDULE_HINT = `No schedule found in that box, drag around the finish/material schedule ${WHERE}.`;
 
 /** A box too small to read (the canvas's size gate): a mis-drag, never a
  *  claim about the page. */
-export const EMPTY_BOX_MESSAGE = `No text in that box — drag around the finish/material schedule ${WHERE}.`;
+export const EMPTY_BOX_MESSAGE = `No text in that box, drag around the finish/material schedule ${WHERE}.`;
 
 /** The most text runs a box can hold and still go to the on-device reader:
  *  a raster schedule can carry a few real text labels (a stamp, a title
@@ -58,8 +58,8 @@ export function refusalWhy(refused: RefusalReason, title?: string): string {
 /** The canvas message for a refused table. */
 export function refusalMessage(refused: RefusalReason, title?: string): string {
   return refused === "title" && title
-    ? `${refusalWhy(refused, title)} — drag around the finish schedule instead.`
-    : `${refusalWhy(refused, title)} — drag around the finish schedule ${WHERE}.`;
+    ? `${refusalWhy(refused, title)}, drag around the finish schedule instead.`
+    : `${refusalWhy(refused, title)}, drag around the finish schedule ${WHERE}.`;
 }
 
 /** rows → the dialog (with any skipped codes — four- or five-letter codes
@@ -114,7 +114,7 @@ export function ocrReadingMessage(p: { rastersDone: number; rastersPlanned: numb
 
 /** A box past the on-device reader's tile cap (OCR_MAX_TILES), refused
  *  before the engine starts: no download notice for a read that can't run. */
-export const OCR_TOO_LARGE_MESSAGE = "That box is too large to read — draw it around the schedule only.";
+export const OCR_TOO_LARGE_MESSAGE = "That box is too large to read, draw it around the schedule only.";
 /** …and while it waits for a page read or copy read (#471) ahead of it: the
  *  same words as Copy text's own waiting line (an inline string there). */
 export const OCR_WAITING_MESSAGE = "Waiting for another read…";
@@ -156,10 +156,10 @@ export function heldKeyWouldPress(key: string, target: KeyTarget): boolean {
 export const OCR_BUSY_MESSAGE = "Still reading the last box.";
 
 /** The download notice's Cancel. */
-export const OCR_DECLINED_MESSAGE = "Not read — reading a raster schedule needs the on-device reader, which wasn't downloaded.";
+export const OCR_DECLINED_MESSAGE = "Not read, reading a raster schedule needs the on-device reader, which wasn't downloaded.";
 
 /** The on-device reader read the box and found no finish table in it. */
-export const OCR_NO_ROWS_MESSAGE = `No schedule found in that box — the on-device reader found no finish/material rows. Drag around the schedule ${WHERE}.`;
+export const OCR_NO_ROWS_MESSAGE = `No schedule found in that box, the on-device reader found no finish/material rows. Drag around the schedule ${WHERE}.`;
 
 /** Why the on-device reader can't run on this site, as a clause: turned off
  *  (VITE_OCR=off) or not installed (no models staged). Copy text says it too. */
@@ -173,7 +173,7 @@ export const ocrOffReason = (reason: "disabled" | "uninstalled"): string =>
 export function ocrUnavailableMessage(reason: "disabled" | "uninstalled", box: BoxText): string {
   const why = ocrOffReason(reason);
   return box.textRuns === 0 && !box.pageHasText
-    ? `No schedule text here — this page looks like a raster image (no text layer), and ${why}.`
+    ? `No schedule text here, this page looks like a raster image (no text layer), and ${why}.`
     : `No schedule found in that box. If it's a raster image, ${why}.`;
 }
 
@@ -181,18 +181,18 @@ export function ocrUnavailableMessage(reason: "disabled" | "uninstalled", box: B
  *  the reader restarts on its own, so trying again is the next move. Its
  *  own line rather than ocrFailedMessage, which would wrap the error's
  *  sentence in parentheses. */
-export const OCR_TIMEOUT_MESSAGE = "The on-device reader stopped responding — try again.";
+export const OCR_TIMEOUT_MESSAGE = "The on-device reader stopped responding, try again.";
 
 /** A start or a read step that failed, with the reason it gave. */
 export function ocrFailedMessage(reason: string): string {
-  return `Couldn't read that box on this device (${reason}) — try again.`;
+  return `Couldn't read that box on this device (${reason}), try again.`;
 }
 
 /** No table, but finish codes stacked in a column (#484): the engine found
  *  the codes and no header row, as on a schedule whose header row is rotated
  *  90° (OCR reads left to right only, and gave no detections in a rotated
  *  header band at all) or that the box cut off above. */
-export const OCR_NO_HEADER_MESSAGE = "Found finish codes in a column but no header row the reader could read. The headers may be rotated (which can't be read yet) or outside the box — box the schedule with a header row that reads left to right.";
+export const OCR_NO_HEADER_MESSAGE = "Found finish codes in a column but no header row the reader could read. The headers may be rotated (which can't be read yet) or outside the box, box the schedule with a header row that reads left to right.";
 
 /** A span's text as a code: upper case, only letters, digits and hyphens
  *  kept. Close to the reader's rowKeyOf, not the same: rowKeyOf keeps "/"

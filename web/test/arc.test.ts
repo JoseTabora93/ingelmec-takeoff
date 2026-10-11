@@ -33,7 +33,7 @@ test("the circle is the circumcircle, and every flattened point lands on it", ()
   near(arcLength(QA, QM, QB), Math.PI * 50, 1e-4, "quarter-arc length");
 });
 
-test("flattenArc returns the interior only — the caller owns its corners", () => {
+test("flattenArc returns the interior only, the caller owns its corners", () => {
   const pts = flattenArc(QA, QM, QB);
   const same = (p: Pt, q: Pt) => Math.hypot(p[0] - q[0], p[1] - q[1]) < 1e-9;
   assert.ok(!pts.some((p) => same(p as Pt, QA)), "start is not re-emitted");
@@ -65,7 +65,7 @@ test("a square with one semicircular bay closes with the right area", () => {
   const flat = flattenArcRing(ring, [3], true) as Pt[];
   const want = 10000 + (Math.PI * 50 * 50) / 2;
   const got = ringArea(flat);
-  assert.ok(got < want, "a chorded arc is inscribed — it can only under-measure");
+  assert.ok(got < want, "a chorded arc is inscribed, it can only under-measure");
   near(got, want, want * 0.005, "bowed-bay area");
   for (const corner of [[0, 0], [100, 0], [100, 100], [0, 100]])
     assert.ok(flat.some((p) => Math.hypot(p[0] - corner[0], p[1] - corner[1]) < 1e-9), `corner ${corner} survives`);
@@ -97,7 +97,7 @@ test("no marks is the identity, and the input is never mutated", () => {
   assert.equal(JSON.stringify(sq), snapshot, "input untouched");
 });
 
-test("the vertex budget holds — a sweeping arc can't mint a thousand-point shape", () => {
+test("the vertex budget holds, a sweeping arc can't mint a thousand-point shape", () => {
   assert.ok(flattenArc([0, 0], [5000, 3000], [10000, 0]).length <= 96, "big arc capped");
   assert.ok(flattenArc([0, 0], [2, 1], [4, 0]).length >= 8, "small arc still smooth");
   const ring: Pt[] = [[0, 0], [400, 0], [400, 400], [200, 900], [0, 400]];

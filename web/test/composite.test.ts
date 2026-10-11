@@ -85,5 +85,5 @@ test("composite: the store's onRemoteUpdate/isBusy options are null-guarded befo
   // With both bridge handlers still null, the store's bootstrap (which reads isBusy
   // and may fire onRemoteUpdate on a seed) must not throw. A plain load is local + safe.
   await assert.doesNotReject(store.loadAnnotations());
-  assert.equal(store.syncBridge.onRemoteUpdate, null); // still null — nothing registered
+  assert.equal(store.syncBridge.onRemoteUpdate, null); // still null, nothing registered
 });

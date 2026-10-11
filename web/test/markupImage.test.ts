@@ -117,7 +117,7 @@ test("resizeImageFromCorner: aspect preserved (bh/bw == aspect)", () => {
   assert.ok(Math.abs(bh / bw - 0.75) < 1e-9);
 });
 
-test("resizeImageFromCorner: non-square sheet (sheetW≠sheetH) — catches width/height normalization swap", () => {
+test("resizeImageFromCorner: non-square sheet (sheetW≠sheetH), catches width/height normalization swap", () => {
   const fixedTL = { x: 100, y: 100 };
   const r = resizeImageFromCorner(fixedTL, { x: 300, y: 400 }, 0.5, 1000, 500);
   // bw=200 → w=0.2, bh=100 → at=[(100+100)/1000,(100+50)/500]=[0.2,0.3]

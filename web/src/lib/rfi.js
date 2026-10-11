@@ -18,10 +18,10 @@ import { csvEsc as esc } from "./csv.js";
 // The four RFI states, in lifecycle order. `color` is a literal hex (used both
 // as an SVG fill and as DOM chrome), `label` is the human string.
 export const RFI_STATUSES = [
-  { id: "open", label: "Open", color: "#1f3fc7" },       // cobalt — awaiting an answer
-  { id: "answered", label: "Answered", color: "#1f6b4a" }, // positive green — response in
-  { id: "closed", label: "Closed", color: "#5a5346" },    // muted ink — resolved & filed
-  { id: "void", label: "Void", color: "#b03a26" },        // danger red — withdrawn / N/A
+  { id: "open", label: "Open", color: "#1f3fc7" },       // cobalt, awaiting an answer
+  { id: "answered", label: "Answered", color: "#1f6b4a" }, // positive green, response in
+  { id: "closed", label: "Closed", color: "#5a5346" },    // muted ink, resolved & filed
+  { id: "void", label: "Void", color: "#b03a26" },        // danger red, withdrawn / N/A
 ];
 
 const STATUS_BY_ID = Object.fromEntries(RFI_STATUSES.map((s) => [s.id, s]));
@@ -88,7 +88,7 @@ export function rfisToCsv(rfis = [], markups = [], projectName = "", sheetLabel 
     "Response date", "Linked markups", "Linked sheets",
   ];
   const lines = [
-    "# RFI log — one row per RFI; linked markups/sheets derived from markup.rfi_id",
+    "# RFI log, one row per RFI; linked markups/sheets derived from markup.rfi_id",
     header.map(esc).join(","),
   ];
   for (const r of liveRfis(rfis)) {
@@ -110,7 +110,7 @@ export function rfisToCsv(rfis = [], markups = [], projectName = "", sheetLabel 
       sheets,
     ].map(esc).join(","));
   }
-  const title = projectName ? `# ${projectName} — ${brandName} RFI log\n` : "";
+  const title = projectName ? `# ${projectName}, ${brandName} RFI log\n` : "";
   return title + lines.join("\n") + "\n";
 }
 

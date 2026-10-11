@@ -49,9 +49,9 @@ export default function PresenceChip({ bridge }) {
   if (!peers.length) return null;
   const first = peers[0];
   const firstSheet = sheetLabel(first.sheet);
-  const line = `${first.name} has this project open — last seen ${ago(first.ageMs)}${firstSheet ? `, on ${firstSheet}` : ""}`;
+  const line = `${first.name} has this project open, last seen ${ago(first.ageMs)}${firstSheet ? `, on ${firstSheet}` : ""}`;
   const title = peers
-    .map((p) => `${p.name} — last seen ${ago(p.ageMs)}${sheetLabel(p.sheet) ? `, on ${sheetLabel(p.sheet)}` : ""}`)
+    .map((p) => `${p.name}, last seen ${ago(p.ageMs)}${sheetLabel(p.sheet) ? `, on ${sheetLabel(p.sheet)}` : ""}`)
     .join("\n");
 
   return (

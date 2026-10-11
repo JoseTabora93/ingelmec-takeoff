@@ -59,7 +59,7 @@ export function shapesToCsv(rows, projectName = "", brandName = "OpenTakeoff", u
   const L = (v) => (M ? round2((Number(v) || 0) * M_PER_FT) : v);
   const header = ["Shape", "Sheet", "Sheet ID", "Finish", "Role", `Area ${areaUnit}`, lengthUnit, "EA", `Height ${heightUnit}`, "Height override", `Rise ${heightUnit}`, `Drop ${heightUnit}`, "Origin"];
   const lines = [
-    "# Per-shape measured quantities — no multiplier or waste; deducts negative; LF on floor/deduct/surface rows is trace reference only (incl. openings) — linear rows alone sum to condition LF; a linear row's LF includes its Rise + Drop",
+    "# Per-shape measured quantities, no multiplier or waste; deducts negative; LF on floor/deduct/surface rows is trace reference only (incl. openings), linear rows alone sum to condition LF; a linear row's LF includes its Rise + Drop",
     header.map(esc).join(","),
   ];
   for (const r of rows) {
@@ -71,7 +71,7 @@ export function shapesToCsv(rows, projectName = "", brandName = "OpenTakeoff", u
       r.origin,
     ].map(esc).join(","));
   }
-  const title = projectName ? `# ${projectName} — ${brandName} shapes\n` : "";
+  const title = projectName ? `# ${projectName}, ${brandName} shapes\n` : "";
   return title + lines.join("\n") + "\n";
 }
 

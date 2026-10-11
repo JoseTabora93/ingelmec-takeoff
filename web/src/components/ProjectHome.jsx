@@ -70,7 +70,7 @@ export default function ProjectHome() {
         <AuthChip />
       </div>
 
-      {/* recently opened — this browser only; hidden entirely when empty */}
+      {/* recently opened, this browser only; hidden entirely when empty */}
       {recents.length > 0 && (
         <div>
           <div style={sectionHead}>Recently opened</div>
@@ -85,7 +85,7 @@ export default function ProjectHome() {
         </div>
       )}
 
-      {/* the project list — flat: every folder here is one project */}
+      {/* the project list, flat: every folder here is one project */}
       {recents.length > 0 && <div style={sectionHead}>All projects</div>}
 
       {/* folder listing */}
@@ -97,7 +97,7 @@ export default function ProjectHome() {
             <div style={{ color: "var(--c-danger)", marginBottom: 12 }}>Couldn't list the projects: {err}</div>
             {/* Retry must be a BUTTON: the click is a user gesture, so if the
                 token expired, the silent-refresh popup GIS may need to open
-                isn't popup-blocked — an auto-retry's would be. */}
+                isn't popup-blocked, an auto-retry's would be. */}
             <button type="button" onClick={() => setAttempt((n) => n + 1)}
               style={{ padding: "7px 14px", border: "1px solid var(--ink)", background: "transparent", color: "var(--ink)", cursor: "pointer", fontSize: 12.5, fontWeight: 600 }}>
               Retry
@@ -105,7 +105,7 @@ export default function ProjectHome() {
           </div>
         ) : folders.length === 0 ? (
           <div style={{ padding: 40, textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>
-            No projects yet — create a folder in the Projects drive.
+            No projects yet, create a folder in the Projects drive.
           </div>
         ) : (
           folders.map((f) => (

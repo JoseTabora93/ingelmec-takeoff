@@ -71,7 +71,7 @@ test("materialsSummary: same-named materials sum across conditions", () => {
 
 // ── edge cases + the vertical-wall helper (2026-07-05) ──────────────────────
 
-test("deduct larger than the floor goes negative — never clamped silently", () => {
+test("deduct larger than the floor goes negative, never clamped silently", () => {
   const conds = [{ id: "c", finish_tag: "X-1" }];
   const shapes = [area("c", 100), { condition_id: "c", measure_role: "deduct", computed: { area_sf: 150 } }];
   const [row] = conditionTotals(conds, shapes);
@@ -106,7 +106,7 @@ test("materials: linear and count bases use LF/EA, never area", () => {
 
 // ── report JSON schema v1 — the key set is a published contract (2026-07-07) ──
 
-test("reportJson: v1 key set pinned — top level, sheets[], markups[], by_sheet rows", () => {
+test("reportJson: v1 key set pinned, top level, sheets[], markups[], by_sheet rows", () => {
   const conds = [{ id: "ct", finish_tag: "CT-1", color: "#123456", waste_pct: 10 }];
   const shapes = [{ condition_id: "ct", sheet_id: "sh1", measure_role: "floor_area", computed: { area_sf: 100, perimeter_lf: 40 } }];
   const rows = conditionTotals(conds, shapes);
@@ -134,7 +134,7 @@ test("reportJson: v1 key set pinned — top level, sheets[], markups[], by_sheet
   assert.deepEqual(Object.keys(j),
     ["schema", "project_name", "generated_with", "sheets", "conditions", "by_sheet", "totals", "materials", "markups", "rfis", "condition_columns", "shape_labels", "by_label", "units", "display_units", "roll_goods"]);
   assert.equal(j.display_units, "imperial");
-  assert.deepEqual(j.roll_goods, []);   // #136 — always emitted; empty when nothing carries a roll_setup
+  assert.deepEqual(j.roll_goods, []);   // #136, always emitted; empty when nothing carries a roll_setup
   // rfis[] appends after markups (additive v1); linked_markups/linked_sheets derived
   assert.deepEqual(Object.keys(j.rfis[0]),
     ["id", "number", "subject", "question", "status", "to", "priority", "cost_impact", "schedule_impact",
@@ -177,7 +177,7 @@ test("reportJson: roll_goods rides through verbatim; a non-array coerces to [] (
   assert.deepEqual(reportJson({ rollGoods: "corrupt" as any }).roll_goods, []);
 });
 
-test("reportJson: by_sheet rows serialize round2-ed — incl. ea — with key order intact", () => {
+test("reportJson: by_sheet rows serialize round2-ed, incl. ea, with key order intact", () => {
   const conds = [{ id: "c", finish_tag: "FX-1" }];
   // hand-edited payloads can carry fractional counts (drawn count shapes are
   // always count: 1) — serialization rounds them like every other quantity
@@ -206,7 +206,7 @@ test("reportJson: legacy 'source' key still read as a fallback", () => {
   assert.equal(j.sheets[0].scale_source, "detected");
 });
 
-test("reportJson: scale gate — agent-set unconfirmed rides through as false, absent = true", () => {
+test("reportJson: scale gate, agent-set unconfirmed rides through as false, absent = true", () => {
   const j = reportJson({ scaleInfo: [
     { sheet_id: "s1", scale_source: "detected", scale_confirmed: false },
     { sheet_id: "s2", scale_source: "calibrated" },
@@ -215,7 +215,7 @@ test("reportJson: scale gate — agent-set unconfirmed rides through as false, a
   assert.equal(j.sheets[1].scale_confirmed, true);
 });
 
-test("reportJson: custom columns — definitions emitted; row values filter orphans/non-strings/empties", () => {
+test("reportJson: custom columns, definitions emitted; row values filter orphans/non-strings/empties", () => {
   const conds = [{ id: "a", finish_tag: "A" }, { id: "b", finish_tag: "B" }, { id: "c", finish_tag: "C" }];
   const shapes = [area("a", 10), area("b", 20), area("c", 30)];
   const defs = [

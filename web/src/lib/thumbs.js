@@ -22,7 +22,7 @@
 import { metaGet, metaPut, metaDelete, metaDeletePrefix } from "./store.js";
 import { PICTURE_PARAMS_HASH } from "./pictureParams";
 
-export const THUMB_W = 640;           // CSS px — large gallery cards are capped at this width
+export const THUMB_W = 640;           // CSS px, large gallery cards are capped at this width
 const THUMB_VERSION = 3;              // bump to invalidate every persisted thumb
 const PREFIX = `thumb:v${THUMB_VERSION}:`;
 

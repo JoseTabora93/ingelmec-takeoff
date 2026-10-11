@@ -19,7 +19,7 @@ function hatchField(x0: number, y0: number, x1: number, y1: number, pitch: numbe
   }
 }
 
-test("hatchFamilies: signature reported faithfully — angle, pitch, pen width, rows", () => {
+test("hatchFamilies: signature reported faithfully, angle, pitch, pen width, rows", () => {
   const segs: number[] = [], meta: number[] = [];
   hatchField(100, 100, 700, 500, 4, 1, segs, meta);
   const fams = hatchFamilies(segs, Uint8Array.from(meta));
@@ -36,13 +36,13 @@ test("hatchFamilies: signature reported faithfully — angle, pitch, pen width, 
   assert.ok(f.memberIdx.every((i) => i >= 0 && i < (segs.length >> 2)));
 });
 
-test("hatchFamilies: the legend-match property — same spec, different place, SAME id", () => {
+test("hatchFamilies: the legend-match property, same spec, different place, SAME id", () => {
   const segs: number[] = [], meta: number[] = [];
   hatchField(100, 100, 400, 400, 6, 1, segs, meta);   // "plan region"
   hatchField(900, 700, 1000, 760, 6, 1, segs, meta);  // "legend swatch", far away
   const fams = hatchFamilies(segs, Uint8Array.from(meta));
   assert.equal(fams.length, 2, "two instances, reported separately");
-  assert.equal(fams[0].id, fams[1].id, "same (angle, pitch, penW) spec ⇒ same id — matching is id === id");
+  assert.equal(fams[0].id, fams[1].id, "same (angle, pitch, penW) spec ⇒ same id, matching is id === id");
   assert.notDeepEqual(fams[0].bbox, fams[1].bbox, "…but they are distinct instances in distinct places");
 });
 
@@ -86,5 +86,5 @@ test("hatchFamilies and classifyHatchSegs agree on membership (one sweep, two vi
   for (let i = 0; i <= n; i++) if (soft[i]) assert.ok(members.has(i), `soft ${i} must be a family member`);
   // …but membership is wider than softness: the guards keep walls hard
   assert.ok(members.has(n), "the heavy overprint is a member of the family");
-  assert.equal(soft[n], 0, "…and still hard — the wall guard held");
+  assert.equal(soft[n], 0, "…and still hard, the wall guard held");
 });

@@ -26,7 +26,7 @@ test("draftCommitValue: transient keystrokes commit NOTHING (typing '0.125' char
   // exactly what made the joint field untypeable when onChange clamped
   assert.equal(draftCommitValue("0", MIN, MAX), null);
   assert.equal(draftCommitValue("0.", MIN, MAX), null);      // parseFloat("0.") = 0, not > 0
-  assert.equal(draftCommitValue("0.1", MIN, MAX), 0.1);      // in range already — live re-derive kicks in
+  assert.equal(draftCommitValue("0.1", MIN, MAX), 0.1);      // in range already, live re-derive kicks in
   assert.equal(draftCommitValue("0.12", MIN, MAX), 0.12);
   assert.equal(draftCommitValue("0.125", MIN, MAX), 0.125);
 });
@@ -50,7 +50,7 @@ test("blurCommitValue: clamps a positive out-of-range draft into [min, max]", ()
   assert.equal(blurCommitValue("7", 0), 7);                  // no max: unclamped above
 });
 
-test("blurCommitValue: abandons an empty/invalid/non-positive draft (null — last good value redisplays)", () => {
+test("blurCommitValue: abandons an empty/invalid/non-positive draft (null, last good value redisplays)", () => {
   for (const t of ["", ".", "-", "abc", "0", "0.", "-3", null, undefined]) {
     assert.equal(blurCommitValue(t as any, MIN, MAX), null, JSON.stringify(t));
   }
@@ -62,7 +62,7 @@ test("blurCommitValue: abandons an empty/invalid/non-positive draft (null — la
 // and note with no undo. blurCommitNonNegative is its blur gate: abandon
 // empty/unparseable, commit anything parseable clamped non-negative.
 
-test("blurCommitNonNegative: abandons an empty/unparseable draft (null — last good value redisplays)", () => {
+test("blurCommitNonNegative: abandons an empty/unparseable draft (null, last good value redisplays)", () => {
   for (const t of ["", ".", "-", "abc", "NaN", null, undefined]) {
     assert.equal(blurCommitNonNegative(t as any), null, JSON.stringify(t));
   }
@@ -74,7 +74,7 @@ test("blurCommitNonNegative: an intentional 0 typed as \"0\" still commits; posi
   assert.equal(blurCommitNonNegative("512"), 512);
   assert.equal(blurCommitNonNegative("2.49"), 2.49);
   assert.equal(blurCommitNonNegative("007"), 7);
-  assert.equal(blurCommitNonNegative("-5"), 0);      // the input's min — matches the field's Math.max(0, …) commit
+  assert.equal(blurCommitNonNegative("-5"), 0);      // the input's min, matches the field's Math.max(0, …) commit
 });
 
 test("committed values can never be invalid: whatever either helper returns is in range", () => {

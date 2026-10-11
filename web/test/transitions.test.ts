@@ -35,7 +35,7 @@ test("BUTT JOINT: the shared edge becomes a committable run with both parents", 
   const a = side("C-1", [room("shp-a", 0, 0, 600, 400)]);
   const b = side("T-1", [room("shp-b", 600, 0, 1200, 400)]);
   const { runs, withheld } = deriveTransitionRuns(a, b, sheets());
-  assert.equal(withheld.length, 0, "nothing withheld — the rooms touch");
+  assert.equal(withheld.length, 0, "nothing withheld, the rooms touch");
   assert.equal(runs.length, 1);
   const r = runs[0];
   assert.deepEqual(r.between_shape_ids, ["shp-a", "shp-b"], "both parents ride the record");
@@ -73,7 +73,7 @@ test("rooms that only clip at a corner are neither committed nor reported", () =
   assert.deepEqual(withheld, [], "and it is not a question either");
 });
 
-test("a sheet with no scale takes no part — a transition is a real length", () => {
+test("a sheet with no scale takes no part, a transition is a real length", () => {
   const a = side("C-1", [room("shp-a", 0, 0, 600, 400)]);
   const b = side("T-1", [room("shp-b", 600, 0, 1200, 400)]);
   const unscaled = new Map([[SHEET, { widthPx: W, heightPx: H, upp: 0 }]]);

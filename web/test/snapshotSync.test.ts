@@ -189,7 +189,7 @@ test("delete does not hang when the in-flight push is stuck, and still cannot re
   assert.equal(remoteSnapshotFiles(provider).length, 0, "stuck push wrote nothing; delete removed nothing to recreate");
 });
 
-test("delete during a SLOW (finite) push does not resurrect — the late push cleans up its own file", async () => {
+test("delete during a SLOW (finite) push does not resurrect, the late push cleans up its own file", async () => {
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   const { base, provider, sync } = mk(); // timeoutMs 50
   provider._delayPutJsonMs = 150; // putJson creates the file, but only AFTER delete's cap fires

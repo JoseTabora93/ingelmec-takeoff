@@ -42,7 +42,7 @@ test("describeConditionEdit prints only the fields the proposal carries, current
   ]);
   assert.deepEqual(describeConditionEdit({ ...cond, roll_setup: { material: "carpet" } }, { proposed: { roll_setup: null, height_ft: 8, multiplier: 2 } }), [
     { field: "multiplier", from: "×1", to: "×2" },
-    { field: "height", from: "—", to: "8 ft" },
+    { field: "height", from: "", to: "8 ft" },
     { field: "roll goods", from: "carpet", to: "off" },
   ]);
   assert.deepEqual(describeConditionEdit(cond, { proposed: {} }), []);
@@ -79,7 +79,7 @@ test("proposedConditionEditRows is the report's beside-the-current-values block;
   assert.deepEqual(rows, [{ proposal_id: "p1", condition: "CPT-1", condition_id: "c1", current: { finish_tag: "CPT-1", waste_pct: 5, multiplier: 2, height_ft: 8 }, proposed: { waste_pct: 10 }, rationale: "spec", proposed_at: "T" }]);
 });
 
-test("reportJson: proposed_condition_edits is present ONLY with content — the pinned v1 key set is untouched otherwise", () => {
+test("reportJson: proposed_condition_edits is present ONLY with content, the pinned v1 key set is untouched otherwise", () => {
   const conds = [{ id: "ct", finish_tag: "CT-1", color: "#123456", waste_pct: 10 }];
   const rows = conditionTotals(conds, [{ condition_id: "ct", sheet_id: "s", measure_role: "floor_area", computed: { area_sf: 100, perimeter_lf: 40 } }]);
   const plain = reportJson({ rows });

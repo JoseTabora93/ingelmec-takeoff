@@ -95,7 +95,7 @@ test("recents: corrupt JSON reads as empty and the next remember overwrites it c
   assert.deepEqual(recents.list(), [{ id: "p1", name: "Fresh" }]);
 });
 
-test("recents: storage that throws (Safari private mode) — list is [] and remember doesn't throw", () => {
+test("recents: storage that throws (Safari private mode), list is [] and remember doesn't throw", () => {
   const recents = createRecents({
     getItem() { throw new Error("SecurityError"); },
     setItem() { throw new Error("QuotaExceededError"); },
@@ -125,7 +125,7 @@ test("recents: malformed entries in the stored array are filtered out of list", 
   assert.deepEqual(createRecents(fakeStorage({ opentakeoff_recent_projects: '{"id":"x"}' })).list(), []);
 });
 
-test("browserStorage: without a usable localStorage it degrades to an inert storage — recents list empty, remember a no-op", () => {
+test("browserStorage: without a usable localStorage it degrades to an inert storage, recents list empty, remember a no-op", () => {
   // Under node there is no window.localStorage; in a browser with site data
   // blocked, even ACCESSING window.localStorage throws. Both must degrade to
   // the same inert storage instead of crashing the home screen's render.

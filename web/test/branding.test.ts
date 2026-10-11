@@ -65,10 +65,10 @@ test("garbage / missing mode → default", () => {
 // export titles follow the brand name (decision: exports follow the mode) — the
 // resolver hands brandName to each CSV, defaulting to OpenTakeoff when unbranded
 test("CSV export titles carry the brand name (default OpenTakeoff)", () => {
-  assert.match(totalsToCsv([], "Proj"), /^# Proj — OpenTakeoff report/);
-  assert.match(totalsToCsv([], "Proj", null, null, null, null, null, "345 Flooring"), /^# Proj — 345 Flooring report/);
-  assert.match(shapesToCsv([], "Proj"), /^# Proj — OpenTakeoff shapes/);
-  assert.match(shapesToCsv([], "Proj", "345 Flooring"), /^# Proj — 345 Flooring shapes/);
-  assert.match(rfisToCsv([], [], "Proj"), /^# Proj — OpenTakeoff RFI log/);
-  assert.match(rfisToCsv([], [], "Proj", null, "345 Flooring"), /^# Proj — 345 Flooring RFI log/);
+  assert.match(totalsToCsv([], "Proj"), /^# Proj, OpenTakeoff report/);
+  assert.match(totalsToCsv([], "Proj", null, null, null, null, null, "345 Flooring"), /^# Proj, 345 Flooring report/);
+  assert.match(shapesToCsv([], "Proj"), /^# Proj, OpenTakeoff shapes/);
+  assert.match(shapesToCsv([], "Proj", "345 Flooring"), /^# Proj, 345 Flooring shapes/);
+  assert.match(rfisToCsv([], [], "Proj"), /^# Proj, OpenTakeoff RFI log/);
+  assert.match(rfisToCsv([], [], "Proj", null, "345 Flooring"), /^# Proj, 345 Flooring RFI log/);
 });

@@ -120,8 +120,8 @@ export default function PlanNavigator({
     setM365Err("");
     try {
       const auth = m365AuthRef.current;
-      if (!auth) throw new Error("sign-in module didn't load — check the console and report on issue #315");
-      await auth.signIn(); // popup — needs this click's gesture
+      if (!auth) throw new Error("sign-in module didn't load, check the console and report on issue #315");
+      await auth.signIn(); // popup, needs this click's gesture
       await metaPut(M365_ENABLED_KEY, true);
       window.location.reload(); // the workspace gate installs the 365 store
     } catch (e) {
@@ -199,7 +199,7 @@ export default function PlanNavigator({
   const [data, setData] = useState(null);          // { folders, pdfs } | null
   const [bLoading, setBLoading] = useState(true);
   const [bErr, setBErr] = useState("");
-  const [picked, setPicked] = useState([]);        // [{ id, name }] — accumulates across folders
+  const [picked, setPicked] = useState([]);        // [{ id, name }], accumulates across folders
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("name");        // name | size | date
   const [adding, setAdding] = useState(false);
@@ -725,7 +725,7 @@ export default function PlanNavigator({
   // never through the level grouping/sort above, which would reorder them
   const shownGroups = search ? (search.hits.length ? [{ level: null, keys: search.hits.map((h) => h.key) }] : []) : groups;
   const assignLevel = () => {
-    const label = window.prompt('Level for the selected sheets (e.g. "L1", "Level 2", "Garage") — empty clears:', "");
+    const label = window.prompt('Level for the selected sheets (e.g. "L1", "Level 2", "Garage"), empty clears:', "");
     if (label === null) return;
     onAssignLevel?.(sel, label.trim());
     setSel([]);
@@ -775,7 +775,7 @@ export default function PlanNavigator({
     ? "elija los PDF que abrirá: los planos de specs y as-built quedan sin abrir"
     : mode === "manage"
       ? `${sheets.length} PDF almacenados en este espacio: quite los que este takeoff no necesita`
-      : `${allKeys.length || "…"} hojas · elija una o varias — el orden que elija es el orden de izquierda a derecha`;
+      : `${allKeys.length || "…"} hojas · elija una o varias, el orden que elija es el orden de izquierda a derecha`;
   // the search's count and indexing progress sit beside its box, so the
   // header (and the grid under it) never moves while a query is typed
   // only the hit count is announced; the indexing ticks aren't
@@ -919,7 +919,7 @@ export default function PlanNavigator({
               const tagStyle = { fontFamily: "var(--f-mono)", fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.08em", minWidth: 72, textAlign: "right" };
               return (
                 <label key={f.id} style={{ ...rowBase, cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.6 : 1 }}
-                  title={conflict ? "Another selected PDF already uses this name — a project can't have two sheets with the same name" : undefined}>
+                  title={conflict ? "Another selected PDF already uses this name, a project can't have two sheets with the same name" : undefined}>
                   <input name="drive-file-pick" type="checkbox" checked={selPick || inSet} disabled={disabled} onChange={() => togglePick(f)}
                     style={{ width: 16, height: 16, cursor: disabled ? "default" : "pointer" }} />
                   <span style={{ fontFamily: "var(--f-mono)", fontSize: 13, color: "var(--ink)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={f.name}>{f.name}</span>
@@ -936,7 +936,7 @@ export default function PlanNavigator({
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", borderTop: "1px solid var(--ink)", background: "var(--paper-bright)" }}>
         <span style={{ fontFamily: "var(--f-mono)", fontSize: 11.5, color: "var(--ink-muted)" }}>
-          {picked.length ? `${picked.length} selected to open` : "check the PDFs you want to open — nothing downloads until you add them"}
+          {picked.length ? `${picked.length} selected to open` : "check the PDFs you want to open, nothing downloads until you add them"}
         </span>
         <div style={{ flex: 1 }} />
         {picked.length > 0 && (
@@ -1020,7 +1020,7 @@ export default function PlanNavigator({
                 <div style={{ position: "absolute", top: 8, right: 8, zIndex: 2, display: "flex", gap: 6 }}>
                   <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewSheet(key); }} style={ctrlBtn}>Previa</button>
                   {isFirstPageOfPdf && onClosePdf && (
-                    <button onClick={(e) => { e.stopPropagation(); requestClose(parsed.file); }} title={cloudMode ? "Close this PDF — unload it from the plan set (it stays in Drive)" : "Close this PDF — remove it from the plan set (local plans aren't stored elsewhere)"}
+                    <button onClick={(e) => { e.stopPropagation(); requestClose(parsed.file); }} title={cloudMode ? "Close this PDF, unload it from the plan set (it stays in Drive)" : "Close this PDF, remove it from the plan set (local plans aren't stored elsewhere)"}
                       style={{ padding: "5px 8px", border: "none", background: "var(--paper-bright)", color: "var(--ink-muted)", cursor: "pointer", fontFamily: "var(--f-mono)", fontSize: 11, boxShadow: "var(--shadow-1)" }}>✕</button>
                   )}
                   <button onClick={(e) => { e.stopPropagation(); onOpen([key], false); }} title="Abrir solo esta hoja"
@@ -1037,11 +1037,11 @@ export default function PlanNavigator({
                   {search?.chipsByKey[key]?.map((t) => (
                     <span key={`m:${t}`} title="Texto coincidente en esta hoja" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--cobalt)", border: "1px solid var(--cobalt)", padding: "1px 5px", whiteSpace: "nowrap" }}>{t}</span>
                   ))}
-                  {search?.ocrKeys.has(key) && <span title="Coincidencia en texto que el lector local (OCR) sacó de la imagen de la página, no del texto propio del PDF — revise la hoja" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--c-warning)", textTransform: "uppercase", letterSpacing: "0.08em" }}>OCR</span>}
+                  {search?.ocrKeys.has(key) && <span title="Coincidencia en texto que el lector local (OCR) sacó de la imagen de la página, no del texto propio del PDF, revise la hoja" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--c-warning)", textTransform: "uppercase", letterSpacing: "0.08em" }}>OCR</span>}
                   {isOpenTab && <span title="Ya está abierta como pestaña" style={{ fontSize: 9.5, fontFamily: "var(--f-mono)", color: "var(--cobalt)", textTransform: "uppercase", letterSpacing: "0.08em" }}>open</span>}
                   {cnt > 0 && <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, color: "var(--ink-muted)" }}>{cnt}▦</span>}
                   <span style={{ fontSize: 10, fontWeight: 600, whiteSpace: "nowrap", color: scales[key] ? (scaleUnconfirmed[key] === false ? "var(--c-warning)" : "var(--c-positive)") : detectedScales[key] ? "var(--c-warning)" : "var(--c-danger)" }}
-                    title={scales[key] && scaleUnconfirmed[key] === false ? "Scale set by an agent — no person has confirmed it. Open the sheet and confirm from the scale menu." : undefined}>
+                    title={scales[key] && scaleUnconfirmed[key] === false ? "Scale set by an agent, no person has confirmed it. Open the sheet and confirm from the scale menu." : undefined}>
                     {scales[key] ? (scaleUnconfirmed[key] === false ? "scale ⚠ confirm" : "scale ✓") : detectedScales[key] ? `plan: ${detectedScales[key].label}` : "no scale"}
                   </span>
                 </div>
@@ -1056,7 +1056,7 @@ export default function PlanNavigator({
           <div style={{ padding: 48, textAlign: "center", color: "var(--ink-muted)", fontSize: 13.5, lineHeight: 1.7 }}>
             <div style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)", marginBottom: 6 }}>Ninguna hoja coincide con «{query.trim()}»</div>
             {indexProg
-              ? `Still reading sheet text — ${indexProg.done} of ${indexProg.total} checked.`
+              ? `Still reading sheet text, ${indexProg.done} of ${indexProg.total} checked.`
               : "Search reads each sheet's own text: finish tags, room and sheet numbers, and words of three letters or more."}
           </div>
         )}
@@ -1071,12 +1071,12 @@ export default function PlanNavigator({
             {!sheets.length ? (
               <div style={{ maxWidth: 560, margin: "0 auto" }}>
                 <div style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--cobalt)", marginBottom: 6 }}>Personas y agentes · un solo motor</div>
-                <div style={{ fontFamily: "var(--f-display)", fontSize: 18, color: "var(--ink)", lineHeight: 1.32, marginBottom: 5 }}>Mida un plano a mano — o apunte un agente de IA al mismo motor.</div>
+                <div style={{ fontFamily: "var(--f-display)", fontSize: 18, color: "var(--ink)", lineHeight: 1.32, marginBottom: 5 }}>Mida un plano a mano, o apunte un agente de IA al mismo motor.</div>
                 <div style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.55, marginBottom: 20 }}>Cada medición guarda su escala y cómo se hizo: una persona, un clic o un agente.</div>
                 <button onClick={() => fileRef.current?.click()}
                   style={{ display: "block", width: "100%", margin: "24px auto 0", padding: "44px 24px", border: "2px dashed var(--ink-faint)", background: "var(--paper-bright)", cursor: "pointer", color: "var(--ink-muted)", fontFamily: "var(--f-body)", fontSize: 13.5, lineHeight: 1.7 }}>
                   <div style={{ fontFamily: "var(--f-display)", fontSize: 20, color: "var(--ink)", marginBottom: 8 }}>Abra sus planos</div>
-                  Arrastre aquí un PDF, una imagen o un juego de planos .zip completo — o haga clic para elegir. Nada sale de su navegador.
+                  Arrastre aquí un PDF, una imagen o un juego de planos .zip completo, o haga clic para elegir. Nada sale de su navegador.
                 </button>
                 {isGoogleConfigured() && (!user || projectHomeFolderId()) && (
                   <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.6 }}>
@@ -1144,7 +1144,7 @@ export default function PlanNavigator({
                 </div>
                 {onStartTour && (
                   <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "12px 18px", marginBottom: 14, textAlign: "left" }}>
-                    {/* the guided takeoff itself, a real recorded run at 2× — muted, and
+                    {/* the guided takeoff itself, a real recorded run at 2×, muted, and
                         still under reduced motion (the poster shows; controls play it) */}
                     {/* INGELMEC: el video del original muestra su marca y su botón de pago: retirado */}
                     {!SIN_EXTERNOS && <video src={`${demoBase}demo/first-takeoff.mp4`} poster={`${demoBase}demo/first-takeoff-poster.jpg`}
@@ -1153,7 +1153,7 @@ export default function PlanNavigator({
                       onClick={reducedMotion ? undefined : onStartTour}
                       style={{ width: 220, aspectRatio: "960 / 618", border: "1px solid var(--ink-faint)", background: "var(--paper-shadow)", cursor: reducedMotion ? "default" : "pointer", display: "block" }} />}
                     <div style={{ maxWidth: 250 }}>
-                      <button onClick={onStartTour} title="Abrir el plano de ejemplo y hacer un takeoff real, paso a paso — unos dos minutos"
+                      <button onClick={onStartTour} title="Abrir el plano de ejemplo y hacer un takeoff real, paso a paso, unos dos minutos"
                         style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "13px 22px", border: "1px solid var(--ink)", background: "var(--cobalt)", color: "var(--paper-bright)", cursor: "pointer", fontWeight: 700, fontSize: 14, fontFamily: "var(--f-body)" }}>
                         <Icon name="takeoff" size={16} />Primer takeoff guiado
                       </button>
@@ -1188,7 +1188,7 @@ export default function PlanNavigator({
             ) : enumerated ? (
               <>
                 <div style={{ fontFamily: "var(--f-display)", fontSize: 16, color: "var(--ink)", marginBottom: 6 }}>No se pudieron leer esos PDF</div>
-                None of the opened files would render — try opening them again.
+                None of the opened files would render, try opening them again.
               </>
             ) : "Leyendo el juego de planos…"}
           </div>
@@ -1199,7 +1199,7 @@ export default function PlanNavigator({
           <span style={{ fontFamily: "var(--f-mono)", fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-muted)" }}>Superficies empalmadas</span>
           {stitches.map((st) => (
             <span key={st.id} style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "1px solid var(--ink-faint)", padding: "4px 8px", fontSize: 12 }}>
-              <button onClick={() => onOpenStitch && onOpenStitch(st.id)} title={`Open ${st.name} — ${st.members.length} sheets as one working surface`}
+              <button onClick={() => onOpenStitch && onOpenStitch(st.id)} title={`Open ${st.name}, ${st.members.length} sheets as one working surface`}
                 style={{ border: "none", background: "transparent", color: "var(--cobalt)", cursor: "pointer", fontWeight: 600, fontSize: 12, padding: 0 }}>{st.name}</button>
               <button onClick={() => onDeleteStitch && onDeleteStitch(st.id)} title="Eliminar este empalme (se niega mientras tenga mediciones encima)"
                 style={{ border: "none", background: "transparent", color: "var(--ink-muted)", cursor: "pointer", fontSize: 12, padding: 0 }}>×</button>
@@ -1223,13 +1223,13 @@ export default function PlanNavigator({
             Open {sel.length || ""} as tabs
           </button>
           <button disabled={sel.length < 2 || sel.length > MAX_GROUP} onClick={() => onOpen(sel, true)}
-            title={sel.length > MAX_GROUP ? `Side-by-side maxes at ${MAX_GROUP} — open as tabs instead` : "One pan/zoom moves the whole row"}
+            title={sel.length > MAX_GROUP ? `Side-by-side maxes at ${MAX_GROUP}, open as tabs instead` : "One pan/zoom moves the whole row"}
             style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 14px", border: "none", background: sel.length >= 2 && sel.length <= MAX_GROUP ? "var(--cobalt)" : "var(--ink-faint)", color: "var(--paper-bright)", cursor: sel.length >= 2 && sel.length <= MAX_GROUP ? "pointer" : "default", fontWeight: 700, fontSize: 12.5 }}>
             <Icon name="sideBySide" size={14} />Open {sel.length >= 2 ? sel.length : ""} side-by-side
           </button>
           {onStitch && (
             <button disabled={sel.length < 2 || sel.length > MAX_GROUP} onClick={() => onStitch(sel)}
-              title={sel.length > MAX_GROUP ? `A stitch maxes at ${MAX_GROUP} sheets` : "Stitch — join a floor split at a match line into ONE working surface: the sheets butt edge-to-edge (no gap), you align the match line with two clicks, then a room crossing it traces as one shape"}
+              title={sel.length > MAX_GROUP ? `A stitch maxes at ${MAX_GROUP} sheets` : "Stitch, join a floor split at a match line into ONE working surface: the sheets butt edge-to-edge (no gap), you align the match line with two clicks, then a room crossing it traces as one shape"}
               style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 14px", border: "1px solid var(--ink)", background: "transparent", color: sel.length >= 2 && sel.length <= MAX_GROUP ? "var(--ink)" : "var(--ink-faint)", cursor: sel.length >= 2 && sel.length <= MAX_GROUP ? "pointer" : "default", fontWeight: 700, fontSize: 12.5 }}>
               <Icon name="calibrate" size={14} />Stitch {sel.length >= 2 ? sel.length : ""} into one surface
             </button>
@@ -1274,7 +1274,7 @@ export default function PlanNavigator({
               <span style={{ fontFamily: "var(--f-mono)", fontSize: 13, color: "var(--ink)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={s.name}>{s.name}</span>
               {tabsOpen > 0 && <span style={{ fontFamily: "var(--f-mono)", fontSize: 9.5, color: "var(--cobalt)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{tabsOpen} open</span>}
               <span style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)", minWidth: 74, textAlign: "right" }}>{pg !== undefined ? `${pg || "?"} sheet${pg === 1 ? "" : "s"}` : "…"}</span>
-              <span title={cnt ? "This PDF carries takeoffs — they persist in the project and restore if you re-add the same file" : undefined}
+              <span title={cnt ? "This PDF carries takeoffs, they persist in the project and restore if you re-add the same file" : undefined}
                 style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: cnt ? "var(--c-warning)" : "var(--text-faint)", minWidth: 88, textAlign: "right" }}>
                 {cnt ? `${cnt} takeoff${cnt === 1 ? "" : "s"}` : "no takeoffs"}
               </span>
@@ -1287,37 +1287,37 @@ export default function PlanNavigator({
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", borderTop: "1px solid var(--ink)", background: "var(--paper-bright)", flexWrap: "wrap" }}>
         <span style={{ fontFamily: "var(--f-mono)", fontSize: 11.5, color: "var(--ink-muted)" }}>
-          {working ? "Working…" : mSel.length ? `${mSel.length} PDF${mSel.length === 1 ? "" : "s"} selected${mSelShapes ? ` · ${mSelShapes} takeoff${mSelShapes === 1 ? "" : "s"} on them` : ""}` : "check the PDFs to remove — removing never deletes takeoff data"}
+          {working ? "Working…" : mSel.length ? `${mSel.length} PDF${mSel.length === 1 ? "" : "s"} selected${mSelShapes ? ` · ${mSelShapes} takeoff${mSelShapes === 1 ? "" : "s"} on them` : ""}` : "check the PDFs to remove, removing never deletes takeoff data"}
         </span>
         <div style={{ flex: 1 }} />
         {m365Cfg && m365Active && (
-          <span title="Annotations sync through the configured Microsoft 365 document library (experimental — issue #315)"
+          <span title="Annotations sync through the configured Microsoft 365 document library (experimental, issue #315)"
             style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: "var(--ink-muted)" }}>
             ⇄ 365 library{" "}
-            <button onClick={doStopM365} title="Stop syncing through the 365 library — local work stays in this browser"
+            <button onClick={doStopM365} title="Stop syncing through the 365 library, local work stays in this browser"
               style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 11, textDecoration: "underline", fontFamily: "var(--f-mono)" }}>
               stop
             </button>
           </span>
         )}
         {folderUiOn && (folderLink ? (
-          <span title={folderCopies.length ? `The folder's sync client forked the annotations file — someone should reconcile these by hand:\n${folderCopies.join("\n")}` : `Annotations sync through “${folderLink.name}” — the folder's own sync client replicates them`}
+          <span title={folderCopies.length ? `The folder's sync client forked the annotations file, someone should reconcile these by hand:\n${folderCopies.join("\n")}` : `Annotations sync through “${folderLink.name}”, the folder's own sync client replicates them`}
             style={{ fontFamily: "var(--f-mono)", fontSize: 11, color: folderCopies.length ? "var(--c-warning)" : "var(--ink-muted)" }}>
             ⇄ “{folderLink.name}”{folderCopies.length ? ` · ${folderCopies.length} conflict cop${folderCopies.length === 1 ? "y" : "ies"}` : ""}
             {" "}
-            <button onClick={doForgetFolder} title="Stop syncing through this folder — local work stays in this browser"
+            <button onClick={doForgetFolder} title="Stop syncing through this folder, local work stays in this browser"
               style={{ border: "none", background: "transparent", padding: 0, color: "var(--c-danger)", cursor: "pointer", fontSize: 11, textDecoration: "underline", fontFamily: "var(--f-mono)" }}>
               stop
             </button>
           </span>
         ) : (
           <button onClick={doLinkFolder} disabled={working}
-            title="Pick a folder your team already syncs — the takeoff syncs through it as one JSON file, no credentials involved"
+            title="Pick a folder your team already syncs, the takeoff syncs through it as one JSON file, no credentials involved"
             style={{ ...ctrlBtn, opacity: working ? 0.5 : 1 }}>Sync through a folder…</button>
         ))}
         {onClearWorkspace && (
           <button onClick={() => setConfirmClear(true)} disabled={working}
-            title="Remove every stored PDF and reset the takeoff — a snapshot of a non-empty takeoff is saved first (Revisions restores it)"
+            title="Remove every stored PDF and reset the takeoff, a snapshot of a non-empty takeoff is saved first (Revisions restores it)"
             style={{ ...ctrlBtn, border: "1px solid var(--c-danger)", color: "var(--c-danger)", opacity: working ? 0.5 : 1 }}>Clear workspace…</button>
         )}
         <button onClick={() => setConfirmBulk(true)} disabled={!mSel.length || working}
@@ -1334,10 +1334,10 @@ export default function PlanNavigator({
         <strong style={{ fontFamily: "var(--f-display)", fontSize: 15, color: "var(--ink)" }}>Remove {mSel.length} PDF{mSel.length === 1 ? "" : "s"} from the plan set?</strong>
         <p style={{ fontSize: 12.5, color: "var(--ink-muted)", lineHeight: 1.6, margin: "10px 0 4px" }}>
           {cloudMode
-            ? "They stop loading in this plan set — the files stay in your Drive project and re-add any time from Browse Drive."
+            ? "They stop loading in this plan set, the files stay in your Drive project and re-add any time from Browse Drive."
             : "Their stored bytes are removed from this browser. Local plans aren't stored anywhere else, so you'd re-open the files to get them back."}
           {mSelShapes > 0 && (
-            <><br /><span style={{ color: "var(--c-warning)" }}>{mSelShapes} takeoff{mSelShapes === 1 ? "" : "s"} live on these PDFs — they're preserved in the project and restore if you re-add the same files.</span></>
+            <><br /><span style={{ color: "var(--c-warning)" }}>{mSelShapes} takeoff{mSelShapes === 1 ? "" : "s"} live on these PDFs, they're preserved in the project and restore if you re-add the same files.</span></>
           )}
         </p>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
@@ -1353,8 +1353,8 @@ export default function PlanNavigator({
       <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: 460, maxWidth: "100%", background: "var(--paper-bright)", boxShadow: "var(--shadow-2)", padding: "18px 20px" }}>
         <strong style={{ fontFamily: "var(--f-display)", fontSize: 15, color: "var(--c-danger)" }}>Clear the whole workspace?</strong>
         <p style={{ fontSize: 12.5, color: "var(--ink-muted)", lineHeight: 1.6, margin: "10px 0 4px" }}>
-          Every stored PDF ({sheets.length}) is removed and the takeoff resets to empty — a clean start without touching browser storage by hand.
-          <br /><span style={{ color: "var(--ink)" }}>A non-empty takeoff is snapshotted first</span> — Revisions → restore brings it back (you'd re-open the same PDFs to see its shapes). The PDFs themselves aren't stored anywhere else.
+          Every stored PDF ({sheets.length}) is removed and the takeoff resets to empty, a clean start without touching browser storage by hand.
+          <br /><span style={{ color: "var(--ink)" }}>A non-empty takeoff is snapshotted first</span>, Revisions → restore brings it back (you'd re-open the same PDFs to see its shapes). The PDFs themselves aren't stored anywhere else.
         </p>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
           <button onClick={() => setConfirmClear(false)} style={{ ...ctrlBtn, color: "var(--ink-muted)" }}>Cancel</button>
@@ -1371,10 +1371,10 @@ export default function PlanNavigator({
         <strong style={{ fontFamily: "var(--f-display)", fontSize: 15, color: "var(--ink)" }}>Close “{confirmClose.file}”?</strong>
         <p style={{ fontSize: 12.5, color: "var(--ink-muted)", lineHeight: 1.6, margin: "10px 0 4px" }}>
           {cloudMode
-            ? "Closing removes it from this plan set so it stops loading — the file stays in your Drive project and you can re-add it any time from Browse Drive."
+            ? "Closing removes it from this plan set so it stops loading, the file stays in your Drive project and you can re-add it any time from Browse Drive."
             : "This removes the PDF from the plan set. Local plans aren't stored anywhere else, so you'll have to re-open the file to get it back."}
           {confirmClose.shapeCount > 0 && (
-            <><br /><span style={{ color: "var(--c-warning)" }}>This PDF has {confirmClose.shapeCount} takeoff{confirmClose.shapeCount === 1 ? "" : "s"} — they're preserved and restore if you re-add the same file.</span></>
+            <><br /><span style={{ color: "var(--c-warning)" }}>This PDF has {confirmClose.shapeCount} takeoff{confirmClose.shapeCount === 1 ? "" : "s"}, they're preserved and restore if you re-add the same file.</span></>
           )}
         </p>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16, flexWrap: "wrap" }}>

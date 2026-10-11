@@ -83,7 +83,7 @@ test("copyPictureInputs: copyPlan's picture inputs from the sheet's index entry"
   assert.deepEqual(copyPictureInputs({ ...buildSheetIndex("h.pdf", [{ str: "VCT-1" }], "ocr"), textLayer: true, pictures: [PIC] }), { hybridPictures: [PIC], pictureState: "measured" });
 });
 
-test("copyPlan: pictures not measured yet is today's behavior — the scan chain on a scan, else the text chain, whatever pictures are passed", () => {
+test("copyPlan: pictures not measured yet is today's behavior, the scan chain on a scan, else the text chain, whatever pictures are passed", () => {
   assert.deepEqual(plan({ pictureState: "unknown" }), { kind: "text" });
   assert.deepEqual(plan({ pictureState: "unknown", scan: true }), { kind: "scan" });
   assert.deepEqual(plan({ pictureState: "unknown", scope: "page", rect: null, pageRead: true }), { kind: "text" });
@@ -192,14 +192,14 @@ test("combining: only OCR text in the box is labelled OCR; only the text layer, 
   assert.equal(textOnly.kind === "text" && "imageUnread" in textOnly, false);
 });
 
-test("combining: every OCR word dropped as overlap counts as finding nothing — the text layer copies whole", () => {
+test("combining: every OCR word dropped as overlap counts as finding nothing, the text layer copies whole", () => {
   const tail: OcrWord = { str: "GE", x: 202, y: 360, w: 26, h: 20 };
   const o = sync(readCopyText([hybrid({ lines: [tail], tc: tcOf(EDGE, OVER) }).reader], BOX));
   assert.equal(o.kind === "text" && o.reader, TEXT_LAYER);
   assert.equal(textOf(o), "OVER\nEDGE");
 });
 
-test("combining: no read in memory — the cached read, then a read of box ∩ picture only (never the whole box)", async () => {
+test("combining: no read in memory, the cached read, then a read of box ∩ picture only (never the whole box)", async () => {
   const cached = hybrid({ cached: READ });
   const c = await readCopyText([cached.reader], BOX);
   assert.equal(textOf(c), "VCT-1\nSIDE\tOVER\nBELOW");

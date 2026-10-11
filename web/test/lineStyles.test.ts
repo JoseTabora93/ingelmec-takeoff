@@ -46,7 +46,7 @@ test("pdfDashFor: dashed returns a fresh page-point array (no scale)", () => {
 });
 
 test("boostForDark: a dark color is lightened", () => {
-  const dark = "#1f2937"; // near-black navy — invisible on the dark canvas
+  const dark = "#1f2937"; // near-black navy, invisible on the dark canvas
   const out = boostForDark(dark);
   assert.notEqual(out.toLowerCase(), dark.toLowerCase());
   assert.ok(luminance(out) > luminance(dark), "boosted color must be brighter");
